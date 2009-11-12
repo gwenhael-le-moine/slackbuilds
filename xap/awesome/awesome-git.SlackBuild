@@ -1,0 +1,131 @@
+#!/bin/sh -x
+
+# variables
+TMP=/tmp
+CWD=$(pwd)
+
+APP_NAME=awesome
+PKG=$TMP/package-$APP_NAME
+
+VERSION=git$(date +%F | sed 's|-||g')
+SUFFIX=
+#BRANCH=awesome-next
+if [ ! "x$BRANCH" == "x" ] ; then
+    APP_NAME=$BRANCH
+fi
+
+REPOSITORIES_DIR=/home/cycojesus/projets/packages/repositories
+
+DOCS="AUTHORS LICENSE README STYLE TODO UPGRADE PATCHES STYLE"
+
+ARCH=x86_64
+BUILD=$(expr $(ls $TMP/$APP_NAME-$VERSION.txz | wc -l) + 1)cyco
+
+PREFIX=/usr
+
+SLCKFLAGS=""
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+SRC_PATH=$REPOSITORIES_DIR/awesome
+if [ -e $CWD/$APP_NAME-$VERSION.tar.?z* ] ; then
+        tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
+        SRC_PATH=.
+        cd $TMP/$APP_NAME-$VERSION
+else
+        if [ ! -e $REPOSITORIES_DIR/awesome ] ; then
+                mkdir -p $(dirname $REPOSITORIES_DIR/awesome)
+                cd $(dirname $REPOSITORIES_DIR/awesome)
+                git clone git://git.naquadah.org/awesome.git
+        fi
+        cd $REPOSITORIES_DIR/awesome
+        git pull #origin $BRANCH
+        rm -fr $TMP/$APP_NAME-$VERSION
+        mkdir -p $TMP/$APP_NAME-$VERSION
+        cd $TMP/$APP_NAME-$VERSION
+fi
+
+# configuration
+cmake \
+        -DPREFIX=$PREFIX \
+        -DWITH_DBUS=1 \
+        -DSYSCONFDIR=/etc \
+        -DAWESOME_DOC_PATH=$PREFIX/doc/$APP_NAME-$VERSION \
+        -DAWESOME_XSESSION_PATH=/usr/share/apps/kdm/sessions \
+        -DAWESOME_MAN_PATH=$PREFIX/man \
+        $SRC_PATH
+
+
+# compilation
+make -j3
+
+# installation
+make install DESTDIR=$PKG
+
+# wicked
+#(
+#    if [ ! -e $REPOSITORIES_DIR/wicked ] ; then
+#        mkdir -p $REPOSITORIES_DIR
+#        cd $(dirname $REPOSITORIES_DIR)
+#        git clone git://git.glacicle.com/awesome/wicked.git
+#    fi
+#    cd $REPOSITORIES_DIR/wicked/
+#    git pull
+#
+#    mkdir -p $PKG/usr/man/man7
+#    cp $REPOSITORIES_DIR/wicked/wicked.lua $PKG/usr/share/awesome/lib/
+#    cp $REPOSITORIES_DIR/wicked/wicked.7.gz $PKG/usr/man/man7
+#)
+
+# org-awesome
+#(
+#    if [ ! -e $REPOSITORIES_DIR/org-awesome ] ; then
+#        mkdir -p $REPOSITORIES_DIR
+#        cd $(dirname $REPOSITORIES_DIR)
+#        git clone git://fensalir.fr/dleone/org-awesome.git
+#    fi
+#    cd $REPOSITORIES_DIR/org-awesome/
+#    git pull
+#
+#    cp $REPOSITORIES_DIR/org-awesome/org-awesome.lua $PKG/usr/share/awesome/lib/
+#)
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find . -name "*.in" -delete
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME (Tiling Window Manager)
+$APP_NAME:
+$APP_NAME: awesome is an extremely fast, small, and dynamic window manager for X.
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
+$APP_NAME:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

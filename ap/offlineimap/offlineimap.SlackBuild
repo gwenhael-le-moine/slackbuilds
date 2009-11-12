@@ -1,0 +1,176 @@
+#!/bin/bash
+#
+#  offlineimap.SlackBuild is free software; you can redistribute
+#  it and/or modify it under the terms of the GNU General Public License as
+#  published by the Free Software Foundation; either version 2 of the License,
+#  or any later version.
+#
+#  offlineimap.SlackBuild is distributed in the hope that it will
+#  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+#  Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License along
+#  with this program; if not, write to the Free Software Foundation, Inc.,
+#  59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+#
+# slackbuild for offlineimap, by Silvio Rhatto
+# requires:  
+# tested: offlineimap-6.2.0
+#
+
+# Look for slackbuildrc
+if [ -f ~/.slackbuildrc ]; then
+  source ~/.slackbuildrc
+elif [ -f /etc/slackbuildrc ]; then
+  source /etc/slackbuildrc
+fi
+
+# Set variables
+CWD="$(pwd)"
+SRC_NAME="offlineimap"
+PKG_NAME="offlineimap"
+ARCH=${ARCH:=x86_64}
+SRC_VERSION=${VERSION:=6.2.0}
+PKG_VERSION="$(echo "$SRC_VERSION" | tr '[[:blank:]-]' '_')"
+BUILD=${BUILD:=1cyco}
+SRC_DIR=${SRC_DIR:=$CWD}/$PKG_NAME
+TMP=${TMP:=/tmp}
+PKG=${PKG:=$TMP/package-$PKG_NAME}
+REPOS=${REPOS:=$TMP}
+PREFIX=${PREFIX:=/usr}
+PKG_WORK="$TMP/$SRC_NAME"
+CONF_OPTIONS=${CONF_OPTIONS:=""}
+NUMJOBS=${NUMJOBS:=""}
+
+# Set system libraries' path and optmization flags based on $ARCH
+LIBDIR="$PREFIX/lib"
+
+if [ "$ARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mcpu=i686"
+elif [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mcpu=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686"
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIR="$PREFIX/lib64"
+  LDFLAGS="-L/lib64 -L/usr/lib64"
+fi
+
+# Set error codes (used by createpkg)
+ERROR_WGET=31;      ERROR_MAKE=32;      ERROR_INSTALL=33
+ERROR_MD5=34;       ERROR_CONF=35;      ERROR_HELP=36
+ERROR_TAR=37;       ERROR_MKPKG=38;     ERROR_GPG=39
+ERROR_PATCH=40;     ERROR_VCS=41;       ERROR_MKDIR=42
+
+# Clean up any leftovers of previous builds
+rm -rf "$PKG_WORK" 2> /dev/null
+rm -rf "$PKG" 2> /dev/null
+
+# Create directories if necessary
+mkdir -p "$SRC_DIR" || exit $ERROR_MKDIR
+mkdir -p "$PKG" || exit $ERROR_MKDIR
+mkdir -p "$REPOS" || exit $ERROR_MKDIR
+mkdir -p "$PKG_WORK" || exit $ERROR_MKDIR
+
+# Dowload source if necessary
+SRC="$SRC_NAME"_"$SRC_VERSION.tar.gz"
+URL="http://ftp.de.debian.org/debian/pool/main/o/offlineimap/$SRC"
+
+if [ ! -s "$SRC_DIR/$SRC" ] || ! gunzip -t "$SRC_DIR/$SRC" 2> /dev/null; then
+  wget "$URL" -O "$SRC_DIR/$SRC" || exit $ERROR_WGET
+fi
+
+# Untar
+cd "$PKG_WORK"
+tar --no-same-owner --no-same-permissions -xvf "$SRC_DIR/$SRC" || exit $ERROR_TAR
+PKG_SRC="$PWD/`ls -l | awk '/^d/ { print $NF }'`"
+cd "$PKG_SRC"
+
+# Patch source
+patches="
+         $PKG_NAME.diff $PKG_NAME-$PKG_VERSION.diff
+         $PKG_NAME-$PKG_VERSION-$ARCH.diff $PKG_NAME-$ARCH.diff"
+for patch in $patches; do
+  if [ -f "$CWD/$patch" ]; then
+    patch -Np1 < "$CWD/$patch" || exit $ERROR_PATCH
+  elif [ -f "$CWD/patches/$patch" ]; then
+    patch -Np1 < "$CWD/patches/$patch" || exit $ERROR_PATCH
+  elif [ -f "$CWD/$patch.gz" ]; then
+    gzip -dc "$CWD/$patch.gz" | patch -Np1 || exit $ERROR_PATCH
+  elif [ -f "$CWD/patches/$patch.gz" ]; then
+    gzip -dc "$CWD/patches/$patch.gz" | patch -Np1 || exit $ERROR_PATCH
+  fi
+done
+
+if echo [[PATCH URLS]] | grep -q -v "PATCH URLS"; then
+  for patch_url in [[PATCH URLS]]; do
+    patch="`basename $patch_url`"
+    if [ ! -s "$SRC_DIR/$patch" ]; then
+      wget "$patch_url" -O "$SRC_DIR/$patch" || exit $ERROR_WGET
+    fi
+    if [ "`basename $patch .gz`" != "$patch" ]; then
+      gzip -dc $SRC_DIR/$patch | patch -Np1 || exit $ERROR_PATCH
+    elif [ "`basename $patch .bz2`" != "$patch" ]; then
+      bzip2 -dc $SRC_DIR/$patch | patch -Np1 || exit $ERROR_PATCH
+    else
+      patch -Np1 < "$SRC_DIR/$patch" || exit $ERROR_PATCH
+    fi
+  done
+fi
+
+# Build and install package
+python setup.py build install --root=$PKG
+
+# Strip binaries
+( cd "$PKG"
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | \
+    xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | \
+    xargs strip --strip-unneeded 2> /dev/null
+)
+
+# Install documentation
+DOCS="COPYING COPYRIGHT FAQ.html README UPGRADING"
+mkdir -p "$PKG/usr/doc/$PKG_NAME-$PKG_VERSION" || exit $ERROR_MKDIR
+for doc in $DOCS; do
+  if [ -f "$doc" ]; then
+    cp -a $doc "$PKG/usr/doc/$PKG_NAME-$PKG_VERSION"
+  fi
+done
+
+# Add package description (slack-desc)
+mkdir -p "$PKG/install" || exit $ERROR_MKDIR
+cat << EODESC > "$PKG/install/slack-desc"
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description. Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in. You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+           |-----handy-ruler--------------------------------------------------|
+offlineimap: offlineimap
+offlineimap:
+offlineimap: OfflineIMAP is a tool to simplify your e-mail reading.
+offlineimap: With OfflineIMAP, you can read the same mailbox from multiple
+offlineimap: computers. You get a current copy of your messages on each computer,
+offlineimap: and changes you make one place will be visible on all other systems.
+offlineimap: For instance, you can delete a message on your home computer, and it
+offlineimap: will appear deleted on your work computer as well. OfflineIMAP is
+offlineimap: also useful if you want to use a mail reader that does not have IMAP
+offlineimap: support, has poor IMAP support, or does not provide disconnected
+offlineimap: operation.
+EODESC
+
+# Build the package
+cd "$PKG"
+makepkg -l y -c n "$REPOS/$PKG_NAME-$PKG_VERSION-$ARCH-$BUILD.tgz" || exit $ERROR_MKPKG
+
+# Delete source and build directories if requested
+if [ "$CLEANUP" == "yes" ]; then
+  rm -rf "$PKG_WORK" "$PKG"
+fi
