@@ -1,0 +1,81 @@
+#!/bin/sh -x
+
+# variables
+TMP=/tmp
+CWD=$(pwd)
+
+APP_NAME=textroom
+PKG=$TMP/package-$APP_NAME
+
+VERSION=0.5.4
+
+EXT=tar.gz
+
+DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
+
+ARCH=x86_64
+BUILD=1cyco
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+tar xf $CWD/$APP_NAME-$VERSION.$EXT
+cd $APP_NAME-$VERSION
+
+# configuration
+sed -i "s|/usr/local/textroom/doc|/usr/doc/$APP_NAME-$VERSION|" textroom.pro
+sed -i "s|usr/local|usr|g" textroom.pro
+qmake
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install INSTALL_ROOT=$PKG
+mv $PKG/root/.local/applications $PKG/usr/share/
+rm -fr $PKG/root
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+# cd $TMP/$APP_NAME-$VERSION
+# cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME (Anti-distraction text editor)
+$APP_NAME:
+$APP_NAME: TextRoom is a pretty basic full-screen text editor, heavily inspired
+$APP_NAME: by similar text editors such as Q10, JDarkRoom and so on.
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
+$APP_NAME:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

@@ -1,0 +1,90 @@
+#!/bin/sh -x
+
+# variables
+TMP=/tmp
+CWD=$(pwd)
+
+APP_NAME=ack
+PKG=$TMP/package-$APP_NAME
+
+VERSION=git$(date +%F|tr -d '-')
+
+EXT=tar.xz
+
+DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
+
+ARCH=$(uname -m)
+BUILD=1cyco
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORIES/$APP_NAME ] ; then
+    mkdir $REPOSITORIES
+    ( cd $REPOSITORIES
+        git git clone git://github.com/petdance/ack.git $APP_NAME
+    )
+else
+    ( cd $REPOSITORIES/$APP_NAME
+        git pull
+    )
+fi
+cp -R $REPOSITORIES/$APP_NAME $TMP/$APP_NAME-$VERSION
+cd $TMP/$APP_NAME-$VERSION
+
+# configuration
+perl Makefile.PL
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install DESTDIR=$PKG
+mv $PKG$PREFIX/share/man $PKG$PREFIX/
+rm -fr $PKG$PREFIX/share/
+
+# correction
+cd $PKG
+chown -R root:root *
+
+mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+cd $TMP/$APP_NAME-$VERSION
+cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME (one line description here)
+$APP_NAME:
+$APP_NAME: More verbose description here, usually from the README file.
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
+$APP_NAME:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
