@@ -49,9 +49,9 @@ chmod +x $PKG$PREFIX/bin/$PRGNAM
 )
 
 # packaging
-( cd $PKG
-    mkdir install
-    cat <<EOF > install/slack-desc
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (JVM targetting Lisp dialect)
 $PRGNAM: 
 $PRGNAM: Clojure is a dynamic programming language that targets the Java Virtual
@@ -65,5 +65,4 @@ $PRGNAM:
 $PRGNAM: http://clojure.org
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
-)
+makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
