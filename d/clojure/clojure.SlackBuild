@@ -31,7 +31,7 @@ mkdir -p $PKG$PREFIX/libexec/$PRGNAM-$VERSION
 mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
 cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
 #!/bin/sh
-java -cp $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar $@
+java -jar $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar $@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM
 ( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
