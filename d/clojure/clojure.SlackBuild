@@ -1,0 +1,69 @@
+#!/bin/sh
+set -x -e
+
+PRGNAM=clojure
+VERSION=1.0.0
+ARCH=java
+BUILD=1
+PACKAGER=cyco
+
+CWD=$(pwd)
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# unpacking
+mkdir -p $PKG$PREFIX/libexec/$PRGNAM-$VERSION
+( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
+    unzip $CWD/${PRGNAM}_$VERSION.zip
+)
+
+# compilation
+( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
+    #rm $PRGNAM-$VERSION.jar
+    ant
+)
+
+# installation
+mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
+cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
+#!/bin/sh
+java -cp $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar $@
+EOF
+chmod +x $PKG$PREFIX/bin/$PRGNAM
+( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
+    mv epl-v10.html readme.txt svninfo.txt $PKG$PREFIX/doc/$PRGNAM-$VERSION
+
+    rm *.xml
+    rm -r classes src
+
+    rm $PRGNAM.jar
+    ln -s $PRGNAM-$VERSION.jar $PRGNAM.jar
+    rm $PRGNAM-sources.jar
+    ln -s $PRGNAM-sources-$VERSION.jar $PRGNAM-sources.jar
+    rm $PRGNAM-slim.jar
+    ln -s $PRGNAM-slim-$VERSION.jar $PRGNAM-slim.jar
+)
+
+# packaging
+( cd $PKG
+    mkdir install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (JVM targetting Lisp dialect)
+$PRGNAM: 
+$PRGNAM: Clojure is a dynamic programming language that targets the Java Virtual
+$PRGNAM: Machine (and the CLR ). It is designed to be a general-purpose language,
+$PRGNAM: combining the approachability and interactive development of a scripting
+$PRGNAM: language with an efficient and robust infrastructure for multithreaded
+$PRGNAM: programming.
+$PRGNAM: 
+$PRGNAM: see $PREFIX/doc/$PRGNAM-$VERSION
+$PRGNAM: 
+$PRGNAM: http://clojure.org
+EOF
+
+    makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
