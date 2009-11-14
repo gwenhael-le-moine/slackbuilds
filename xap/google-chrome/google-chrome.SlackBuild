@@ -1,0 +1,85 @@
+#!/bin/sh
+# Note:
+# You'll need to download the binary from the following url:
+# http://www.google.com/chrome/intl/en/eula_dev.html?dl=unstable_amd64_deb
+
+CWD=$(pwd)
+
+PRGNAM=google-chrome
+VERSION=unstable_current
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PREFIX=/usr
+
+rm -fr $PKG
+mkdir -p $PKG$PREFIX/libexec/$PRGNAM
+( cd $PKG$PREFIX/libexec/$PRGNAM
+    ar x $CWD/$PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb
+    rm control.tar.gz debian-binary
+    tar xf data.tar.lzma
+    rm data.tar.lzma
+    mv usr/share/man $PKG$PREFIX
+    mv opt/google/chrome/* .
+    mv xdg-settings xdg-settings.orig
+    chmod -x xdg-settings.orig
+    rm -fr etc usr opt
+
+    ln -s /usr/lib64/seamonkey/libssl3.so     ./libssl3.so.1d
+    ln -s /usr/lib64/seamonkey/libnspr4.so    ./libnspr4.so.0d
+    ln -s /usr/lib64/seamonkey/libplds4.so    ./libplds4.so.0d
+    ln -s /usr/lib64/seamonkey/libsmime3.so   ./libsmime3.so.1d
+    ln -s /usr/lib64/seamonkey/libnssutil3.so ./libnssutil3.so.1d
+    ln -s /usr/lib64/seamonkey/libplc4.so     ./libplc4.so.0d
+    ln -s /usr/lib64/seamonkey/libnss3.so     ./libnss3.so.1d
+
+    sed -i "s|/opt/google/chrome/|$PREFIX/libexec/$PRGNAM/|g" google-chrome.desktop
+    mkdir -p $PKG$PREFIX/share/applications
+    mv google-chrome.desktop $PKG$PREFIX/share/applications
+)
+
+mkdir $PKG$PREFIX/bin
+cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
+#!/bin/sh -e
+cd $PREFIX/libexec/$PRGNAM
+./$PRGNAM $@
+EOF
+chmod +x $PKG$PREFIX/bin/$PRGNAM
+
+( cd $PKG
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 700 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+
+    find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+        | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+( cd $PKG/usr/man
+  find . -type f -exec gzip -9 {} \;
+  for i in $(find . -type l) ; do ln -s $(readlink $i).gz $i.gz ; rm $i ; done
+)
+( cd $PKG
+    mkdir install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Google's Web browser)
+$PRGNAM:
+$PRGNAM: Chromium is an open-source browser project that aims to build a safer,
+$PRGNAM: faster, and more stable way for all Internet users to experience the
+$PRGNAM: web.
+$PRGNAM:
+$PRGNAM:          * * * * * * * * * * * * * * * * * * * * * * * * *
+$PRGNAM:         * Please Note: This package WILL NOT auto-update! *
+$PRGNAM:          * * * * * * * * * * * * * * * * * * * * * * * * *
+$PRGNAM:
+$PRGNAM: http://dev.chromium.org/getting-involved/dev-channel#TOC-Linux
+EOF
+
+    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+)
