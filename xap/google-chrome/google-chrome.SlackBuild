@@ -2,6 +2,9 @@
 # Note:
 # You'll need to download the binary from the following url:
 # http://www.google.com/chrome/intl/en/eula_dev.html?dl=unstable_amd64_deb
+# or
+# wget -c http://dl.google.com/linux/direct/google-chrome-unstable_current_amd64.deb
+# but really you need to accept the EULA in the forst link ;)
 
 CWD=$(pwd)
 
@@ -16,6 +19,10 @@ PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 PREFIX=/usr
 
 rm -fr $PKG
+
+# mv $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb.orig
+# wget -c http://dl.google.com/linux/direct/$PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb
+
 mkdir -p $PKG$PREFIX/libexec/$PRGNAM
 ( cd $PKG$PREFIX/libexec/$PRGNAM
     ar x $CWD/$PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb
