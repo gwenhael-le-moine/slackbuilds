@@ -1,0 +1,55 @@
+#!/bin/sh
+set -x -e
+
+PRGNAM=factor
+VERSION=2009-11-08-21-51
+ARCH=$(uname -m)
+BUILD=1
+PACKAGER=cyco
+
+CWD=$(pwd)
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# unpacking
+mkdir -p $PKG$PREFIX/libexec/
+( cd $PKG$PREFIX/libexec/
+    tar xf $CWD/$PRGNAM-linux-$( [ "$ARCH" = "x86_64" ] && echo "x86-64" || echo "x86-32")-$VERSION.tar.gz
+    mv $PRGNAM $PRGNAM-$VERSION
+)
+
+# installation
+mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
+cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
+#!/bin/sh
+cd $PREFIX/libexec/$PRGNAM-$VERSION
+./$PRGNAM $@
+EOF
+chmod +x $PKG$PREFIX/bin/$PRGNAM
+( cd $PKG$PREFIX/doc/$PRGNAM-$VERSION
+    ln -s ../libexec/$PRGNAM-$VERSION/readme.html
+    ln -s ../libexec/$PRGNAM-$VERSION/license.txt
+)
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (A practical stack language)
+$PRGNAM: 
+$PRGNAM: Factor is expressive, fast, supports interactive development and has a
+$PRGNAM: full-featured library. Factor runs on all common platforms and Factor
+$PRGNAM: applications are portable between them. Factor can deploy stand-alone
+$PRGNAM: applications on all platforms.
+$PRGNAM: 
+$PRGNAM: see $PREFIX/doc/$PRGNAM-$VERSION
+$PRGNAM: 
+$PRGNAM: http://factorcode.org/
+$PRGNAM: 
+EOF
+
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz

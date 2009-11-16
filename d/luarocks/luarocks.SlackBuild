@@ -13,7 +13,7 @@ EXT=tar.gz
 
 DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 
-ARCH=i686
+ARCH=$(uname -m)
 BUILD=2cyco
 
 PREFIX=/usr

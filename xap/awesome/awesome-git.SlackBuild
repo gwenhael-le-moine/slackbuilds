@@ -66,34 +66,9 @@ make -j3
 
 # installation
 make install DESTDIR=$PKG
-
-# wicked
-#(
-#    if [ ! -e $REPOSITORIES_DIR/wicked ] ; then
-#        mkdir -p $REPOSITORIES_DIR
-#        cd $(dirname $REPOSITORIES_DIR)
-#        git clone git://git.glacicle.com/awesome/wicked.git
-#    fi
-#    cd $REPOSITORIES_DIR/wicked/
-#    git pull
-#
-#    mkdir -p $PKG/usr/man/man7
-#    cp $REPOSITORIES_DIR/wicked/wicked.lua $PKG/usr/share/awesome/lib/
-#    cp $REPOSITORIES_DIR/wicked/wicked.7.gz $PKG/usr/man/man7
-#)
-
-# org-awesome
-#(
-#    if [ ! -e $REPOSITORIES_DIR/org-awesome ] ; then
-#        mkdir -p $REPOSITORIES_DIR
-#        cd $(dirname $REPOSITORIES_DIR)
-#        git clone git://fensalir.fr/dleone/org-awesome.git
-#    fi
-#    cd $REPOSITORIES_DIR/org-awesome/
-#    git pull
-#
-#    cp $REPOSITORIES_DIR/org-awesome/org-awesome.lua $PKG/usr/share/awesome/lib/
-#)
+mkdir -p $PKG/etc/X11/xinit/
+cp $CWD/xinitrc.awesome $PKG/etc/X11/xinit/
+chmod +x $PKG/etc/X11/xinit/xinitrc.awesome
 
 # correction
 cd $PKG
