@@ -28,8 +28,7 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
             hg clone http://hg.scrapping.cc/subtle $REPOSITORIES/$PRGNAM
         else
             ( cd $REPOSITORIES/$PRGNAM
-                hg pull
-                hg update
+                hg pull -u
             )
         fi
         cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION

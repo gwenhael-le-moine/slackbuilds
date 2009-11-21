@@ -20,8 +20,8 @@ PREFIX=/usr
 
 rm -fr $PKG
 
-#[ -e $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb ] && mv $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb.orig
-#wget -c http://dl.google.com/linux/direct/$PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb
+[ -e $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb ] && mv $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb $PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb.orig
+wget -c http://dl.google.com/linux/direct/$PRGNAM-${VERSION}_$( [ $ARCH = "x86_64" ] && echo amd64 || echo i386).deb
 
 mkdir -p $PKG$PREFIX/libexec/$PRGNAM
 ( cd $PKG$PREFIX/libexec/$PRGNAM
