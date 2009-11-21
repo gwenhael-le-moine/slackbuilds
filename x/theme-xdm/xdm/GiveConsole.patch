@@ -1,0 +1,9 @@
+--- /etc/X11/xdm/./GiveConsole	2009-06-03 12:40:26.000000000 +0700
++++ ./GiveConsole	2005-09-27 15:25:32.000000000 +0700
+@@ -7,4 +7,6 @@
+ # the console output.  This way a random user can invoke xterm -C without
+ # causing serious grief.
+ #
++kill -9 $(cat /var/run/Xsession.pid)
++
+ chown $USER /dev/console

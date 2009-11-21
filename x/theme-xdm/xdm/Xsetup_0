@@ -1,0 +1,57 @@
+#!/bin/sh
+# $Xorg: Xsetup_0,v 1.3 2000/08/17 19:54:17 cpqbld Exp $
+#xconsole -geometry 480x130-0-0 -daemon -notify -verbose -fn fixed -exitOnFail
+
+# Fix backspace problem in login box:
+sysmodmap=/etc/X11/xinit/.Xmodmap
+if [ -f $sysmodmap ]; then
+	/usr/bin/xmodmap $sysmodmap
+fi
+
+PATH="/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin";
+
+wish8.4 -name Powerbox <<EOF &
+wm geometry . -0-0
+button .halt                 \
+-bg black                    \
+-activebackground black      \
+-activeforeground #e0e0e0    \
+-fg #4f4f5f                  \
+-highlightbackground black   \
+-font aqui\ 10               \
+-text halt                   \
+-borderwidth 0               \
+-cursor left_ptr             \
+-command { exec halt 2>/dev/console >/dev/console }
+button .reboot               \
+-bg black                    \
+-activebackground black      \
+-activeforeground #e0e0e0    \
+-fg #4f4f5f                  \
+-highlightbackground black   \
+-font aqui\ 10               \
+-text reboot                 \
+-borderwidth 0               \
+-cursor left_ptr             \
+-command { exec reboot 2>/dev/console >/dev/console }
+button .console              \
+-bg black                    \
+-activebackground black      \
+-activeforeground #e0e0e0    \
+-fg #4f4f5f                  \
+-highlightbackground black   \
+-font aqui\ 10               \
+-text console                \
+-borderwidth 0               \
+-cursor left_ptr             \
+-command { exec killall xdm 2>/dev/console >/dev/console }
+pack .console .halt .reboot -side left -fill both
+EOF
+
+umask 022
+# saving PID of Powerbox process
+echo $! > /var/run/Xsession.pid
+
+#xv -root -quit -viewonly /usr/X11R6/lib/X11/xdm/pixmaps/FreeBSD.jpg
+fbsetbg -f /usr/X11R6/lib/X11/xdm/pixmaps/headphones.jpg
+#xsnow &

@@ -1,0 +1,41 @@
+! $Xorg: Xresources,v 1.3 2000/08/17 19:54:17 cpqbld Exp $
+!
+!
+!
+!
+! $XFree86: xc/programs/xdm/config/Xres.cpp,v 1.6 2003/01/04 03:11:31 dawes Exp $
+!
+
+xlogin.Login.translations:	#override\
+				Ctrl<Key>R: abort-display()\n\
+				<Key>Delete: delete-character()\n\
+				<Key>F1: set-session-argument(failsafe) finish-field()\n\
+				Ctrl<Key>Return: set-session-argument(failsafe) finish-field()\n\
+				<Key>Return: set-session-argument() finish-field()
+				<Key>Left: move-backward-character()\n\
+				<Key>Right: move-forward-character()\n\
+				<Key>Home: move-to-begining()\n\
+				<Key>End: move-to-end()\n\
+				<Key>KP_Enter: set-session-argument() finish-field()
+
+xlogin.Login.x:                 200
+xlogin.Login.y:                 200
+xlogin.Login.width:		300
+xlogin.Login.foreground:	#c0c0c0
+xlogin.Login.background:	#000048
+xlogin.Login.font:		*aqui*
+xlogin.Login.greeting:		CLIENTHOST
+xlogin.Login.unsecureGreeting:	CLIENTHOST
+xlogin.Login.greetFont:		*aqui*
+xlogin.Login.greetColor:	#c0c0c0
+xlogin.Login.namePrompt:	Login : 
+xlogin.Login.passwdPrompt:	Mot de passe :  
+xlogin.Login.promptFont:	*aqui*
+xlogin.Login.promptColor:	#c0c0c0
+xlogin.Login.fail:		Permission Refus�e
+xlogin.Login.failFont:		*aqui*
+xlogin.Login.failColor:		#c0c0c0
+xlogin.Login.failTimeout:	1
+xlogin.Login.allowRootLogin:	false
+xlogin.Login.allowNullPasswd:	false
+Xcursor.theme:			whiteglass
