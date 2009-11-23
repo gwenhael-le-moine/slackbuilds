@@ -1,0 +1,118 @@
+#!/bin/sh -x
+
+# Copyright 2008, 2009  Patrick J. Volkerding, Sebeka, MN, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+APP_NAME=node.js
+VERSION=git$(date +%F | tr -d '-')
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1cyco}
+
+NUMJOBS=${NUMJOBS:-" -j2 "}
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp}
+PKG=$TMP/package-$APP_NAME
+rm -rf $PKG
+mkdir -p $TMP $PKG
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+fi
+
+cd $TMP
+rm -rf $APP_NAME-$VERSION
+cd $TMP
+if [ -e $CWD/$APP_NAME-$VERSION.$EXT ] ; then
+    tar xf $CWD/$APP_NAME-$VERSION.$EXT
+else
+    if [ ! -e $REPOSITORIES/$APP_NAME ] ; then
+        ( cd $REPOSITORIES
+            git clone git://github.com/ry/node.git $APP_NAME
+        ) ;
+    fi
+    ( cd $REPOSITORIES/$APP_NAME
+        git pull
+    )
+    cp -R $REPOSITORIES/$APP_NAME $TMP/$APP_NAME-$VERSION
+fi
+
+cd $APP_NAME-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \;
+
+CFLAGS="$SLKCFLAGS" \
+./configure # \
+  # --prefix=/usr \
+  # --libdir=/usr/lib${LIBDIRSUFFIX} \
+  # --sysconfdir=/etc \
+  # --localstatedir=/var/lib \
+  # --mandir=/usr/man \
+  # --infodir=/usr/info \
+  # --docdir=/usr/doc/$APP_NAME-$VERSION \
+  # --build=$ARCH-slackware-linux
+
+make $NUMJOBS PREFIX=$PREFIX || make || exit 1
+make install DESTDIR=$PKG PREFIX=$PREFIX || exit 1
+
+( cd $PKG/usr/man
+  find . -type f -exec gzip -9 {} \;
+  for i in $(find . -type l) ; do ln -s $(readlink $i).gz $i.gz ; rm $i ; done
+)
+
+mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+cp -a \
+  AUTHORS COPYING HACKING INSTALL LICENSE NEWS README* docs/Wilber* \
+  $PKG/usr/doc/$APP_NAME-$VERSION
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD.txz
+
