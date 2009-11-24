@@ -29,6 +29,8 @@ NUMJOBS=${NUMJOBS:-" -j2 "}
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
+PREFIX=/usr
+
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$APP_NAME
@@ -71,24 +73,13 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-CFLAGS="$SLKCFLAGS" \
-./configure # \
-  # --prefix=/usr \
-  # --libdir=/usr/lib${LIBDIRSUFFIX} \
-  # --sysconfdir=/etc \
-  # --localstatedir=/var/lib \
-  # --mandir=/usr/man \
-  # --infodir=/usr/info \
-  # --docdir=/usr/doc/$APP_NAME-$VERSION \
-  # --build=$ARCH-slackware-linux
+echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscript
+
+./configure configure \
+   --prefix=$PREFIX
 
 make $NUMJOBS PREFIX=$PREFIX || make || exit 1
 make install DESTDIR=$PKG PREFIX=$PREFIX || exit 1
-
-( cd $PKG/usr/man
-  find . -type f -exec gzip -9 {} \;
-  for i in $(find . -type l) ; do ln -s $(readlink $i).gz $i.gz ; rm $i ; done
-)
 
 mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
 cp -a \
