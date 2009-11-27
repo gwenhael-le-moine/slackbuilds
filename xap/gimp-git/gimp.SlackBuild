@@ -25,11 +25,13 @@ VERSION=git$(date +%F | tr -d '-')
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1cyco}
 
-NUMJOBS=${NUMJOBS:-" -j7 "}
+NUMJOBS=${NUMJOBS:-" -j3 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-gimp
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
 rm -rf $PKG
 mkdir -p $TMP $PKG
 
@@ -46,11 +48,10 @@ fi
 
 cd $TMP
 rm -rf gimp-$VERSION
-#tar xvf $CWD/gimp-$VERSION.tar.bz2 || exit 1
-( cd $CWD/gimp
+( cd $REPOSITORIES/gimp
     git pull
 )
-mkdir gimp-$VERSION
+cp -R $REPOSITORIES/gimp gimp-$VERSION
 cd gimp-$VERSION || exit 1
 chown -R root:root .
 find . \
@@ -60,7 +61,7 @@ find . \
   -exec chmod 644 {} \;
 
 CFLAGS="$SLKCFLAGS" \
-$CWD/gimp/autogen.sh \
+./autogen.sh \
   --prefix=/usr \
   --libdir=/usr/lib${LIBDIRSUFFIX} \
   --sysconfdir=/etc \
@@ -79,10 +80,10 @@ mkdir -p $PKG/usr/share/applications $PKG/usr/share/application-registry
 make install DESTDIR=$PKG || exit 1
 
 ( cd $PKG/usr/bin
-    ln -s gimp-remote-2.7 gimp-remote
-    ln -s gimp-console-2.7 gimp-console
-    ln -s gimp-2.7 gimp
-    ln -s gimptool-2.0 gimptool
+    ln -s gimp-remote-2.? gimp-remote
+    ln -s gimp-console-2.? gimp-console
+    ln -s gimp-2.? gimp
+    ln -s gimptool-2.? gimptool
 )
 
 # Add a manpage symlink for POLA-compliance
