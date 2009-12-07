@@ -1,25 +1,5 @@
 #!/bin/sh -x
 
-# Copyright 2008, 2009  Patrick J. Volkerding, Sebeka, MN, USA
-# All rights reserved.
-#
-# Redistribution and use of this script, with or without modification, is
-# permitted provided that the following conditions are met:
-#
-# 1. Redistributions of this script must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
-#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
-#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 APP_NAME=node.js
 VERSION=git$(date +%F | tr -d '-')
 ARCH=${ARCH:-x86_64}
@@ -78,8 +58,8 @@ echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscrip
 ./configure configure \
    --prefix=$PREFIX
 
-make $NUMJOBS PREFIX=$PREFIX || make || exit 1
-make install DESTDIR=$PKG PREFIX=$PREFIX || exit 1
+make $NUMJOBS PREFIX=$PREFIX
+make install DESTDIR=$PKG PREFIX=$PREFIX
 
 mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
 cp -a \
@@ -91,16 +71,16 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME
+$APP_NAME: $APP_NAME (Evented I/O for V8 javascript.)
+$APP_NAME: 
+$APP_NAME: Node's goal is to provide an easy way to build scalable network programs.
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
+$APP_NAME: http://nodejs.org/
 $APP_NAME: 
 EOF
 
