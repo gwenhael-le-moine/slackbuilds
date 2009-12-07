@@ -42,6 +42,10 @@ rm -fr $PKG
             --infodir=$PREFIX/info
         make
         make DESTDIR=$PKG install
+        mkdir -p $PKG/$PREFIX/doc/
+        ( cd $PKG/$PREFIX/doc
+            ln -s ../share/doc/parrot $PRGNAM-$VERSION
+        )
     )
 )
 
@@ -60,6 +64,15 @@ $PRGNAM:
 $PRGNAM: http://parrot.org/
 $PRGNAM: 
 EOF
+
+    chown -R root:root *
+
+    [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+    ( cd $PKG
+        find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+        find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+    )
 
     makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
 )
