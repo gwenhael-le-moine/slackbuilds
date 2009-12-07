@@ -1,0 +1,65 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+BRANCH=trunk
+VERSION=$BRANCH$(date +%F | tr -d -)
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            svn update
+        )
+    else
+        svn co https://svn.parrot.org/parrot/$BRANCH parrot
+    fi
+)
+
+( cd $TMP
+    rm -fr $PRGNAM-$VERSION && cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
+    ( cd $PRGNAM-$VERSION
+        perl Configure.pl \
+            --prefix=$PREFIX \
+            --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
+            --mandir=$PREFIX/man \
+            --infodir=$PREFIX/info
+        make
+        make DESTDIR=$PKG install
+    )
+)
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Virtual Machine)
+$PRGNAM: 
+$PRGNAM: Parrot is a virtual machine designed to efficiently compile and execute
+$PRGNAM: bytecode for dynamic languages. Parrot currently hosts a variety of
+$PRGNAM: language implementations in various stages of completion, including Tcl,
+$PRGNAM: Javascript, Ruby, Lua, Scheme, PHP, Python, Perl 6, APL, and a .NET
+$PRGNAM: bytecode translator. Parrot is not about parrots, though we are rather
+$PRGNAM: fond of them for obvious reasons.
+$PRGNAM: 
+$PRGNAM: http://parrot.org/
+$PRGNAM: 
+EOF
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
