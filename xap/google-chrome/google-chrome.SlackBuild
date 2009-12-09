@@ -1,10 +1,5 @@
 #!/bin/sh
-# Note:
-# You'll need to download the binary from the following url:
-# http://www.google.com/chrome/intl/en/eula_dev.html?dl=unstable_amd64_deb
-# or
-# wget -c http://dl.google.com/linux/direct/google-chrome-unstable_current_amd64.deb
-# but really you need to accept the EULA in the first link ;)
+# really you need to accept the EULA in the first link ;)
 
 CWD=$(pwd)
 
