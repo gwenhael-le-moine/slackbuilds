@@ -9,7 +9,7 @@
 CWD=$(pwd)
 
 PRGNAM=google-chrome
-VERSION=unstable_current
+VERSION=beta_current
 BUILD=1
 PACKAGER=cyco
 ARCH=$(uname -m)
