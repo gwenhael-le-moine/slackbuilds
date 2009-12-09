@@ -7,7 +7,7 @@ CWD=$(pwd)
 APP_NAME=emacs
 PKG=$TMP/package-$APP_NAME
 
-VERSION=cvs$(date +"%Y%m%d")
+VERSION=${VERSION:-git$(date +"%Y%m%d")}
 
 ARCH=x86_64
 BUILD=1cyco
@@ -24,19 +24,23 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-mkdir $APP_NAME-$VERSION
-if [ ! -e $REPOSITORY ] ; then
+if [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] ; then
+    mkdir $APP_NAME-$VERSION
+    if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        #cvs -z3 -d:pserver:anonymous@cvs.savannah.gnu.org:/sources/emacs co emacs ;
         git clone http://git.sv.gnu.org/r/emacs.git
+    fi
+    
+    cd $REPOSITORY
+    make distclean
+    
+    git pull
+else
+    tar xvf $CWD/$APP_NAME-$VERSION.tar.?z*
+    cd $APP_NAME-$VERSION
+    REPOSITORY=.
 fi
-
-cd $REPOSITORY
-make distclean
-
-git pull
-#cvs update
 
 CFLAGS=$SLCKFLAGS \
     CXXFLAGS=$SLCKFLAGS \
@@ -48,6 +52,7 @@ CFLAGS=$SLCKFLAGS \
     --enable-font-backend \
     --with-x-toolkit=gtk \
     --with-freetype \
+    --with-libotf \
     --with-xft
 make bootstrap
 
