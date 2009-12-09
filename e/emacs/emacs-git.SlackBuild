@@ -70,8 +70,9 @@ cd $PKG
 chown -R root:root *
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+rm $PKG/usr/info/dir
 [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*" -exec gzip -9f {} \;
-gunzip $PKG/usr/info/dir.gz
+#gunzip $PKG/usr/info/dir.gz
 
 # Strip binaries
 ( cd $PKG
@@ -90,9 +91,16 @@ cat <<EOF > $PKG/install/doinst.sh
 # *both* emacs and vi?  I'd think that would bring the universe
 # to an end.  ;-)
 if [ ! -e usr/bin/ctags ]; then
-  cp -a usr/bin/ctags-emacs usr/bin/ctags
-  cp -a usr/man/man1/ctags-emacs.1.gz usr/man/man1/ctags.1.gz
+   cp -a usr/bin/ctags-emacs usr/bin/ctags
+   cp -a usr/man/man1/ctags-emacs.1.gz usr/man/man1/ctags.1.gz
 fi
+
+#rebuild /usr/info/dir
+( cd /usr/info
+   for i in $(ls *.gz | grep -v ".*\-[0-9]*.gz$") ; do
+      install-info $i ./dir ;
+   done
+)
 EOF
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
