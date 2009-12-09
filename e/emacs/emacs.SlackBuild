@@ -60,9 +60,10 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
         git clone http://git.sv.gnu.org/r/emacs.git
     fi
 
-    cd $REPOSITORY
-    git pull
-
+    ( cd $REPOSITORY
+       [ -e Makefile ] && make distclean
+       git pull
+    )
     #mkdir $PRGNAM-$VERSION
     # FIXME: Hackish hack
     cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
@@ -95,6 +96,8 @@ $REPOSITORY/configure \
   --with-x-toolkit=gtk \
   --build=${ARCH}-slackware-linux
 
+make bootstrap
+
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
@@ -108,13 +111,31 @@ EMACS_VERSION=$(echo "$(basename $(ls $PKG/usr/bin/emacs-2*))" | grep -o "[0-9\.
 
 XMODIFIERS= GTK_IM_MODULE= QT_IM_MODULE= /usr/bin/emacs-${EMACS_VERSION}-with-x11 "\$@"
 EOF
-chmod +x $PKG/usr/bin/emacs
+  chmod +x $PKG/usr/bin/emacs
 )
 
 # Also add a version of the binary that is not linked to X11:
 cd $TMP
 rm -rf $PRGNAM-$VERSION
-tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2 || exit 1
+if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
+    # if [ ! -e $REPOSITORY ] ; then
+    #     mkdir -p $(dirname $REPOSITORY)
+    #     cd $(dirname $REPOSITORY)
+    #     git clone http://git.sv.gnu.org/r/emacs.git
+    # fi
+
+    # ( cd $REPOSITORY
+    #    [ -e Makefile ] && make distclean
+    #    git pull
+    # )
+    # #mkdir $PRGNAM-$VERSION
+    # # FIXME: Hackish hack
+    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+else
+    tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
+    REPOSITORY=.
+fi
+
 cd $PRGNAM-$VERSION || exit 1
 chown -R root:root .
 find . \
@@ -125,7 +146,7 @@ find . \
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
-./configure \
+$REPOSITORY/configure \
   --prefix=/usr \
   --sysconfdir=/etc \
   --localstatedir=/var \
