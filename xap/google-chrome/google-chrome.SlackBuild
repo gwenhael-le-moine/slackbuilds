@@ -1,5 +1,5 @@
 #!/bin/sh
-# really you need to accept the EULA in the first link ;)
+# really you need to accept the EULA first ;)
 
 CWD=$(pwd)
 
