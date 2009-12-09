@@ -1,0 +1,223 @@
+#!/bin/sh -x
+
+# Copyright 2008, 2009  Patrick J. Volkerding, Sebeka, MN, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Slackware build script for emacs-22
+
+# Written by Dušan Stefanović (stefanovic.dusan@gmail.com)
+# Modified by Robby Workman <rworkman@slackbuilds.org>
+# Modified by Patrick Volkerding <volkerdi@slackware.com>
+# Modified by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
+
+PRGNAM=emacs
+VERSION=${VERSION:-git$(date +"%Y%m%d")}
+ARCH=${ARCH:-$(uname -m)}
+NUMJOBS=${NUMJOBS:-" -j3 "}
+BUILD=${BUILD:-1cyco}
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+fi
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp}
+PKG=$TMP/package-$PRGNAM
+REPOSITORY=/home/cycojesus/projets/packages/repositories/emacs
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+
+if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
+    if [ ! -e $REPOSITORY ] ; then
+        mkdir -p $(dirname $REPOSITORY)
+        cd $(dirname $REPOSITORY)
+        git clone http://git.sv.gnu.org/r/emacs.git
+    fi
+
+    cd $REPOSITORY
+    git pull
+
+    #mkdir $PRGNAM-$VERSION
+    # FIXME: Hackish hack
+    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+else
+    tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
+    REPOSITORY=.
+fi
+
+cd $PRGNAM-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \;
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+$REPOSITORY/configure \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --program-prefix="" \
+  --program-suffix="" \
+  --mandir=/usr/man \
+  --infodir=/usr/info \
+  --enable-static=no \
+  --enable-shared=yes \
+  --with-x \
+  --with-x-toolkit=gtk \
+  --build=${ARCH}-slackware-linux
+
+make $NUMJOBS || make || exit 1
+make install DESTDIR=$PKG || exit 1
+
+EMACS_VERSION=$(echo "$(basename $(ls $PKG/usr/bin/emacs-2*))" | grep -o "[0-9\.]*")
+( cd $PKG/usr/bin
+  rm emacs
+  mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
+  #ln -sf emacs-${EMACS_VERSION}-with-x11 emacs
+  cat <<EOF > $PKG/usr/bin/emacs
+#!/bin/sh
+
+XMODIFIERS= GTK_IM_MODULE= QT_IM_MODULE= /usr/bin/emacs-${EMACS_VERSION}-with-x11 "\$@"
+EOF
+chmod +x $PKG/usr/bin/emacs
+)
+
+# Also add a version of the binary that is not linked to X11:
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2 || exit 1
+cd $PRGNAM-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \;
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --program-prefix="" \
+  --program-suffix="" \
+  --mandir=/usr/man \
+  --infodir=/usr/info \
+  --enable-static=no \
+  --enable-shared=yes \
+  --with-x=no \
+  --build=${ARCH}-slackware-linux
+
+make $NUMJOBS || make || exit 1
+
+# Install the non-x version:
+cat src/emacs > $PKG/usr/bin/emacs-${EMACS_VERSION}-no-x11
+chown root:root $PKG/usr/bin/emacs-${EMACS_VERSION}-no-x11
+chmod 1755 $PKG/usr/bin/emacs-${EMACS_VERSION}-no-x11
+
+# I don't care for broken permissions.
+chmod 755 $PKG/var/games/emacs
+chown -R games:root $PKG/var/games/emacs
+
+# This avoids a collision with Exuberant Ctags...
+mv $PKG/usr/bin/ctags $PKG/usr/bin/ctags-emacs
+mv $PKG/usr/man/man1/ctags.1 $PKG/usr/man/man1/ctags-emacs.1
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" \
+  | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+( cd $PKG/usr/man
+  find . -type f -exec gzip -9 {} \;
+  for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
+)
+
+( cd $PKG/usr/info
+  rm -f dir
+  gzip -9 *
+)
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a \
+  AUTHORS COPYING* ChangeLog INSTALL README \
+  $PKG/usr/doc/$PRGNAM-$VERSION
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+     |-----handy-ruler------------------------------------------------------|
+emacs: emacs (GNU Emacs)
+emacs:
+emacs: Emacs is the extensible, customizable, self-documenting real-time
+emacs: display editor. If this seems to be a bit of a mouthful, an
+emacs: easier explanation is that Emacs is a text editor and more. At
+emacs: its core is an interpreter for Emacs Lisp, a dialect of the Lisp
+emacs: programming language with extensions to support text editing.
+emacs: This version supports X.
+emacs:
+emacs: http://www.gnu.org/software/emacs/
+emacs:
+EOF
+
+cat <<EOF > $PKG/install/doinst.sh
+# Vim ships a better (IMHO) version of ctags, and we don't want
+# to overwrite it with this one.  If you really want emacs' ctags
+# either copy or link it into place yourself, or remove the vim
+# packages and reinstall emacs.  Besides, does anyone know/use
+# *both* emacs and vi?  I'd think that would bring the universe
+# to an end.  ;-)
+if [ ! -e usr/bin/ctags ]; then
+  cp -a usr/bin/ctags-emacs usr/bin/ctags
+  cp -a usr/man/man1/ctags-emacs.1.gz usr/man/man1/ctags.1.gz
+fi
+EOF
+
+# Make the .desktop file
+mkdir -p $PKG/usr/share/applications
+cat << "EOF" > $PKG/usr/share/applications/$PRGNAM.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=emacs
+Icon=emacs.png
+Terminal=0
+Name=Emacs
+Comment=Text Editor
+Categories=Application;Development;
+EOF
+
+# Make the package freedesktop compliant
+mkdir -p $PKG/usr/share/icons/hicolor/48x48/apps
+cat $PKG/usr/share/$PRGNAM/$EMACS_VERSION/etc/images/icons/emacs_48.png > $PKG/usr/share/icons/hicolor/48x48/apps/emacs.png
+
+cd $PKG
+/sbin/makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+

@@ -31,10 +31,10 @@ if [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] ; then
         cd $(dirname $REPOSITORY)
         git clone http://git.sv.gnu.org/r/emacs.git
     fi
-    
+
     cd $REPOSITORY
     make distclean
-    
+
     git pull
 else
     tar xvf $CWD/$APP_NAME-$VERSION.tar.?z*
