@@ -1,0 +1,82 @@
+#!/bin/sh -x
+
+# variables
+VERSION=git$(date +"%Y%m%d")
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+ARCH=x86_64
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ] ; then
+        mkdir -p $(dirname $REPOSITORY)
+        cd $(dirname $REPOSITORY)
+        git clone git://github.com/Arora/arora.git $PRGNAM
+fi
+
+( cd $REPOSITORY
+    git pull
+)
+
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
+
+    sed -i "s|PREFIX = /usr/local|PREFIX = $PREFIX|g" install.pri
+
+    qmake
+    make
+
+    make PREFIX=$PREFIX DESTDIR=$PKG INSTALL_ROOT=$PKG install
+)
+
+# correction
+( cd $PKG
+    chown -R root:root *
+
+    [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+    [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*" -exec gzip -9f {} \;
+
+)
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (Cross Platform WebKit Browser)
+$PRGNAM:
+$PRGNAM: Arora is a lightweight cross-platform web browser. It's free (as in
+$PRGNAM: free speech and free beer). Arora runs on Linux, embedded Linux,
+$PRGNAM: FreeBSD, Mac OS X, Windows, Haiku, and any other platforms supported
+$PRGNAM: by the Qt toolkit.
+$PRGNAM: Arora uses the QtWebKit port of the fully standards-compliant WebKit
+$PRGNAM: layout engine. It features fast rendering, powerful JavaScript engine
+$PRGNAM: and supports Netscape plugins.
+$PRGNAM:
+$PRGNAM: http://code.google.com/p/arora/
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
