@@ -20,7 +20,7 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Slackware build script for emacs-22
+# Slackware build script for emacs-23
 
 # Written by Dušan Stefanović (stefanovic.dusan@gmail.com)
 # Modified by Robby Workman <rworkman@slackbuilds.org>
@@ -94,6 +94,7 @@ $REPOSITORY/configure \
   --enable-shared=yes \
   --with-x \
   --with-x-toolkit=gtk \
+  --without-gconf \
   --build=${ARCH}-slackware-linux
 
 make bootstrap
@@ -118,18 +119,7 @@ EOF
 cd $TMP
 rm -rf $PRGNAM-$VERSION
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    # if [ ! -e $REPOSITORY ] ; then
-    #     mkdir -p $(dirname $REPOSITORY)
-    #     cd $(dirname $REPOSITORY)
-    #     git clone http://git.sv.gnu.org/r/emacs.git
-    # fi
-
-    # ( cd $REPOSITORY
-    #    [ -e Makefile ] && make distclean
-    #    git pull
-    # )
-    # #mkdir $PRGNAM-$VERSION
-    # # FIXME: Hackish hack
+    # FIXME: Hackish hack
     cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
@@ -157,6 +147,7 @@ $REPOSITORY/configure \
   --enable-static=no \
   --enable-shared=yes \
   --with-x=no \
+  --without-gconf \
   --build=${ARCH}-slackware-linux
 
 make $NUMJOBS || make || exit 1
@@ -234,10 +225,6 @@ Name=Emacs
 Comment=Text Editor
 Categories=Application;Development;
 EOF
-
-# Make the package freedesktop compliant
-mkdir -p $PKG/usr/share/icons/hicolor/48x48/apps
-cat $PKG/usr/share/$PRGNAM/$EMACS_VERSION/etc/images/icons/emacs_48.png > $PKG/usr/share/icons/hicolor/48x48/apps/emacs.png
 
 cd $PKG
 /sbin/makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
