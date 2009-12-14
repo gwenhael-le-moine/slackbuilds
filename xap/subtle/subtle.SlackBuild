@@ -2,63 +2,73 @@
 
 set -x
 
-PRGNAM=subtle
-VERSION=hg$(date +%F | tr -d '-' )
-BUILD=1
-PACKAGER=cyco
-
-ARCH=$(uname -m)
-
 CWD=$(pwd)
 HOME=/home/cycojesus
 TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 REPOSITORIES=$HOME/projets/packages/repositories
 
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+PRGNAM=$(basename $CWD)
+PRGNAM1=$PRGNAM
+PRGNAM2=sur
+VERSION=hg$(date +%F | tr -d '-' )
+BUILD=1
+PACKAGER=cyco
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
-[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+ARCH=$(uname -m)
+
+PREFIX=/usr
+
 [ -e $PKG ] && rm -fr $PKG
 
-( cd $TMP
-    if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ]; then
-        tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
-    else
-        if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-            hg clone http://hg.scrapping.cc/subtle $REPOSITORIES/$PRGNAM
+function get_build_install() {
+    COMPONENT=$1
+
+    [ -e $TMP/$COMPONENT-$VERSION ] && rm -fr $TMP/$COMPONENT-$VERSION
+
+    ( cd $TMP
+        if [ -e $CWD/$COMPONENT-$VERSION.tar.?z* ]; then
+            tar xf $CWD/$COMPONENT-$VERSION.tar.?z*
         else
-            ( cd $REPOSITORIES/$PRGNAM
-                hg pull -u
-            )
+            if [ ! -e $REPOSITORIES/$COMPONENT ]; then
+                hg clone http://hg.scrapping.cc/subtle $REPOSITORIES/$COMPONENT
+            else
+                ( cd $REPOSITORIES/$COMPONENT
+                    hg pull -u
+                )
+            fi
+            cp -R $REPOSITORIES/$COMPONENT $TMP/$COMPONENT-$VERSION
         fi
-        cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
-    fi
-)
+    )
 
-( cd $TMP/$PRGNAM-$VERSION
-    RAKE_OPTIONS=$([ ! -e ./Rakefile ] && echo " -f $REPOSITORIES/$PRGNAM/Rakefile ")
+    ( cd $TMP/$COMPONENT-$VERSION
+        RAKE_OPTIONS=$([ ! -e ./Rakefile ] && echo " -f $REPOSITORIES/$COMPONENT/Rakefile ")
 
-    rake $RAKE_OPTIONS destdir=$PKG prefix=/usr config
+        rake $RAKE_OPTIONS destdir=$PKG prefix=$PREFIX config
 
-    rake $RAKE_OPTIONS destdir=$PKG prefix=/usr build
+        rake $RAKE_OPTIONS destdir=$PKG prefix=$PREFIX build
 
-    rake $RAKE_OPTIONS destdir=$PKG prefix=/usr install
-)
+        rake $RAKE_OPTIONS destdir=$PKG prefix=$PREFIX install
+    )
+}
+
+get_build_install $PRGNAM1
+get_build_install $PRGNAM2
 
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc
-$PRGNAM: $PRGNAM (is a grid-based manual tiling window manager)
+$PRGNAM: $PRGNAM1 (is a grid-based manual tiling window manager)
 $PRGNAM: 
 $PRGNAM: with a strong focus on easy but customizable look and feel. In comparison to
 $PRGNAM: other tiling windows managers, subtle has no automatic tiling of the screen
 $PRGNAM: size in any way, instead windows are arranged according to positions inside
 $PRGNAM: of a grid - these positions are called gravities.
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
 $PRGNAM: http://unexist.scrapping.cc/projects/subtle
-$PRGNAM: 
+$PRGNAM:                                -------
+$PRGNAM: $PRGNAM2 (Subtle User Repository ("rubbygem-like" repository of sublets))
+$PRGNAM: {required gems: curb, sinatra, datamapper}
+$PRGNAM: http://unexist.scrapping.cc/projects/sur
 EOF
 )
 
