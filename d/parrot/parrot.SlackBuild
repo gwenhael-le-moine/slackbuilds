@@ -32,6 +32,7 @@ rm -fr $PKG
     fi
 )
 
+mkdir -p $TMP
 ( cd $TMP
     rm -fr $PRGNAM-$VERSION && cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
     ( cd $PRGNAM-$VERSION
