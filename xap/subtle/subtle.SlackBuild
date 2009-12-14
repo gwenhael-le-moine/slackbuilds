@@ -46,5 +46,22 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 )
 
 ( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (is a grid-based manual tiling window manager)
+$PRGNAM: 
+$PRGNAM: with a strong focus on easy but customizable look and feel. In comparison to
+$PRGNAM: other tiling windows managers, subtle has no automatic tiling of the screen
+$PRGNAM: size in any way, instead windows are arranged according to positions inside
+$PRGNAM: of a grid - these positions are called gravities.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://unexist.scrapping.cc/projects/subtle
+$PRGNAM: 
+EOF
+)
+
+( cd $PKG
     makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
 )
