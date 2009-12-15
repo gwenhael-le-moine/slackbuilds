@@ -31,7 +31,7 @@ function get_build_install() {
             tar xf $CWD/$COMPONENT-$VERSION.tar.?z*
         else
             if [ ! -e $REPOSITORIES/$COMPONENT ]; then
-                hg clone http://hg.scrapping.cc/subtle $REPOSITORIES/$COMPONENT
+                hg clone http://hg.scrapping.cc/$COMPONENT $REPOSITORIES/$COMPONENT
             else
                 ( cd $REPOSITORIES/$COMPONENT
                     hg pull -u
