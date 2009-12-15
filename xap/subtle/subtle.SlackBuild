@@ -50,6 +50,7 @@ function get_build_install() {
 
         rake $RAKE_OPTIONS destdir=$PKG prefix=$PREFIX install
     )
+	[ -e $PKG$PREFIX/share/man ] && cp -a $PKG$PREFIX/share/man $PKG$PREFIX && rm -fr $PKG$PREFIX/share/man
 }
 
 get_build_install $PRGNAM1
