@@ -2,7 +2,7 @@
 set -x -e
 
 PRGNAM=clojure
-VERSION=1.0.0
+VERSION=1.1.0-rc1
 ARCH=java
 BUILD=1
 PACKAGER=cyco
@@ -16,9 +16,9 @@ PREFIX=/usr
 rm -fr $PKG
 
 # unpacking
-mkdir -p $PKG$PREFIX/libexec/$PRGNAM-$VERSION
-( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
-    unzip $CWD/${PRGNAM}_$VERSION.zip
+mkdir -p $PKG$PREFIX/libexec #/$PRGNAM-$VERSION
+( cd $PKG$PREFIX/libexec #/$PRGNAM-$VERSION
+    unzip $CWD/${PRGNAM}-$VERSION.zip
 )
 
 # compilation
@@ -65,4 +65,4 @@ $PRGNAM:
 $PRGNAM: http://clojure.org
 EOF
 
-makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION|tr -d -)-$ARCH-$BUILD$PACKAGER.txz
