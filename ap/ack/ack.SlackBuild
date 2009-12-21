@@ -1,5 +1,7 @@
 #!/bin/sh -x
 
+#NOTE: Needs File::Next (cpan -i File::Next)
+
 # variables
 TMP=/tmp
 CWD=$(pwd)
