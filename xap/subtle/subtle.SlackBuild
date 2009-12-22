@@ -56,11 +56,15 @@ function get_build_install() {
 get_build_install $PRGNAM1
 get_build_install $PRGNAM2
 
+mkdir -p $PKG/etc/X11/xinit/
+cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
+chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
+
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc
-$PRGNAM: $PRGNAM1 (is a grid-based manual tiling window manager)
-$PRGNAM: 
+$PRGNAM: $PRGNAM (is a grid-based manual tiling window manager)
+$PRGNAM:
 $PRGNAM: with a strong focus on easy but customizable look and feel. In comparison to
 $PRGNAM: other tiling windows managers, subtle has no automatic tiling of the screen
 $PRGNAM: size in any way, instead windows are arranged according to positions inside
