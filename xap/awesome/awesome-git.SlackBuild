@@ -14,6 +14,7 @@ PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
 PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+OUTPUT=/tmp
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
@@ -115,4 +116,4 @@ fi
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
