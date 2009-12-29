@@ -1,64 +1,66 @@
 #!/bin/sh -x
 
+#set to 0 if you don't want to pack obvious
+INCLUDE_OBVIOUS=1
+
 # variables
-TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=awesome
-PKG=$TMP/package-$APP_NAME
-
+PRGNAM=awesome
 VERSION=git$(date +%F | sed 's|-||g')
-SUFFIX=
-#BRANCH=awesome-next
-if [ ! "x$BRANCH" == "x" ] ; then
-    APP_NAME=$BRANCH
-fi
+ARCH=$(uname -m)
+BUILD=1
+PACKAGER=cyco
 
-REPOSITORIES_DIR=/home/cycojesus/projets/packages/repositories
+TMP=/tmp/$PACKAGER
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
 DOCS="AUTHORS LICENSE README STYLE TODO UPGRADE PATCHES STYLE"
-
-ARCH=x86_64
-BUILD=$(expr $(ls $TMP/$APP_NAME-$VERSION.txz | wc -l) + 1)cyco
 
 PREFIX=/usr
 
 SLCKFLAGS=""
 
+function git_clone_or_pull() {
+    REPO_URL=$1
+    REPO_NAME=$2
+    if [ ! -e $REPOSITORIES/$REPO_NAME ]; then
+        git clone $REPO_URL $REPOSITORIES/$REPO_NAME
+    else
+        ( cd $REPOSITORIES/$REPO_NAME
+            git pull
+        )
+    fi
+}
+
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-SRC_PATH=$REPOSITORIES_DIR/awesome
-if [ -e $CWD/$APP_NAME-$VERSION.tar.?z* ] ; then
-        tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
-        SRC_PATH=.
-        cd $TMP/$APP_NAME-$VERSION
+SRC_PATH=$REPOSITORIES/$PRGNAM
+if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
+    tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
+    SRC_PATH=.
+    cd $TMP/$PRGNAM-$VERSION
 else
-        if [ ! -e $REPOSITORIES_DIR/awesome ] ; then
-                mkdir -p $(dirname $REPOSITORIES_DIR/awesome)
-                cd $(dirname $REPOSITORIES_DIR/awesome)
-                git clone git://git.naquadah.org/awesome.git
-        fi
-        cd $REPOSITORIES_DIR/awesome
-        git pull #origin $BRANCH
-        rm -fr $TMP/$APP_NAME-$VERSION
-        mkdir -p $TMP/$APP_NAME-$VERSION
-        cd $TMP/$APP_NAME-$VERSION
+    git_clone_or_pull git://git.naquadah.org/$PRGNAM.git $PRGNAM
+    rm -fr $TMP/$PRGNAM-$VERSION
+    mkdir -p $TMP/$PRGNAM-$VERSION
+    cd $TMP/$PRGNAM-$VERSION
 fi
 
 # configuration
 cmake \
-        -DPREFIX=$PREFIX \
-        -DWITH_DBUS=1 \
-        -DSYSCONFDIR=/etc \
-        -DAWESOME_DOC_PATH=$PREFIX/doc/$APP_NAME-$VERSION \
-        -DAWESOME_XSESSION_PATH=/usr/share/apps/kdm/sessions \
-        -DAWESOME_MAN_PATH=$PREFIX/man \
-        $SRC_PATH
+    -DPREFIX=$PREFIX \
+    -DSYSCONFDIR=/etc \
+    -DAWESOME_DOC_PATH=$PREFIX/doc/$PRGNAM-$VERSION \
+    -DAWESOME_MAN_PATH=$PREFIX/man \
+    $SRC_PATH
 
 
 # compilation
@@ -67,14 +69,20 @@ make -j3
 # installation
 make install DESTDIR=$PKG
 mkdir -p $PKG/etc/X11/xinit/
-cp $CWD/xinitrc.awesome $PKG/etc/X11/xinit/
-chmod +x $PKG/etc/X11/xinit/xinitrc.awesome
+cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
+chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
+
+if [ $INCLUDE_OBVIOUS == 1 ] ; then
+    git_clone_or_pull git://git.mercenariesguild.net/obvious.git obvious
+
+    cp -R $REPOSITORIES/obvious $PKG/usr/share/$PRGNAM/lib/
+fi
 
 # correction
 cd $PKG
 chown -R root:root *
 
-find . -name "*.in" -delete
+find $PKG -name \.git\* -exec rm -fr {} \;
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -88,19 +96,23 @@ find . -name "*.in" -delete
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Tiling Window Manager)
-$APP_NAME:
-$APP_NAME: awesome is an extremely fast, small, and dynamic window manager for X.
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
-$APP_NAME:
+$PRGNAM: $PRGNAM (Window Manager "Framework")
+$PRGNAM:
+$PRGNAM: $PRGNAM is an extremely fast, small, and dynamic window manager for X.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://$PRGNAM.naquadah.org
+$PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
+$PRGNAM:
 EOF
+if [ $INCLUDE_OBVIOUS == 1 ] ; then
+echo "$PRGNAM: [ include obvious ( http://$PRGNAM.naquadah.org/wiki/Obvious ) ]" >> $PKG/install/slack-desc
+else
+echo "$PRGNAM:" >> $PKG/install/slack-desc
+fi
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
