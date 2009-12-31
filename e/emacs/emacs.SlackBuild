@@ -28,7 +28,8 @@
 # Modified by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
 PRGNAM=emacs
-VERSION=${VERSION:-git$(date +"%Y%m%d")}
+BRANCH=trunk
+VERSION=${VERSION:-$BRANCH$(date +"%Y%m%d")}
 ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1cyco}
@@ -46,7 +47,7 @@ fi
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PRGNAM
-REPOSITORY=/home/cycojesus/projets/packages/repositories/emacs
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -54,22 +55,23 @@ cd $TMP
 rm -rf $PRGNAM-$VERSION
 
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    if [ ! -e $REPOSITORY ] ; then
-        mkdir -p $(dirname $REPOSITORY)
-        cd $(dirname $REPOSITORY)
-        git clone http://git.sv.gnu.org/r/emacs.git
+    if [ ! -e $REPOSITORIES/$PRGNAM/$BRANCH ] ; then
+        mkdir -p $REPOSITORIES/$PRGNAM
+        ( cd $REPOSITORIES/$PRGNAM
+            bzr branch http://bzr.savannah.gnu.org/r/emacs/$BRANCH
+        )
     fi
 
-    ( cd $REPOSITORY
+    ( cd $REPOSITORIES/$PRGNAM/$BRANCH
        [ -e Makefile ] && make distclean
-       git pull
+       bzr update
     )
-    #mkdir $PRGNAM-$VERSION
     # FIXME: Hackish hack
-    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+    cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION
+    SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
-    REPOSITORY=.
+    SRCDIR=.
 fi
 
 cd $PRGNAM-$VERSION || exit 1
@@ -82,7 +84,7 @@ find . \
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
-$REPOSITORY/configure \
+$SRCDIR/configure \
   --prefix=/usr \
   --sysconfdir=/etc \
   --localstatedir=/var \
@@ -106,7 +108,6 @@ EMACS_VERSION=$(echo "$(basename $(ls $PKG/usr/bin/emacs-2*))" | grep -o "[0-9\.
 ( cd $PKG/usr/bin
   rm emacs
   mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
-  #ln -sf emacs-${EMACS_VERSION}-with-x11 emacs
   cat <<EOF > $PKG/usr/bin/emacs
 #!/bin/sh
 
@@ -120,10 +121,11 @@ cd $TMP
 rm -rf $PRGNAM-$VERSION
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     # FIXME: Hackish hack
-    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+    cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION
+    SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
-    REPOSITORY=.
+    SRCDIR=.
 fi
 
 cd $PRGNAM-$VERSION || exit 1
@@ -136,7 +138,7 @@ find . \
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
-$REPOSITORY/configure \
+$SRCDIR/configure \
   --prefix=/usr \
   --sysconfdir=/etc \
   --localstatedir=/var \
