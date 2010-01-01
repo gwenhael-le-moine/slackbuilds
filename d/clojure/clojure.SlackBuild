@@ -2,7 +2,7 @@
 set -x -e
 
 PRGNAM=clojure
-VERSION=1.1.0-rc3
+VERSION=1.1.0
 ARCH=java
 BUILD=1
 PACKAGER=cyco
@@ -14,6 +14,13 @@ PREFIX=/usr
 
 # cleaning
 rm -fr $PKG
+
+# do we have the sources?
+if [ ! -e $CWD/$PRGNAM-VERSION.zip ] ; then
+   ( cd $CWD
+      wget -c http://$PRGNAM.googlecode.com/files/$PRGNAM-$VERSION.zip
+   )
+fi
 
 # unpacking
 mkdir -p $PKG$PREFIX/libexec #/$PRGNAM-$VERSION
