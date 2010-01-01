@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=1.9.1-p243
+VERSION=1.9.1-p376
 BUILD=${BUILD:-1cyco}
 
 ARCH=emacs
