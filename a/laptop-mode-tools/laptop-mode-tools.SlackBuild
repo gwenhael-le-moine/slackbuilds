@@ -86,6 +86,11 @@ config() {
 }
 
 config etc/rc.d/rc.laptop-mode.new
+
+grep -q "rc\.laptop-mode" /etc/rc.d/rc.local || cat <<EORCLOCAL >> /etc/rc.d/rc.local
+
+[ -x /etc/rc.d/rc.laptop-mode ] && /etc/rc.d/rc.laptop-mode start
+EORCLOCAL
 EOF
 
     cat <<EOF > install/slack-desc
