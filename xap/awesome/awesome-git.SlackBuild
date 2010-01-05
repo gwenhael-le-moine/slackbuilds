@@ -7,9 +7,9 @@ INCLUDE_OBVIOUS=1
 CWD=$(pwd)
 
 PRGNAM=awesome
-VERSION=git$(date +%F | sed 's|-||g')
+VERSION=git
 ARCH=$(uname -m)
-BUILD=1
+BUILD=$(date +%F | sed 's|-||g')
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
