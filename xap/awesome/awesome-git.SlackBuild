@@ -9,7 +9,7 @@ CWD=$(pwd)
 PRGNAM=awesome
 VERSION=git
 ARCH=$(uname -m)
-BUILD=$(date +%F | sed 's|-||g')
+BUILD=$(date +%Y%m%d%H%M)
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
