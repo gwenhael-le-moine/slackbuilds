@@ -58,7 +58,7 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     if [ ! -e $REPOSITORIES/$PRGNAM/$BRANCH ] ; then
         mkdir -p $REPOSITORIES/$PRGNAM
         ( cd $REPOSITORIES/$PRGNAM
-            bzr branch http://bzr.savannah.gnu.org/r/emacs/$BRANCH
+            bzr checkout --lightweight http://bzr.savannah.gnu.org/r/emacs/$BRANCH $BRANCH
         )
     fi
 
