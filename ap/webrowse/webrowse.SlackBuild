@@ -46,9 +46,6 @@ PREFIX=/usr
 # Installation
 mkdir -p $PKG$PREFIX/{bin,man/man1}
 ( cd $TMP/$PRGNAM-$VERSION
-    # cp $PRGNAM $PKG$PREFIX/bin
-    # cp $PRGNAM.1 $PKG$PREFIX/man/man1
-    # cp raw.data/* $PKG$PREFIX/lib$LIBSUFFIX/$PRGNAM
     make install install.man BINDIR=$PKG$PREFIX/bin MANDIR=$PKG$PREFIX/man/man1
 )
 
