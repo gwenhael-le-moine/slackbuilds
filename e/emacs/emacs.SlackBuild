@@ -20,7 +20,7 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Slackware build script for emacs-23
+# Slackware build script for emacs-trunk
 
 # Written by Dušan Stefanović (stefanovic.dusan@gmail.com)
 # Modified by Robby Workman <rworkman@slackbuilds.org>
@@ -29,10 +29,10 @@
 
 PRGNAM=emacs
 BRANCH=trunk
-VERSION=${VERSION:-$BRANCH}
+VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H:%M")}
 ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
-BUILD=${BUILD:-$(date +"%Y%m%d")}
+BUILD=${BUILD:-1}
 PACKAGER=cyco
 
 if [ "$ARCH" = "i486" ]; then
@@ -68,7 +68,8 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
        bzr update
     )
     # FIXME: Hackish hack
-    cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION
+    # cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION
+    mkdir -p $TMP/$PRGNAM-$VERSION
     SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
