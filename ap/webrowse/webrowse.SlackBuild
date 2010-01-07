@@ -7,7 +7,7 @@ VERSION=1.6.3
 BUILD=1
 PACKAGER=cyco
 ARCH=$(uname -m)
-LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+LIBSUFFIX=$(echo $ARCH | grep -o "64")
 
 CWD=$(pwd)
 TMP=/tmp
