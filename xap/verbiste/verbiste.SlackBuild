@@ -9,7 +9,7 @@ PKG=$PWD/tgz
 TMP=$PWD/tmp
 
 PRGNAM=verbiste
-VERSION=0.1.27
+VERSION=0.1.28
 ARCH=$(uname -m)
 BUILD=1
 PACKAGER=cyco

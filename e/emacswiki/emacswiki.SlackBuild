@@ -1,0 +1,61 @@
+#!/bin/sh
+
+PRGNAM=emacswiki
+VERSION=svn_$(date +"%Y.%m.%d_%H:%M")
+BUILD=${BUILD:-1}
+PACKAGER=cyco
+ARCH=emacs
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp}
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+PREFIX=/usr
+
+rm -rf $PKG
+
+( cd $REPOSITORIES
+    if [ ! -e $PRGNAM ] ; then
+        svn checkout "svn://svn.sv.gnu.org/emacswiki/emacswikipages" $PRGNAM
+    else
+        ( cd $PRGNAM
+            svn update
+        )
+    fi
+)
+
+mkdir -p $PKG/$PREFIX/doc/
+( cd $PKG/$PREFIX/doc/
+    cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
+    rm -fr $PRGNAM-$VERSION/.svn
+    ln -s $PRGNAM-$VERSION $PRGNAM
+)
+
+( cd $PKG
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+            
+            mkdir -p $PKG/install
+            cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (a local mirror of EmacsWiki)
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: http://emacswiki.org/
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+EOF
+)
+
+cd $PKG
+/sbin/makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+
