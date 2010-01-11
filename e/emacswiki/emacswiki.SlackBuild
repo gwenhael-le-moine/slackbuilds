@@ -39,9 +39,9 @@ mkdir -p $PKG/$PREFIX/doc/
         -exec chmod 755 {} \; -o \
         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
         -exec chmod 644 {} \;
-            
-            mkdir -p $PKG/install
-            cat <<EOF > $PKG/install/slack-desc
+
+    mkdir -p $PKG/install
+    cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (a local mirror of EmacsWiki)
 $PRGNAM:
 $PRGNAM: 
@@ -57,5 +57,5 @@ EOF
 )
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+/sbin/makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
 
