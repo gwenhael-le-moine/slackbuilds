@@ -27,9 +27,40 @@ rm -rf $PKG
 
 mkdir -p $PKG/$PREFIX/doc/
 ( cd $PKG/$PREFIX/doc/
-    cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
-    rm -fr $PRGNAM-$VERSION/.svn
-    ln -s $PRGNAM-$VERSION $PRGNAM
+    cp -R $REPOSITORIES/$PRGNAM $PRGNAM
+    rm -fr $PRGNAM/.svn
+)
+
+mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
+( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
+    for el in \
+        "workspaces.el" \
+        "auto-complete.el" \
+        "gnugo.el" \
+        "http-post-simple.el" \
+        "facebook.el" \
+        "tumbl.el" \
+        "dom.el" \
+        "babel.el" \
+        "cheezburger.el" \
+        "jira.el" \
+        "folding.el" \
+        "sunrise-commander.el" \
+        "typing.el" \
+        "wiki.el" \
+        "tidy.el" \
+        "fixme-mode.el" \
+        "work-timer.el" \
+        "sdcv.el" \
+        "etxt.el" \
+        "htmlr.el" \
+        "cus-edit+.el" \
+        "xml-rpc.el" \
+        "weblogger.el" \
+        "newsticker-notify.el" ;
+    do
+        ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
+    done
 )
 
 ( cd $PKG

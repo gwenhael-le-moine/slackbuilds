@@ -2,13 +2,13 @@
 
 # variables
 VERSION=master_$(date +"%Y.%m.%d_%H:%M")
-BUILD=2
+BUILD=1
 PACKAGER=cyco
 
 TMP=/tmp
 CWD=$(pwd)
 
-PRGNAM=emacs-nav
+PRGNAM=yasnippet
 PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
 ARCH=$(uname -m)
@@ -29,18 +29,24 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        hg clone https://emacs-nav.googlecode.com/hg/ $PRGNAM
+        svn checkout "http://yasnippet.googlecode.com/svn/trunk" $PRGNAM
 fi
 
 ( cd $REPOSITORY
-    hg pull -u
+    svn update
 )
 
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp
 cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
-    rm -fr .hg
-    $EMACS -batch -f batch-byte-compile *.el
+    find . -name \.svn -exec rm -fr {} \;
+    # $EMACS -batch -f batch-byte-compile *.el
+    rake compile
+    rake doc
+    mkdir -p $PKG$PREFIX/doc/
+    mv doc $PKG$PREFIX/doc/$PRGNAM-$VERSION
+    mv README $PKG$PREFIX/doc/$PRGNAM-$VERSION
+    rm -fr pkg Rakefile
 )
 
 # correction
@@ -60,17 +66,17 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Emacs file browser)
-$PRGNAM: Nav is a lightweight solution for Emacs users who want something like
-$PRGNAM: TextMate's file browser, or the Eclipse project view.
+$PRGNAM: $PRGNAM (template system for Emacs)
+$PRGNAM: It allows you to type an abbreviation and automatically expand it into function
+$PRGNAM: templates. Bundled language templates includes: C, C++, C#, Perl, Python, Ruby,
+$PRGNAM: SQL, LaTeX, HTML, CSS and more.
 $PRGNAM: 
+$PRGNAM: (add-to-list 'load-path "$PREFIX/share/emacs/site-lisp/yasnippet")
+$PRGNAM: (require 'yasnippet)
+$PRGNAM: (yas/initialize)
+$PRGNAM: (yas/load-directory "$PREFIX/share/emacs/site-lisp/yasnippet/snippets")
 $PRGNAM: 
-$PRGNAM: 
-$PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: http://code.google.com/p/emacs-nav/
-$PRGNAM: 
+$PRGNAM: http://code.google.com/p/yasnippet/
 EOF
 
 # empaquetage

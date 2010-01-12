@@ -2,13 +2,13 @@
 
 # variables
 VERSION=master_$(date +"%Y.%m.%d_%H:%M")
-BUILD=2
+BUILD=1
 PACKAGER=cyco
 
 TMP=/tmp
 CWD=$(pwd)
 
-PRGNAM=emacs-nav
+PRGNAM=emacs-chess
 PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
 ARCH=$(uname -m)
@@ -29,18 +29,22 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        hg clone https://emacs-nav.googlecode.com/hg/ $PRGNAM
+        git clone "git://github.com/jwiegley/emacs-chess.git" $PRGNAM
 fi
 
 ( cd $REPOSITORY
-    hg pull -u
+    git pull
 )
 
-mkdir -p $PKG$PREFIX/share/emacs/site-lisp
-cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
-( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
-    rm -fr .hg
-    $EMACS -batch -f batch-byte-compile *.el
+cp -R $REPOSITORY $TMP
+( cd $TMP/$PRGNAM
+    ./autogen.sh
+    ./configure \
+        --prefix=$PREFIX \
+        --infodir=$PREFIX/info
+    make
+    make install DESTDIR=$PKG
+    rm $PKG$PREFIX/info/dir
 )
 
 # correction
@@ -51,6 +55,14 @@ cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
 # embaumement
 mkdir -p $PKG/install
 
+cat <<EOF > $PKG/install/doinst.sh
+cd /usr/info
+for file in $(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
+do
+    install-info \$file ./dir
+done
+EOF
+
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
@@ -60,16 +72,16 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Emacs file browser)
-$PRGNAM: Nav is a lightweight solution for Emacs users who want something like
-$PRGNAM: TextMate's file browser, or the Eclipse project view.
+$PRGNAM: $PRGNAM (A complete chess client written in Emacs Lisp.)
+$PRGNAM: 
+$PRGNAM: a client and library for playing Chess from Emacs.
+$PRGNAM: chess.el is an Emacs Lisp library and several clients on top of the
+$PRGNAM: underlying library functionality for performing various activities
+$PRGNAM: related to the game of chess.
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: http://code.google.com/p/emacs-nav/
+$PRGNAM: http://github.com/jwiegley/emacs-chess
 $PRGNAM: 
 EOF
 
