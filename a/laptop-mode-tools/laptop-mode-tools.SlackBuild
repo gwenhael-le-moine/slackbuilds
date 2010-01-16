@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=laptop-mode-tools
-VERSION=1.52
+VERSION=1.53
 
 
 BUILD=1

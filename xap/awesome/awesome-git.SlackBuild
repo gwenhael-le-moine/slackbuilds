@@ -7,9 +7,10 @@ INCLUDE_OBVIOUS=1
 CWD=$(pwd)
 
 PRGNAM=awesome
-VERSION=git
-ARCH=$(uname -m)
-BUILD=$(date +%Y%m%d%H%M)
+BRANCH=master
+VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H:%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
