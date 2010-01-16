@@ -25,27 +25,27 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
 
 # mise en place
+mkdir -p $CWD/els
 ( cd $CWD/els
     elfileget_or_update() {
         URL=$1
         FILENAME=$(echo "$URL" | grep -o -e "[/=][A-Za-z0-9+-]*\.el" | tr -d '=' | tr -d '/')
-        ( cd $LISPDIR
-            wget -c "$URL" -O "$FILENAME.new"
-            if [ ! -e "$FILENAME" ] ; then
+        wget -c "$URL" -O "$FILENAME.new"
+        if [ ! -e "$FILENAME" ] ; then
+            mv "$FILENAME.new" "$FILENAME"
+        else
+            MD5ORIG=$(md5sum "$FILENAME" | awk '{print $1}')
+            MD5NEW=$(md5sum "$FILENAME.new" | awk '{print $1}')
+            if [ "$MD5ORIG" != "$MD5NEW" ] ; then
                 mv "$FILENAME.new" "$FILENAME"
             else
-                MD5ORIG=$(md5sum "$FILENAME" | awk '{print $1}')
-                MD5NEW=$(md5sum "$FILENAME.new" | awk '{print $1}')
-                if [ "$MD5ORIG" != "$MD5NEW" ] ; then
-                    mv "$FILENAME.new" "$FILENAME"
-                else
-                    rm "$FILENAME.new"
-                fi
+                rm "$FILENAME.new"
             fi
-        )
+        fi
     }
 
     for el in \
+        "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
         "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
         "http://www.davep.org/emacs/boxquote.el" \
         "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
