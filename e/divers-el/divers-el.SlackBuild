@@ -1,4 +1,5 @@
 #!/bin/sh -x
+# http://www.emacswiki.org/emacs/DiminishedModes
 
 # variables
 VERSION=$(date +"%Y.%m.%d_%H:%M")
@@ -45,6 +46,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://www.eskimo.com/~seldon/diminish.el" \
         "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
         "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
         "http://www.davep.org/emacs/boxquote.el" \

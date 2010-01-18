@@ -54,6 +54,15 @@ cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
     make install
     make install-info
     rm $PKG$PREFIX/info/dir
+
+    # install contrib
+    # mkdir -p $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
+    cp -R contrib/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
+    # mkdir -p $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
+    cp -R contrib/babel/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
+
+    mkdir -p $PKG$PREFIX/doc/$APP_NAME
+    cp -R contrib $PKG$PREFIX/doc/$APP_NAME
 )
 
 # correction
