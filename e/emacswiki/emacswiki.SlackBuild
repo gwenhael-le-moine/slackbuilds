@@ -57,6 +57,7 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
         "cus-edit+.el" \
         "xml-rpc.el" \
         "weblogger.el" \
+        "color-theme-tango.el" \
         "newsticker-notify.el" ;
     do
         ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
