@@ -34,6 +34,7 @@ mkdir -p $PKG/$PREFIX/doc/
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
     for el in \
+        "legalese.el" \
         "workspaces.el" \
         "auto-complete.el" \
         "gnugo.el" \
