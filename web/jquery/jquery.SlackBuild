@@ -45,6 +45,9 @@ cp -R $REPOSITORIES/$PRGNAM $TMP
 VERSION=$(cat $PKG$PREFIX/doc/$PRGNAM/version.txt)_$VERSION
 
 ( cd $PKG
+    # Amis, nettoyons un tantinet la zone
+    find $PKG -name \.git\* -exec rm -fr {} \;
+
     mkdir -p install
     cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (New Wave Javascript)
