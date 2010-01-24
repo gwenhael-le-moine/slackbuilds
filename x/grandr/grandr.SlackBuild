@@ -11,7 +11,7 @@ CWD=$(pwd)
 PRGNAM=grandr
 PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
-ARCH=x86_64
+ARCH=$(uname -m)
 
 REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 PREFIX=/usr
@@ -24,14 +24,15 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
-        mkdir -p $(dirname $REPOSITORY)
-        cd $(dirname $REPOSITORY)
+    mkdir -p $(dirname $REPOSITORY)
+    ( cd $(dirname $REPOSITORY)
         git clone git://anongit.freedesktop.org/xorg/app/grandr $PRGNAM
+    )
+else
+    ( cd $REPOSITORY
+        git pull
+    )
 fi
-
-( cd $REPOSITORY
-    git pull
-)
 
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 ( cd $TMP/$PRGNAM-$VERSION
