@@ -30,10 +30,15 @@ if [ ! -e $CWD/$PRGNAM.el ] ; then
         wget -c http://download.savannah.gnu.org/releases-noredirect/espresso/espresso.el
     )
 fi
+if [ ! -e $CWD/moz.el ] ; then
+    ( cd $CWD
+        wget -c http://download.savannah.gnu.org/releases-noredirect/espresso/moz.el
+    )
+fi
 
-mkdir -p $PKG$PREFIX/share/emacs/site-lisp
-cp -R $CWD/$PRGNAM.el $PKG$PREFIX/share/emacs/site-lisp
-( cd $PKG$PREFIX/share/emacs/site-lisp/
+mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
+cp -R $CWD/$PRGNAM.el $CWD/moz.el $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
+( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
     $EMACS -batch -f batch-byte-compile *.el
 )
 
