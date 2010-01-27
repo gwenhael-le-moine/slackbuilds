@@ -46,6 +46,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://repo.or.cz/w/ShellArchive.git?a=blob_plain;hb=HEAD;f=smallurl.el" \
         "http://edward.oconnor.cx/elisp/color-theme-hober2.el" \
         "http://www.eskimo.com/~seldon/diminish.el" \
         "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
