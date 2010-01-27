@@ -46,6 +46,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://edward.oconnor.cx/elisp/color-theme-hober2.el" \
         "http://www.eskimo.com/~seldon/diminish.el" \
         "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
         "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \

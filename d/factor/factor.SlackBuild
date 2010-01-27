@@ -2,7 +2,7 @@
 set -x -e
 
 PRGNAM=factor
-VERSION=2009-11-25-17-51
+VERSION=2010-01-24-14-47
 ARCH=$(uname -m)
 BUILD=1
 PACKAGER=cyco
