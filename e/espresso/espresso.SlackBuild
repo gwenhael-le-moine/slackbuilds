@@ -69,7 +69,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: http://www.nongnu.org/espresso/
-$PRGNAM: 
+$PRGNAM: (need http://wiki.github.com/bard/mozrepl/ )
 EOF
 
 # empaquetage
