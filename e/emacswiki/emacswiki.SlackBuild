@@ -55,6 +55,7 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
         "tidy.el" \
         "fixme-mode.el" \
         "work-timer.el" \
+        "showtip.el" \
         "sdcv.el" \
         "etxt.el" \
         "htmlr.el" \
