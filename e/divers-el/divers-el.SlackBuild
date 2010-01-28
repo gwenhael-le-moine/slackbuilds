@@ -32,17 +32,8 @@ mkdir -p $CWD/els
         URL=$1
         FILENAME=$(echo "$URL" | grep -o -e "[/=][A-Za-z0-9+-]*\.el" | tr -d '=' | tr -d '/')
         wget -c "$URL" -O "$FILENAME.new"
-        if [ ! -e "$FILENAME" ] ; then
-            mv "$FILENAME.new" "$FILENAME"
-        else
-            MD5ORIG=$(md5sum "$FILENAME" | awk '{print $1}')
-            MD5NEW=$(md5sum "$FILENAME.new" | awk '{print $1}')
-            if [ "$MD5ORIG" != "$MD5NEW" ] ; then
-                mv "$FILENAME.new" "$FILENAME"
-            else
-                rm "$FILENAME.new"
-            fi
-        fi
+        [ "$(wc -c $FILENAME.new)" > 0 ] && mv "$FILENAME.new" "$FILENAME"
+        [ -e "$FILENAME.new" ] && rm "$FILENAME.new"
     }
 
     for el in \
