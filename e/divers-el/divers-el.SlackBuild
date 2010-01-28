@@ -51,7 +51,7 @@ mkdir -p $CWD/els
         "http://www.bobnewell.net/elisp/speedread.el" \
         "http://dev.nozav.org/scripts/textile-mode.el" \
         "http://www.ccs.neu.edu/home/guttman/undoc.el" \
-        "http://svn.collab.net/repos/svn/trunk/contrib/client-side/emacs/dsvn.el" ;
+        "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" ;
     do
         elfileget_or_update "$el"
     done
