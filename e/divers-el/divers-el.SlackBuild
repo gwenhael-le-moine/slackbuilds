@@ -31,8 +31,8 @@ mkdir -p $CWD/els
     elfileget_or_update() {
         URL=$1
         FILENAME=$(echo "$URL" | grep -o -e "[/=][A-Za-z0-9+-]*\.el" | tr -d '=' | tr -d '/')
-        wget -T 10 -t 5 -c "$URL" -O "$FILENAME.new"
-        [ "$(wc -c $FILENAME.new)" > 0 ] && mv "$FILENAME.new" "$FILENAME"
+        wget -T 10 -t 3 -c "$URL" -O "$FILENAME.new"
+        [ "$(wc -c $FILENAME.new | cut -d ' ' -f 1)" > 0 ] && mv "$FILENAME.new" "$FILENAME"
         [ -e "$FILENAME.new" ] && rm "$FILENAME.new"
     }
 
@@ -45,11 +45,9 @@ mkdir -p $CWD/els
         "http://www.eskimo.com/~seldon/diminish.el" \
         "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
         "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
-        "http://www.davep.org/emacs/boxquote.el" \
         "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
         "http://damtp.cam.ac.uk/user/sje30/emacs/ell.el" \
         "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
-        "http://www.davep.org/emacs/parenface.el" \
         "http://www.bobnewell.net/elisp/speedread.el" \
         "http://dev.nozav.org/scripts/textile-mode.el" \
         "http://www.ccs.neu.edu/home/guttman/undoc.el" \
