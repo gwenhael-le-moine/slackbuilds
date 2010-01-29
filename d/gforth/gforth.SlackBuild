@@ -1,0 +1,159 @@
+#!/bin/sh
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+#VERSION=master_$(date +"%Y.%m.%d_%H:%M")
+VERSION=0.7.0
+
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+LIBSUFFIX=$(echo $ARCH | grep -o 64)
+
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+
+PREFIX=/usr
+
+# Cleaning
+( cd $TMP
+    rm -fr $PRGNAM-$VERSION
+    rm -fr $PKG
+)
+
+# Fetching sources
+( cd $TMP
+    # if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+    #     mkdir -p $REPOSITORIES
+    #     cd $REPOSITORIES
+    #     git clone git://github.com/earl/gforth-mirror.git $PRGNAM
+    # fi
+
+    # ( cd $REPOSITORIES/$PRGNAM
+    #     git pull
+    # )
+
+    # cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+
+    cd $TMP
+    if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
+        ( cd $CWD
+            wget -c http://www.complang.tuwien.ac.at/forth/gforth/$PRGNAM-$VERSION.tar.gz
+        )
+    fi
+    tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
+)
+
+# Preparation
+( cd $TMP/$PRGNAM-$VERSION
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+)
+
+# Configuration
+( cd $TMP/$PRGNAM-$VERSION
+    sed -i "s|lib/|lib$LIBSUFFIX/|g" Makefile.in
+    ./autogen.sh \
+        --prefix=$PREFIX \
+        --mandir=$PREFIX/man \
+        --infodir=$PREFIX/info \
+        --libdir=$PREFIX/lib$LIBSUFFIX
+)
+
+# Building
+( cd $TMP/$PRGNAM-$VERSION
+    make
+    make doc
+    make more
+)
+
+# Installation
+( cd $TMP/$PRGNAM-$VERSION
+    make install install.TAGS DESTDIR=$PKG
+
+    mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
+    cp gforth.el* $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
+
+    mkdir -p $PKG$PREFIX/doc/$PRGNAM
+    cp -R doc/*.{dvi,ps,pdf,txt} doc/gforth doc/vmgen AUTHORS BUGS COPYING* ChangeLog INSTALL* NEWS* README* TAGS ToDo $PKG$PREFIX/doc/$PRGNAM
+)
+
+# Cleaning
+( cd $PKG
+    find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+    find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+    find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+    find $PKG$PREFIX/info -name "dir" -exec rm {} \;
+    find $PKG$PREFIX/info -type f -exec gzip -9 {} \;
+
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+)
+
+# Packaging
+( cd $PKG
+    mkdir install
+    cat <<EOF > $PKG/install/doinst.sh
+cd /usr/info
+for file in $(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
+do
+    install-info \$file ./dir
+done
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf socket.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf socket.so.0.0.0 socket.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf socket.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf socket.so.0.0.0 socket.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf cstr.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf cstr.so.0.0.0 cstr.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf cstr.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf cstr.so.0.0.0 cstr.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf fflib.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf fflib.so.0.0.0 fflib.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf fflib.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf fflib.so.0.0.0 fflib.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf libffi.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf libffi.so.0.0.0 libffi.so )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf libffi.so.0 )
+( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf libffi.so.0.0.0 libffi.so.0 )
+( cd /usr/bin ; rm -rf vmgen )
+( cd /usr/bin ; ln -sf vmgen-$VERSION vmgen )
+( cd /usr/bin ; rm -rf gforthmi )
+( cd /usr/bin ; ln -sf gforthmi-$VERSION gforthmi )
+( cd /usr/bin ; rm -rf gforth-itc )
+( cd /usr/bin ; ln -sf gforth-itc-$VERSION gforth-itc )
+( cd /usr/bin ; rm -rf gforth-fast )
+( cd /usr/bin ; ln -sf gforth-fast-$VERSION gforth-fast )
+( cd /usr/bin ; rm -rf gforth )
+( cd /usr/bin ; ln -sf gforth-$VERSION gforth )
+EOF
+
+    cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (programming language)
+$PRGNAM:
+$PRGNAM: Gforth is a fast and portable implementation of the ANS Forth language.
+$PRGNAM: It works nicely with the Emacs editor, offers some nice features such as
+$PRGNAM: input completion and history and a powerful locals facility, and it even
+$PRGNAM: has (the beginnings of) a manual. Gforth employs traditional implementation
+$PRGNAM: techniques: its inner interpreter is indirect or direct threaded.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://www.gnu.org/software/gforth
+$PRGNAM:
+EOF
+
+    makepkg -l n -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+)
+
