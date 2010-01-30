@@ -45,7 +45,8 @@ PREFIX=/usr
 	./configure \
 		--prefix=$PREFIX \
 		--mandir=$PREFIX/man \
-		--libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64")
+		--libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
+        --sysconfdir=/etc
 )
 
 # Building
