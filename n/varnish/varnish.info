@@ -1,0 +1,8 @@
+PRGNAM="varnish"
+VERSION="2.0.6"
+HOMEPAGE="http://varnish.projects.linpro.no/"
+DOWNLOAD="http://downloads.sourceforge.net/varnish/varnish-2.0.6.tar.gz"
+MD5SUM="131f502a9a507b9ce0a7a91b22528e0c"
+MAINTAINER="Cherife Li"
+EMAIL="cherife-#-dotimes.com"
+APPROVED="dsomero"
