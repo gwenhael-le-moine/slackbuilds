@@ -100,9 +100,9 @@ $PRGNAM:
 $PRGNAM: The x48 is an emulator of the Saturn Processor and the I/O of an
 $PRGNAM: HP48 calculator. There is a debugger for the Saturn Processor. 
 $PRGNAM: 
-$PRGNAM: 
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: initialization:
+$PRGNAM: $ mkdir ~/.hp48 && cp $PREFIX/share/$PRGNAM/gxrom-r ~/.hp48/rom.dump
+$PRGNAM: $ x48 -initialize
 $PRGNAM:
 $PRGNAM: http://x48.berlios.de/
 $PRGNAM:
