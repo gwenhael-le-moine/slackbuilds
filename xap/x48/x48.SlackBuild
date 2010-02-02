@@ -102,7 +102,7 @@ $PRGNAM: HP48 calculator. There is a debugger for the Saturn Processor.
 $PRGNAM: 
 $PRGNAM: initialization:
 $PRGNAM: $ mkdir ~/.hp48 && cp $PREFIX/share/$PRGNAM/gxrom-r ~/.hp48/rom.dump
-$PRGNAM: $ x48 -initialize
+$PRGNAM: $ cd ~/.hp48 && x48 -initialize
 $PRGNAM:
 $PRGNAM: http://x48.berlios.de/
 $PRGNAM:
