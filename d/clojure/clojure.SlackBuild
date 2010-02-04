@@ -16,7 +16,7 @@ PREFIX=/usr
 rm -fr $PKG
 
 # do we have the sources?
-if [ ! -e $CWD/$PRGNAM-VERSION.zip ] ; then
+if [ ! -e $CWD/$PRGNAM-$VERSION.zip ] ; then
    ( cd $CWD
       wget -c http://$PRGNAM.googlecode.com/files/$PRGNAM-$VERSION.zip
    )
@@ -42,7 +42,7 @@ java -jar $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar \$@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM
 ( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
-    mv epl-v10.html readme.txt svninfo.txt $PKG$PREFIX/doc/$PRGNAM-$VERSION
+    mv epl-v10.html readme.txt $PKG$PREFIX/doc/$PRGNAM-$VERSION
 
     rm *.xml
     rm -r classes src
