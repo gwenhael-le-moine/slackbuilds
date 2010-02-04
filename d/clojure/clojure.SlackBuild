@@ -23,14 +23,13 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.zip ] ; then
 fi
 
 # unpacking
-mkdir -p $PKG$PREFIX/libexec #/$PRGNAM-$VERSION
-( cd $PKG$PREFIX/libexec #/$PRGNAM-$VERSION
+mkdir -p $PKG$PREFIX/libexec
+( cd $PKG$PREFIX/libexec
     unzip $CWD/${PRGNAM}-$VERSION.zip
 )
 
 # compilation
 ( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
-    #rm $PRGNAM-$VERSION.jar
     ant
 )
 
@@ -41,10 +40,11 @@ cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
 java -jar $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar \$@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM
-( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
-    mv epl-v10.html readme.txt $PKG$PREFIX/doc/$PRGNAM-$VERSION
 
-    rm *.xml
+( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
+    mv *.html *.txt test/ $PKG$PREFIX/doc/$PRGNAM-$VERSION
+
+    rm *.xml .gitignore
     rm -r classes src
 
     rm $PRGNAM.jar
@@ -72,4 +72,4 @@ $PRGNAM:
 $PRGNAM: http://clojure.org
 EOF
 
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION|tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d - )-$ARCH-$BUILD$PACKAGER.txz
