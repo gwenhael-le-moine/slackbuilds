@@ -28,7 +28,7 @@ mkdir -p $PKG/usr/doc/$PRGNAM
 
 ( cd $PKG$FONTDIR/TTF
     for fnt in bold.ttf bolditalic.ttf italic.ttf ornaments.ttf regular.ttf ; do
-        [ ! -e $CWD/$fnt ] && ( cd $CWD ; wget -c http://foohack.com/tpl/fonts/Hoefler-Text/$fnt )
+        [ ! -e $CWD/$fnt ] && ( cd $CWD ; wget -c http://foohack.com/tpl/fonts/$PRGNAM/$fnt )
         cp $CWD/$fnt ./$PRGNAM-$fnt
     done
 )

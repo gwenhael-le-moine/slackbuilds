@@ -26,7 +26,7 @@ FONTDIR="/usr/share/fonts"
 mkdir -p $PKG$FONTDIR/TTF
 
 ( cd $PKG$FONTDIR/TTF
-    [ ! -e $CWD/Century-Schoolbook-Monospace-BT.ttf ] && ( cd $CWD ; wget -c http://foohack.com/tpl/fonts/CentSchBook-Mono/Century-Schoolbook-Monospace-BT.ttf )
+    [ ! -e $CWD/Century-Schoolbook-Monospace-BT.ttf ] && ( cd $CWD ; wget -c http://foohack.com/tpl/fonts/$PRGNAM/Century-Schoolbook-Monospace-BT.ttf )
     cp $CWD/Century-Schoolbook-Monospace-BT.ttf .
 )
 
