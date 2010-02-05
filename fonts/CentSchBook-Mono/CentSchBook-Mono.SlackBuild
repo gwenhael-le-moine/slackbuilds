@@ -1,0 +1,65 @@
+#!/bin/sh
+
+PRGNAM=CentSchBook-Mono
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H:%M")}
+ARCH=font
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+CWD=$(pwd)
+
+# Place to build (TMP) package (PKG) and output (OUTPUT) the program:
+PKG=$TMP/package-$PRGNAM
+TMP=/tmp
+OUTPUT=${OUTPUT:-/tmp}
+
+# Create working directories:
+mkdir -p $OUTPUT          # place for the package to be saved
+mkdir -p $PKG             # place for the package to be built
+rm -rf $PKG/*             # always erase old package's contents
+rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+                          # remove old log files
+
+FONTDIR="/usr/share/fonts"
+
+# Move the fonts into place:
+mkdir -p $PKG$FONTDIR/TTF
+
+( cd $PKG$FONTDIR/TTF
+    [ ! -e $CWD/Century-Schoolbook-Monospace-BT.ttf ] && ( cd $CWD ; wget -c http://foohack.com/tpl/fonts/CentSchBook-Mono/Century-Schoolbook-Monospace-BT.ttf )
+    cp $CWD/Century-Schoolbook-Monospace-BT.ttf .
+)
+
+# Post-install script:
+mkdir -p $PKG/install
+cat <<EOT > $PKG/install/doinst.sh
+# Update X font indexes and the font cache:
+if [ -x .$XPREF/bin/mkfontdir ]; then
+  chroot . $XPREF/bin/mkfontscale $FONTDIR
+  chroot . $XPREF/bin/mkfontdir $FONTDIR
+fi
+if [ -x .$XPREF/bin/fc-cache ]; then
+  chroot . $XPREF/bin/fc-cache -f $FONTDIR
+fi
+EOT
+
+# Add a package description:
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (font)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://foohack.com/tpl/fonts/Hoefler-Text/
+$PRGNAM: 
+EOF
+
+# Build the package:
+cd $PKG
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
+
