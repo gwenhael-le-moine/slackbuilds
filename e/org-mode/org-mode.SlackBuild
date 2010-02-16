@@ -2,7 +2,7 @@
 
 # variables
 BRANCH=master
-VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H:%M")}
+VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 PACKAGER=cyco

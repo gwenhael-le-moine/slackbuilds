@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=cclive
-VERSION=0.5.7
+VERSION=0.6.1
 
 
 BUILD=1

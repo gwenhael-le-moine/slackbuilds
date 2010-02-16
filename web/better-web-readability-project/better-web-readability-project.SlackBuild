@@ -1,0 +1,51 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%F | tr -d -)
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+[ ! -e $CWD/Better-Web-Readability-Project-CSS-Library.zip ] && ( cd $CWD ; \
+    wget -c http://better-web-readability-project.googlecode.com/files/Better-Web-Readability-Project-CSS-Library.zip  ; )
+
+mkdir -p $PKG/srv/www/htdocs
+( cd $PKG/srv/www/htdocs ;
+    unzip $CWD/Better-Web-Readability-Project-CSS-Library.zip
+)
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (CSS library)
+$PRGNAM: 
+$PRGNAM: The main purpose of this project is to contribute to better reading experience
+$PRGNAM: on the screen by using CSS typography library.
+$PRGNAM: All about this solution:
+$PRGNAM: http://www.vcarrer.com/2009/05/how-we-read-on-web-and-how-can-we.html
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://code.google.com/p/better-web-readability-project/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
