@@ -2,7 +2,7 @@
 # http://www.emacswiki.org/emacs/DiminishedModes
 
 # variables
-VERSION=$(date +"%Y.%m.%d_%H:%M")
+VERSION=$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 PACKAGER=cyco
 
