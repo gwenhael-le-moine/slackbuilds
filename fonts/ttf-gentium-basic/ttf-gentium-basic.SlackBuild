@@ -1,0 +1,71 @@
+#!/bin/sh
+
+PRGNAM=$(basename $(pwd))
+VERSION=110
+ARCH=noarch
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+CWD=$(pwd)
+
+# Place to build (TMP) package (PKG) and output (OUTPUT) the program:
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+# Create working directories:
+mkdir -p $OUTPUT          # place for the package to be saved
+mkdir -p $PKG             # place for the package to be built
+rm -rf $PKG/*             # always erase old package's contents
+rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+                          # remove old log files
+
+FONTDIR="/usr/share/fonts/TTF"
+
+# Move the fonts into place:
+mkdir -p $PKG$FONTDIR $PKG/usr/doc/$PRGNAM-$VERSION
+( cd $PKG$FONTDIR/
+    [ ! -e $CWD/GentiumBasic_${VERSION}.zip ] && wget -c "http://scripts.sil.org/cms/scripts/render_download.php?site_id=nrsi&format=file&media_id=GentiumBasic_${VERSION}&filename=GentiumBasic_${VERSION}.zip" -O $CWD/GentiumBasic_${VERSION}.zip
+    unzip $CWD/GentiumBasic_${VERSION}.zip
+
+    find . -type f -name "*.ttf" -exec mv {} . \;
+    find . -type f -not -name "*.ttf" -exec mv {} $PKG/usr/doc/$PRGNAM-$VERSION \;
+    find . -type d -exec rm -r {} \;
+)
+
+# Post-install script:
+mkdir -p $PKG/install
+cat <<EOT > $PKG/install/doinst.sh
+# Update X font indexes and the font cache:
+if [ -x .$XPREF/bin/mkfontdir ]; then
+  chroot . $XPREF/bin/mkfontscale $FONTDIR
+  chroot . $XPREF/bin/mkfontdir $FONTDIR
+fi
+if [ -x .$XPREF/bin/fc-cache ]; then
+  chroot . $XPREF/bin/fc-cache -f $FONTDIR
+fi
+EOT
+
+# Add a package description:
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (font)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&item_id=Gentium
+$PRGNAM: 
+EOF
+
+# Build the package:
+cd $PKG
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz 2>&1 | tee $OUTPUT/makepkg-${PRGNAM}.log
+cd $OUTPUT
+md5sum ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz > ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz.md5
+cd -
+cat $PKG/install/slack-desc | grep "^${PRGNAM}" > $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txt
+
