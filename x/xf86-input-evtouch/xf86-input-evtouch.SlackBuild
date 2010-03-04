@@ -39,9 +39,7 @@ cd $TMP
 tar xf $CWD/xf86-input-evtouch-$VERSION.tar.bz2
 cd $TMP/$APP_NAME-$VERSION
 
-sed -i 's|xf86Version.h|xorgVersion.h|g' evtouch.c
-sed -i 's|xf86OSMouse.h|xorgOSMouse.h|g' evtouch.c
-sed -i 's|XF86_|XORG_|g' evtouch.c
+patch -p1 -i $CWD/hacks.diff
 
 # configuration
 CFLAGS="$SLCKFLAGS" \

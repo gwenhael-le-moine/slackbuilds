@@ -1,0 +1,59 @@
+diff -Nur xf86-input-evtouch-0.8.8/evtouch.c xf86-input-evtouch-0.8.8-patched/evtouch.c
+--- xf86-input-evtouch-0.8.8/evtouch.c	2008-11-11 15:47:55.000000000 +0700
++++ xf86-input-evtouch-0.8.8-patched/evtouch.c	2010-03-04 16:32:40.670484045 +0700
+@@ -30,8 +30,8 @@
+ 
+ #define _evdev_touch_C_
+ 
+-#include <xf86Version.h>
+-#if XF86_VERSION_CURRENT >= XF86_VERSION_NUMERIC(3,9,0,0,0)
++#include <xorgVersion.h>
++#if XORG_VERSION_CURRENT >= XORG_VERSION_NUMERIC(3,9,0,0,0)
+ #define XFREE86_V4
+ #endif
+ 
+@@ -74,11 +74,11 @@
+ #include "xf86_OSproc.h"
+ #include "xf86Xinput.h"
+ #include "exevents.h"
+-#include "xf86OSmouse.h"
++//#include "xf86OSmouse.h"
+ #include "randrstr.h"
+ 
+-#ifndef NEED_XF86_TYPES
+-#define NEED_XF86_TYPES	/* for xisb.h when !XFree86LOADER */
++#ifndef NEED_XORG_TYPES
++#define NEED_XORG_TYPES	/* for xisb.h when !XFree86LOADER */
+ #endif
+ 
+ #define DBG(lvl, f) {if ((lvl) <= debug_level) f;}
+@@ -139,7 +139,7 @@
+         "Kenan Esau",
+         MODINFOSTRING1,
+         MODINFOSTRING2,
+-        XF86_VERSION_CURRENT,
++        XORG_VERSION_CURRENT,
+         0, 8, 8,
+         ABI_CLASS_XINPUT,
+         ABI_XINPUT_VERSION,
+@@ -653,8 +653,8 @@
+          * Device reports motions on 2 axes in absolute coordinates.
+          * Axes min and max values are reported in raw coordinates.
+          */
+-        if (InitValuatorClassDeviceStruct(dev, 2, xf86GetMotionEvents,
+-                                          local->history_size, Absolute) == FALSE)
++        if (InitValuatorClassDeviceStruct(dev, 2, (int)xf86GetMotionEvents,
++                                          local->history_size) == FALSE)
+         {
+                 ErrorF ("Unable to allocate EVTouch touchscreen ValuatorClassDeviceStruct\n");
+                 return !Success;
+@@ -673,6 +673,9 @@
+         xf86InitValuatorDefaults(dev, 1);
+ #else
+ 	xf86InitValuatorAxisStruct(dev, 0, priv->min_x, priv->max_x,
++                               1024,
++                               EV_AXIS_MIN_RES /* min_res */ ,
++                               EV_AXIS_MAX_RES /* max_res */ );
+         xf86InitValuatorDefaults(dev, 1);
+ #endif
+ 
