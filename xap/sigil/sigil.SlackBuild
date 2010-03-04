@@ -22,10 +22,10 @@ PREFIX=/usr
 
 SLCKFLAGS=""
 
-if [ ! -e $REPOSITORIES/$REPO_NAME ]; then
-    hg clone https://sigil.googlecode.com/hg/ $REPOSITORIES/$REPO_NAME
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    hg clone https://sigil.googlecode.com/hg/ $REPOSITORIES/$PRGNAM
 else
-    ( cd $REPOSITORIES/$REPO_NAME
+    ( cd $REPOSITORIES/$PRGNAM
         hg pull -u
     )
 fi
