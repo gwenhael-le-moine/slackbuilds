@@ -56,7 +56,11 @@ make -j3 PREFIX=$PREFIX
 
 # installation
 make install DESTDIR=$PKG
-mv $PKG$PREFIX/lib$(echo "$ARCH" | grep -o "64")/xf86-input-evtouch/ $PKG$PREFIX/bin
+mkdir -p $PKG$PREFIX/bin
+( cd $PKG$PREFIX/bin
+    ln -s ../lib$(echo "$ARCH" | grep -o "64")/xf86-input-evtouch/ev_calibrate ev_calibrate
+    ln -s ../lib$(echo "$ARCH" | grep -o "64")/xf86-input-evtouch/calibrate.sh calibrate.sh
+)
 
 # correction
 cd $PKG
