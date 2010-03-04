@@ -47,13 +47,16 @@ CPPFLAGS="$SLCKFLAGS" \
 ./configure \
     --prefix=$PREFIX \
     --mandir=$PREFIX/man \
-    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64")
+    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
+    --enable-udevinstall \
+    --enable-evcalibrate
 
 # compilation
 make -j3 PREFIX=$PREFIX
 
 # installation
 make install DESTDIR=$PKG
+mv $PKG$PREFIX/lib$(echo "$ARCH" | grep -o "64")/xf86-input-evtouch/ $PKG$PREFIX/bin
 
 # correction
 cd $PKG
