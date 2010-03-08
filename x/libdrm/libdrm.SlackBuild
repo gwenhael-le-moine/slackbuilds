@@ -82,7 +82,7 @@ CFLAGS="$SLKCFLAGS" \
   --prefix=/usr \
   --libdir=/usr/lib${LIBDIRSUFFIX} \
   --enable-udev \
-    --enable-nouveau-experimental-api \
+	--enable-nouveau-experimental-api \
   --build=$ARCH-slackware-linux
 
 # Build and install:
