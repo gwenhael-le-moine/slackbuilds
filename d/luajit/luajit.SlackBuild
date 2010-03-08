@@ -40,6 +40,9 @@ rm -fr $PKG
         echo "$ARCH" | grep -q 64 &&  sed -i "s|lib/|lib64/|g" Makefile src/luaconf.h
         make
         make DESTDIR=$PKG install
+        ( cd $PKG$PREFIX/bin/
+            ln -s luajit-* luajit
+        )
     )
 )
 
