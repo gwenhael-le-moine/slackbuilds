@@ -33,7 +33,7 @@ rm -fr $PKG
 
 mkdir -p $PKG/srv/www/htdocs
 cp -R $REPOSITORIES/$PRGNAM $PKG/srv/www/htdocs/
-find $PKG/srv/www/htdocs -name \.git\* -exec rm -fr {} \;
+find $PKG/srv/www/htdocs -name \.hg\* -exec rm -fr {} \;
 
 ( cd $PKG
     mkdir -p install
