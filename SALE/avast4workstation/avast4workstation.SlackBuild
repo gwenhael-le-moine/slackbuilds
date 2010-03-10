@@ -1,0 +1,54 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=avast4workstation
+VERSION=1.3.0
+BUILD=1
+PACKAGER=cyco
+ARCH=i386
+
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PREFIX=/usr
+
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c http://files.avast.com/files/linux/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz
+
+rm -fr $PKG
+mkdir -p $PKG
+( cd $PKG
+    tar xf $CWD/$PRGNAM-$VERSION.tar.gz
+    mv $PRGNAM-$VERSION ./$PREFIX/
+    mv ./$PREFIX/share/man ./$PREFIX/man
+)
+
+( cd $PKG
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 700 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+
+    find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+        | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+( cd $PKG
+    mkdir install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Oh. God. Not. That! (an proprietary antivirus))
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.avast.com/fr-fr/linux-home-edition
+EOF
+
+    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+)
