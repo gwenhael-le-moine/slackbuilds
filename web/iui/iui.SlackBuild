@@ -1,0 +1,57 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git$(date +%Y.%m.%d_%H.%M)
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            hg pull -u
+        )
+    else
+        hg clone https://iui.googlecode.com/hg/ $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG/srv/www/htdocs
+cp -R $REPOSITORIES/$PRGNAM $PKG/srv/www/htdocs/
+find $PKG/srv/www/htdocs -name \.hg\* -exec rm -fr {} \;
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (iPhone User Interface Framework)
+$PRGNAM: iUI is a framework consisting of a JavaScript library, CSS, and images for
+$PRGNAM: developing iPhone webapps.
+$PRGNAM: Makes WebApps Look and Feel Like iPhone Native Apps
+$PRGNAM: iUI has the following features:
+$PRGNAM:    * Create Navigational Menus and iPhone interfaces from standard HTML
+$PRGNAM:    * Use or knowledge of JavaScript is not required to create basic iPhone pages
+$PRGNAM:    * Ability to handle phone orientation changes
+$PRGNAM:    * Provide a more "iPhone-like" experience to Web apps (on or off the iPhone) 
+$PRGNAM: 
+$PRGNAM: http://code.google.com/p/iui/
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)

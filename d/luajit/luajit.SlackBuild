@@ -27,36 +27,38 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone git://github.com/rakudo/rakudo.git $REPOSITORIES/$PRGNAM
+        git clone http://luajit.org/git/luajit-2.0.git $REPOSITORIES/$PRGNAM
     fi
 )
 
 ( cd $TMP
     rm -fr $PRGNAM-$VERSION && cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
     ( cd $PRGNAM-$VERSION
-        perl Configure.pl \
-            --prefix=$PREFIX \
-            --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
-            --mandir=$PREFIX/man \
-            --infodir=$PREFIX/info
+        sed -i "s|/usr/local|$PREFIX|g" Makefile src/luaconf.h
+        sed -i 's|$(INSTALL_SHARE)/man/man1|$(DPREFIX)/man/man1|g' Makefile
+        echo "$ARCH" | grep -q 64 &&  sed -i "s|/lib|/lib64|g" Makefile src/luaconf.h
+        echo "$ARCH" | grep -q 64 &&  sed -i "s|lib/|lib64/|g" Makefile src/luaconf.h
         make
         make DESTDIR=$PKG install
+        ( cd $PKG$PREFIX/bin/
+            ln -s luajit-* luajit
+        )
     )
 )
 
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc
-$PRGNAM: $PRGNAM (Implementation of Perl6)
+$PRGNAM: $PRGNAM (a Just-In-Time Compiler for Lua.)
 $PRGNAM: 
-$PRGNAM: Rakudo is an implementation of Perl 6 on the Parrot Virtual Machine
+$PRGNAM: LuaJIT implements the full set of language features defined by Lua 5.1.
+$PRGNAM: The virtual machine (VM) is API- and ABI-compatible to the standard Lua
+$PRGNAM: interpreter and can be deployed as a drop-in replacement.
 $PRGNAM: 
+$PRGNAM: LuaJIT offers more performance, at the expense of portability. It currently
+$PRGNAM: runs on all popular operating systems based on x86 or x64 CPUs
 $PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: http://perlcabal.org/syn/
-$PRGNAM: 
-$PRGNAM: http://raduko.org/
+$PRGNAM: http://luajit.org/luajit.html
 $PRGNAM: 
 EOF
 

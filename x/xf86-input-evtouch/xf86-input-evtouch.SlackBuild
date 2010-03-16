@@ -1,7 +1,5 @@
 #!/bin/sh -x
 
-#NOTE: Needs File::Next (cpan -i File::Next)
-
 # variables
 TMP=/tmp
 CWD=$(pwd)
@@ -20,9 +18,8 @@ BUILD=1cyco
 
 PREFIX=/usr
 
-SLCKFLAGS="-fPIC -O2"
+SLCKFLAGS="-O2 $(echo "$ARCH" | grep -q "64" && echo -fPIC)"
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
 # nettoyage préalable
 rm -fr $PKG $TMP/$APP_NAME-$VERSION
 
