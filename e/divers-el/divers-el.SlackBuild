@@ -37,6 +37,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://www.randomsample.de/minimap.el" \
         "http://nschum.de/src/emacs/guess-style/guess-style.el" \
         "http://nschum.de/src/emacs/full-ack/full-ack.el" \
         "http://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
