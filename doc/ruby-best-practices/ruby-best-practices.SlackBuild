@@ -1,0 +1,64 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            git pull
+        )
+    else
+        git clone git://github.com/sandal/rbp-book.git $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
+
+# TODO
+# ( cd $PKG$PREFIX/doc/$PRGNAM/oreilly_final
+#     asciidoc book.xml
+#     cd ..
+#     ln -s oreilly_final/book.html
+# )
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Ruby Best Practices book)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://rubybestpractices.com/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
