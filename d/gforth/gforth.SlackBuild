@@ -61,19 +61,20 @@ PREFIX=/usr
 # Configuration
 ( cd $TMP/$PRGNAM-$VERSION
     sed -i "s|lib/|lib$LIBSUFFIX/|g" $(grep -l "lib/" * -r)
-    [ ! -e configure ] && autoreconf
+    [ ! -e configure ] && ./autogen.sh #autoreconf
     ./configure \
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
         --infodir=$PREFIX/info \
-        --libdir=$PREFIX/lib$LIBSUFFIX
+        --libdir=$PREFIX/lib$LIBSUFFIX \
+        --libexecdir=$PREFIX/libexec
 )
 
 # Building
 ( cd $TMP/$PRGNAM-$VERSION
-    make
-    make doc
-    make more
+    make libdir=$PREFIX/lib$LIBSUFFIX
+    make libdir=$PREFIX/lib$LIBSUFFIX doc
+    make libdir=$PREFIX/lib$LIBSUFFIX more
 )
 
 # Installation
