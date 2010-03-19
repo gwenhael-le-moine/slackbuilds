@@ -60,8 +60,9 @@ PREFIX=/usr
 
 # Configuration
 ( cd $TMP/$PRGNAM-$VERSION
-    sed -i "s|lib/|lib$LIBSUFFIX/|g" Makefile.in
-    ./autogen.sh \
+    sed -i "s|lib/|lib$LIBSUFFIX/|g" $(grep -l "lib/" * -r)
+    [ ! -e configure ] && autoreconf
+    ./configure \
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
         --infodir=$PREFIX/info \
