@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $(pwd))
 BRANCH=
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H:%M")}
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 PACKAGER=cyco

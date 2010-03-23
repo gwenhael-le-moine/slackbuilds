@@ -33,6 +33,7 @@ if [ ! -e $REPOSITORY ] ; then
 fi
 
 ( cd $REPOSITORY
+    bzr pull
     bzr update
 )
 
