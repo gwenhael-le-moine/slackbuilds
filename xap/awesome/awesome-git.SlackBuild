@@ -19,8 +19,6 @@ OUTPUT=/tmp
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
-DOCS="AUTHORS LICENSE README STYLE TODO UPGRADE PATCHES STYLE"
-
 PREFIX=/usr
 
 SLCKFLAGS=""
@@ -60,7 +58,7 @@ fi
 cmake \
     -DPREFIX=$PREFIX \
     -DSYSCONFDIR=/etc \
-    -DAWESOME_DOC_PATH=$PREFIX/doc/$PRGNAM-$VERSION \
+    -DAWESOME_DOC_PATH=$PREFIX/doc/$PRGNAM \
     -DAWESOME_MAN_PATH=$PREFIX/man \
     $SRC_PATH
 
