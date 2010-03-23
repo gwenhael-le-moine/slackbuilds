@@ -36,15 +36,10 @@ PREFIX=/usr
     # ( cd $REPOSITORIES/$PRGNAM
     #     git pull
     # )
-
     # cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
 
-    cd $TMP
-    if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-        ( cd $CWD
-            wget -c http://www.complang.tuwien.ac.at/forth/gforth/$PRGNAM-$VERSION.tar.gz
-        )
-    fi
+    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
+        wget -c http://www.complang.tuwien.ac.at/forth/gforth/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
 )
 
@@ -60,6 +55,8 @@ PREFIX=/usr
 
 # Configuration
 ( cd $TMP/$PRGNAM-$VERSION
+#    VERSION=$(grep -o "AC_INIT(\[gforth\],\[[0-9\.]*-[0-9]*\]" configure.in | sed 's|AC_INIT([gforth],[||' | sed 's|]||')
+
     sed -i "s|lib/|lib$LIBSUFFIX/|g" $(grep -l "lib/" * -r)
     [ ! -e configure ] && ./autogen.sh #autoreconf
     ./configure \
@@ -114,32 +111,32 @@ for file in $(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
 do
     install-info \$file ./dir
 done
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf socket.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf socket.so.0.0.0 socket.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf socket.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf socket.so.0.0.0 socket.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf cstr.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf cstr.so.0.0.0 cstr.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf cstr.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf cstr.so.0.0.0 cstr.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf fflib.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf fflib.so.0.0.0 fflib.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf fflib.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf fflib.so.0.0.0 fflib.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf libffi.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf libffi.so.0.0.0 libffi.so )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf libffi.so.0 )
-( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf libffi.so.0.0.0 libffi.so.0 )
-( cd /usr/bin ; rm -rf vmgen )
-( cd /usr/bin ; ln -sf vmgen-$VERSION vmgen )
-( cd /usr/bin ; rm -rf gforthmi )
-( cd /usr/bin ; ln -sf gforthmi-$VERSION gforthmi )
-( cd /usr/bin ; rm -rf gforth-itc )
-( cd /usr/bin ; ln -sf gforth-itc-$VERSION gforth-itc )
-( cd /usr/bin ; rm -rf gforth-fast )
-( cd /usr/bin ; ln -sf gforth-fast-$VERSION gforth-fast )
-( cd /usr/bin ; rm -rf gforth )
-( cd /usr/bin ; ln -sf gforth-$VERSION gforth )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf socket.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf socket.so.0.0.0 socket.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf socket.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf socket.so.0.0.0 socket.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf cstr.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf cstr.so.0.0.0 cstr.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf cstr.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf cstr.so.0.0.0 cstr.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf fflib.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf fflib.so.0.0.0 fflib.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf fflib.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf fflib.so.0.0.0 fflib.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf libffi.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf libffi.so.0.0.0 libffi.so )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; rm -rf libffi.so.0 )
+# ( cd /usr/lib64/gforth/$VERSION/libcc-named ; ln -sf libffi.so.0.0.0 libffi.so.0 )
+# ( cd /usr/bin ; rm -rf vmgen )
+# ( cd /usr/bin ; ln -sf vmgen-$VERSION vmgen )
+# ( cd /usr/bin ; rm -rf gforthmi )
+# ( cd /usr/bin ; ln -sf gforthmi-$VERSION gforthmi )
+# ( cd /usr/bin ; rm -rf gforth-itc )
+# ( cd /usr/bin ; ln -sf gforth-itc-$VERSION gforth-itc )
+# ( cd /usr/bin ; rm -rf gforth-fast )
+# ( cd /usr/bin ; ln -sf gforth-fast-$VERSION gforth-fast )
+# ( cd /usr/bin ; rm -rf gforth )
+# ( cd /usr/bin ; ln -sf gforth-$VERSION gforth )
 EOF
 
     cat <<EOF > $PKG/install/slack-desc
