@@ -1,0 +1,77 @@
+#!/bin/sh -x
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp}
+PKG=$TMP/package-mozilla-firefox
+
+# This is not a source build script.  Rather, it builds a Slackware
+# package from the official binary tarball available from mozilla.org.
+# Using the official binaries seems like the most direct way to satify
+# the Mozilla project's concerns about quality control (and thus to
+# provide the most quality-certified package possible), and therefore
+# be able to use the official trademarks and logos.
+#
+# Thanks to the folks at the Mozilla Foundation for permission to
+# distribute this, and for all the great work!  :-)
+
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1 #$(date +%F | tr -d '-')
+PACKAGER=cyco
+
+[ ! -e firefox-*.tar.bz2 ] && lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central/ -e "mget firefox-*.en-US.linux-x86_64.tar.bz2 ; quit"
+
+VERSION=$(ls firefox-*.tar.bz2 | cut -d - -f 2 | sed 's|.en||') #rev | cut -f 3- -d . | rev)
+
+LIBSUFFIX=$(echo "$ARCH" | grep -o "64")
+
+if [ ! -d $TMP ]; then
+  mkdir -p $TMP
+fi
+rm -rf $PKG
+mkdir -p $PKG/usr/lib$LIBSUFFIX
+( cd $PKG/usr/lib$LIBSUFFIX
+  tar xf $CWD/firefox-$VERSION.en-US.linux-$ARCH.tar.bz2 || exit 1
+  mv firefox firefox-$VERSION
+  ln -sf firefox-$VERSION firefox
+  cd firefox-$VERSION
+  sed -i -e "s/usr\/local/usr/" firefox
+  #zcat $CWD/mozilla-firefox-mimeTypes-fix.diff.gz | patch -p1 --verbose --suffix=.orig || exit 1
+  zcat $CWD/firefox.moz_plugin_path.diff.gz | sed "s|/lib/|/lib$LIBSUFFIX/|g" | sed "s|firefox-3.0|firefox-$VERSION|g" | patch -p1 --verbose --suffix=.orig || exit 1
+  rm -f defaults/pref/firefox.js.orig
+  cd $PKG/usr/lib$LIBSUFFIX/firefox-$VERSION
+  # There's really no reason to save this .orig:
+  #mv defaults/profile/mimeTypes.rdf defaults/profile/mimeTypes.rdf.orig || exit 1
+  zcat $CWD/mimeTypes.rdf > defaults/profile/mimeTypes.rdf || exit 1
+) || exit 1
+mkdir -p $PKG/usr/bin
+( cd $PKG/usr/bin
+  ln -sf /usr/lib$LIBSUFFIX/firefox-$VERSION/firefox .
+)
+mkdir -p $PKG/usr/lib$LIBSUFFIX/mozilla/plugins
+mkdir -p $PKG/usr/share/applications
+cat $CWD/mozilla-firefox.desktop > $PKG/usr/share/applications/mozilla-firefox.desktop
+mkdir -p $PKG/usr/share/pixmaps
+cat $CWD/firefox.png > $PKG/usr/share/pixmaps/firefox.png
+
+# These files/directories are usually created if Firefox is run as root, which on many
+# systems might (and possibly should) be never.  Therefore, if we don't see them we'll
+# put stubs in place to prevent startup errors.
+( cd $PKG/usr/lib$LIBSUFFIX/firefox-$VERSION
+  if [ -d extensions/talkback\@mozilla.org ]; then
+    if [ ! -r extensions/talkback\@mozilla.org/chrome.manifest ]; then
+      echo > extensions/talkback\@mozilla.org/chrome.manifest
+    fi
+  fi
+  if [ ! -d updates ]; then
+    mkdir -p updates/0
+  fi
+)
+
+mkdir $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+VERSION=${VERSION}_$(date +"%Y.%m.%d_%H.%M")
+
+cd $PKG
+makepkg -l y -c n $TMP/mozilla-firefox-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+
