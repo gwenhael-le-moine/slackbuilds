@@ -1,0 +1,86 @@
+#!/bin/sh -x
+
+# variables
+TMP=/tmp
+CWD=$(pwd)
+
+APP_NAME=libfakekey
+PKG=$TMP/package-$APP_NAME
+
+VERSION=0.1
+
+DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
+
+ARCH=$(uname -m)
+BUILD=1cyco
+
+PREFIX=/usr
+
+case $ARCH in
+    x86_64)
+        SLCKFLAGS="-fPIC -O2"
+        ;;
+    *)
+        SLCKFLAGS="-O2"
+esac
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+tar xf $CWD/$APP_NAME-$VERSION.?z*
+cd $APP_NAME-$VERSION
+
+# configuration
+CFLAGS=$SLCKFLAGS \
+CPPFLAGS=$SLCKFLAGS \
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man \
+    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o 64)
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install DESTDIR=$PKG
+
+# correction
+cd $PKG
+chown -R root:root *
+
+mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+cd $TMP/$APP_NAME-$VERSION
+cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME ()
+$APP_NAME:
+$APP_NAME: 
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME: http://matchbox-project.org/
+$APP_NAME:
+$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
+$APP_NAME:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
