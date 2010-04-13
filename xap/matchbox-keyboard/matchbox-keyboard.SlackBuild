@@ -31,7 +31,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-tar xf $CWD/$APP_NAME-$VERSION.?z*
+tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
 cd $APP_NAME-$VERSION
 
 # configuration
