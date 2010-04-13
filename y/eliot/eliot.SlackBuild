@@ -44,17 +44,18 @@ CPPFLAGS=$SLCKFLAGS \
     --prefix=$PREFIX \
     --mandir=$PREFIX/man \
     --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
-    --infodir=$PREFIX/info \
-    --disable-qt
+    --infodir=$PREFIX/info #  \
+    # --disable-qt
 
+#just close your eyes and pretend these don't exist
 case $ARCH in
     "x86_64")
         sed -i 's|/usr/lib[^6]|/usr/lib64 |g' $(find . -name Makefile)
         ;;
     *)
-        break
 esac
 sed -i 's|-lreadline|-lncursesw -lreadline|g' $(find . -name Makefile)
+sed -i 's|../../qt/||g' qt/*.moc.cpp
 
 # compilation
 make -j3 PREFIX=$PREFIX
