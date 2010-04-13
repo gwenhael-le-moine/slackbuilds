@@ -69,14 +69,14 @@ cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (one line description here)
+$APP_NAME: $APP_NAME
 $APP_NAME:
-$APP_NAME: More verbose description here, usually from the README file.
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
+$APP_NAME: http://www.jezuk.co.uk/cgi-bin/view/arabica
 $APP_NAME:
 $APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
 $APP_NAME:
