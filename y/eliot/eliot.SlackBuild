@@ -97,7 +97,7 @@ $APP_NAME: $APP_NAME (Free Scrabble game)
 $APP_NAME:
 $APP_NAME: Eliot is an open source Scrabble game, freely available under the GNU GPL license.
 $APP_NAME: 
-$APP_NAME: 
+$APP_NAME: Dictionaries are installed in $PREFIX/share/$APP_NAME
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
