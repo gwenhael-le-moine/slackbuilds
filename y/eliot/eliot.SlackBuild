@@ -44,8 +44,7 @@ CPPFLAGS=$SLCKFLAGS \
     --prefix=$PREFIX \
     --mandir=$PREFIX/man \
     --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
-    --infodir=$PREFIX/info #  \
-    # --disable-qt
+    --infodir=$PREFIX/info
 
 #just close your eyes and pretend these don't exist
 case $ARCH in
