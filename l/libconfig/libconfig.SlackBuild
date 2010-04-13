@@ -37,6 +37,7 @@ CPPFLAGS=$SLCKFLAGS \
 ./configure \
     --prefix=$PREFIX \
     --mandir=$PREFIX/man \
+    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o 64) \
     --infodir=$PREFIX/info
 
 # compilation
