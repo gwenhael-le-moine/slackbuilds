@@ -62,6 +62,15 @@ make -j3 PREFIX=$PREFIX
 # installation
 make install DESTDIR=$PKG
 
+# dictionaries
+DICOS="ods5.dawg twl06.dawg sowpods06.dawg"
+mkdir -p $PKG$PREFIX/share/$APP_NAME
+for d in $DICOS ; do
+    [ ! -e $CWD/$d ] && \
+        wget -c http://dl.sv.nongnu.org/releases/eliot/dict/$d -O $CWD/$d
+    cp $CWD/$d $PKG$PREFIX/share/$APP_NAME/
+done
+
 # correction
 cd $PKG
 chown -R root:root *
