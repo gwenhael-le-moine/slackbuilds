@@ -68,11 +68,12 @@ cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-cd /usr/info
+( cd /usr/info
 for file in $(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
 do
     install-info \$file ./dir
 done
+)
 EOF
 cat <<EOF > $PKG/install/slack-desc
 $APP_NAME: $APP_NAME (Configuration file library for C and C++.)
