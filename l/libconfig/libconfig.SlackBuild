@@ -1,0 +1,92 @@
+#!/bin/sh -x
+
+# variables
+TMP=/tmp
+CWD=$(pwd)
+
+APP_NAME=$(basename $CWD)
+PKG=$TMP/package-$APP_NAME
+
+VERSION=1.4.3
+
+DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
+
+ARCH=$(uname -m)
+BUILD=1cyco
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
+    wget -c http://ftp1.fr.freebsd.org/pub/frugalware/frugalware-current/source/lib-extra/libconfig/$APP_NAME-$VERSION.tar.gz \
+    -O $CWD/$APP_NAME-$VERSION.tar.gz
+tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
+cd $APP_NAME-$VERSION
+
+# configuration
+CFLAGS=$SLCKFLAGS \
+CPPFLAGS=$SLCKFLAGS \
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man \
+    --infodir=$PREFIX/info
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install DESTDIR=$PKG
+
+# correction
+cd $PKG
+chown -R root:root *
+
+mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+cd $TMP/$APP_NAME-$VERSION
+cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && rm $PKG/usr/info/dir
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+cd /usr/info
+for file in $(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
+do
+    install-info \$file ./dir
+done
+EOF
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME (Configuration file library for C and C++.)
+$APP_NAME:
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME:
+$APP_NAME: http://hyperrealm.com/libconfig/libconfig.html
+$APP_NAME:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
