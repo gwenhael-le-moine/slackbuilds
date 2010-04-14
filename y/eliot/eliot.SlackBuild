@@ -38,18 +38,18 @@ mkdir -p $PKG
 
 ( cd $TMP/$APP_NAME-$VERSION
     # configuration
+    CCPFLAGS=$SLCKFLAGS \
     CFLAGS=$SLCKFLAGS \
-        CPPFLAGS=$SLCKFLAGS \
+    LIBS="-lncursesw" \
+    LDFLAGS="-L$PREFIX/lib$(echo $ARCH | grep -o 64)" \
         ./configure \
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
         --infodir=$PREFIX/info \
-        --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64)
+        --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
+        --enable-text
 
     # just close your eyes and let's pretend these don't exist
-    sed -i 's|-lreadline|-lncursesw -lreadline|g' $(find . -name Makefile)
-    echo "$ARCH" | grep -q 64 && \
-        sed -i 's|/usr/lib[^6]|/usr/lib64 |g' $(find . -name Makefile)
     for m in qt/*.moc.cpp ; do
         mv $m $m.bkp ;
         moc ${m%moc.cpp}h > $m ;
