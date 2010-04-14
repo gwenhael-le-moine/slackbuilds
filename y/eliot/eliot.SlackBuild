@@ -1,27 +1,26 @@
 #!/bin/sh -x
 
 # variables
-TMP=/tmp
 CWD=$(pwd)
 
 APP_NAME=$(basename $CWD)
-PKG=$TMP/package-$APP_NAME
-
 VERSION=1.11b
-
-DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
-
 ARCH=$(uname -m)
-BUILD=1cyco
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$APP_NAME
 
 PREFIX=/usr
+DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 
+SLCKFLAGS="-O2"
 case $ARCH in
     "x86_64")
-        SLCKFLAGS="-fPIC -O2"
+        SLCKFLAGS="$SLCKFLAGS -fPIC"
         ;;
     *)
-        SLCKFLAGS="-O2"
 esac
 
 # nettoyage préalable
@@ -30,57 +29,53 @@ rm -fr $PKG $TMP/$APP_NAME-$VERSION
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-[ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
-    wget -c http://mirror.cinquix.com/pub/savannah/eliot/releases/$APP_NAME-$VERSION.tar.gz \
-    -O $CWD/$APP_NAME-$VERSION.tar.gz
-tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
-cd $APP_NAME-$VERSION
+( cd $TMP
+    [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
+        wget -c http://mirror.cinquix.com/pub/savannah/eliot/releases/$APP_NAME-$VERSION.tar.gz \
+        -O $CWD/$APP_NAME-$VERSION.tar.gz
+    tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
+)
 
-# configuration
-CFLAGS=$SLCKFLAGS \
-CPPFLAGS=$SLCKFLAGS \
-./configure \
-    --prefix=$PREFIX \
-    --mandir=$PREFIX/man \
-    --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
-    --infodir=$PREFIX/info
+( cd $TMP/$APP_NAME-$VERSION
+    # configuration
+    CFLAGS=$SLCKFLAGS \
+        CPPFLAGS=$SLCKFLAGS \
+        ./configure \
+        --prefix=$PREFIX \
+        --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64)
 
-# just close your eyes and let's pretend these don't exist
-case $ARCH in
-    "x86_64")
+    # just close your eyes and let's pretend these don't exist
+    sed -i 's|-lreadline|-lncursesw -lreadline|g' $(find . -name Makefile)
+    echo "$ARCH" | grep -q 64 && \
         sed -i 's|/usr/lib[^6]|/usr/lib64 |g' $(find . -name Makefile)
-        ;;
-    *)
-esac
-sed -i 's|-lreadline|-lncursesw -lreadline|g' $(find . -name Makefile)
-for m in qt/*.moc.cpp ; do
-    mv $m $m.bkp ;
-    moc ${m%moc.cpp}h > $m ;
-done
+    for m in qt/*.moc.cpp ; do
+        mv $m $m.bkp ;
+        moc ${m%moc.cpp}h > $m ;
+    done
 
-# compilation
-make -j3 PREFIX=$PREFIX
+    # compilation
+    make -j3 PREFIX=$PREFIX
 
-# installation
-make install DESTDIR=$PKG
+    # installation
+    make install DESTDIR=$PKG
 
-# dictionaries
-DICOS="ods5.dawg twl06.dawg sowpods06.dawg"
-mkdir -p $PKG$PREFIX/share/$APP_NAME
-for d in $DICOS ; do
-    [ ! -e $CWD/$d ] && \
-        wget -c http://dl.sv.nongnu.org/releases/eliot/dict/$d -O $CWD/$d
-    cp $CWD/$d $PKG$PREFIX/share/$APP_NAME/
-done
+    # dictionaries
+    DICOS="ods5.dawg twl06.dawg sowpods06.dawg"
+    mkdir -p $PKG$PREFIX/share/$APP_NAME
+    for d in $DICOS ; do
+        [ ! -e $CWD/$d ] && \
+            wget -c http://dl.sv.nongnu.org/releases/eliot/dict/$d -O $CWD/$d
+        cp $CWD/$d $PKG$PREFIX/share/$APP_NAME/
+    done
+)
 
 # correction
-cd $PKG
-chown -R root:root *
+chown -R root:root $PKG/*
 
 mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+( cd $TMP/$APP_NAME-$VERSION
+    cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+)
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
@@ -99,16 +94,17 @@ cat <<EOF > $PKG/install/slack-desc
 $APP_NAME: $APP_NAME (Free Scrabble game)
 $APP_NAME:
 $APP_NAME: Eliot is an open source Scrabble game, freely available under the GNU GPL license.
-$APP_NAME: 
+$APP_NAME:
 $APP_NAME: Dictionaries are installed in $PREFIX/share/$APP_NAME
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
 $APP_NAME:
 $APP_NAME: http://www.nongnu.org/eliot/en/index.html
 $APP_NAME:
 EOF
 
 # empaquetage
-cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+( cd $PKG
+    makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+)
