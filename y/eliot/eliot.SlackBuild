@@ -42,6 +42,8 @@ mkdir -p $PKG
         CPPFLAGS=$SLCKFLAGS \
         ./configure \
         --prefix=$PREFIX \
+        --mandir=$PREFIX/man \
+        --infodir=$PREFIX/info \
         --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64)
 
     # just close your eyes and let's pretend these don't exist
@@ -82,11 +84,8 @@ mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
 [ -d $PKG/usr/info ] && rm $PKG/usr/info/dir
 
 # Strip binaries
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-
+find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 # embaumement
 mkdir -p $PKG/install
