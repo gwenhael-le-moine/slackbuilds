@@ -11,6 +11,7 @@ PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
 PKG=$TMP/pkg-$APP_NAME
+OUTPUT=/tmp
 
 PREFIX=/usr
 DOCS="ABOUT-NLS AUTHORS ChangeLog COPYING* INSTALL NEWS README THANKS TODO"
@@ -51,7 +52,7 @@ mkdir -p $PKG
 
     # just close your eyes and let's pretend these don't exist
     for m in qt/*.moc.cpp ; do
-        mv $m $m.bkp ;
+        rm $m ;
         moc ${m%moc.cpp}h > $m ;
     done
 
@@ -105,5 +106,5 @@ EOF
 
 # empaquetage
 ( cd $PKG
-    makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
 )
