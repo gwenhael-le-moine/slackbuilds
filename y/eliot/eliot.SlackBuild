@@ -105,5 +105,5 @@ EOF
 
 # empaquetage
 ( cd $PKG
-    makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD.txz
+    makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
 )
