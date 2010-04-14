@@ -1,0 +1,61 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=hg$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            git pull
+        )
+    else
+        hg clone http://hg.diveintopython3.org/ $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.hg\* -exec rm -fr {} \;
+
+( cd $PKG$PREFIX/doc/$PRGNAM
+    make
+)
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (a book about Python 3)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://diveintopython3.org
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
