@@ -50,9 +50,8 @@ mkdir -p $PKG
         --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
         --enable-text
 
-    # just close your eyes and let's pretend these don't exist
+    # just close your eyes and let's pretend this doesn't exist
     for m in qt/*.moc.cpp ; do
-        rm $m ;
         moc ${m%moc.cpp}h > $m ;
     done
 
