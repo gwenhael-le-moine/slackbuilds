@@ -57,14 +57,14 @@ mkdir -p $PKG
 
     # compilation
     make -j3 PREFIX=$PREFIX
-    (cd utils
+    ( cd utils
         make eliottxt
     )
 
     # installation
     make install DESTDIR=$PKG
     cp utils/eliottxt $PKG$PREFIX/bin/
-    
+
     # dictionaries
     DICOS="ods5.dawg twl06.dawg sowpods06.dawg"
     mkdir -p $PKG$PREFIX/share/$APP_NAME
