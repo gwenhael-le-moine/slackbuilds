@@ -6,7 +6,7 @@ CWD=$(pwd)
 APP_NAME=$(basename $CWD)
 VERSION=1.11b
 ARCH=$(uname -m)
-BUILD=1
+BUILD=2
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
