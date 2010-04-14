@@ -46,7 +46,7 @@ CPPFLAGS=$SLCKFLAGS \
     --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
     --infodir=$PREFIX/info
 
-#just close your eyes and pretend these don't exist
+# just close your eyes and let's pretend these don't exist
 case $ARCH in
     "x86_64")
         sed -i 's|/usr/lib[^6]|/usr/lib64 |g' $(find . -name Makefile)
@@ -54,7 +54,10 @@ case $ARCH in
     *)
 esac
 sed -i 's|-lreadline|-lncursesw -lreadline|g' $(find . -name Makefile)
-sed -i 's|../../qt/||g' qt/*.moc.cpp
+for m in qt/*.moc.cpp ; do
+    mv $m $m.bkp ;
+    moc ${m%moc.cpp}h > $m ;
+done
 
 # compilation
 make -j3 PREFIX=$PREFIX
