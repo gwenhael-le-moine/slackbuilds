@@ -43,7 +43,7 @@ mkdir -p $PKG
     CFLAGS=$SLCKFLAGS \
     LIBS="-lncursesw" \
     LDFLAGS="-L$PREFIX/lib$(echo $ARCH | grep -o 64)" \
-        ./configure \
+    ./configure \
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
         --infodir=$PREFIX/info \
