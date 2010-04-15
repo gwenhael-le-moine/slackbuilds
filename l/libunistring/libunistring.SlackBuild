@@ -47,6 +47,7 @@ mkdir -p $PKG
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
         --infodir=$PREFIX/info \
+        --docdir=$PREFIX/doc/$APP_NAME-$VERSION \
         --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64)
 
     # compilation
