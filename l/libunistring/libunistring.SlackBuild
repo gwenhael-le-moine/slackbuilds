@@ -1,0 +1,93 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+APP_NAME=$(basename $CWD)
+VERSION=0.9.2.1
+ARCH=$(uname -m)
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$APP_NAME
+OUTPUT=/tmp
+
+PREFIX=/usr
+DOCS="ABOUT-NLS AUTHORS ChangeLog COPYING* INSTALL NEWS README THANKS TODO"
+
+SLCKFLAGS="-O2"
+case $ARCH in
+    "x86_64")
+        SLCKFLAGS="$SLCKFLAGS -fPIC"
+        ;;
+    *)
+esac
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+( cd $TMP
+    [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
+        wget -c http://ftp.gnu.org/gnu/libunistring/$APP_NAME-$VERSION.tar.gz \
+        -O $CWD/$APP_NAME-$VERSION.tar.gz
+    tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
+)
+
+( cd $TMP/$APP_NAME-$VERSION
+    # configuration
+    CCPFLAGS=$SLCKFLAGS \
+    CFLAGS=$SLCKFLAGS \
+    LIBS="-lncursesw" \
+    LDFLAGS="-L$PREFIX/lib$(echo $ARCH | grep -o 64)" \
+    ./configure \
+        --prefix=$PREFIX \
+        --mandir=$PREFIX/man \
+        --infodir=$PREFIX/info \
+        --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64)
+
+    # compilation
+    make -j3 PREFIX=$PREFIX
+    # installation
+    make install DESTDIR=$PKG
+)
+
+# correction
+chown -R root:root $PKG/*
+
+mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+( cd $TMP/$APP_NAME-$VERSION
+    cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+)
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && rm $PKG/usr/info/dir
+
+# Strip binaries
+find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME (GNU Unicode library)
+$APP_NAME:
+$APP_NAME: This library provides functions for manipulating Unicode strings and
+$APP_NAME: for manipulating C strings according to the Unicode standard.
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME:
+$APP_NAME: http://www.gnu.org/software/libunistring/
+$APP_NAME:
+EOF
+
+# empaquetage
+( cd $PKG
+    makepkg -l y -c n $OUTPUT/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+)
