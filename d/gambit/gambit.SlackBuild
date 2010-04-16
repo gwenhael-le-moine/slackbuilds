@@ -1,0 +1,97 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+APP_NAME=$(basename $CWD)
+VERSION=4.6.0
+ARCH=$(uname -m)
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$APP_NAME
+OUTPUT=/tmp
+
+PREFIX=/usr
+DOCS="ABOUT-NLS AUTHORS ChangeLog COPYING* INSTALL NEWS README THANKS TODO"
+
+SLCKFLAGS="-O2"
+case $ARCH in
+    "x86_64")
+        SLCKFLAGS="$SLCKFLAGS -fPIC"
+        ;;
+    *)
+esac
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+( cd $TMP
+    TMPVER=v$(echo $VERSION | tr . _)
+    [ ! -e $CWD/gambc-$TMPVER-devel.tgz ] && \
+        wget -c http://www.iro.umontreal.ca/~gambit/download/gambit/v4.6/source/gambc-$TMPVER-devel.tgz \
+        -O $CWD/gambc-$TMPVER-devel.tgz
+    tar xf $CWD/gambc-$TMPVER-devel.tgz
+    mv gambc-$TMPVER-devel $APP_NAME-$VERSION
+)
+
+( cd $TMP/$APP_NAME-$VERSION
+    # configuration
+    CCPFLAGS=$SLCKFLAGS \
+    CFLAGS=$SLCKFLAGS \
+    ./configure \
+        --prefix=$PREFIX \
+        --mandir=$PREFIX/man \
+        --infodir=$PREFIX/info \
+        --docdir=$PREFIX/doc/$APP_NAME-$VERSION \
+        --includedir=$PREFIX/include \
+        --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
+        --enable-single-host \
+        --enable-gcc-opts
+
+    # compilation
+    make -j3 PREFIX=$PREFIX
+    # installation
+    make install DESTDIR=$PKG
+)
+
+# correction
+chown -R root:root $PKG/*
+
+mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+( cd $TMP/$APP_NAME-$VERSION
+    cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+)
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && rm $PKG/usr/info/dir
+
+# Strip binaries
+find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$APP_NAME: $APP_NAME (Scheme programming system)
+$APP_NAME:
+$APP_NAME: Gambit-C includes a Scheme interpreter and a Scheme compiler which can be used
+$APP_NAME: to build standalone executables.  Because the compiler generates portable
+$APP_NAME: C code it is fairly easy to port to any platform with a decent C compiler.
+$APP_NAME: 
+$APP_NAME: The Gambit-C system conforms to the R4RS, R5RS and IEEE Scheme standards.
+$APP_NAME:
+$APP_NAME:
+$APP_NAME: http://dynamo.iro.umontreal.ca/~gambit/wiki/index.php/Main_Page
+$APP_NAME:
+EOF
+
+# empaquetage
+( cd $PKG
+    makepkg -l y -c n $OUTPUT/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+)
