@@ -57,6 +57,10 @@ mkdir -p $PKG
     make -j3 PREFIX=$PREFIX
     # installation
     make install DESTDIR=$PKG
+    # WTF .bat
+    for b in $PKG$PREFIX/bin/*.bat ; do
+        mv $b ${b%bat}sh
+    done
 )
 
 # correction
