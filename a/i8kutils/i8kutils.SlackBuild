@@ -14,7 +14,7 @@ EXT=tar.gz
 DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README* TODO examples patches"
 
 ARCH=$(uname -m)
-BUILD=1cyco
+BUILD=2cyco
 
 PREFIX=/usr
 
@@ -37,8 +37,49 @@ make -j3 PREFIX=$PREFIX
 
 # installation
 mkdir -p $PKG$PREFIX/{sbin,bin,man}
-make install DESTDIR=$PKG  PREFIX=$PREFIX
+make install DESTDIR=$PKG PREFIX=$PREFIX
 cp *.1 $PKG$PREFIX/man
+
+mkdir -p $PKG/etc/rc.d
+cat <<EOF > $PKG/etc/rc.d/rc.i8kmon.new
+#!/bin/sh
+# Start/stop/restart i8kmon.
+
+# Start i8kmon:
+i8kmon_start() {
+  if [ -x /usr/bin/i8kmon -a -d /proc/i8k ]; then
+    echo "Starting i8k daemon:  /usr/sbin/i8kmon"
+    /usr/bin/i8kmon
+  fi
+}
+
+# Stop i8kmon:
+i8kmon_stop() {
+  killall i8kmon
+}
+
+# Restart i8kmon:
+i8kmon_restart() {
+  i8kmon_stop
+  sleep 1
+  i8kmon_start
+}
+
+case "$1" in
+'start')
+  i8kmon_start
+  ;;
+'stop')
+  i8kmon_stop
+  ;;
+'restart')
+  i8kmon_restart
+  ;;
+*)
+  echo "usage $0 start|stop|restart"
+esac
+EOF
+chmod +x $PKG/etc/rc.d/rc.i8kmon.new
 
 # correction
 cd $PKG
@@ -61,6 +102,21 @@ cp i8kmon.conf $PKG/etc/i8kmon.conf.new
 
 # embaumement
 mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then
+    # toss the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+config etc/rc.d/rc.i8kmon.new
+EOF
 cat <<EOF > $PKG/install/slack-desc
 $APP_NAME: $APP_NAME (user-space programs for accessing the SMM BIOS of Dell laptops.)
 $APP_NAME:
