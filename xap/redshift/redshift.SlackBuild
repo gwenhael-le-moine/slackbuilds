@@ -1,0 +1,81 @@
+#!/bin/sh -x
+
+# variables
+VERSION=trunk_$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+ARCH=$(uname -m)
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+PREFIX=/usr
+
+EMACS=$(basename $(ls /usr/bin/emacs-2*))
+EMACS_VERSION=$(echo "$EMACS" | grep -o "\-[0-9\.]*\-" | tr -d - | head -n1)
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ] ; then
+    mkdir -p $(dirname $REPOSITORY)
+    bzr branch lp:redshift $REPOSITORY
+fi
+
+( cd $REPOSITORY
+    bzr update
+)
+
+cp -R $REPOSITORY $TMP/
+( cd $TMP/$PRGNAM
+    ./bootstrap
+    ./configure \
+        --prefix=$PREFIX \
+        --mandir=$PREFIX/man
+    make
+    make install DESTDIR=$PKG
+)
+
+# correction
+( cd $PKG
+    chown -R root:root *
+    find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+)
+
+# embaumement
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (color temperature adjustment)
+$PRGNAM:
+$PRGNAM: Redshift adjusts the color temperature of your screen according to your surroundings.
+$PRGNAM: This may help your eyes hurt less if you are working in front of the screen at night.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://jonls.dk/redshift/
+$PRGNAM: 
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
