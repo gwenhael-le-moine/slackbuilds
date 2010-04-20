@@ -18,7 +18,8 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=1 #$(date +%F | tr -d '-')
 PACKAGER=cyco
 
-[ ! -e firefox-*.tar.bz2 ] && lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central/ -e "mget firefox-*.en-US.linux-x86_64.tar.bz2 ; quit"
+[ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
+lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central/ -e "mget firefox-*.en-US.linux-x86_64.tar.bz2 ; quit"
 
 VERSION=$(ls firefox-*.tar.bz2 | cut -d - -f 2 | sed 's|.en||') #rev | cut -f 3- -d . | rev)
 
