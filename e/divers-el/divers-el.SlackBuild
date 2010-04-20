@@ -37,6 +37,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://lumiere.ens.fr/~guerry/u/blorg.el" \
         "http://www.timepoorblogger.com/files/article-mode.el" \
         "http://www.randomsample.de/minimap.el" \
         "http://mumble.net/~campbell/emacs/paredit.el" \
