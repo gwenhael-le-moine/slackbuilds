@@ -45,6 +45,9 @@ cp -R $REPOSITORY $TMP
         INFODIR=$PKG$PREFIX/info \
         MAN1DIR=$PKG$PREFIX/man/man1 \
         SITELISP=$PKG$PREFIX/share/emacs/site-lisp
+
+    mkdir -p $PKG$PREFIX/doc/$PRGNAM
+    cp -R AUTHORS COPYING FAQ NEWS README RELEASE doc/ $PKG$PREFIX/doc/$PRGNAM/
 )
 
 # correction
