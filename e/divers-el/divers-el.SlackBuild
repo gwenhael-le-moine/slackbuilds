@@ -32,7 +32,7 @@ mkdir -p $CWD/els
         URL=$1
         FILENAME=$(echo "$URL" | grep -o -e "[/=][A-Za-z0-9+-]*\.el" | tr -d '=' | tr -d '/')
         wget -T 10 -t 3 -c "$URL" -O "$FILENAME.new"
-        [ "$(wc -c $FILENAME.new | cut -d ' ' -f 1)" > 0 ] && mv "$FILENAME.new" "$FILENAME"
+        [ "$(cat $FILENAME.new | wc -c)" > 0 ] && mv "$FILENAME.new" "$FILENAME"
         [ -e "$FILENAME.new" ] && rm "$FILENAME.new"
     }
 
