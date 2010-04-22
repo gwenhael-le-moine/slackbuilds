@@ -37,6 +37,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://varnish-cache.org/browser/trunk/varnish-tools/emacs/vcl-mode.el?format=txt" \
         "http://lumiere.ens.fr/~guerry/u/blorg.el" \
         "http://www.timepoorblogger.com/files/article-mode.el" \
         "http://www.randomsample.de/minimap.el" \
