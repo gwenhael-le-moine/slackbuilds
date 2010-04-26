@@ -16,19 +16,19 @@ ARCH=$(uname -m)
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/fossil-$VERSION
+rm -fr $PKG $TMP/$APP_NAME-$VERSION
 
 mkdir -p $PKG$PREFIX/doc/$APP_NAME
 
 # mise en place
 ( cd $CWD
-    [ ! -e fossil-src-$VERSION.tar.gz ] && wget -c http://www.fossil-scm.org/download/fossil-src-$VERSION.tar.gz
+    [ ! -e $APP_NAME-src-$VERSION.tar.gz ] && wget -c http://www.$APP_NAME-scm.org/download/$APP_NAME-src-$VERSION.tar.gz
 )
 
 ( cd $TMP
-    tar xf $CWD/fossil-src-$VERSION.tar.gz
-    mv fossil-src-$VERSION fossil-$VERSION
-    cd fossil-$VERSION
+    tar xf $CWD/$APP_NAME-src-$VERSION.tar.gz
+    mv $APP_NAME-src-$VERSION $APP_NAME-$VERSION
+    cd $APP_NAME-$VERSION
 
     make
 
@@ -62,7 +62,7 @@ $APP_NAME:
 $APP_NAME: 
 $APP_NAME: 
 $APP_NAME: 
-$APP_NAME: http://fossil-scm.org
+$APP_NAME: http://www.fossil-scm.org
 $APP_NAME: 
 EOF
 
