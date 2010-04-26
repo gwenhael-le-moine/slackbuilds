@@ -1,0 +1,71 @@
+#!/bin/sh -x
+
+# variables
+VERSION=20100318142033 #$(date +"%Y%m%d")
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp
+CWD=$(pwd)
+
+APP_NAME=$(basename $CWD)
+PKG=$TMP/$PACKAGER/pkg-$APP_NAME
+
+ARCH=$(uname -m)
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr $PKG $TMP/fossil-$VERSION
+
+mkdir -p $PKG$PREFIX/doc/$APP_NAME
+
+# mise en place
+( cd $CWD
+    [ ! -e fossil-src-$VERSION.tar.gz ] && wget -c http://www.fossil-scm.org/download/fossil-src-$VERSION.tar.gz
+)
+
+( cd $TMP
+    tar xf $CWD/fossil-src-$VERSION.tar.gz
+    mv fossil-src-$VERSION fossil-$VERSION
+    cd fossil-$VERSION
+
+    make
+
+    mkdir -p $PKG$PREFIX/bin $PKG$PREFIX/doc/
+    mv $APP_NAME $PKG$PREFIX/bin
+    cp -R www $PKG$PREFIX/doc/$APP_NAME
+)
+
+# correction
+( cd $PKGl
+    chown -R root:root *
+)
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+$APP_NAME: $APP_NAME (distributed software configuration management)
+$APP_NAME:
+$APP_NAME: Simple, high-reliability, distributed software configuration management
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: 
+$APP_NAME: http://fossil-scm.org
+$APP_NAME: 
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD$PACKAGER.txz
