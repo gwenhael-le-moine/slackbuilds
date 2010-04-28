@@ -1,0 +1,46 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/thinkpython.pdf ] && mv $CWD/thinkpython.pdf $CWD/thinkpython.pdf.orig
+wget -c http://www.greenteapress.com/thinkpython/thinkpython.pdf -O $CWD/thinkpython.pdf
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/thinkpython.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Python for Software Design» book)
+$PRGNAM: 
+$PRGNAM: Python for Software Design is a concise introduction to software design using
+$PRGNAM: the Python programming language. Intended for people with no programming
+$PRGNAM: experience, this book starts with the most basic concepts and gradually adds
+$PRGNAM: new material.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.greenteapress.com/thinkpython/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
