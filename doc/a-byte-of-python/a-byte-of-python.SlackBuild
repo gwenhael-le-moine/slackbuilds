@@ -1,0 +1,49 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/byteofpython_120.pdf ] && mv $CWD/byteofpython_120.pdf $CWD/byteofpython_120.pdf.orig
+wget -c http://www.ibiblio.org/swaroopch/byteofpython/files/120/byteofpython_120.pdf -O $CWD/byteofpython_120.pdf
+[ -e $CWD/byteofpython_v192.pdf ] && mv $CWD/byteofpython_v192.pdf $CWD/byteofpython_v192.pdf.orig
+wget -c http://www.swaroopch.com/files/byteofpython/byte_of_python_v192.pdf -O $CWD/byteofpython_v192.pdf
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/byteofpython_120.pdf $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/byteofpython_v192.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («A Byte of Python» book)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.swaroopch.com/notes/Python
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
