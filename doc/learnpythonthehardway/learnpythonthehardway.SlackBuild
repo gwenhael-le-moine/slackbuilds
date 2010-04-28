@@ -1,0 +1,46 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/LearnPythonTheHardWay.pdf ] && mv $CWD/LearnPythonTheHardWay.pdf $CWD/LearnPythonTheHardWay.pdf.orig
+wget -c http://sheddingbikes.com/LearnPythonTheHardWay.pdf -O $CWD/LearnPythonTheHardWay.pdf
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/LearnPythonTheHardWay.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Learn Python the Hard way» book)
+$PRGNAM: 
+$PRGNAM: Zed Shaw Python learning book project
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://learnpythonthehardway.com/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
