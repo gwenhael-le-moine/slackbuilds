@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=1.9.1-p376
+VERSION=1.9.1-p378
 BUILD=${BUILD:-1cyco}
 
 ARCH=emacs
@@ -13,7 +13,7 @@ rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
 rm -rf ruby-$VERSION
-tar xvf $CWD/ruby-$VERSION.tar.?z* || exit 1
+tar xvf $CWD/ruby-$VERSION.tar.?z* ruby-$VERSION/misc/ || exit 1
 cd ruby-$VERSION || exit 1
 
 chown -R root:root .
