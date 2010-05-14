@@ -8,8 +8,6 @@ TMP=/tmp
 REPOSITORIES=$HOME/projets/packages/repositories
 
 PRGNAM=$(basename $CWD)
-PRGNAM1=$PRGNAM
-PRGNAM2=sur
 VERSION=hg$(date +%F | tr -d '-' )
 BUILD=1
 PACKAGER=cyco
@@ -53,8 +51,10 @@ function get_build_install() {
 	[ -e $PKG$PREFIX/share/man ] && cp -a $PKG$PREFIX/share/man $PKG$PREFIX && rm -fr $PKG$PREFIX/share/man
 }
 
-get_build_install $PRGNAM1
-get_build_install $PRGNAM2
+get_build_install $PRGNAM
+get_build_install sur
+get_build_install sublets
+# get_build_install subtly
 
 mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
