@@ -4,9 +4,9 @@
 CWD=$(pwd)
 
 APP_NAME=$(basename $CWD)
-VERSION=1.11b
+VERSION=1.12
 ARCH=$(uname -m)
-BUILD=3
+BUILD=1
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
@@ -32,7 +32,7 @@ mkdir -p $PKG
 # mise en place
 ( cd $TMP
     [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
-        wget -c http://mirror.cinquix.com/pub/savannah/eliot/releases/$APP_NAME-$VERSION.tar.gz \
+        wget -c http://dl.sv.nongnu.org/releases-noredirect/eliot/releases/$APP_NAME-$VERSION.tar.gz \
         -O $CWD/$APP_NAME-$VERSION.tar.gz
     tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
 )
