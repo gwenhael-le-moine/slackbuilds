@@ -66,13 +66,14 @@ mkdir -p $PKG
     cp utils/eliottxt $PKG$PREFIX/bin/
 
     # dictionaries
-    DICOS="ods5.dawg twl06.dawg sowpods06.dawg"
+    #note: ods5.dawg has been taken down from upstream due to legal requirement
+    DICOS="eliot-dic-fr.dawg twl06.dawg sowpods06.dawg"
     mkdir -p $PKG$PREFIX/share/$APP_NAME
     for d in $DICOS ; do
         [ ! -e $CWD/$d ] && \
             wget -c http://dl.sv.nongnu.org/releases/eliot/dict/$d -O $CWD/$d
-        cp $CWD/$d $PKG$PREFIX/share/$APP_NAME/
     done
+    cp $CWD/*.dawg $PKG$PREFIX/share/$APP_NAME/
 )
 
 # correction
