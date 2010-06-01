@@ -29,7 +29,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone git://gitorious.org/magit/mainline.git $PRGNAM
+        git clone http://github.com/philjackson/magit.git $PRGNAM
 fi
 
 ( cd $REPOSITORY
