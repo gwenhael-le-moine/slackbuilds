@@ -37,11 +37,23 @@ fi
     cvs update
 )
 
-cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
+if [ ! -e $REPOSITORY ] ; then
+    [ -e $CWD/$APP_NAME-$VERSION.tar.gz ] && rm $CWD/$APP_NAME-$VERSION.tar.gz
+    wget -c "http://cvs.namazu.org/emacs-w3m.tar.gz?view=tar" -O $CWD/$APP_NAME-$VERSION.tar.gz
+    ( cd $TMP
+        tar xvf $CWD/$APP_NAME-$VERSION.tar.gz
+        mv $APP_NAME $APP_NAME-$VERSION
+    )
+else
+    cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
+fi
 ( cd $TMP/$APP_NAME-$VERSION
+    zcat $CWD/widget-mouse-face.patch.gz | patch -p1
     autoreconf
     ./configure \
-        --prefix=$PREFIX
+        --prefix=$PREFIX \
+        --infodir=$PREFIX/info \
+        --mandir=$PREFIX/man
     make
     make install prefix=$PKG$PREFIX
 )
