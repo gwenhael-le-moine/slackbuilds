@@ -48,7 +48,6 @@ mkdir -p $CWD/els
         "http://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
         "http://repo.or.cz/w/ShellArchive.git?a=blob_plain;hb=HEAD;f=smallurl.el" \
         "http://www.eskimo.com/~seldon/diminish.el" \
-        "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
         "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
         "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
         "http://damtp.cam.ac.uk/user/sje30/emacs/ell.el" \
