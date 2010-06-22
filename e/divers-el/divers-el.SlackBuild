@@ -55,7 +55,6 @@ mkdir -p $CWD/els
         "http://damtp.cam.ac.uk/user/sje30/emacs/ell.el" \
         "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
         "http://www.bobnewell.net/elisp/speedread.el" \
-        "http://dev.nozav.org/scripts/textile-mode.el" \
         "http://www.ccs.neu.edu/home/guttman/undoc.el" \
         "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" ;
     do
