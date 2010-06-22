@@ -65,7 +65,7 @@ i8kmon_restart() {
   i8kmon_start
 }
 
-case "$1" in
+case "\$1" in
 'start')
   i8kmon_start
   ;;
@@ -76,7 +76,7 @@ case "$1" in
   i8kmon_restart
   ;;
 *)
-  echo "usage $0 start|stop|restart"
+  echo "usage \$0 start|stop|restart"
 esac
 EOF
 chmod +x $PKG/etc/rc.d/rc.i8kmon.new
