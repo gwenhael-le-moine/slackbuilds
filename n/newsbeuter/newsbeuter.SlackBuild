@@ -5,7 +5,7 @@
 # Released under the WTFPL
 
 PRGNAM=newsbeuter
-VERSION=${VERSION:-2.2}
+VERSION=${VERSION:-2.3}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}

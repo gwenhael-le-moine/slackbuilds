@@ -1,4 +1,4 @@
- #!/bin/sh
+#!/bin/sh
 
 set -x
 
@@ -54,7 +54,7 @@ function get_build_install() {
 get_build_install $PRGNAM
 get_build_install sur
 get_build_install sublets
-# get_build_install subtly
+get_build_install subtly
 
 mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
