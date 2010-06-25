@@ -47,15 +47,12 @@ mkdir -p $CWD/els
         "http://nschum.de/src/emacs/full-ack/full-ack.el" \
         "http://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
         "http://repo.or.cz/w/ShellArchive.git?a=blob_plain;hb=HEAD;f=smallurl.el" \
-        "http://edward.oconnor.cx/elisp/color-theme-hober2.el" \
         "http://www.eskimo.com/~seldon/diminish.el" \
-        "http://lambda.nirv.net/m/files/color-theme-chocolate-rain.el" \
         "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
         "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
         "http://damtp.cam.ac.uk/user/sje30/emacs/ell.el" \
         "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
         "http://www.bobnewell.net/elisp/speedread.el" \
-        "http://dev.nozav.org/scripts/textile-mode.el" \
         "http://www.ccs.neu.edu/home/guttman/undoc.el" \
         "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" ;
     do
