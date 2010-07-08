@@ -55,17 +55,17 @@ cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
     make install-info
     rm $PKG$PREFIX/info/dir
 
-    # install contrib
-    cp -R contrib/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
-    # install org-babel
-    cp -R contrib/babel/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
+    # # install contrib
+    # cp -R contrib/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
+    # # install org-babel
+    # cp -R contrib/babel/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
 
-    ( cd $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
-        emacs -batch -f batch-byte-compile-file *.el
-    )
-    ( cd $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
-        emacs -batch -f batch-byte-compile-file *.el
-    )
+    # ( cd $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
+    #     emacs -batch -f batch-byte-compile-file *.el
+    # )
+    # ( cd $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
+    #     emacs -batch -f batch-byte-compile-file *.el
+    # )
     mkdir -p $PKG$PREFIX/doc/$APP_NAME
     cp -R contrib $PKG$PREFIX/doc/$APP_NAME
 )
