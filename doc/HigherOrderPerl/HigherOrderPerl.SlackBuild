@@ -1,0 +1,48 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/http://hop.perl.plover.com/book/pdf/HigherOrderPerl.pdf ] && mv $CWD/HigherOrderPerl.pdf $CWD/HigherOrderPerl.pdf.orig
+wget -c http://hop.perl.plover.com/book/pdf/HigherOrderPerl.pdf -O $CWD/HigherOrderPerl.pdf
+[ -e $CWD/http://hop.perl.plover.com/book/pdf/HigherOrderPerl-trimmed.pdf ] && mv $CWD/HigherOrderPerl-trimmed.pdf $CWD/HigherOrderPerl-trimmed.pdf.orig
+wget -c http://hop.perl.plover.com/book/pdf/HigherOrderPerl-trimmed.pdf -O $CWD/HigherOrderPerl-trimmed.pdf
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/HigherOrderPerl*.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Higher-Order Perl» book)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://hop.perl.plover.com/book/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
