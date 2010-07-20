@@ -62,7 +62,7 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Google Maps in Emacs)
+$PRGNAM: $PRGNAM (Emacs: from org-mode to ToodleDo)
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
