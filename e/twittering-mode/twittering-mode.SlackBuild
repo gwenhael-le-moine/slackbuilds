@@ -39,7 +39,7 @@ fi
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp
 cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
-    rm -fr .git*
+    rm -fr .git* .nosearch
     $EMACS -batch -f batch-byte-compile *.el
 )
 
