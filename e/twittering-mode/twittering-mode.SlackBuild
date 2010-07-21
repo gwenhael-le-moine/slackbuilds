@@ -40,6 +40,7 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp
 cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
     find . \( -name ".git*" -o -name ".nosearch" \) -exec rm -fr {} \;
+    find . -type d \( -name "*emacs21" -o -name "win-curl" \) -exec rm -fr {} \;
     $EMACS -batch -f batch-byte-compile *.el
 )
 
