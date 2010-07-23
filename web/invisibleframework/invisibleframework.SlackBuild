@@ -1,0 +1,49 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=2.0
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+mkdir -p $PKG/srv/www/htdocs/$PRGNAM
+
+[ ! -e $CWD/${PRGNAM}_$VERSION.zip ] && ( cd $CWD ; wget -c http://edge.launchpad.net/invisible/$VERSION/$VERSION/+download/${PRGNAM}-$VERSION.zip )
+( cd $PKG/srv/www/htdocs/$PRGNAM
+    unzip $CWD/${PRGNAM}-$VERSION.zip
+)
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (CSS framework)
+$PRGNAM: 
+$PRGNAM: Invisible is a simple and modular CSS framework.
+$PRGNAM: Invisible is not complex.
+$PRGNAM: It provides a reset, a base resizable layout and some other stuff.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://launchpad.net/invisible
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
