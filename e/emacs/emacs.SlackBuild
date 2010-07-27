@@ -173,15 +173,7 @@ mv $PKG/usr/man/man1/ctags.1 $PKG/usr/man/man1/ctags-emacs.1
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-( cd $PKG/usr/man
-  find . -type f -exec gzip -9 {} \;
-  for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-)
-
-( cd $PKG/usr/info
-  rm -f dir
-  gzip -9 *
-)
+rm $PKG/usr/info/dir*
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a \
