@@ -29,8 +29,8 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        cvs -d ":pserver:anonymous@cvs.luaforge.net:/cvsroot/lua-mode" login
-        cvs -d ":pserver:anonymous@cvs.luaforge.net:/cvsroot/lua-mode" checkout $PRGNAM
+        cvs -d :pserver:anonymous@cvs.luaforge.net:/cvsroot/lua-mode login
+        cvs -d :pserver:anonymous@cvs.luaforge.net:/cvsroot/lua-mode checkout $PRGNAM
 fi
 
 ( cd $REPOSITORY
@@ -38,7 +38,16 @@ fi
 )
 
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp
-cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
+if [ -e $REPOSITORY ] ; then
+    cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
+else
+    wget -c "http://luaforge.net/snapshots.php?group_id=185" -O $CWD/$PRGNAM-$VERSION.tar.gz
+    ( cd $PKG$PREFIX/share/emacs/site-lisp/
+        tar xf $CWD/$PRGNAM-$VERSION.tar.gz
+        mv lua-mode-scm*/lua-mode .
+        rm -fr lua-mode-scm*
+    )
+fi
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
     rm -fr CVS
     $EMACS -batch -f batch-byte-compile *.el
