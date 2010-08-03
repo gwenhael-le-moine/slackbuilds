@@ -1,0 +1,65 @@
+#!/bin/sh
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+VERSION=git_$(date +%Y%m%d_%H%M)
+ARCH=$(uname -m)
+BUILD=1
+PACKAGER=cyco
+
+PREFIX=/usr
+LIBSUFFIX=$(echo $ARCH | grep -o 64)
+
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+OUTPUT=$TMP
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+if [ -e $REPOSITORIES/$PRGNAM ] ; then
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+else
+    git clone git://repo.or.cz/conkeror.git $REPOSITORIES/$PRGNAM
+fi
+
+mkdir -p $PKG$PREFIX/libexec/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/libexec/
+( cd $PKG$PREFIX/libexec/$PRGNAM
+    make conkeror-spawn-helper
+    rm -fr .git .gitignore
+)
+
+mkdir -p $PKG$PREFIX/bin
+( cd $PKG$PREFIX/bin
+    ln -s ../libexec/$PRGNAM/conkeror-spawn-helper conkeror-spawn-helper
+    ln -s ../libexec/$PRGNAM/contrib/run-conkeror run-conkeror
+    ln -s run-conkeror conkeror
+)
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+( cd $PKG$PREFIX/doc/$PRGNAM
+    for d in COPYING CREDITS INSTALL help ; do
+        ln -s ../../libexec/$PRGNAM/$d $d
+    done
+)
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Web browser)
+$PRGNAM: 
+$PRGNAM: Conkeror is a keyboard-oriented, highly-customizable, highly-extensible
+$PRGNAM: web browser based on Mozilla XULRunner, written mainly in JavaScript, and
+$PRGNAM: inspired by exceptional software such as Emacs and vi. Conkeror features
+$PRGNAM: a sophisticated keyboard system, allowing users to run commands and interact
+$PRGNAM: with content in powerful and novel ways. It is self-documenting, featuring a
+$PRGNAM: powerful interactive help system. 
+$PRGNAM: 
+$PRGNAM: http://conkeror.org/
+$PRGNAM: 
+EOF
+
+( cd $PKG
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
