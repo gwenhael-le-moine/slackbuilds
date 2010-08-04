@@ -29,7 +29,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone "git://git.naquadah.org/~jd/jd-el.git" $PRGNAM
+        git clone "git://git.naquadah.org/rainbow.git" $PRGNAM
 fi
 
 ( cd $REPOSITORY
@@ -60,16 +60,16 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Julien Danjou Emacs thingies)
+$PRGNAM: $PRGNAM (Rainbow mode for Emacs)
+$PRGNAM: 
+$PRGNAM: This minor mode will set background color to strings that matches
+$PRGNAM: color names.
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: http://julien.danjou.info/
+$PRGNAM: http://julien.danjou.info/rainbow-mode.html
 $PRGNAM: 
 EOF
 
