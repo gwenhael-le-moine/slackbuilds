@@ -1,17 +1,20 @@
 #!/bin/sh
 set -x
 
-PRGNAM=discount
-VERSION=1.5.5
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git_$(date +%Y%m%d_%H%M)
 
 BUILD=1
 PACKAGER=cyco
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
-CWD=$(pwd)
 TMP=/tmp
 PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 
 PREFIX=/usr
 
@@ -21,16 +24,19 @@ PREFIX=/usr
     rm -fr $PKG
 )
 
-# Fetching sources
-( cd $TMP
-    [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] \
-        && tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
-    [ ! -e $PRGNAM-$VERSION ] \
-        && wget -c http://nchc.dl.sourceforge.net/project/$PRGNAM/$PRGNAM/$VERSION/$PRGNAM-$VERSION.tar.gz \
-        && tar xvf $PRGNAM-$VERSION.tar.?z*
+if [ ! -e $REPOSITORY ] ; then
+        mkdir -p $(dirname $REPOSITORY)
+        ( cd $(dirname $REPOSITORY)
+            git clone "http://github.com/Orc/discount.git" $PRGNAM
+        )
+fi
+
+( cd $REPOSITORY
+    git pull
 )
 
 # Preparation
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 ( cd $TMP/$PRGNAM-$VERSION
     chown -R root:root .
     find . \
