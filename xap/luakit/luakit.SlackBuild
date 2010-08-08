@@ -1,0 +1,94 @@
+#!/bin/sh
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git_$(date +%Y%m%d_%H%M)
+
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+
+PREFIX=/usr
+
+# Cleaning
+( cd $TMP
+    rm -fr $PRGNAM-$VERSION
+    rm -fr $PKG
+)
+
+if [ ! -e $REPOSITORY ] ; then
+        mkdir -p $(dirname $REPOSITORY)
+        ( cd $(dirname $REPOSITORY)
+            git clone "git://github.com/mason-larobina/luakit.git" $PRGNAM
+        )
+fi
+
+( cd $REPOSITORY
+    git pull
+)
+
+# Preparation
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+)
+
+# Building
+( cd $TMP/$PRGNAM-$VERSION
+    make PREFIX=$PREFIX
+)
+
+# Installation
+( cd $TMP/$PRGNAM-$VERSION
+#	mkdir -p $PKG$PREFIX/{bin,lib$(echo "$ARCH" | grep -o "64")}
+	make install DESTDIR=$PKG PREFIX=$PREFIX DOCDIR=$PKG$PREFIX/doc/$PRGNAM
+)
+
+# Cleaning
+( cd $PKG
+    find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+    find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+    find ./man -type f -name "*.?" -exec gzip -9 {} \;
+
+    chown -R root:root .
+    find . \
+        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+        -exec chmod 755 {} \; -o \
+        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+        -exec chmod 644 {} \;
+)
+
+# Packaging
+( cd $PKG
+    mkdir install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (browser «framework»)
+$PRGNAM:
+$PRGNAM: luakit is a highly configurable, micro-browser framework based on the
+$PRGNAM: WebKit web content engine and the GTK+ toolkit. It is very fast,
+$PRGNAM: extensible by Lua and licensed under the GNU GPLv3 license with sections
+$PRGNAM: under the MIT license.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://www.luakit.org/projects/luakit
+$PRGNAM:
+EOF
+
+    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+)
+
