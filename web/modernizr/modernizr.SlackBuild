@@ -27,9 +27,7 @@ mv $CWD/$PRGNAM-VERSIONPLACEHOLDER.min.js $CWD/$PRGNAM-$VERSION.min.js
 mv $CWD/$PRGNAM-VERSIONPLACEHOLDER.js $CWD/$PRGNAM-$VERSION.js
 
 mkdir -p $PKG/srv/www/htdocs/$PRGNAM
-( cd $PKG/srv/www/htdocs/$PRGNAM
-    cp $CWD/$PRGNAM-*.js .
-)
+cp $CWD/$PRGNAM-*.js $PKG/srv/www/htdocs/$PRGNAM
 
 ( cd $PKG
     mkdir -p install
