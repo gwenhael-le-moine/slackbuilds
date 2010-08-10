@@ -1,0 +1,56 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=latest
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+find $CWD -name "$PRGNAM-*.zip" -exec mv {} {}.bkp \;
+( cd $CWD
+    lftp -c "open http://html5reset.org/-/downloads/ ; mget *.zip"
+)
+
+VERSION=$(ls $CWD/html5reset-barebones-*.zip | sed 's|html5reset-barebones-||' | sed 's|\.zip||')
+
+mkdir -p $PKG/srv/www/htdocs/$PRGNAM
+( cd $PKG/srv/www/htdocs/$PRGNAM
+    for z in $CWD/html5reset-*.zip ; do
+        unzip $z
+    done
+    rm -fr __MACOSX
+    find . -type d -name "-" -exec mv {} _ \;
+
+)
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (HTML5 skeleton and reset)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://html5reset.org
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
