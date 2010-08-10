@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 CWD=$(pwd)
 
@@ -22,7 +22,7 @@ find $CWD -name "$PRGNAM-*.zip" -exec mv {} {}.bkp \;
     lftp -c "open http://html5reset.org/-/downloads/ ; mget *.zip"
 )
 
-VERSION=$(ls $CWD/html5reset-barebones-*.zip | sed 's|html5reset-barebones-||' | sed 's|\.zip||')
+VERSION=$(basename $(ls $CWD/html5reset-barebones-*.zip) | sed 's|html5reset-barebones-||' | sed 's|\.zip||')
 
 mkdir -p $PKG/srv/www/htdocs/$PRGNAM
 ( cd $PKG/srv/www/htdocs/$PRGNAM
@@ -30,8 +30,7 @@ mkdir -p $PKG/srv/www/htdocs/$PRGNAM
         unzip $z
     done
     rm -fr __MACOSX
-    find . -type d -name "-" -exec mv {} _ \;
-
+    # find . -type d -name "-" -exec mv {} _ \;
 )
 
 ( cd $PKG
