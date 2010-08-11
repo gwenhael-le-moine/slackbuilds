@@ -40,6 +40,7 @@ OUTPUT=${OUTPUT:-/tmp}
 case "$ARCH" in
   i?86) REL="chromium-rel-linux" ; LIBDIRSUFFIX="" ; ARCH=i386 ;;
   x86_64) REL="chromium-rel-linux-64" ; LIBDIRSUFFIX="64" ;;
+  arm*) REL="chromium-rel-arm"; LIBDIRSUFFIX="" ; ARCH=arm ;;
 esac
 
 #set -eu
