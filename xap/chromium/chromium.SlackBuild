@@ -1,0 +1,96 @@
+#!/bin/sh
+#
+# Slackware build script for Google Chrome
+
+# Copyright 2009-2010  Erik Hanson, Minneapolis, MN, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Adapted by Gwenhael Le Moine for Chromium snapshot
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=snapshot
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+# Just in case:
+case "$ARCH" in
+  i?86) REL="chromium-rel-linux" ; LIBDIRSUFFIX="" ; ARCH=i386 ;;
+  x86_64) REL="chromium-rel-linux-64" ; LIBDIRSUFFIX="64" ;;
+esac
+
+#set -eu
+
+rm -rf $PKG
+mkdir -p $TMP $PKG/opt $OUTPUT
+cd $PKG/opt
+
+#get latest revision number
+[ -e ./LATEST ] && rm ./LATEST
+wget -c http://build.chromium.org/buildbot/snapshots/$REL/LATEST
+REVISION=$(cat ./LATEST)
+VERSION=${VERSION}_$REVISION
+rm ./LATEST
+
+#get chromium
+[ -e chrome-linux.zip ] && rm chrome-linux.zip
+wget -c http://build.chromium.org/buildbot/snapshots/$REL/$REVISION/chrome-linux.zip
+unzip ./chrome-linux.zip && rm ./chrome-linux.zip
+
+cd ..
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+chmod 0755 $PKG # Put this back.
+chmod 4755 opt/chrome-linux/chrome_sandbox # This needs to be SUID.
+
+# We need bits of Moz, do this as dynamically as possible:
+MISSING_LIBS=$(ldd opt/chrome-linux/chrome | grep "not found" | cut -d\  -f1 | xargs)
+for MLIB in $MISSING_LIBS ; do
+  ln -s /usr/lib${LIBDIRSUFFIX}/seamonkey/${MLIB%.?d} opt/chrome-linux/$MLIB
+done
+
+mkdir -p $PKG/usr/man/man1/
+mv opt/chrome-linux/chrome.1 $PKG/usr/man/man1/
+gzip -9 $PKG/usr/man/man?/*.?
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Web browser)
+$PRGNAM: 
+$PRGNAM: Chromium is an open-source browser project that aims to build a safer,
+$PRGNAM: faster, and more stable way for all users to experience the web.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://chromium.org
+$PRGNAM: 
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
