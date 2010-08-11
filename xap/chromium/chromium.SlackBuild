@@ -47,8 +47,8 @@ esac
 
 rm -rf $PKG
 mkdir -p $TMP $PKG/opt $OUTPUT
-cd $PKG/opt
 
+cd $PKG/opt
 #get latest revision number
 [ -e ./LATEST ] && rm ./LATEST
 wget -c http://build.chromium.org/buildbot/snapshots/$REL/LATEST
@@ -62,11 +62,6 @@ wget -c http://build.chromium.org/buildbot/snapshots/$REL/$REVISION/chrome-linux
 unzip ./chrome-linux.zip && rm ./chrome-linux.zip
 
 cd ..
-chown -R root:root .
-chmod -R u+w,go+r-w,a-s .
-
-chmod 0755 $PKG # Put this back.
-chmod 4755 opt/chrome-linux/chrome_sandbox # This needs to be SUID.
 
 # We need bits of Moz, do this as dynamically as possible:
 MISSING_LIBS=$(ldd opt/chrome-linux/chrome | grep "not found" | cut -d\  -f1 | xargs)
@@ -75,8 +70,20 @@ for MLIB in $MISSING_LIBS ; do
 done
 
 mkdir -p $PKG/usr/man/man1/
-mv opt/chrome-linux/chrome.1 $PKG/usr/man/man1/
+mv $PKG/opt/chrome-linux/chrome.1 $PKG/usr/man/man1/
 gzip -9 $PKG/usr/man/man?/*.?
+
+mkdir -p $PKG/usr/bin
+cat <<EOF > $PKG/usr/bin/$PRGNAM
+#!/bin/sh
+cd /opt/chrome-linux/
+LD_LIBRARY_PATH=/opt/chrome-linux/:$LD_LIBRARY_PATH ./chrome $*
+EOF
+
+( cd $PKG/usr/bin/
+    ln -s $PRGNAM chrome
+    ln -s $PRGNAM google-chrome
+)
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
@@ -94,4 +101,12 @@ $PRGNAM:
 EOF
 
 cd $PKG
+chown -R root:root .
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;
+
+chmod 755 $PKG/opt/chrome-linux/{chrome,chrome_sandbox,xdg-settings,chrome-wrapper} $PKG/usr/bin/*
+chmod +s $PKG/opt/chrome-linux/chrome_sandbox
+
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
+
