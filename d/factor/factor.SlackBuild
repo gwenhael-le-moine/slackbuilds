@@ -4,8 +4,8 @@ set -x -e
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=$([ -e $PRGNAM-linux-*.tar.?z* ] && ls $PRGNAM-linux-*.tar.?z* | cut -d . -f 1 | cut -d - -f 5,6,7,8,9 )
 ARCH=$(uname -m)
+VERSION=$(ls -u factor*.tar.?z* | head -n1 | sed 's|.tar.gz$||' | sed "s|^factor-linux-$( [ "$ARCH" = "x86_64" ] && echo x86-64 || echo x86-32)-||" )
 BUILD=1
 PACKAGER=cyco
 
