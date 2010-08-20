@@ -2,7 +2,7 @@
 set -x -e
 
 PRGNAM=clojure
-VERSION=1.1.0
+VERSION=1.2.0
 ARCH=java
 BUILD=1
 PACKAGER=cyco
@@ -18,7 +18,7 @@ rm -fr $PKG
 # do we have the sources?
 if [ ! -e $CWD/$PRGNAM-$VERSION.zip ] ; then
    ( cd $CWD
-      wget -c http://$PRGNAM.googlecode.com/files/$PRGNAM-$VERSION.zip
+      wget -c http://github.com/downloads/clojure/clojure/$PRGNAM-$VERSION.zip
    )
 fi
 
