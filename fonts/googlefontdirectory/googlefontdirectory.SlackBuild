@@ -1,0 +1,79 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+ARCH=font
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+# Place to build (TMP) package (PKG) and output (OUTPUT) the program:
+PKG=$TMP/package-$PRGNAM
+TMP=/tmp
+OUTPUT=${OUTPUT:-/tmp}
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+
+# Create working directories:
+mkdir -p $OUTPUT          # place for the package to be saved
+[ -e $PKG ] && rm -fr $PKG
+mkdir -p $PKG             # place for the package to be built
+rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+                          # remove old log files
+
+FONTDIR="/usr/share/fonts"
+
+# get sources
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    hg clone https://googlefontdirectory.googlecode.com/hg/ $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        hg pull -u
+    )
+fi
+# Move the fonts into place:
+mkdir -p $PKG$FONTDIR/{TTF,OTF}
+mkdir -p $PKG/usr/doc/
+
+cp -R $REPOSITORIES/$PRGNAM $PKG/usr/doc/
+find $PKG/usr/doc/$PRGNAM -type f -name \*.ttf -exec mv {} $PKG$FONTDIR/TTF \;
+find $PKG/usr/doc/$PRGNAM -type f -name \*.otf -exec mv {} $PKG$FONTDIR/OTF \;
+find $PKG/usr/doc/$PRGNAM -name .hg\* -exec rm -fr {} \;
+
+[ ! -e $CWD/eula.html ] && wget -c http://www.josbuivenga.demon.nl/eula.html -O $CWD/eula.html
+cp $CWD/eula.html $PKG/usr/doc/$PRGNAM
+
+# Post-install script:
+mkdir -p $PKG/install
+cat <<EOT > $PKG/install/doinst.sh
+# Update X font indexes and the font cache:
+if [ -x .$XPREF/bin/mkfontdir ]; then
+  chroot . $XPREF/bin/mkfontscale $FONTDIR
+  chroot . $XPREF/bin/mkfontdir $FONTDIR
+fi
+if [ -x .$XPREF/bin/fc-cache ]; then
+  chroot . $XPREF/bin/fc-cache -f $FONTDIR
+fi
+EOT
+
+# Add a package description:
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (exljbris Font Foundry's free fonts)
+$PRGNAM: 
+$PRGNAM: fonts in the Google Font Directory. Please see http://code.google.com/webfonts
+$PRGNAM: for access to those fonts through the Google Font API.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://code.google.com/p/googlefontdirectory/
+EOF
+
+# Build the package:
+cd $PKG
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
+
