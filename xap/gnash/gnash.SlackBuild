@@ -52,6 +52,13 @@ find . \
 CFLAGS="$SLKCFLAGS" \
 ./configure \
     --enable-gui=gtk \
+    --enable-write \
+    --enable-ssh \
+    --enable-ssl \
+    --enable-doublebuf \
+    --enable-offscreen \
+    --enable-hwaccel=vaapi \
+    --with-plugins-install=system \
   --prefix=/usr \
   --libdir=/usr/lib${LIBDIRSUFFIX} \
   --sysconfdir=/etc \
@@ -62,8 +69,9 @@ CFLAGS="$SLKCFLAGS" \
   --build=$ARCH-slackware-linux
 
 make $NUMJOBS || make || exit 1
-make install DESTDIR=$PKG || exit 1
+make install install-plugins DESTDIR=$PKG || exit 1
 
+mv $PKG/usr/share/man $PKG/usr/
 find $PKG/usr/man -type f -exec gzip -9 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
