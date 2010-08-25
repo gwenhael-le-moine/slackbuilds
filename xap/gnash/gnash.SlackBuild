@@ -1,36 +1,17 @@
 #!/bin/sh
 
-# Copyright 2008, 2009  Patrick J. Volkerding, Sebeka, MN, USA
-# All rights reserved.
-#
-# Redistribution and use of this script, with or without modification, is
-# permitted provided that the following conditions are met:
-#
-# 1. Redistributions of this script must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
-#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
-#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-$PRGNAM
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
 PRGNAM=$(basename $CWD)
-VERSION=git$(date +%F | tr -d '-')
-ARCH=${ARCH:-x86_64}
-BUILD=${BUILD:-1cyco}
+PKG=$TMP/package-$PRGNAM
 
-NUMJOBS=${NUMJOBS:-" -j3 "}
+VERSION=git$(date +%F | tr -d '-')
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1cyco}
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+NUMJOBS=${NUMJOBS:-" -j2 "}
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -56,7 +37,8 @@ fi
 
 cd $TMP
 [ -e $PRGNAM-$VERSION ] && rm -rf $PRGNAM-$VERSION
-cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
+rsync -HPa --exclude .git\* $REPOSITORIES/$PRGNAM .
+mv $PRGNAM $PRGNAM-$VERSION
 cd $PRGNAM-$VERSION || exit 1
 chown -R root:root .
 find . \
@@ -81,15 +63,15 @@ CFLAGS="$SLKCFLAGS" \
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-( cd $PKG/usr/man
-  find . -type f -exec gzip -9 {} \;
-  for i in $(find . -type l) ; do ln -s $(readlink $i).gz $i.gz ; rm $i ; done
-)
+find $PKG/usr/man -type f -exec gzip -9 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a \
-  AUTHORS COPYING HACKING INSTALL LICENSE NEWS README* docs/Wilber* \
-  $PKG/usr/doc/$PRGNAM-$VERSION
+    ABOUT-NLS AUTHORS COPYING ChangeLog ChangeLog-0.8.0 ChangeLog-0.8.1 ChangeLog-0.8.2 \
+    ChangeLog-0.8.3 ChangeLog-0.8.4 ChangeLog-0.8.5 ChangeLog-0.8.6 ChangeLog-0.8.7 \
+    ChangeLog-0.8.8 ChangeLog.gameswf INSTALL NEWS README README.dump-gnash README.git \
+    README_bzr TODO doc/ \
+    $PKG/usr/doc/$PRGNAM-$VERSION
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
@@ -106,7 +88,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: http://www.gnashdev.org/
-$PRGNAM: 
+$PRGNAM: [needs agg from SBo]
 EOF
 
 cd $PKG
