@@ -36,6 +36,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://ipython.scipy.org/dist/ipython.el" \
         "http://lumiere.ens.fr/~guerry/u/blorg.el" \
         "http://varnish-cache.org/export/4714/trunk/varnish-tools/emacs/vcl-mode.el" \
         "http://www.timepoorblogger.com/files/article-mode.el" \
