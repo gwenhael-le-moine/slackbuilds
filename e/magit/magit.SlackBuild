@@ -7,7 +7,8 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 PACKAGER=cyco
 
-TMP=/tmp
+TMP=/tmp/$PACKAGER
+OUTPUT=/tmp
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
@@ -102,4 +103,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
