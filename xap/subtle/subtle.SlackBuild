@@ -86,7 +86,6 @@ find $PKG -name .hg\* -exec rm -fr {} \;
     mkdir -p install
     cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (is a grid-based manual tiling window manager)
-$PRGNAM:
 $PRGNAM: with a strong focus on easy but customizable look and feel. In comparison to
 $PRGNAM: other tiling windows managers, subtle has no automatic tiling of the screen
 $PRGNAM: size in any way, instead windows are arranged according to positions inside
@@ -95,7 +94,8 @@ $PRGNAM: http://subforge.org
 $PRGNAM:                                -------
 $PRGNAM: includes sur (Subtle User Repository ("rubbygem-like" repository of sublets))
 $PRGNAM: includes subtly, a Web browser
-$PRGNAM: {required gems: curb, sinatra, datamapper, archive-tar-minitar, ffi}
+$PRGNAM: required gems:
+$PRGNAM: curb sinatra datamapper archive-tar-minitar ffi subtle-graph subtle-dynamic_icon
 EOF
 
     makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
