@@ -2,7 +2,7 @@
 
 PRGNAM=$(basename $(pwd))
 VERSION=${VERSION:-PR7}
-ARCH=noarch
+ARCH=font
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
