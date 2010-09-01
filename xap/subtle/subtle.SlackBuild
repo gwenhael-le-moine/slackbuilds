@@ -1,45 +1,47 @@
-#!/bin/sh
+#!/bin/sh -x
 
-set -x
+WITH_SUBTLY="YES"
 
 CWD=$(pwd)
-HOME=/home/cycojesus
-TMP=/tmp
-REPOSITORIES=$HOME/projets/packages/repositories
-
 PRGNAM=$(basename $CWD)
 VERSION=hg$(date +%F | tr -d '-' )
 BUILD=1
 PACKAGER=cyco
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
 
 ARCH=$(uname -m)
 
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
 PREFIX=/usr
 
 [ -e $PKG ] && rm -fr $PKG
 
-function get_build_install() {
+function get_sources_here() {
     COMPONENT=$1
 
-    [ -e $TMP/$COMPONENT-$VERSION ] && rm -fr $TMP/$COMPONENT-$VERSION
+    [ -e ./$COMPONENT-$VERSION ] && rm -fr ./$COMPONENT-$VERSION
 
-    ( cd $TMP
-        if [ -e $CWD/$COMPONENT-$VERSION.tar.?z* ]; then
-            tar xf $CWD/$COMPONENT-$VERSION.tar.?z*
+    if [ -e $CWD/$COMPONENT-$VERSION.tar.?z* ]; then
+        tar xf $CWD/$COMPONENT-$VERSION.tar.?z*
+    else
+        if [ ! -e $REPOSITORIES/$COMPONENT ]; then
+            hg clone http://hg.subtle.de/$COMPONENT $REPOSITORIES/$COMPONENT
         else
-            if [ ! -e $REPOSITORIES/$COMPONENT ]; then
-                hg clone http://hg.scrapping.cc/$COMPONENT $REPOSITORIES/$COMPONENT
-            else
-                ( cd $REPOSITORIES/$COMPONENT
-                    hg pull -u
-                )
-            fi
-            cp -R $REPOSITORIES/$COMPONENT $TMP/$COMPONENT-$VERSION
+            ( cd $REPOSITORIES/$COMPONENT
+                hg pull -u
+            )
         fi
-    )
+        cp -R $REPOSITORIES/$COMPONENT ./$COMPONENT-$VERSION
+    fi
+}
 
-    ( cd $TMP/$COMPONENT-$VERSION
+function build_install() {
+    COMPONENT=$1
+
+    ( cd ./$COMPONENT-$VERSION
         RAKE_OPTIONS=$([ ! -e ./Rakefile ] && echo " -f $REPOSITORIES/$COMPONENT/Rakefile ")
 
         rake $RAKE_OPTIONS destdir=$PKG prefix=$PREFIX config
@@ -49,16 +51,36 @@ function get_build_install() {
         rake $RAKE_OPTIONS destdir=$PKG prefix=$PREFIX install
     )
 	[ -e $PKG$PREFIX/share/man ] && cp -a $PKG$PREFIX/share/man $PKG$PREFIX && rm -fr $PKG$PREFIX/share/man
+    find $PKG$PREFIX/man -not -name "*.gz" -exec gzip -9 {} \;
 }
 
-get_build_install $PRGNAM
-get_build_install sur
-get_build_install sublets
-get_build_install subtly
+( cd $TMP
+    get_sources_here subtle
+    build_install subtle
+    get_sources_here sur
+    build_install sur
+    if [ $WITH_SUBTLY == "YES" ]; then
+        get_sources_here subtly
+        build_install subtly
+    fi
+)
+
+( cd $PKG$PREFIX/share/subtle/
+    get_sources_here subtle-contrib
+    mv subtle-contrib-$VERSION subtle-contrib
+
+    get_sources_here sublets
+    mv sublets-$VERSION sublets
+    ( cd sublets
+        rake build
+    )
+)
 
 mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
 chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
+
+find $PKG -name .hg\* -exec rm -fr {} \;
 
 ( cd $PKG
     mkdir -p install
@@ -69,14 +91,12 @@ $PRGNAM: with a strong focus on easy but customizable look and feel. In comparis
 $PRGNAM: other tiling windows managers, subtle has no automatic tiling of the screen
 $PRGNAM: size in any way, instead windows are arranged according to positions inside
 $PRGNAM: of a grid - these positions are called gravities.
-$PRGNAM: http://unexist.scrapping.cc/projects/subtle
+$PRGNAM: http://subforge.org
 $PRGNAM:                                -------
-$PRGNAM: $PRGNAM2 (Subtle User Repository ("rubbygem-like" repository of sublets))
-$PRGNAM: {required gems: curb, sinatra, datamapper}
-$PRGNAM: http://unexist.scrapping.cc/projects/sur
+$PRGNAM: includes sur (Subtle User Repository ("rubbygem-like" repository of sublets))
+$PRGNAM: includes subtly, a Web browser
+$PRGNAM: {required gems: curb, sinatra, datamapper, archive-tar-minitar, ffi}
 EOF
-)
 
-( cd $PKG
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
 )
