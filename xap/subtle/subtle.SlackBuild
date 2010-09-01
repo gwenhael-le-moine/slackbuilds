@@ -68,7 +68,8 @@ function build_install() {
 ( cd $PKG$PREFIX/share/subtle/
     get_sources_here subtle-contrib
     mv subtle-contrib-$VERSION subtle-contrib
-
+    chmod +x subtle-contrib/*.rb
+    
     get_sources_here sublets
     mv sublets-$VERSION sublets
     ( cd sublets
