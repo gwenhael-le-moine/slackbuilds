@@ -42,7 +42,7 @@ mkdir -p $PKG/usr/lib$LIBSUFFIX
   cd $PKG/usr/lib$LIBSUFFIX/firefox-$VERSION
   # There's really no reason to save this .orig:
   #mv defaults/profile/mimeTypes.rdf defaults/profile/mimeTypes.rdf.orig || exit 1
-  zcat $CWD/mimeTypes.rdf > defaults/profile/mimeTypes.rdf || exit 1
+  #zcat $CWD/mimeTypes.rdf > defaults/profile/mimeTypes.rdf || exit 1
 ) || exit 1
 mkdir -p $PKG/usr/bin
 ( cd $PKG/usr/bin

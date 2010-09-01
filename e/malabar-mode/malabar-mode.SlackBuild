@@ -39,7 +39,7 @@ fi
 mkdir -p $TMP/$PACKAGER/
 cp -R $REPOSITORY $TMP/$PACKAGER/
 ( cd $TMP/$PACKAGER/$PRGNAM
-    mvn package
+    mvn package -Dmaven.skip.test=true
 )
 
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp
