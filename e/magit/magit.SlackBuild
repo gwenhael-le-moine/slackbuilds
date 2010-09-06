@@ -39,14 +39,9 @@ fi
 
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 ( cd $TMP/$PRGNAM-$VERSION
-    ./autogen.sh
-    ./configure \
-        --prefix=$PREFIX \
-        --infodir=$PREFIX/info \
-        --sysconfdir=/etc
-    make
+    make PREFIX=$PREFIX
 
-    make DESTDIR=$PKG install
+    make PREFIX=$PREFIX DESTDIR=$PKG install
 )
 
 # correction
