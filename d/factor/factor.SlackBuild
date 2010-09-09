@@ -26,8 +26,8 @@ mkdir -p $PKG$PREFIX/libexec/
 mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
 cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
 #!/bin/sh
-cd $PREFIX/libexec/$PRGNAM-$VERSION
-./$PRGNAM $@
+cd $PREFIX/libexec/$PRGNAM
+./$PRGNAM \$@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM
 ( cd $PKG$PREFIX/doc/$PRGNAM-$VERSION
