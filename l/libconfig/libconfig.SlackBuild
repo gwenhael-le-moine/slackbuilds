@@ -69,7 +69,7 @@ cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 ( cd /usr/info
-for file in $(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
+for file in \$(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
 do
     install-info \$file ./dir
 done
