@@ -39,6 +39,7 @@ fi
 
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 ( cd $TMP/$PRGNAM-$VERSION
+    sed -i 's|/share/info|/info|g' Makefile
     make PREFIX=$PREFIX
 
     make PREFIX=$PREFIX DESTDIR=$PKG install
