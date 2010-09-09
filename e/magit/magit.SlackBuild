@@ -57,7 +57,7 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
     [ -d $PKG$PREFIX/share/emacs/site-lisp ] && \
         find $PKG$PREFIX/share/emacs/site-lisp -type f -name "*.el" -exec gzip -9f {} \;
 
-    # magit wants to install etc/emacs/site-start.d/50magit.el which seem to be a debianism
+    # magit wants to install etc/emacs/site-start.d/50magit.el which seems to be a debianism
     # and I think it sucks, so rm
     # it'll be in $PKG/usr/doc/$PRGNAM-$VERSION/ if you want it
     rm -r $PKG/etc
