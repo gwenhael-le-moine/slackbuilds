@@ -24,7 +24,7 @@ BRANCH=latest-tracemonkey #latest-mozilla-central
 WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date ; quit" | awk '{print $4}' | grep firefox-.\*.en-US.linux-x86_64.tar.bz2 | tail -n1)
 wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
 
-VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')_$(echo $BRANCH | sed 's|latest-||')
+VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')
 
 LIBSUFFIX=$(echo "$ARCH" | grep -o "64")
 
@@ -74,7 +74,7 @@ cat $CWD/firefox.png > $PKG/usr/share/pixmaps/firefox.png
 mkdir $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
-VERSION=${VERSION}_$(date +"%Y.%m.%d_%H.%M")
+VERSION=${VERSION}_$(echo $BRANCH | sed 's|latest-||')_$(date +"%Y.%m.%d_%H.%M")
 
 cd $PKG
 makepkg -l y -c n $TMP/mozilla-firefox-$VERSION-$ARCH-$BUILD$PACKAGER.txz
