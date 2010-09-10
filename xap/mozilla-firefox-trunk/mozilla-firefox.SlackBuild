@@ -18,12 +18,13 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=1 #$(date +%F | tr -d '-')
 PACKAGER=cyco
 
-[ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
-lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-tracemonkey/ -e "mget firefox-4*.en-US.linux-x86_64.tar.bz2 ; quit"
-#lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central/ -e "mget firefox-4*.en-US.linux-x86_64.tar.bz2 ; quit"
+BRANCH=latest-tracemonkey #latest-mozilla-central
 
-#VERSION=$(ls firefox-*.tar.bz2 | cut -d - -f 2 | sed 's|.en||')
-VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')tracemonkey
+[ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
+WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date ; quit" | awk '{print $4}' | grep firefox-.\*.en-US.linux-x86_64.tar.bz2 | tail -n1)
+wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
+
+VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')_$(echo $BRANCH | sed 's|latest-||')
 
 LIBSUFFIX=$(echo "$ARCH" | grep -o "64")
 
