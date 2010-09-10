@@ -43,13 +43,13 @@ mkdir -p $PKG/usr/lib$LIBSUFFIX
   ln -sf firefox-$VERSION firefox
   cd firefox-$VERSION
   sed -i -e "s/usr\/local/usr/" firefox
-  #zcat $CWD/mozilla-firefox-mimeTypes-fix.diff.gz | patch -p1 --verbose --suffix=.orig || exit 1
+  # zcat $CWD/mozilla-firefox-mimeTypes-fix.diff.gz | patch -p1 --verbose --suffix=.orig || exit 1
   zcat $CWD/firefox.moz_plugin_path.diff.gz | sed "s|/lib/|/lib$LIBSUFFIX/|g" | sed "s|firefox-3.0|firefox-$VERSION|g" | patch -p1 --verbose --suffix=.orig || exit 1
   rm -f defaults/pref/firefox.js.orig
   cd $PKG/usr/lib$LIBSUFFIX/firefox-$VERSION
   # There's really no reason to save this .orig:
   #mv defaults/profile/mimeTypes.rdf defaults/profile/mimeTypes.rdf.orig || exit 1
-  #zcat $CWD/mimeTypes.rdf > defaults/profile/mimeTypes.rdf || exit 1
+  # zcat $CWD/mimeTypes.rdf > defaults/profile/mimeTypes.rdf || exit 1
 ) || exit 1
 mkdir -p $PKG/usr/bin
 ( cd $PKG/usr/bin
