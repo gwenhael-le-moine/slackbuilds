@@ -1,5 +1,7 @@
 #!/bin/sh -x
 
+KEEP_TAR=${KEEP_TAR:-"NO"}
+
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-mozilla-firefox
@@ -15,14 +17,16 @@ PKG=$TMP/package-mozilla-firefox
 # distribute this, and for all the great work!  :-)
 
 ARCH=${ARCH:-$(uname -m)}
-BUILD=1 #$(date +%F | tr -d '-')
+BUILD=1
 PACKAGER=cyco
 
 BRANCH=latest-tracemonkey #latest-mozilla-central
 
-[ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
-WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date ; quit" | awk '{print $4}' | grep firefox-.\*.en-US.linux-x86_64.tar.bz2 | tail -n1)
-wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
+if [ $KEEP_TAR == "NO" ]; then
+    [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
+    WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date ; quit" | awk '{print $4}' | grep firefox-.\*.en-US.linux-x86_64.tar.bz2 | tail -n1)
+    wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
+fi
 
 VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')
 
