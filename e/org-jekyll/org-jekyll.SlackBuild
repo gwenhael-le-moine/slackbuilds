@@ -36,10 +36,11 @@ else
 fi
 
 
-mkdir -p $PKG$PREFIX/share/emacs/site-lisp
+mkdir -p $PKG$PREFIX/share/emacs/site-lisp $PKG$PREFIX/doc/$PRGNAM
 cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
     rm -fr .git*
+    mv test/ README $PKG$PREFIX/doc/$PRGNAM
     $EMACS -batch -f batch-byte-compile *.el
 )
 
