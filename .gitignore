@@ -1,0 +1,15 @@
+repositories/
+*.tar.?z*
+*.zip
+*.tgz
+*.tar
+*.pdf
+*.ttf
+*.otf
+*.bkp
+*.dfont
+*.html
+*.el
+*.js
+*.orig
+*.bz2
