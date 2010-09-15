@@ -1,0 +1,96 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+BRANCH=master
+VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+PREFIX=/usr
+
+SLCKFLAGS=""
+
+EMACS=$(basename $(ls /usr/bin/emacs-2*))
+EMACS_VERSION=$(echo "$EMACS" | grep -o "\-[0-9\.]*\-" | tr -d - | head -n1)
+LISPDIR=$PREFIX/share/emacs/site-lisp
+VERSION_SPECIFIC_LISPDIR==$PREFIX/share/emacs/$EMACS_VERSION
+
+function git_clone_or_pull() {
+    REPO_URL=$1
+    REPO_NAME=$2
+    if [ ! -e $REPOSITORIES/$REPO_NAME ]; then
+        git clone $REPO_URL $REPOSITORIES/$REPO_NAME
+    else
+        ( cd $REPOSITORIES/$REPO_NAME
+            git pull
+        )
+    fi
+}
+
+function process() {
+    PRG=$1
+    git_clone_or_pull git://github.com/wanderlust/$PRG.git $PRG
+
+    ( cd $TMP
+        cp -R $REPOSITORIES/$PRG $PRG
+        ( cd $PRG
+            make
+            make install PREFIX=$PKG$PREFIX LISPDIR=$PKG$LISPDIR VERSION_SPECIFIC_LISPDIR=$PKG$VERSION_SPECIFIC_LISPDIR
+        )
+    )
+}
+# nettoyage préalable
+rm -fr $PKG && mkdir -p $PKG
+
+process apel
+process flim
+process semi
+process wanderlust
+
+# # correction
+# ( cd $PKG
+#     chown -R root:root *
+    
+#     find $PKG -name \.git\* -exec rm -fr {} \;
+    
+#     [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+    
+# # Strip binaries
+#     find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+#     find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# )
+
+
+# # embaumement
+# mkdir -p $PKG/install
+# cat <<EOF > $PKG/install/slack-desc
+# $PRGNAM: $PRGNAM (Window Manager "Framework")
+# $PRGNAM:
+# $PRGNAM: $PRGNAM is an extremely fast, small, and dynamic window manager for X.
+# $PRGNAM:
+# $PRGNAM:
+# $PRGNAM:
+# $PRGNAM:
+# $PRGNAM: http://$PRGNAM.naquadah.org
+# $PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
+# $PRGNAM:
+# EOF
+# if [ $INCLUDE_OBVIOUS == 1 ] ; then
+# echo "$PRGNAM: [ include obvious ( http://$PRGNAM.naquadah.org/wiki/Obvious ) ]" >> $PKG/install/slack-desc
+# else
+# echo "$PRGNAM:" >> $PKG/install/slack-desc
+# fi
+
+# # empaquetage
+# cd $PKG
+# makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$PACKAGER.txz
