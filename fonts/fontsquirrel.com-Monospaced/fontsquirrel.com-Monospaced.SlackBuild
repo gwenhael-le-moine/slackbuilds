@@ -1,0 +1,78 @@
+#!/bin/sh
+
+PRGNAM=fontsquirrel.com-Monospaced
+VERSION=${VERSION:-$(date +%F | tr -d '-')}
+ARCH=noarch
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+CWD=$(pwd)
+
+# Place to build (TMP) package (PKG) and output (OUTPUT) the program:
+PKG=$TMP/package-$PRGNAM
+TMP=/tmp
+OUTPUT=${OUTPUT:-/tmp}
+
+# Create working directories:
+mkdir -p $OUTPUT          # place for the package to be saved
+mkdir -p $PKG             # place for the package to be built
+rm -rf $PKG/*             # always erase old package's contents
+rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+                          # remove old log files
+
+FONTDIR="/usr/share/fonts"
+
+# Move the fonts into place:
+mkdir -p $PKG$FONTDIR/{TTF,OTF}
+mkdir -p $PKG/usr/doc/$PRGNAM
+[ -e $TMP/$TAG/$PRGNAM ] && rm -fr $TMP/$TAG/$PRGNAM
+mkdir -p $TMP/$TAG/$PRGNAM
+( cd $TMP/$TAG/$PRGNAM
+    for i in $CWD/*.zip ; do
+        unzip $i ;
+        find . -name "*.ttf" -exec mv {} $PKG$FONTDIR/TTF \;
+        find . -name "*.otf" -exec mv {} $PKG$FONTDIR/OTF \;
+        find . -name ".DS_Store" -exec rm -fr {} \;
+        find . -name "__MACOSX" -exec rm -fr {} \;
+        find . -empty -exec rm -fr {} \;
+        mv * $PKG/usr/doc/$PRGNAM ;
+    done
+)
+
+# Post-install script:
+mkdir -p $PKG/install
+cat <<EOT > $PKG/install/doinst.sh
+# Update X font indexes and the font cache:
+if [ -x .$XPREF/bin/mkfontdir ]; then
+  chroot . $XPREF/bin/mkfontscale $FONTDIR
+  chroot . $XPREF/bin/mkfontdir $FONTDIR
+fi
+if [ -x .$XPREF/bin/fc-cache ]; then
+  chroot . $XPREF/bin/fc-cache -f $FONTDIR
+fi
+EOT
+
+# Add a package description:
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Monospace fonts)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.fontsquirrel.com/fonts/list/style/Monospaced
+$PRGNAM: 
+$PRGNAM: 
+EOF
+
+# Build the package:
+cd $PKG
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz 2>&1 | tee $OUTPUT/makepkg-${PRGNAM}.log
+cd $OUTPUT
+md5sum ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz > ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz.md5
+cd -
+cat $PKG/install/slack-desc | grep "^${PRGNAM}" > $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txt
+
