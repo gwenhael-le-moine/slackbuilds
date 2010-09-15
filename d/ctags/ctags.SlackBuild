@@ -28,28 +28,18 @@ TMP=${TMP:-/tmp}
 PKG=${PKG:-$TMP/package-ctags}
 OUT=${OUT:-$TMP/build}
 
-# version on the tarball
 VERSION=${VERSION:-5.8}
-# version used in the source directory to cd into
-DIRVER=${DIRVER:-5.8}
-# version used for the Slackware package
-PKGVER=${PKGVER:-5.8}
 
 # target
 ARCH=${ARCH:-$(uname -m)}
 TARGET=${TARGET:-$(uname -m)}
-BUILD=${BUILD:-1_SBn}
+BUILD=${BUILD:-1cyco}
 
 # set tarball download link
 SOURCE=${SOURCE:-http://switch.dl.sourceforge.net/sourceforge/ctags/ctags-$VERSION.tar.gz}
 ARCHIVE=$(basename $SOURCE)
 
 # sanity checks
-if [ "$(id -u)" = "0" ]; then
-    echo "Do not run this SlackBuild as ROOT !"
-    exit 1
-fi
-
 if [ ! -d $TMP ]; then
     mkdir -p $TMP
 fi
@@ -78,9 +68,9 @@ mkdir -p $PKG
 
 # extraction
 cd $TMP
-rm -rf ctags-$DIRVER
+rm -rf ctags-$VERSION
 tar -xvf $CWD/ctags-$VERSION.tar.gz
-cd ctags-$DIRVER
+cd ctags-$VERSION
 
 # make sure ownerships and permissions are sane
 chmod -R a-s,u+rw,go-w+r .
@@ -124,37 +114,41 @@ fi
 
 # add a documentation directory
 echo "Adding documentation package..."
-mkdir -p $PKG/usr/doc/ctags-$PKGVER
+mkdir -p $PKG/usr/doc/ctags-$VERSION
 install -p -m 644 \
     COPYING FAQ INSTALL NEWS README MAINTAINERS ctags.html EXTENDING.html\
-    $PKG/usr/doc/ctags-$PKGVER
+    $PKG/usr/doc/ctags-$VERSION
 
 # build the package
 mkdir -p $PKG/install
-if [ -r $CWD/slack-desc ]; then
-    install -m 644 $CWD/slack-desc $PKG/install
-fi
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description. Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in. You must
+# make exactly 11 lines for the formatting to be correct. It's also
+# customary to leave one space after the ':'.
 
-if [ -r $CWD/doinst.sh ]; then
-    install -m 755 $CWD/doinst.sh $PKG/install
-fi
+     |-----handy-ruler------------------------------------------------------|
+ctags: ctags (Generate tag files for source code)
+ctags:
+ctags: The ctags and etags programs (hereinafter collectively referred
+ctags: to as ctags, except where distinguished) generate an index (or "tag")
+ctags: file for a variety of language objects found in file(s).
+ctags: This tag file allows these items to be quickly and easily
+ctags: located by a text editor or other utility. A "tag" signifies
+ctags: a language object for which an index entry is available
+ctags: (or, alternatively, the index entry created for that object).
+ctags:
+ctags:
+EOF
+
 cd $PKG
 
-PACKAGING="
-    chown -R root.root .
-    find . -perm 664 -exec chmod 644 {} \;
-    find . -perm 777 -exec chmod 755 {} \;
-    mkdir -p $OUT
-    rm -f                   $OUT/ctags-$PKGVER-$ARCH-$BUILD.tgz
-    /sbin/makepkg -l y -c n $OUT/ctags-$PKGVER-$ARCH-$BUILD.tgz
-    rm -rf $PKG
-    rm -rf $TMP/ctags-$DIRVER
-"
-
-if [ "$(which fakeroot 2> /dev/null)" ]; then
-    echo "$PACKAGING" | fakeroot
-else
-    su -c "$PACKAGING"
-fi
-
-exit 0
+chown -R root.root .
+find . -perm 664 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+mkdir -p $OUT
+/sbin/makepkg -l y -c n $OUT/ctags-$VERSION-$ARCH-$BUILD.tgz
+rm -rf $PKG
+rm -rf $TMP/ctags-$VERSION
