@@ -40,7 +40,7 @@ find . \
  -exec chmod 644 {} \;
 
 # for some reason Slackware needs -ldl to explicitely be added
-sed -i 's|LIBS=-lzmq -lsqlite3|LIBS=-lzmq -lsqlite3 -ldl|' Makefile
+sed -i 's|-lsqlite3|-lsqlite3 -ldl|' Makefile tools/m2sh/Makefile
 # hmmm, no.
 sed -i 's|sudo ||g' Makefile
 
@@ -48,10 +48,7 @@ sed -i 's|sudo ||g' Makefile
 make bin/mongrel2 PREFIX=$PREFIX
 
 mkdir -p $PKG$PREFIX/bin
-make install-bin PREFIX=$PKG$PREFIX
-
-sed -i 's|python setup.py install|python setup.py install --root=$(DESTDIR)|' Makefile
-make install-py DESTDIR=$PKG
+make install-bin install-m2sh PREFIX=$PKG$PREFIX
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a LICENSE docs/ examples/ $PKG/usr/doc/$PRGNAM-$VERSION
