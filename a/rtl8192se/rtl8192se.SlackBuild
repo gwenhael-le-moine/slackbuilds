@@ -87,6 +87,6 @@ $PRGNAM: http://realtek.com
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')_$(uname -r | tr - _)-$ARCH-$BUILD$PACKAGER.txz
 )
 
