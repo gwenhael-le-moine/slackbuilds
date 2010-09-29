@@ -35,16 +35,11 @@ mv ${PRGNAM}_linux_$VERSION $PRGNAM-$VERSION
         -exec chmod 755 {} \; -o \
         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
         -exec chmod 644 {} \;
-)
 
 # Building
-( cd $TMP/$PRGNAM-$VERSION
     make
-)
 
 # Installation
-( cd $TMP/$PRGNAM-$VERSION
-#    make install DESTDIR=$PKG PREFIX=$PREFIX DOCDIR=$PKG$PREFIX/doc/$PRGNAM
     mkdir -p $PKG/lib/modules/$(uname -r)/kernel/drivers/net/wireless/
     find ./HAL/ -name \*.ko -exec cp {} $PKG/lib/modules/$(uname -r)/kernel/drivers/net/wireless/ \;
 
@@ -64,10 +59,8 @@ mv ${PRGNAM}_linux_$VERSION $PRGNAM-$VERSION
         -exec chmod 755 {} \; -o \
         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
         -exec chmod 644 {} \;
-)
 
 # Packaging
-( cd $PKG
     mkdir install
     cat <<EOF > install/doinst.sh
 #!/bin/sh
