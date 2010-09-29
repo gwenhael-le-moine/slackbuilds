@@ -48,8 +48,12 @@ mv ${PRGNAM}_linux_$VERSION $PRGNAM-$VERSION
     mkdir -p $PKG/lib/modules/$(uname -r)/kernel/drivers/net/wireless/
     find ./HAL/ -name \*.ko -exec cp {} $PKG/lib/modules/$(uname -r)/kernel/drivers/net/wireless/ \;
 
+    mkdir -p $PKG/lib/
+    cp -R firmware $PKG/lib/
+
     mkdir -p $PKG/usr/doc/$PRGNAM
     cp readme.txt release_note $PKG/usr/doc/$PRGNAM
+    mv $PKG/lib/firmware/*/Realtek-Firmware-License.txt $PKG/usr/doc/$PRGNAM
 )
 
 # Cleaning
