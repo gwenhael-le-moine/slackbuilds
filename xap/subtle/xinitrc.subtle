@@ -25,5 +25,5 @@ if [ -f $usermodmap ]; then
 fi
 
 [ -x $HOME/.config/subtle/startup.sh ] \
-	&& $HOME/.subtle/subtle/startup.sh \
+	&& $HOME/.config/subtle/startup.sh \
 	|| exec subtle
