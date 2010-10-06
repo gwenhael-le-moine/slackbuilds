@@ -6,11 +6,14 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 VERSION=svn$(date +%F | sed 's/-//g')
-BUILD=1cyco
+BUILD=1
+PACKAGER=cyco
 
-TMP=/tmp
-PKG=$TMP/package-$PRGNAM
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
 
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
 GZBZ2="bz2"
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
@@ -22,12 +25,13 @@ cd $TMP
 if [ -e $CWD/PRGNAM-$VERSION.tar.$GZBZ2 ] ; then
       tar xvf $CWD/PRGNAM-$VERSION.tar.$GZBZ2
 else
-      svn co http://svn.kfish.org/xsel/trunk/ $PRGNAM-$VERSION
+      svn co http://svn.kfish.org/xsel/trunk/ $REPOSITORIES/$PRGNAM
+      cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
 fi
 cd $PRGNAM-$VERSION
 
-autoreconf
-./configure \
+./autogen.sh
+LIBS=-lX11 ./configure \
   --libdir=/usr/lib$( [ $ARCH = "x86_64" ] && echo 64 ) \
 	--mandir=/usr/man \
     --prefix=/usr
@@ -44,7 +48,6 @@ find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip
 find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
-cd $PKG
 mkdir -p install
 cat << EOF > install/slack-desc
 # HOW TO EDIT THIS FILE:
@@ -70,4 +73,4 @@ EOF
 
 chown -R root:root $PKG
 
-makepkg -c n -l y $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD.txz || exit $ERROR_MKPKG
+makepkg -c n -l y $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
