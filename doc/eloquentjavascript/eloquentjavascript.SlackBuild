@@ -1,0 +1,47 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/$PRGNAM.zip ] && mv $CWD/$PRGNAM.zip $CWD/$PRGNAM.zip.orig
+wget -c http://eloquentjavascript.net/Eloquent%20JavaScript.zip -O $CWD/$PRGNAM.zip
+
+mkdir -p $PKG$PREFIX/doc/
+unzip -d $PKG$PREFIX/doc/ $CWD/$PRGNAM.zip
+mv $PKG$PREFIX/doc/Eloquent\ JavaScript $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Javascript book)
+$PRGNAM: 
+$PRGNAM: An Modern Introduction to Programming
+$PRGNAM: by Marijn Haverbeke
+$PRGNAM: 
+$PRGNAM: Eloquent JavaScript is a book providing an introduction to the
+$PRGNAM: JavaScript programming language and programming in general.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://eloquentjavascript.net/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
