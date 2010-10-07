@@ -10,6 +10,7 @@ CWD=$(pwd)
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
 PKG=$TMP/package-$PRGNAM
+TMP=${TMP:-/tmp}
 OUTPUT=${OUTPUT:-/tmp}
 
 # Create working directories:
