@@ -59,14 +59,14 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     if [ ! -e $REPOSITORIES/$PRGNAM/$BRANCH ] ; then
         mkdir -p $REPOSITORIES/$PRGNAM
         ( cd $REPOSITORIES/$PRGNAM
-            bzr checkout --lightweight http://bzr.savannah.gnu.org/r/emacs/$BRANCH $BRANCH
+            bzr branch --stacked http://bzr.savannah.gnu.org/r/emacs/$BRANCH $BRANCH
         )
     fi
 
     ( cd $REPOSITORIES/$PRGNAM/$BRANCH
        [ -e Makefile ] && make distclean
        bzr pull
-       bzr update
+       # bzr update
     )
     # FIXME: Hackish hack
     # cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION

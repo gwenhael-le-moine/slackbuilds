@@ -1,0 +1,57 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            git pull
+        )
+    else
+        git clone git://git.norang.ca/org-mode-doc.git $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Documentation about Emacs' org-mode)
+$PRGNAM: 
+$PRGNAM: Organize Your Life In Plain Text!
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://doc.norang.ca/org-mode.html
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
