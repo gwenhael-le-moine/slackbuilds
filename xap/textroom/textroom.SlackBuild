@@ -7,7 +7,7 @@ CWD=$(pwd)
 APP_NAME=textroom
 PKG=$TMP/package-$APP_NAME
 
-VERSION=0.5.4
+VERSION=0.6.5
 
 EXT=tar.gz
 
@@ -27,6 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
+[ ! -e $CWD/$APP_NAME-$VERSION.$EXT ] && wget -c http://textroom.googlecode.com/files/$APP_NAME-$VERSION.$EXT -O $CWD/$APP_NAME-$VERSION.$EXT
 tar xf $CWD/$APP_NAME-$VERSION.$EXT
 cd $APP_NAME-$VERSION
 
