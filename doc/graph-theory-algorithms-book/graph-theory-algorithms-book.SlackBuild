@@ -1,0 +1,61 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            hg pull -u
+        )
+    else
+        hg clone https://graph-theory-algorithms-book.googlecode.com/hg/ $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.hg\* -exec rm -fr {} \;
+
+( cd $PKG$PREFIX/doc/$PRGNAM
+    make
+)
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (A graph theory book)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: A GNU-FDL  book on algorithmic graph theory by David Joyner,
+$PRGNAM: Minh Van Nguyen, and Nathann Cohen. This is an introductory book on
+$PRGNAM: algorithmic graph theory. Theory and algorithms are illustrated using
+$PRGNAM: the Sage open source mathematics software.
+$PRGNAM: 
+$PRGNAM: http://code.google.com/p/graph-theory-algorithms-book/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
