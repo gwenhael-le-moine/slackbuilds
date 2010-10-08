@@ -34,6 +34,7 @@ cd $APP_NAME-$VERSION
 # configuration
 sed -i "s|/usr/local/textroom/doc|/usr/doc/$APP_NAME-$VERSION|" textroom.pro
 sed -i "s|usr/local|usr|g" textroom.pro
+sed -i 's|lhunspell|lhunspell-1.2|g' textroom.pro
 qmake
 
 # compilation
@@ -43,6 +44,8 @@ make -j3 PREFIX=$PREFIX
 make install INSTALL_ROOT=$PKG
 mv $PKG/root/.local/applications $PKG/usr/share/
 rm -fr $PKG/root
+#no need for this
+rm -f $PKG/usr/bin/textroom-uninstall
 
 # correction
 cd $PKG
