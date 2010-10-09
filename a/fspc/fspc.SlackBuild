@@ -41,6 +41,11 @@ mv release_$(echo $VERSION | tr . _) $PRGNAM-$VERSION
     cp -R pic fspcui.xrc $PKG$PREFIX/share/$PRGNAM
 
     chmod +x $PKG$PREFIX/bin/*
+
+    cd ../tools/
+    mkdir $PKG/etc/pm/sleep.d/
+    fromdos < fsp_pm.sh > $PKG/etc/pm/sleep.d/fsp_pm.sh
+    chmod +x $PKG/etc/pm/sleep.d/*
 )
 
 # correction
