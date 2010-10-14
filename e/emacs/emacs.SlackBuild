@@ -27,6 +27,8 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
+ONLY_X11=1
+
 PRGNAM=emacs
 BRANCH=trunk
 VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
@@ -119,6 +121,7 @@ EOF
   chmod +x $PKG/usr/bin/emacs
 )
 
+if [ $ONLY_X11 == 0 ] ; then
 # Also add a version of the binary that is not linked to X11:
 cd $TMP
 rm -rf $PRGNAM-$VERSION
@@ -161,6 +164,7 @@ make $NUMJOBS || make || exit 1
 cat src/emacs > $PKG/usr/bin/emacs-${EMACS_VERSION}-no-x11
 chown root:root $PKG/usr/bin/emacs-${EMACS_VERSION}-no-x11
 chmod 1755 $PKG/usr/bin/emacs-${EMACS_VERSION}-no-x11
+fi
 
 # I don't care for broken permissions.
 chmod 755 $PKG/var/games/emacs
