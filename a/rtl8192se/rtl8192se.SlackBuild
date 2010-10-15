@@ -4,7 +4,7 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=2.6.0017.0705.2010
+VERSION=2.6.0018.1013.2010
 
 BUILD=1
 PACKAGER=cyco
@@ -80,8 +80,8 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
 $PRGNAM: http://realtek.com
+$PRGNAM: http://www.realtek.com/downloads/downloadsView.aspx?Langid=1&PNid=21&PFid=48&Level=5&Conn=4&DownTypeID=3&GetDown=false&Downloads=true
 $PRGNAM:
 EOF
 
