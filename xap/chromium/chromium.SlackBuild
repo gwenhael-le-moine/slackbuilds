@@ -80,10 +80,10 @@ cd /opt/chrome-linux/
 LD_LIBRARY_PATH=/opt/chrome-linux/:$LD_LIBRARY_PATH ./chrome $*
 EOF
 
-( cd $PKG/usr/bin/
-    ln -s $PRGNAM chrome
-    ln -s $PRGNAM google-chrome
-)
+# ( cd $PKG/usr/bin/
+#     ln -s $PRGNAM chrome
+#     ln -s $PRGNAM google-chrome
+# )
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
