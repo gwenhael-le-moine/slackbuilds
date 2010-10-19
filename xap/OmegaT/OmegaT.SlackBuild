@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=2.2.0_01_Beta_Without_JRE
+RELEASE="2.2.0%20update%201"
+ARCH=${ARCH:-noarch}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+rm -rf $PKG
+mkdir -p $TMP $PKG/opt/$PRGNAM $OUTPUT
+
+cd $PKG/opt/$PRGNAM
+
+[ ! -e $CWD/OmegaT_$VERSION.zip ] && \
+    wget -c "http://downloads.sourceforge.net/project/omegat/OmegaT%20-%20Latest/OmegaT%20$RELEASE/OmegaT_$VERSION.zip" \
+         -O $CWD/OmegaT_$VERSION.zip
+unzip $CWD/OmegaT_$VERSION.zip
+
+mkdir -p $PKG/usr/bin
+cat <<EOF > $PKG/usr/bin/$PRGNAM
+#!/bin/sh
+cd /opt/$PRGNAM/
+./$PRGNAM $*
+EOF
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (The free (GPL) translation memory tool)
+$PRGNAM: 
+$PRGNAM: OmegaT is a free translation memory application written in Java. It is
+$PRGNAM: a tool intended for professional translators. It does not translate for you!
+$PRGNAM: (Software that does this is called "machine translation", and you will have
+$PRGNAM: to look elsewhere for it.)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://omegat.org/
+$PRGNAM: 
+EOF
+
+cd $PKG
+chown -R root:root .
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;
+
+chmod 755 $PKG/opt/$PRGNAM/$PRGNAM $PKG/usr/bin/*
+
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
+
