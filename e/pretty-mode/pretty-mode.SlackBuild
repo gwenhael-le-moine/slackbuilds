@@ -59,14 +59,14 @@ cat <<EOF > $PKG/install/slack-desc
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
 
-     |-----handy-ruler------------------------------------------------------|
+       |-----handy-ruler------------------------------------------------------|
 $PRGNAM: $PRGNAM (symbols prettyfier for Emacs)
 $PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM: Minor mode for redisplaying parts of the buffer as pretty symbols
+$PRGNAM: originally modified from Trent Buck's version at
+$PRGNAM: http://paste.lisp.org/display/42335,2/raw
+$PRGNAM: Also includes code from `sml-mode'
+$PRGNAM: See also http://www.emacswiki.org/cgi-bin/wiki/PrettyLambda
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: http://github.com/mattharrison/pretty-mode
