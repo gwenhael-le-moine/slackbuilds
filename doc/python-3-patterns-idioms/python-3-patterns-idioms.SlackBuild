@@ -24,7 +24,7 @@ rm -fr $PKG
 ( cd $REPOSITORIES
     if [ -e $REPOSITORIES/$PRGNAM ] ; then
         ( cd $REPOSITORIES/$PRGNAM
-            hg pull --rebase --update
+            hg pull --update
         )
     else
         hg clone http://bitbucket.org/BruceEckel/python-3-patterns-idioms $REPOSITORIES/$PRGNAM
@@ -33,7 +33,7 @@ rm -fr $PKG
 
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
-find $PKG$PREFIX/doc/$PRGNAM -name \.DS\* -o -name \.hg\*-exec rm -fr {} \;
+find $PKG$PREFIX/doc/$PRGNAM -name \.DS\* -o -name \.hg\* -exec rm -fr {} \;
 
 ( cd $PKG
     mkdir -p install
