@@ -7,7 +7,7 @@ CWD=$(pwd)
 APP_NAME=$(basename $CWD)
 PKG=$TMP/package-$APP_NAME
 
-VERSION=2009-march
+VERSION=2010-November
 
 DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 
@@ -31,7 +31,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && wget -c http://downloads.sourceforge.net/project/arabica/arabica/March-09/$APP_NAME-$VERSION.tar.bz2?use_mirror=nchc -O $CWD/$APP_NAME-$VERSION.tar.bz2
+[ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && wget -c http://downloads.sourceforge.net/project/arabica/arabica/November-10/$APP_NAME-$VERSION.tar.bz2 -O $CWD/$APP_NAME-$VERSION.tar.bz2
 tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
 cd $APP_NAME-$VERSION
 
