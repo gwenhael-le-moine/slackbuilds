@@ -76,3 +76,4 @@ EOF
 # empaquetage
 cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+
