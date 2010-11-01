@@ -1,0 +1,99 @@
+#!/bin/sh -x
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+TMP=${TMP:-/tmp/cyco}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+VERSION=${VERSION:-PLACEHOLDER}
+ARCH=${ARCH:-noarch}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+PREFIX=/usr
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $OUTPUT $PKG/{opt,etc/profile.d}
+
+cd $PKG/opt
+[ -e $CWD/$PRGNAM.zip ] && mv $CWD/$PRGNAM.zip $CWD/$PRGNAM.zip.bkp
+wget -c http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip -O $CWD/$PRGNAM.zip
+unzip $CWD/$PRGNAM.zip || exit 1
+VERSION=$(ls | sed "s|$PRGNAM-||")
+
+cd $PRGNAM-$VERSION
+chown -R root:root .
+find . \
+    \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+    -exec chmod 755 {} \; -o \
+    \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+    -exec chmod 644 {} \;
+
+#no need to keep DOS/Windows batch files around
+rm bin/*.cmd
+
+chmod +x bin/*
+
+mkdir -p $PKG$PREFIX/bin
+( cd $PKG$PREFIX/bin
+    for b in $PKG/opt/$PRGNAM-$VERSION/bin/* ; do
+        ln -s /opt/$PRGNAM-$VERSION/bin/$(basename $b) $(basename $b)
+    done
+)
+cat <<EOF > $PKG/etc/profile.d/$PRGNAM.sh
+#!/bin/sh
+
+# see http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/setting-up-your-tools.html
+# for documentation
+
+# See the output of \$(ec2-describe-regions) to set this:
+export EC2_URL=https://ec2.ap-southeast-1.amazonaws.com
+
+# export EC2_PRIVATE_KEY=~/.ec2/pk-*.pem
+# export EC2_CERT=~/.ec2/cert-*.pem
+
+export EC2_HOME=/opt/$PRGNAM-$VERSION
+EOF
+
+cat <<EOF > $PKG/etc/profile.d/$PRGNAM.csh
+#!/bin/csh
+
+# see http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/setting-up-your-tools.html
+# for documentation
+
+# See the output of \$(ec2-describe-regions) to set this:
+setenv EC2_URL https://ec2.ap-southeast-1.amazonaws.com
+
+# setenv EC2_PRIVATE_KEY ~/.ec2/pk-*.pem
+# setenv EC2_CERT ~/.ec2/cert-*.pem
+
+setenv EC2_HOME /opt/$PRGNAM-$VERSION
+EOF
+
+chmod +x $PKG/etc/profile.d/$PRGNAM.*
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+mv THIRDPARTYLICENSE.TXT license.txt notice.txt $PKG/usr/doc/$PRGNAM-$VERSION
+
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Amazon EC2 Command line tools)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/setting-up-your-tools.html
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
