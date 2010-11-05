@@ -20,7 +20,8 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 PACKAGER=cyco
 
-BRANCH=latest-tracemonkey #latest-mozilla-central
+#BRANCH=latest-tracemonkey
+BRANCH=latest-mozilla-central
 
 if [ $KEEP_TAR == "NO" ]; then
     [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
