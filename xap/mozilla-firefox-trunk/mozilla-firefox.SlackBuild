@@ -82,5 +82,5 @@ cat $CWD/slack-desc > $PKG/install/slack-desc
 VERSION=${VERSION}_$(echo $BRANCH | sed 's|latest-||')_$(date +"%Y.%m.%d_%H.%M")
 
 cd $PKG
-makepkg -l y -c n $TMP/mozilla-firefox-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $TMP/mozilla-firefox-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
 
