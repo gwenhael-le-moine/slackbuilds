@@ -55,6 +55,8 @@ cp -R $REPOSITORY $PREFIX/libexec/$PRGNAM
     GOROOT=$GOROOT GOBIN=$GOBIN GOOS=$GOOS GOARCH=$GOARCH bash ./all.bash
 
     mv $PREFIX/libexec/$PRGNAM $PKG$PREFIX/libexec/
+    rm -fr $PKG$PREFIX/libexec/src
+
     mkdir -p $PKG$PREFIX/bin
     ( cd $PKG$PREFIX/bin
         for i in ../libexec/$PRGNAM/bin/* ; do
