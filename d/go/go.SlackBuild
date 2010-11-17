@@ -25,13 +25,12 @@ mkdir -p $PKG
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
-        cd $(dirname $REPOSITORY)
-        hg clone -r release https://go.googlecode.com/hg/ $PRGNAM
+        hg clone -r release https://go.googlecode.com/hg/ $(dirname $REPOSITORY)/$PRGNAM
+else
+    ( cd $REPOSITORY
+        hg pull -u
+    )
 fi
-
-( cd $REPOSITORY
-    hg pull -u
-)
 
 mkdir -p $PKG$PREFIX/libexec/ $PREFIX/libexec/
 cp -R $REPOSITORY $PREFIX/libexec/$PRGNAM
