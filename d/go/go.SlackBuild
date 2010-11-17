@@ -68,7 +68,7 @@ cp -R $REPOSITORY $PREFIX/libexec/$PRGNAM
 GOROOT=$PREFIX/libexec/$PRGNAM
 GOBIN=\$GOROOT/bin
 GOOS=linux
-case $ARCH in
+case \$(uname -m) in
     x86_64)
         GOARCH=amd64
         ;;
