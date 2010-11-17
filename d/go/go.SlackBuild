@@ -56,6 +56,10 @@ cp -R $REPOSITORY $PREFIX/libexec/$PRGNAM
     mv $PREFIX/libexec/$PRGNAM $PKG$PREFIX/libexec/
     rm -fr $PKG$PREFIX/libexec/go/src
 
+    ( cd misc/emacs
+        find . -type f -name \*.el -exec emacs -batch -f batch-byte-compile {} \;
+    )
+    
     mkdir -p $PKG$PREFIX/bin
     ( cd $PKG$PREFIX/bin
         for i in ../libexec/$PRGNAM/bin/* ; do
@@ -63,6 +67,11 @@ cp -R $REPOSITORY $PREFIX/libexec/$PRGNAM
         done
     )
 
+    mkdir -p $PKG$PREFIX/share/emacs/site-lisp/
+    ( cd $PKG$PREFIX/share/emacs/site-lisp/
+        ln -s ../../../libexec/$PRGNAM/misc/emacs golang
+    )
+    
     mkdir -p $PKG/etc/profile.d
     cat <<EOF > $PKG/etc/profile.d/go.sh
 GOROOT=$PREFIX/libexec/$PRGNAM
