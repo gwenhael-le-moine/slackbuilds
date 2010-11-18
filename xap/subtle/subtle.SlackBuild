@@ -4,7 +4,7 @@ WITH_SUBTLY="YES"
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
-VERSION=hg$(date +%Y%m%d_%H%M)
+VERSION=hg$(date +%Y.%m.%d_%H.%M)
 BUILD=1
 PACKAGER=cyco
 

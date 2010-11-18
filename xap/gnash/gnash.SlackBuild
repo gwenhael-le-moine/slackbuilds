@@ -6,7 +6,7 @@ TMP=${TMP:-/tmp}
 PRGNAM=$(basename $CWD)
 PKG=$TMP/package-$PRGNAM
 
-VERSION=git$(date +%F | tr -d '-')
+VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1cyco}
 REPOSITORIES=/home/cycojesus/projets/packages/repositories

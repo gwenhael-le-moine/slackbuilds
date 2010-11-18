@@ -63,7 +63,7 @@ PKGDEST=${PKGDEST:-${CWD}}
 PKGFORMAT=${PKGFORMAT:-txz}
 PKGNAME=${NAME}-$(echo ${VERSION} | tr - . )-${ARCH}-${BUILD}${PACKAGER_ID}
 
-DATE=$(LC_ALL=C date +%d-%b-%Y)
+DATE=$(LC_ALL=C date +%Y.%m.%d_%H.%M)
 
 SRCDIR=${NAME}-${VERSION}
 SRCARCHIVE=${SRCDIR}.tar.gz

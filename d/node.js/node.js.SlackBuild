@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 APP_NAME=node.js
-VERSION=git$(date +%F | tr -d '-')
+VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1cyco}
 

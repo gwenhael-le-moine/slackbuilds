@@ -5,7 +5,7 @@ CWD=$(pwd)
 # default settings
 APP_NAME=sdcv
 ARCH=$(uname -m)
-VERSION=svn$(date +%F | sed 's/-//g')
+VERSION=svn$(date +%Y.%m.%d_%H.%M)
 BUILD=1cyco
 
 TMP=/tmp

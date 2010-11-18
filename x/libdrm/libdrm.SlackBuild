@@ -23,7 +23,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PKGNAM=libdrm
-VERSION=${VERSION:-git$(date +%Y.%m.%d_%H.%M)}
+VERSION=${VERSION:-git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1cyco}
