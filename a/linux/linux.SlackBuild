@@ -66,6 +66,7 @@ make modules_install INSTALL_MOD_PATH=$PKG
 mkdir -p $PKG/install
 cat <<EOF > $PKG/installs/doinst.sh
 cp /etc/lilo.conf /etc/lilo.conf.orig
+grep -q "image = /boot/$KERNEL_VERSION/bzImage" /etc/lilo.conf && \
 cat <<EOLILO >> /etc/lilo.conf
 # Linux bootable partition config begins
 image = /boot/$KERNEL_VERSION/bzImage
