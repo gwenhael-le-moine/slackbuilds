@@ -14,6 +14,8 @@ TMP=/tmp/$PACKAGER
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
+NUMJOBS=${NUMJOBS:-" -j2 "}
+
 SRC_URL="http://www.kernel.org/pub/linux/kernel/v2.6$(echo \"$VERSION\" | grep -q \"\-rc\" && echo \"/testing\" )"
 
 rm -fr $PKG
@@ -52,16 +54,14 @@ if [ $CLEAN_SRC != "NO" ] || [ ! -e .config ] ; then
 fi
 
 make oldconfig $1
-make
+make $NUMJOBS
+make modules_install INSTALL_MOD_PATH=$PKG
 
 KERNEL_VERSION=$(grep -o "2\.6\.[0-9a-z\-]*" .config)$(grep "CONFIG_LOCALVERSION=" .config | sed 's|CONFIG_LOCALVERSION=||' | tr -d \" )
 
 mkdir -p $PKG/boot/$KERNEL_VERSION
-
 cp .config System.map arch/x86/boot/bzImage $PKG/boot/$KERNEL_VERSION
 mv $PKG/boot/$KERNEL_VERSION/{.,}config
-
-make modules_install INSTALL_MOD_PATH=$PKG
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/installs/doinst.sh
