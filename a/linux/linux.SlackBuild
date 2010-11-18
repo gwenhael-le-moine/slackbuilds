@@ -64,7 +64,22 @@ mv $PKG/boot/$KERNEL_VERSION/{.,}config
 make modules_install INSTALL_MOD_PATH=$PKG
 
 mkdir -p $PKG/install
+cat <<EOF > $PKG/installs/doinst.sh
+cp /etc/lilo.conf /etc/lilo.conf.orig
+cat <<EOLILO >> /etc/lilo.conf
+# Linux bootable partition config begins
+image = /boot/$KERNEL_VERSION/bzImage
+  root = /dev/sda1
+  label = $KERNEL_VERSION
+  read-only
+# Linux bootable partition config ends
 
+EOLILO
+
+sed -i "s|default=.*|default=$KERNEL_VERSION|" /etc/lilo.conf
+
+lilo
+EOF
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM-$(echo $VERSION | tr - _): $PRGNAM-$(echo $VERSION | tr - _) (kernel)
 $PRGNAM-$(echo $VERSION | tr - _): 
