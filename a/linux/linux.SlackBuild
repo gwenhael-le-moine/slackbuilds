@@ -53,7 +53,7 @@ if [ $CLEAN_SRC != "NO" ] || [ ! -e .config ] ; then
     fi
 fi
 
-make oldconfig $1
+make oldconfig $*
 make $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
 
