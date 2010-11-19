@@ -1,0 +1,156 @@
+#!/bin/sh
+
+# Slackware build script for cross-gcc
+
+# Copyright 2009-2010 Heinz Wiesinger, Amsterdam, The Netherlands
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SRCNAM=gcc
+SRCVER=4.5.1
+ARCH=${ARCH:-$(uname -m)}
+CROSS=${CROSS:-armv5te}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+PRGNAM=cross-$SRCNAM
+VERSION=${SRCVER}_$CROSS
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+GCC_TMP=$TMP/gcc-$(mcookie)
+SYSTEM="slackware-linux"
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $GCC_TMP $PKG $OUTPUT
+cd $GCC_TMP
+rm -rf $SRCNAM-$SRCVER
+tar xvf $CWD/$SRCNAM-$SRCVER.tar.?z*
+cd $SRCNAM-$SRCVER
+  chown -R root:root .
+  chmod -R u+w,go+r-w,a-s .
+
+  zcat $CWD/gcc-no_fixincludes.diff.gz | patch -p1
+cd -
+
+mkdir gcc.build.lnx
+cd gcc.build.lnx
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+../$SRCNAM-$SRCVER/configure \
+  --prefix=/opt/cross-$CROSS \
+  --libdir=/opt/cross-$CROSS/lib$LIBDIRSUFFIX \
+  --mandir=/usr/man \
+  --infodir=/usr/info \
+  --enable-shared \
+  --enable-languages=c,c++ \
+  --enable-threads=posix \
+  --enable-checking=release \
+  --with-system-zlib \
+  --with-python-dir=/usr/lib$LIBDIRSUFFIX/python2.6/site-packages \
+  --disable-libunwind-exceptions \
+  --enable-__cxa_atexit \
+  --enable-libssp \
+  --disable-multilib \
+  --with-gnu-ld \
+  --verbose \
+  --target=$CROSS-$SYSTEM \
+  --build=$ARCH-$SYSTEM \
+  --host=$ARCH-$SYSTEM
+
+make all-gcc
+
+make install-gcc DESTDIR=$PKG
+
+rm -fr $PKG/usr/man/man7
+rm -fr $PKG/usr/info
+
+find $PKG/usr/man -type f -exec gzip -9 {} \;
+
+find $PKG -empty -delete
+
+cd -
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/{gcc,libmudflap,libgomp,libstdc++-v3}
+cd $SRCNAM-$SRCVER
+  cp -a COPYING* ChangeLog ChangeLog.tree-ssa INSTALL LAST_UPDATED MAINTAINERS \
+    NEWS README* $PKG/usr/doc/$PRGNAM-$VERSION
+cd -
+
+cd $SRCNAM-$SRCVER/gcc
+  cp -a ABOUT* COPYING* LANG* ONEWS README* $PKG/usr/doc/$PRGNAM-$VERSION/gcc
+cd -
+
+cd $SRCNAM-$SRCVER/libmudflap
+  cp -a ChangeLog $PKG/usr/doc/$PRGNAM-$VERSION/libmudflap
+cd -
+
+cd $SRCNAM-$SRCVER/libgomp
+  cp -a ChangeLog $PKG/usr/doc/$PRGNAM-$VERSION/libgomp
+cd -
+
+cd $SRCNAM-$SRCVER/libstdc++-v3
+  cp -a ChangeLog README $PKG/usr/doc/$PRGNAM-$VERSION/libstdc++-v3
+cd -
+
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+         |-----handy-ruler------------------------------------------------------|
+cross-gcc: cross-gcc (A Cross-Compiler for $CROSS_ARCH)
+cross-gcc:
+cross-gcc: This is a cross compiler setup, which is capable of compiling
+cross-gcc: $CROSS_ARCH apps on a $ARCH host system.
+cross-gcc:
+cross-gcc:
+cross-gcc:
+cross-gcc:
+cross-gcc:
+cross-gcc:
+cross-gcc:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-tgz}
+
