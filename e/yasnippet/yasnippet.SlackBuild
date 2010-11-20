@@ -1,0 +1,84 @@
+#!/bin/sh -x
+
+# variables
+VERSION=master_$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+PACKAGER=cyco
+
+TMP=/tmp
+CWD=$(pwd)
+
+PRGNAM=yasnippet
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+ARCH=$(uname -m)
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+PREFIX=/usr
+
+EMACS=$(basename $(ls /usr/bin/emacs-2*))
+EMACS_VERSION=$(echo "$EMACS" | grep -o "\-[0-9\.]*\-" | tr -d - | head -n1)
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ] ; then
+        mkdir -p $(dirname $REPOSITORY)
+        cd $(dirname $REPOSITORY)
+        svn checkout "http://yasnippet.googlecode.com/svn/trunk" $PRGNAM
+fi
+
+( cd $REPOSITORY
+    svn update
+)
+
+mkdir -p $PKG$PREFIX/share/emacs/site-lisp
+cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
+( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
+    find . -name \.svn -exec rm -fr {} \;
+    # $EMACS -batch -f batch-byte-compile *.el
+    rake compile
+    rake doc
+    mkdir -p $PKG$PREFIX/doc/
+    mv doc $PKG$PREFIX/doc/$PRGNAM-$VERSION
+    mv README $PKG$PREFIX/doc/$PRGNAM-$VERSION
+    rm -fr pkg Rakefile
+)
+
+# correction
+( cd $PKG
+    chown -R root:root *
+)
+
+# embaumement
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (template system for Emacs)
+$PRGNAM: It allows you to type an abbreviation and automatically expand it into function
+$PRGNAM: templates. Bundled language templates includes: C, C++, C#, Perl, Python, Ruby,
+$PRGNAM: SQL, LaTeX, HTML, CSS and more.
+$PRGNAM: 
+$PRGNAM: (add-to-list 'load-path "$PREFIX/share/emacs/site-lisp/yasnippet")
+$PRGNAM: (require 'yasnippet)
+$PRGNAM: (yas/initialize)
+$PRGNAM: (yas/load-directory "$PREFIX/share/emacs/site-lisp/yasnippet/snippets")
+$PRGNAM: 
+$PRGNAM: http://code.google.com/p/yasnippet/
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
