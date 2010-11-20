@@ -10,7 +10,7 @@ for e in $(find . -type d -maxdepth 1 -not -name UNUSED -not -name . -not -name 
     (cd $e
         THIS=$(basename $e)
         sh $THIS.SlackBuild \
-            && upgradepkg /tmp/$THIS*.t?z \
+            && upgradepkg --install-new /tmp/$THIS*.t?z \
             && mv /tmp/$THIS*.t?z /home/installs/PKGs/
     )
 done
