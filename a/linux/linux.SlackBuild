@@ -64,7 +64,7 @@ cp .config System.map arch/x86/boot/bzImage $PKG/boot/$KERNEL_VERSION
 mv $PKG/boot/$KERNEL_VERSION/{.,}config
 
 mkdir -p $PKG/install
-cat <<EOF > $PKG/installs/doinst.sh
+cat <<EOF > $PKG/install/doinst.sh
 cp /etc/lilo.conf /etc/lilo.conf.orig
 grep -q "image = /boot/$KERNEL_VERSION/bzImage" /etc/lilo.conf && \
 cat <<EOLILO >> /etc/lilo.conf
