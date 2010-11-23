@@ -32,7 +32,7 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-    mkdir $REPOSITORIES
+    mkdir -p $REPOSITORIES
     ( cd $REPOSITORIES
         git clone git://github.com/petdance/ack.git $PRGNAM
     )
