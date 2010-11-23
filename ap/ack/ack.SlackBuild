@@ -7,7 +7,7 @@ PACKAGER=cyco
 TMP=/tmp/$PACKAGER
 CWD=$(pwd)
 
-PRGNAM=$(basename)
+PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
 VERSION=git$(date +%Y.%m.%d_%H.%M)
