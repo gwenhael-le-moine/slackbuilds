@@ -1,0 +1,65 @@
+ #!/bin/sh
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+VERSION=svn$(date +%Y.%m.%d_%H.%M)
+BUILD=1
+PACKAGER=cyco
+
+ARCH=$(uname -m)
+
+HOME=/home/cycojesus
+TMP=/tmp
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+REPOSITORIES=$HOME/projets/packages/repositories
+
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+[ -e $PKG ] && rm -fr $PKG
+
+mkdir -p $PKG/usr/libexec/
+
+# Put files in place
+cd $PKG/usr/libexec/
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    svn co http://fslint.googlecode.com/svn/trunk/ $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        svn update
+    )
+fi
+cp -R $REPOSITORIES/$PRGNAM .
+cd $PRGNAM/po
+
+make
+
+# Install
+mkdir $PKG/usr/bin
+cat <<EOF > $PKG/usr/bin/$PRGNAM
+#!/bin/sh
+
+cd $PKG/usr/libexec/$PRGNAM
+./fslint-gui
+EOF
+chmod +x $PKG/usr/bin/$PRGNAM
+
+find $PKG/usr/libexec/$PRGNAM -type d -name \.svn -print0 | xargs -0 rm -fr
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install
+$PRGNAM: $PRGNAM (filesystem utility)
+$PRGNAM: 
+$PRGNAM: FSlint is a utility to find and clean various forms of lint on a filesystem.
+$PRGNAM: I.E. unwanted or problematic cruft in your files or file names.
+$PRGNAM: For example, one form of lint it finds is duplicate files.
+$PRGNAM: It has both GUI and command line modes.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.pixelbeat.org/fslint/
+$PRGNAM: 
+EOF
+
+cd $PKG
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
