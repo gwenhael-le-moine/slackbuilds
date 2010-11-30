@@ -57,7 +57,8 @@ make oldconfig $*
 make $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
 
-KERNEL_VERSION=$(grep -o "2\.6\.[0-9a-z\-]*" .config)$(grep "CONFIG_LOCALVERSION=" .config | sed 's|CONFIG_LOCALVERSION=||' | tr -d \" )
+KERNEL_TAG=$(grep "CONFIG_LOCALVERSION=" .config | sed 's|CONFIG_LOCALVERSION=||' | tr -d \" )
+KERNEL_VERSION=$(grep -o "2\.6\.[0-9a-z\-]*" .config)$KERNEL_TAG
 
 mkdir -p $PKG/boot/$KERNEL_VERSION
 cp .config System.map arch/x86/boot/bzImage $PKG/boot/$KERNEL_VERSION
@@ -96,4 +97,4 @@ $PRGNAM-$(echo $VERSION | tr - _):
 EOF
 
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$(echo $KERNEL_VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$(echo $KERNEL_TAG | tr - _)-$ARCH-$BUILD$PACKAGER.txz
