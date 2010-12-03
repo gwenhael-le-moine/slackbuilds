@@ -13,3 +13,6 @@ repositories/
 *.js
 *.orig
 *.bz2
+*.gz
+*.dawg
+*.so
