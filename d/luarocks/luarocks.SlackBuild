@@ -90,16 +90,16 @@ cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM (one line description here)
+$PRGNAM: $PRGNAM (deployment and management system for Lua modules.)
 $PRGNAM:
-$PRGNAM: More verbose description here, usually from the README file.
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: LuaRocks allows you to install Lua modules as self-contained packages
+$PRGNAM: called [*rocks*]
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
+$PRGNAM: LuaRocks is free software and uses the same license as Lua 5.1.
+$PRGNAM:
+$PRGNAM: http://luarocks.org
 $PRGNAM:
 EOF
 
