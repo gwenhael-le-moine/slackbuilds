@@ -14,7 +14,7 @@ VERSION=$(date +%Y.%m%d_%H.%M)
 
 EXT=tar.gz
 
-DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
+DOCS="COPYING* README*"
 
 ARCH=$(uname -m)
 BUILD=1
