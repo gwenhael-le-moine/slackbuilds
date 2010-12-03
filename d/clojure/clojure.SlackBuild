@@ -74,4 +74,4 @@ $PRGNAM:
 $PRGNAM: http://clojure.org
 EOF
 
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d - )-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d - )-$ARCH-$BUILD$PACKAGER.txz
