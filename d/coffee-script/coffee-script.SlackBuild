@@ -1,12 +1,14 @@
 #!/bin/sh -x
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp}
+PACKAGER=cyco
+TMP=${TMP:-/tmp/$PACKAGER}
+OUTPUT=/tmp
 
-APP_NAME=$(basename $CWD)
+PRGNAM=$(basename $CWD)
 VERSION=git$(date +%Y.%m.%d_%H.%M)
-ARCH=${ARCH:-x86_64}
-BUILD=${BUILD:-1cyco}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j2 "}
 
@@ -14,7 +16,7 @@ REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
 PREFIX=/usr
 
-PKG=$TMP/package-$APP_NAME
+PKG=$TMP/pkg-$PRGNAM
 rm -rf $PKG
 mkdir -p $TMP $PKG
 
@@ -30,23 +32,21 @@ elif [ "$ARCH" = "x86_64" ]; then
 fi
 
 cd $TMP
-rm -rf $APP_NAME-$VERSION
+rm -rf $PRGNAM-$VERSION
 cd $TMP
-if [ -e $CWD/$APP_NAME-$VERSION.$EXT ] ; then
-    tar xf $CWD/$APP_NAME-$VERSION.$EXT
+if [ -e $CWD/$PRGNAM-$VERSION.$EXT ] ; then
+    tar xf $CWD/$PRGNAM-$VERSION.$EXT
 else
-    if [ ! -e $REPOSITORIES/$APP_NAME ] ; then
-        ( cd $REPOSITORIES
-            git clone http://github.com/jashkenas/coffee-script.git $APP_NAME
-        ) ;
+    if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+        git clone http://github.com/jashkenas/coffee-script.git $REPOSITORIES/$PRGNAM
     fi
-    ( cd $REPOSITORIES/$APP_NAME
+    ( cd $REPOSITORIES/$PRGNAM
         git pull
     )
-    cp -R $REPOSITORIES/$APP_NAME $TMP/$APP_NAME-$VERSION
+    cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
 fi
 
-cd $APP_NAME-$VERSION || exit 1
+cd $PRGNAM-$VERSION || exit 1
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -54,7 +54,7 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-echo "$ARCH" | grep -q "64" && sed -i 's|$base/lib/coffee-script|$base/lib64/coffee-script|' Cakefile
+sed -i "s|#{base}/lib/coffee-script|#{base}/lib$LIBDIRSUFFIX/coffee-script|g" Cakefile
 
 ./bin/cake --prefix $PKG$PREFIX install
 
@@ -65,26 +65,26 @@ echo "$ARCH" | grep -q "64" && sed -i 's|$base/lib/coffee-script|$base/lib64/cof
 
 )
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cp -a LICENSE README* $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+mv LICENSE README* $PKG/usr/doc/$PRGNAM-$VERSION
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Programming language)
-$APP_NAME: 
-$APP_NAME: CoffeeScript is a little language that compiles into JavaScript.
-$APP_NAME: Think of it as JavaScript's less ostentatious kid brother — the same genes,
-$APP_NAME: roughly the same height, but a different sense of style. Apart from a
-$APP_NAME: handful of bonus goodies, statements in CoffeeScript correspond one-to-one
-$APP_NAME: with their equivalent in JavaScript, it's just another way of saying it. 
-$APP_NAME: 
-$APP_NAME: http://jashkenas.github.com/coffee-script/
-$APP_NAME: 
+$PRGNAM: $PRGNAM (Programming language)
+$PRGNAM: 
+$PRGNAM: CoffeeScript is a little language that compiles into JavaScript.
+$PRGNAM: Think of it as JavaScript's less ostentatious kid brother — the same genes,
+$PRGNAM: roughly the same height, but a different sense of style. Apart from a
+$PRGNAM: handful of bonus goodies, statements in CoffeeScript correspond one-to-one
+$PRGNAM: with their equivalent in JavaScript, it's just another way of saying it. 
+$PRGNAM: 
+$PRGNAM: http://jashkenas.github.com/coffee-script/
+$PRGNAM: 
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
 
