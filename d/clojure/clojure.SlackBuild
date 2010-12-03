@@ -1,16 +1,18 @@
 #!/bin/sh
 set -x -e
 
-PRGNAM=clojure
-VERSION=1.2.0
-ARCH=java
-BUILD=1
-PACKAGER=cyco
-
 CWD=$(pwd)
-TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
-PREFIX=/usr
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-1.2.0}
+ARCH=${ARCH:-java}
+BUILD=${BUILD:-1}
+PACKAGER=${PACKAGER:-cyco}
+
+TMP=${TMP:-/tmp/$PACKAGER}
+OUTPUT=${OUTPUT:-/tmp}
+PKG=$TMP/pkg-$PRGNAM
+PREFIX=${PREFIX:-/usr}
 
 # cleaning
 rm -fr $PKG
@@ -18,7 +20,7 @@ rm -fr $PKG
 # do we have the sources?
 if [ ! -e $CWD/$PRGNAM-$VERSION.zip ] ; then
    ( cd $CWD
-      wget -c http://github.com/downloads/clojure/clojure/$PRGNAM-$VERSION.zip
+      wget -c --no-check-certificate http://github.com/downloads/clojure/clojure/$PRGNAM-$VERSION.zip
    )
 fi
 
