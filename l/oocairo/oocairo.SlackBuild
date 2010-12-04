@@ -45,8 +45,8 @@ LIBS=-lX11 ./configure \
 make
 make install DESTDIR=$PKG
 
-mkdir -p $PKG/usr/doc/PRGNAM-$VERSION/
-cp $DOCS $PKG/usr/doc/PRGNAM-$VERSION/
+mkdir -p $PKG/usr/doc/$PRGNAM/
+cp $DOCS $PKG/usr/doc/$PRGNAM/
 
 cd $PKG
 
