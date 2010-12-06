@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=love
-VERSION=0.6.0
+VERSION=$(date +%F.%m.%d_%H.%M) #0.7.0
 RELEASE_ID=20091214-301312c82b00
 
 
@@ -17,6 +17,8 @@ PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
 PREFIX=/usr
 
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+
 # Cleaning
 ( cd $TMP
     rm -fr $PRGNAM-$VERSION
@@ -25,12 +27,20 @@ PREFIX=/usr
 
 # Fetching sources
 ( cd $TMP
-    [ -e $CWD/$PRGNAM-$VERSION-linux-src.tar.?z* ] \
-        && tar xvf $CWD/$PRGNAM-$VERSION-linux-src.tar.?z*
-    # [ ! -e $PRGNAM-$VERSION ] \
-    #     && wget -c http://$PRGNAM.googlecode.com/files/$PRGNAM-$VERSION.tar.bz2 \
-    #     && tar xvf $PRGNAM-$VERSION.tar.?z*
-    find . -type d -name "$PRGNAM-*-*" -exec mv {} $PRGNAM-$VERSION \;
+    if [ -e $CWD/$PRGNAM-$VERSION-linux-src.tar.?z* ]; then
+        tar xvf $CWD/$PRGNAM-$VERSION-linux-src.tar.?z*
+        find . -type d -name "$PRGNAM-*-*" -exec mv {} $PRGNAM-$VERSION \;
+    else
+        [ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+        if [ -e $REPOSITORIES/$PRGNAM ]; then
+            ( cd $REPOSITORIES/$PRGNAM
+                hg pull -u
+            )
+        else
+            hg clone http://bitbucket.org/rude/love $REPOSITORIES/$PRGNAM
+        fi
+        cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+    fi
 )
 
 # Preparation
@@ -45,6 +55,7 @@ PREFIX=/usr
 
 # Configuration
 ( cd $TMP/$PRGNAM-$VERSION
+    [ ! -e ./configure ] && ./platform/unix/automagic
     ./configure \
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
