@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=libmodplug
-VERSION=0.8.7
+VERSION=0.8.8.1
 
 
 BUILD=1
