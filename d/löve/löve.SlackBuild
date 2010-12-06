@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=love
-VERSION=$(date +%F.%m.%d_%H.%M) #0.7.0
+VERSION=$(date +%Y.%m.%d_%H.%M) #0.7.0
 RELEASE_ID=20091214-301312c82b00
 
 
