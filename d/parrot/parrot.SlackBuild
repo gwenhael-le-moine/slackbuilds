@@ -25,10 +25,10 @@ rm -fr $PKG
 ( cd $REPOSITORIES
     if [ -e $REPOSITORIES/$PRGNAM ] ; then
         ( cd $REPOSITORIES/$PRGNAM
-            svn update
+            git pull
         )
     else
-        svn co https://svn.parrot.org/parrot/$BRANCH parrot
+        git clone git://github.com/parrot/parrot.git parrot
     fi
 )
 
