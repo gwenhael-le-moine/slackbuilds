@@ -1,0 +1,45 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=2011.01.02a
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $CWD/perfbook.$VERSION.pdf ] && wget -c http://kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.$VERSION.pdf -O $CWD/perfbook.$VERSION.pdf
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/perfbook.$VERSION.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Parallel Programming book)
+$PRGNAM: 
+$PRGNAM: Is Parallel Programming Hard, And, If So, What Can You Do About It?
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
