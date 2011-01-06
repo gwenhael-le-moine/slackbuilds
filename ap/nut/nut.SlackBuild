@@ -10,24 +10,20 @@ ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
 CWD=$(pwd)
-TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 
 # Cleaning
-( cd $TMP
-    rm -fr $PRGNAM-$VERSION
-    rm -fr $PKG
-)
+rm -fr $TMP/$PRGNAM-$VERSION
+rm -fr $PKG
 
 # Fetching sources
 ( cd $TMP
-    [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] \
-        && tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
-    [ ! -e $PRGNAM-$VERSION ] \
-        && wget -c http://nchc.dl.sourceforge.net/project/$PRGNAM/$PRGNAM/$VERSION/$PRGNAM-$VERSION.tar.gz \
-        && tar xvf $PRGNAM-$VERSION.tar.?z*
+    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
+        wget -c http://nchc.dl.sourceforge.net/project/$PRGNAM/$PRGNAM/$VERSION/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz
+    tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
 )
 
 # Preparation
