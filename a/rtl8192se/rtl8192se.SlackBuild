@@ -4,25 +4,22 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=2.6.0018.1013.2010
+VERSION=${VERSION:-$(ls -ut $PRGNAM*.tar.?z*| head -n1 | cut -d_ -f3 | sed 's|.tar.*||')}
 
-BUILD=1
-PACKAGER=cyco
+BUILD=${BUILD:-1}
+PACKAGER=${PACKAGER:-cyco}
 ARCH=$(uname -m)
-LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
-TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+TMP=${TMP:-/tmp/$PACKAGER}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
-
-PREFIX=/usr
+PREFIX=${PREFIX:-/usr}
 
 # Cleaning
 rm -fr $TMP/$PRGNAM-$VERSION
 rm -fr $PKG
 
-#[ ! -e ${PRGNAM}_linux_$VERSION.tar.gz ] && wget -c ... #TODO
 tar -C $TMP -xf $CWD/${PRGNAM}_linux_$VERSION.tar.gz
 mv $TMP/${PRGNAM}_linux_$VERSION $TMP/$PRGNAM-$VERSION
 
@@ -53,11 +50,8 @@ mv $TMP/${PRGNAM}_linux_$VERSION $TMP/$PRGNAM-$VERSION
 ( cd $PKG
 # Cleaning
     chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
+    find . -type d -exec chmod 755 {} \;
+    find . -type f -exec chmod 644 {} \;
 
 # Packaging
     mkdir install
@@ -75,16 +69,16 @@ EOF
 $PRGNAM: $PRGNAM (RTL8192SE Linux driver)
 $PRGNAM:
 $PRGNAM: This driver supports RealTek rtl8192SE PCI Wireless LAN NIC
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM:
 $PRGNAM:
 $PRGNAM: http://realtek.com
 $PRGNAM: http://www.realtek.com/downloads/downloadsView.aspx?Langid=1&PNid=21&PFid=48&Level=5&Conn=4&DownTypeID=3&GetDown=false&Downloads=true
 $PRGNAM:
+$PRGNAM: the 3 "official" mirrors:
+$PRGNAM: ftp://WebUser:pGL7E6v@202.134.71.21/cn/wlan/
+$PRGNAM: ftp://WebUser:pGL7E6v@208.70.202.219/cn/wlan/
+$PRGNAM: ftp://WebUser:pGL7E6v@218.210.127.132/cn/wlan/
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')_$(uname -r | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(uname -r | tr - _)-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
 )
 
