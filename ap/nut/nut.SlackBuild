@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=nut
-VERSION=16.3
+VERSION=16.4
 
 BUILD=1
 PACKAGER=cyco
