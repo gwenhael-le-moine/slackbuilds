@@ -2,22 +2,25 @@
 set -x
 
 PRGNAM=nut
-VERSION=16.3
+VERSION=${VERSION:-16.4}
 
-BUILD=1
-PACKAGER=cyco
+BUILD=${BUILD:-1}
+PACKAGER=${PACKAGER:-cyco}
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
 CWD=$(pwd)
-TMP=/tmp/$PACKAGER
-PKG=$TMP/pkg-$PRGNAM
+TMP=${TMP:-/tmp/$PACKAGER}
+PKG=${PKG:-$TMP/pkg-$PRGNAM}
+OUTPUT=${OUTPUT:-/tmp}
 
-PREFIX=/usr
+PREFIX=${PREFIX:-/usr}
 
 # Cleaning
 rm -fr $TMP/$PRGNAM-$VERSION
 rm -fr $PKG
+
+[ ! -e $TMP/ ] && mkdir -p $TMP
 
 # Fetching sources
 ( cd $TMP
@@ -86,6 +89,6 @@ $PRGNAM: http://nut.sourceforge.net/
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
 )
 
