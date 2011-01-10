@@ -3,18 +3,18 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=$(date +"%Y.%m.%d_%H.%M")
-BUILD=1
-PACKAGER=cyco
-ARCH=$(uname -m)
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+BUILD=${BUILD:-1}
+PACKAGER=${PACKAGER:-cyco}
+ARCH=${ARCH:-$(uname -m)}
 
-TMP=/tmp/$PACKAGER
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=/tmp
+TMP=${TMP:-/tmp/$PACKAGER}
+PKG=${PKG:-$TMP/pkg-$PRGNAM}
+OUTPUT=${OUTPUT:-/tmp}
 
-PREFIX=/usr
+PREFIX=${PREFIX:-/usr}
 
-FORMAT=a4 # or letter
+FORMAT=${FORMAT:-a4} # or letter
 
 # cleaning
 rm -fr $PKG
@@ -26,9 +26,9 @@ wget -c http://www.onyxneon.com/books/modern_perl/modern_perl_$FORMAT.pdf -O $CW
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -R $CWD/modern_perl_$FORMAT.pdf $PKG$PREFIX/doc/$PRGNAM
 
-( cd $PKG
-    mkdir -p install
-    cat <<EOF > install/slack-desc
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM («Modern Perl» book)
 $PRGNAM: 
 $PRGNAM: 
@@ -42,7 +42,6 @@ $PRGNAM: http://www.onyxneon.com/books/modern_perl/index.html
 $PRGNAM: 
 EOF
 
-    chown -R root:root *
+chown -R root:root *
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
-)
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
