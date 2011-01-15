@@ -7,7 +7,7 @@ CWD=$(pwd)
 APP_NAME=libev
 PKG=$TMP/package-$APP_NAME
 
-VERSION=3.9
+VERSION=4.03
 
 EXT=tar.gz
 
@@ -27,6 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
+[ ! -e $CWD/$APP_NAME-$VERSION.$EXT ] && wget -c http://dist.schmorp.de/libev/libev-4.03.tar.gz -O $CWD/$APP_NAME-$VERSION.$EXT
 tar xf $CWD/$APP_NAME-$VERSION.$EXT
 cd $APP_NAME-$VERSION
 
