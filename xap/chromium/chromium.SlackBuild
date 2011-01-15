@@ -77,7 +77,7 @@ mkdir -p $PKG/usr/bin
 cat <<EOF > $PKG/usr/bin/$PRGNAM
 #!/bin/sh
 cd /opt/chrome-linux/
-LD_LIBRARY_PATH=/opt/chrome-linux/:$LD_LIBRARY_PATH ./chrome --proxy-server="socks://localhost:9050" $*
+LD_LIBRARY_PATH=/opt/chrome-linux/:\$LD_LIBRARY_PATH ./chrome --proxy-server="socks://localhost:9050" \$*
 EOF
 
 # ( cd $PKG/usr/bin/
