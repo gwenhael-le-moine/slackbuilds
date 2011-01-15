@@ -20,6 +20,8 @@ PREFIX=${PREFIX:-/usr}
 rm -fr $TMP/$PRGNAM-$VERSION
 rm -fr $PKG
 
+mkdir -p $TMP/
+
 tar -C $TMP -xf $CWD/${PRGNAM}_linux_$VERSION.tar.gz
 mv $TMP/${PRGNAM}_linux_$VERSION $TMP/$PRGNAM-$VERSION
 
