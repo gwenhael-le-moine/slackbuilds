@@ -1,37 +1,29 @@
 #!/bin/sh
 
-PRGNAM=$(basename $(pwd))
-VERSION=${VERSION:-$(date +%Y.%m.%d_%H.%M)
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +%Y.%m.%d_%H.%M)}
 ARCH=noarch
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
-
-CWD=$(pwd)
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 # Create working directories:
-mkdir -p $OUTPUT          # place for the package to be saved
-mkdir -p $PKG             # place for the package to be built
-rm -rf $PKG/*             # always erase old package's contents
-rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
-                          # remove old log files
+rm -rf $PKG
+mkdir -p $OUTPUT
+mkdir -p $PKG
 
-FONTDIR="/usr/share/fonts/TTF"
+FONTDIR=/usr/share/fonts/TTF
 
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR
-( cd $PKG$FONTDIR/
-    if [ -e $CWD/helvetica.zip ] ; then
-        unzip $CWD/helvetica.zip
-    else
-        wget -c http://mirrored.spockz.nl/file/fonts/helvetica/helvetica.zip ;
-        unzip helvetica.zip
-        rm helvetica.zip
-    fi
-)
+cd $PKG$FONTDIR/
+[ ! -e $CWD/helvetica.zip ] && wget -c http://mirrored.spockz.nl/file/fonts/helvetica/helvetica.zip -O $CWD/helvetica.zip
+unzip $CWD/helvetica.zip
 
 # Post-install script:
 mkdir -p $PKG/install
@@ -64,9 +56,4 @@ EOF
 
 # Build the package:
 cd $PKG
-makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz 2>&1 | tee $OUTPUT/makepkg-${PRGNAM}.log
-cd $OUTPUT
-md5sum ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz > ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz.md5
-cd -
-cat $PKG/install/slack-desc | grep "^${PRGNAM}" > $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txt
-
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
