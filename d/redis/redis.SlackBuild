@@ -1,0 +1,98 @@
+#!/bin/sh -x
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+TMP=${TMP:-/tmp/cyco}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+VERSION=${VERSION:-$(date +%Y.%m.%d_%H.%M)}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+PREFIX=/usr
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+
+if [ "$ARCH" = "i486" ]; then
+   SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+   SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "x86_64" ]; then
+   SLKCFLAGS="-O2 -fPIC"
+fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT 
+
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+if [ ! -e $REPOSITORY ]; then
+    git clone https://github.com/antirez/redis.git $REPOSITORY
+else
+    ( cd $REPOSITORY
+        git pull
+    )
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+
+cd $PRGNAM-$VERSION
+chown -R root:root .
+find . \
+ \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+ -exec chmod 755 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+ -exec chmod 644 {} \;
+
+# launching tests hangs, so we don't run them -.-
+make PREFIX=$PREFIX
+
+mkdir -p $PKG$PREFIX/bin
+make install PREFIX=$PKG$PREFIX
+
+mkdir -p $PKG/etc/
+install -D -m 644 redis.conf $PKG/etc/redis.conf.new
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a 00-RELEASENOTES BUGS CONTRIBUTING COPYING Changelog INSTALL \
+    README TODO doc/ design-documents/ utils/ \
+    $PKG/usr/doc/$PRGNAM-$VERSION
+
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then # toss\
+ the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+config etc/redis.conf.new
+EOF
+
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (key-value store database)
+$PRGNAM: 
+$PRGNAM: Redis is an extremely fast and powerful key-value store database and server
+$PRGNAM: implemented in ANSI C. Redis offers many different ways to do one
+$PRGNAM: straightforward thing: store a value ("antirez") to a key ("redis").
+$PRGNAM: While the format of keys must always be simple strings, the power is with
+$PRGNAM: the values.
+$PRGNAM: 
+$PRGNAM: http://redis.io
+$PRGNAM: 
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
