@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # Slackware build script for w3m
 # Written by slakmagik <jsun@freeshell.org>
 # Released under the WTFPL
 
 PRGNAM=w3m
-VERSION=0.5.2
+VERSION=0.5.3
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
