@@ -61,10 +61,10 @@ mkdir -p $PKG/etc/rc.d/
 install -D -m 644 $CWD/redis.conf $PKG/etc/redis.conf.new
 install -D -m 755 $CWD/rc.redis $PKG/etc/rc.d/rc.redis.new
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a 00-RELEASENOTES BUGS CONTRIBUTING COPYING Changelog INSTALL \
     README TODO doc/ design-documents/ utils/ \
-    $PKG/usr/doc/$PRGNAM-$VERSION
+    $PKG/usr/doc/$PRGNAM
 
 cd $PKG
 find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
