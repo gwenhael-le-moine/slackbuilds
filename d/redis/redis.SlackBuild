@@ -56,8 +56,10 @@ make PREFIX=$PREFIX
 mkdir -p $PKG$PREFIX/bin
 make install PREFIX=$PKG$PREFIX
 
-mkdir -p $PKG/etc/
-install -D -m 644 redis.conf $PKG/etc/redis.conf.new
+mkdir -p $PKG/etc/rc.d/
+#install -D -m 644 redis.conf $PKG/etc/redis.conf.new
+install -D -m 644 $CWD/redis.conf $PKG/etc/redis.conf.new
+install -D -m 755 $CWD/rc.redis $PKG/etc/rc.d/rc.redis.new
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a 00-RELEASENOTES BUGS CONTRIBUTING COPYING Changelog INSTALL \
@@ -83,6 +85,7 @@ config() {
   # Otherwise, we leave the .new copy for the admin to consider...
 }
 config etc/redis.conf.new
+config etc/rc.d/rc.redis.new
 EOF
 
 cat <<EOF > $PKG/install/slack-desc
