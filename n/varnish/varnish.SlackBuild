@@ -25,7 +25,7 @@
 # adapted by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
 PRGNAM=varnish
-VERSION=${VERSION:-2.1.3}
+VERSION=${VERSION:-2.1.5}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -93,8 +93,54 @@ cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 )
 
 mkdir -p $PKG/install
-cat $CWD/slack-desc > $PKG/install/slack-desc
-cat $CWD/doinst.sh > $PKG/install/doinst.sh
+cat <<EOF > $PKG/install/doinst.sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then
+    # toss the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+
+# Keep same perms on rc.varnishd.new:
+if [ -e etc/rc.d/rc.varnishd ]; then
+  cp -a etc/rc.d/rc.varnishd etc/rc.d/rc.varnishd.new.incoming
+  cat etc/rc.d/rc.varnishd.new > etc/rc.d/rc.varnishd.new.incoming
+  mv etc/rc.d/rc.varnishd.new.incoming etc/rc.d/rc.varnishd.new
+fi
+
+config etc/rc.d/rc.varnishd.new
+config etc/varnish/default.vcl.new
+config etc/varnish/zope-plone.vcl.new
+EOF
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+varnish: VARNISH (high-performance HTTP accelerator)
+varnish: 
+varnish: Varnish is targeted primarily at the FreeBSD 6 and
+varnish: Linux 2.6 platforms, and will take full advantage
+varnish: of the virtual memory system and advanced I/O
+varnish: features offered by these operating systems.
+varnish:   
+varnish: Homepage: http://varnish.projects.linpro.no/
+varnish:  
+varnish: 
+varnish: 
+
+EOF
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
