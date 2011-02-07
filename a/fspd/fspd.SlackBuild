@@ -5,11 +5,11 @@ VERSION=trunk_$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 PACKAGER=cyco
 
-TMP=/tmp
+TMP=/tmp/$PACKAGER
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
 
@@ -17,7 +17,7 @@ REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -26,11 +26,11 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
     mkdir -p $(dirname $REPOSITORY)
     svn checkout http://int.ed.ntnu.no/svn/public/fspd/trunk/ $REPOSITORY
+else
+    ( cd $REPOSITORY
+        svn update
+    )
 fi
-
-( cd $REPOSITORY
-    svn update
-)
 
 cp -R $REPOSITORY $TMP/
 ( cd $TMP/$PRGNAM
@@ -42,6 +42,7 @@ cp -R $REPOSITORY $TMP/
     sed -i "s|FSPD_DIR=/usr/local/bin|FSPD_DIR=$PREFIX/sbin|" $PKG/etc/conf.d/fsp.conf
     sed -i "s|FSP_EVENT=.*|FSP_EVENT=$(ls /dev/input/by-path/platform-i8042-serio-*-event-mouse)|" $PKG/etc/conf.d/fsp.conf
     sed -i "s|FSP_FLAGS_DIR=.*|FSP_FLAGS_DIR=/sys/devices/platform/i8042/serio$(ls /dev/input/by-path/platform-i8042-serio-*-event-mouse | sed 's|/dev/input/by-path/platform-i8042-serio-||' | sed 's|-event-mouse||')|" $PKG/etc/conf.d/fsp.conf
+    sed -i "s|SCROLL=0|SCROLL=1|" $PKG/etc/conf.d/fsp.conf
 
     chmod +x $PKG$PREFIX/sbin/* $PKG/etc/rc.d/*
 )
