@@ -1,0 +1,27 @@
+#!/bin/sh
+
+source /etc/conf.d/fsp.conf
+
+case $1 in
+    "start")
+        if [ -e $PID_FILE ]; then
+            echo "fspd already running ($(cat $PID_FILE))"
+        else
+            exec $FSPD_DIR/fspd &
+        fi
+        ;;
+    "stop")
+        if [ -e $PID_FILE ]; then
+            kill $(cat $PID_FILE)
+            rm $PID_FILE
+        else
+            echo "fspd not running"
+        fi
+        ;;
+    "restart")
+        $0 stop
+        $0 start
+        ;;
+    *)
+        ;;
+esac
