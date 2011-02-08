@@ -1,0 +1,64 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=trunk$(date +%Y.%m.%d_%H.%M)
+BUILD=1
+PACKAGER=cyco
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TMP=/tmp/$PACKAGER
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            svn up
+        )
+    else
+        svn co https://fatfree.svn.sourceforge.net/svnroot/fatfree $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG/srv/www/htdocs $PKG$PREFIX/doc/$PRGNAM
+cp -R $REPOSITORIES/$PRGNAM $PKG/srv/www/htdocs/
+find $PKG/srv/www/htdocs -name \.svn\* -exec rm -fr {} \;
+
+if [ ! -e $CWD/fatfree.sourceforge.net ]; then
+    ( cd $CWD
+        wget -cpk http://fatfree.sourceforge.net/
+    )
+fi
+cp -R $CWD/fatfree.sourceforge.net $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (PHP Web framwork)
+$PRGNAM: 
+$PRGNAM: FAT-FREE is a powerful and lightweight PHP 5.3+ Web application framework
+$PRGNAM: designed to help you build dynamic and robust Web sites - fast! Unlike
+$PRGNAM: other PHP frameworks, Fat-Free aims to be usable - not usual.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://fatfree.sourceforge.net/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+)
