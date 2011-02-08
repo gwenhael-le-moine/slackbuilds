@@ -31,7 +31,7 @@ rm -fr $PKG
     fi
 )
 
-mkdir -p $PKG/srv/www/htdocs $PKG$PREFIX/doc/$PRGNAM
+mkdir -p $PKG/srv/www/htdocs $PKG$PREFIX/doc/
 cp -R $REPOSITORIES/$PRGNAM $PKG/srv/www/htdocs/
 find $PKG/srv/www/htdocs -name \.svn\* -exec rm -fr {} \;
 
