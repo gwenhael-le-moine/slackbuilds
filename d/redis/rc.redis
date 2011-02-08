@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Important notice!
+# This assume the following non-standard options:
+# daemonize yes
+# logfile /var/log/redis.log
+
+DEAMON=redis-server
+
+CONF=/etc/redis.conf
+PIDFILE=/var/run/redis.pid
+
+case $1 in
+    "start")
+        if [ -e $PIDFILE ]; then
+            echo "$DEAMON already running ($(cat $PIDFILE))"
+        else
+            $DEAMON $CONF
+        fi
+        ;;
+    "stop")
+        if [ -e $PIDFILE ]; then
+            kill $(cat $PIDFILE)
+            rm $PIDFILE
+        else
+            echo "$DEAMON not running"
+        fi
+        ;;
+    "restart")
+        $0 stop
+        $0 start
+        ;;
+    *)
+        ;;
+esac
