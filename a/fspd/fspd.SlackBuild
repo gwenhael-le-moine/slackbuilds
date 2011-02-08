@@ -5,8 +5,10 @@ VERSION=trunk_$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 PACKAGER=cyco
 
-TMP=/tmp/$PACKAGER
 CWD=$(pwd)
+
+TMP=/tmp/$PACKAGER
+OUTPUT=/tmp
 
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
@@ -36,9 +38,9 @@ cp -R $REPOSITORY $TMP/
 ( cd $TMP/$PRGNAM
     mkdir -p $PKG{$PREFIX/{sbin,doc/$PRGNAM},/etc/{rc.d,conf.d}}
     cp fspd $PKG$PREFIX/sbin/
-    cp fsp $PKG/etc/rc.d/rc.fspd
+    cp $CWD/rc.fspd $PKG/etc/rc.d/rc.fspd.new
     cp README autoconf $PKG$PREFIX/doc/$PRGNAM
-    cp fsp.conf $PKG/etc/conf.d/
+    cp fsp.conf $PKG/etc/conf.d/fsp.conf.new
     sed -i "s|FSPD_DIR=/usr/local/bin|FSPD_DIR=$PREFIX/sbin|" $PKG/etc/conf.d/fsp.conf
     sed -i "s|FSP_EVENT=.*|FSP_EVENT=$(ls /dev/input/by-path/platform-i8042-serio-*-event-mouse)|" $PKG/etc/conf.d/fsp.conf
     sed -i "s|FSP_FLAGS_DIR=.*|FSP_FLAGS_DIR=/sys/devices/platform/i8042/serio$(ls /dev/input/by-path/platform-i8042-serio-*-event-mouse | sed 's|/dev/input/by-path/platform-i8042-serio-||' | sed 's|-event-mouse||')|" $PKG/etc/conf.d/fsp.conf
@@ -55,6 +57,22 @@ cp -R $REPOSITORY $TMP/
 
 # embaumement
 mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then # toss\
+ the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+config etc/rc.d/rc.fspd.new
+config etc/conf.d/fspd.conf.new
+EOF
 
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
@@ -80,4 +98,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
