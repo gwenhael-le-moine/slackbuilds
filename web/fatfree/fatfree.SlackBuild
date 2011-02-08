@@ -42,6 +42,12 @@ if [ ! -e $CWD/fatfree.sourceforge.net ]; then
 fi
 cp -R $CWD/fatfree.sourceforge.net $PKG$PREFIX/doc/$PRGNAM
 
+mkdir -p $PKG$PREFIX/doc/$PRGNAM/demos $CWD/demos/
+for i in fatfree-url.zip fatfree-oop.zip fatfree-ini.zip fatfree-i18n.zip fatfree-blog.zip; do
+    wget -c http://sourceforge.net/projects/fatfree/files/$i/download -O $CWD/demos/$i
+    cp $CWD/demos/$i $PKG$PREFIX/doc/$PRGNAM/demos
+done
+
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc
