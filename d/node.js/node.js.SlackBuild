@@ -56,11 +56,12 @@ find . \
 echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscript tools/wafadmin/Tools/node_addon.py
 
 ./configure configure \
-    --prefix=$PREFIX \
-    --mandir=$PREFIX/man
+    --prefix=$PREFIX
 
 make $NUMJOBS PREFIX=$PREFIX
 make install DESTDIR=$PKG PREFIX=$PREFIX
+mv $PKG$PREFIX/share/man $PKG$PREFIX
+rm -fr $PKG$PREFIX/share
 
 mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
 cp -a \
