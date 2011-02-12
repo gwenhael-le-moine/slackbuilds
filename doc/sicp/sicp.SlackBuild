@@ -1,24 +1,26 @@
 #!/bin/sh -x
 
 # variables
-VERSION=$(date +"%Y.%m.%d_%H.%M")
-BUILD=2
-PACKAGER=cyco
-
-TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$APP_NAME
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+BUILD=${BUILD:-3}
+PACKAGER=${PACKAGER:-cyco}
 
-ARCH=noarch
+TMP=${TMP:-/tmp/$PACKAGER}
+OUTPUT=${OUTPUT:-/tmp}
 
-PREFIX=/usr
+PRGNAM=${PRGNAM:-$(basename $CWD)}
+PKG=${PKG:-$TMP/pkg-$PRGNAM}
+
+ARCH=${ARCH:-noarch}
+
+PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable
 rm -fr $PKG
 
-mkdir -p $PKG$PREFIX/doc/$APP_NAME
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
 
 # mise en place
 cd $CWD
@@ -27,7 +29,7 @@ wget -c http://www.neilvandyke.org/sicp-texi/sicp.texi.gz || cp ./sicp.texi.gz.b
 [ -e ./allcode.tar.gz ] && mv ./allcode.tar.gz ./allcode.tar.gz.bkp
 wget -c http://mitpress.mit.edu/sicp/code/allcode.tar.gz  || cp ./allcode.tar.gz.bkp ./allcode.tar.gz
 
-cd $PKG$PREFIX/doc/$APP_NAME
+cd $PKG$PREFIX/doc/$PRGNAM
 cp $CWD/sicp.texi.gz .
 cp $CWD/allcode.tar.gz .
 
@@ -61,18 +63,18 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
         |-----handy-ruler------------------------------------------------------|
-$APP_NAME: $APP_NAME (computer-science text)
-$APP_NAME:
-$APP_NAME: Wizard Book n. Hal Abelson's, Jerry Sussman's and Julie Sussman's
-$APP_NAME: Structure and Interpretation of Computer Programs (MIT Press, 1984;
-$APP_NAME: ISBN 0-262-01077-1), an excellent computer science text used in
-$APP_NAME: introductory courses at MIT. So called because of the wizard on the
-$APP_NAME: jacket. One of the bibles of the LISP/Scheme world. Also,
-$APP_NAME: less commonly, known as the Purple Book.
-$APP_NAME: http://mitpress.mit.edu/sicp/
-$APP_NAME: http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/
-$APP_NAME: http://www.neilvandyke.org/sicp-texi/
+$PRGNAM: $PRGNAM (computer-science text)
+$PRGNAM:
+$PRGNAM: Wizard Book n. Hal Abelson's, Jerry Sussman's and Julie Sussman's
+$PRGNAM: Structure and Interpretation of Computer Programs (MIT Press, 1984;
+$PRGNAM: ISBN 0-262-01077-1), an excellent computer science text used in
+$PRGNAM: introductory courses at MIT. So called because of the wizard on the
+$PRGNAM: jacket. One of the bibles of the LISP/Scheme world. Also,
+$PRGNAM: less commonly, known as the Purple Book.
+$PRGNAM: http://mitpress.mit.edu/sicp/
+$PRGNAM: http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/
+$PRGNAM: http://www.neilvandyke.org/sicp-texi/
 EOF
 
 # empaquetage
-makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
