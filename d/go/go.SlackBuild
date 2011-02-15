@@ -33,7 +33,7 @@ else
 fi
 
 mkdir -p $PKG$PREFIX/libexec/ $PREFIX/libexec/
-cp -R $REPOSITORY $PREFIX/libexec/$PRGNAM
+cp -R $REPOSITORY $PREFIX/libexec/
 ( cd $PREFIX/libexec/$PRGNAM
     GOROOT=$(pwd)
     GOBIN=$GOROOT/bin
