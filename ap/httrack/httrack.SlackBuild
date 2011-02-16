@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=httrack
-VERSION=3.43-9
+VERSION=3.43.12
 
 BUILD=1
 PACKAGER=cyco
