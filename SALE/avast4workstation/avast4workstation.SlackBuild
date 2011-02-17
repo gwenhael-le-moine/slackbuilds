@@ -10,8 +10,8 @@ ARCH=i386
 
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp
-PKG=$TMP/$TAG/pkg-$PRGNAM
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
 [ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c http://files.avast.com/files/linux/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz

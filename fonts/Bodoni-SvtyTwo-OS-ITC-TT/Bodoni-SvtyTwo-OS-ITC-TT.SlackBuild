@@ -11,7 +11,7 @@ CWD=$(pwd)
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
 PKG=$TMP/pkg-$PRGNAM
 TAG=cyco
-TMP=/tmp
+TMP=/tmp/$TAG
 OUTPUT=${OUTPUT:-/tmp}
 
 # Create working directories:

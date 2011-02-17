@@ -11,8 +11,8 @@ BUILD=1
 
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp
-PKG=$TMP/$TAG/pkg-$PRGNAM
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
 # cleaning

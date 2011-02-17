@@ -15,7 +15,7 @@ BUILD=1
 
 TAG=cyco
 TMP=/tmp/$TAG
-PKG=$TMP/$TAG/pkg-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories

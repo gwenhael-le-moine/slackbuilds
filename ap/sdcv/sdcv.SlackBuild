@@ -10,7 +10,7 @@ BUILD=1
 
 
 TAG=cyco
-TMP=/tmp
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 
 GZBZ2="bz2"

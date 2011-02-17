@@ -11,7 +11,7 @@ CWD=$(pwd)
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
 PKG=$TMP/pkg-$PRGNAM
 TAG=cyco
-TMP=/tmp
+TMP=/tmp/$TAG
 OUTPUT=${OUTPUT:-/tmp}
 
 # Create working directories:
@@ -26,9 +26,9 @@ FONTDIR="/usr/share/fonts"
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR/{TTF,OTF}
 mkdir -p $PKG/usr/doc/$PRGNAM
-[ -e $TMP/$TAG/$PRGNAM ] && rm -fr $TMP/$TAG/$PRGNAM
-mkdir -p $TMP/$TAG/$PRGNAM
-( cd $TMP/$TAG/$PRGNAM
+[ -e $TMP/$PRGNAM ] && rm -fr $TMP/$TAG/$PRGNAM
+mkdir -p $TMP/$PRGNAM
+( cd $TMP/$PRGNAM
     for i in $CWD/*.zip ; do
         unzip $i ;
         find . -name "*.ttf" -exec mv {} $PKG$FONTDIR/TTF \;

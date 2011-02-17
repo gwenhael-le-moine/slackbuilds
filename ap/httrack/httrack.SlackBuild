@@ -12,8 +12,8 @@ LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp
-PKG=$TMP/$TAG/pkg-$PRGNAM
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 

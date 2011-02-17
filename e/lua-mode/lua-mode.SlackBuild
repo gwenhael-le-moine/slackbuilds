@@ -7,11 +7,11 @@ BUILD=1
 
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp
+TMP=/tmp/$TAG
 CWD=$(pwd)
 
 PRGNAM=lua-mode
-PKG=$TMP/$TAG/pkg-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
 

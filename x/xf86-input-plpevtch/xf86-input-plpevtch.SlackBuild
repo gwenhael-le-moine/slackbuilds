@@ -3,7 +3,7 @@
 # variables
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp
+TMP=/tmp/$TAG
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)

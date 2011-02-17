@@ -13,8 +13,8 @@ ARCH=$(uname -m)
 
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp
-PKG=$TMP/$TAG/pkg-$PRGNAM
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories/
 

@@ -10,7 +10,7 @@ CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
-PKG=$TMP/$TAG/pkg-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 PREFIX=/usr
