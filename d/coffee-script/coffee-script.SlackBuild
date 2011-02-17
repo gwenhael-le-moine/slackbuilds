@@ -1,8 +1,9 @@
 #!/bin/sh -x
 
 CWD=$(pwd)
-PACKAGER=cyco
-TMP=${TMP:-/tmp/$PACKAGER}
+
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
 OUTPUT=/tmp
 
 PRGNAM=$(basename $CWD)
@@ -86,5 +87,5 @@ $PRGNAM:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 

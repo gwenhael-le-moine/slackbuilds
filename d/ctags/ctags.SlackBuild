@@ -24,6 +24,7 @@
 
 set -e
 CWD=$(pwd)
+TAG=cyco
 TMP=${TMP:-/tmp}
 PKG=${PKG:-$TMP/pkg-ctags}
 OUT=${OUT:-$TMP/build}

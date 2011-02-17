@@ -5,11 +5,13 @@ CWD=$(pwd)
 PRGNAM=avast4workstation
 VERSION=1.3.0
 BUILD=1
-PACKAGER=cyco
+
 ARCH=i386
 
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 PREFIX=/usr
 
 [ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c http://files.avast.com/files/linux/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz
@@ -50,5 +52,5 @@ $PRGNAM:
 $PRGNAM: http://www.avast.com/fr-fr/linux-home-edition
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
 )

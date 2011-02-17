@@ -7,12 +7,14 @@ PRGNAM=$(basename $CWD)
 VERSION=$(ls rpl-*.tar.?z* | cut -d - -f 2 | rev | cut -f 3- -d . | rev)
 
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 
 PREFIX=/usr
 
@@ -103,6 +105,6 @@ $PRGNAM: http://www.rpl2.net/
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 )
 

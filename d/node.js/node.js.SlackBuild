@@ -12,6 +12,8 @@ REPOSITORIES=/home/cycojesus/projets/packages/repositories
 PREFIX=/usr
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-$PRGNAM
 rm -rf $PKG
@@ -87,5 +89,5 @@ $PRGNAM:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
 

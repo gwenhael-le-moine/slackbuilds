@@ -7,10 +7,11 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(ls -ut $PRGNAM*.tar.?z*| head -n1 | cut -d_ -f3 | sed 's|.tar.*||')}
 
 BUILD=${BUILD:-1}
-PACKAGER=${PACKAGER:-cyco}
+
 ARCH=$(uname -m)
 
-TMP=${TMP:-/tmp/$PACKAGER}
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -81,6 +82,6 @@ $PRGNAM: ftp://WebUser:pGL7E6v@208.70.202.219/cn/wlan/
 $PRGNAM: ftp://WebUser:pGL7E6v@218.210.127.132/cn/wlan/
 EOF
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(uname -r | tr - _)-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(uname -r | tr - _)-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 )
 

@@ -5,14 +5,15 @@ BRANCH=master
 VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
-PACKAGER=cyco
 
-TMP=/tmp/$PACKAGER
+
+TAG=cyco
+TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 
 REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 PREFIX=/usr
@@ -117,4 +118,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

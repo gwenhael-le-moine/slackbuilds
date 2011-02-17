@@ -8,12 +8,14 @@ PRGNAM=$(basename $CWD)
 VERSION=0.7.0
 
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories/
 
@@ -153,6 +155,6 @@ $PRGNAM: http://www.gnu.org/software/gforth
 $PRGNAM:
 EOF
 
-    makepkg -l n -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l n -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 )
 

@@ -6,12 +6,13 @@ PRGNAM=$(basename $CWD)
 BRANCH=trunk
 VERSION=$BRANCH$(date +%Y.%m.%d_%H.%M)
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
-TMP=/tmp/$PACKAGER
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -66,5 +67,5 @@ EOF
         find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
     )
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 )

@@ -31,6 +31,7 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
 CWD=$(pwd)
+TAG=cyco
 TMP=${TMP:-/tmp/cyco}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

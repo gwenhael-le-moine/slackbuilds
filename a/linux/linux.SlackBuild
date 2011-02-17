@@ -5,12 +5,13 @@ CLEAN_SRC=${CLEAN_SRC:-NO}
 PRGNAM=linux
 VERSION=${VERSION:-$(echo linux-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 
 CWD=$(pwd)
 SOURCES=/usr/src/
-TMP=/tmp/$PACKAGER
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -97,4 +98,4 @@ $PRGNAM-$(echo $VERSION | tr - _):
 EOF
 
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$(echo $KERNEL_TAG | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$(echo $KERNEL_TAG | tr - _)-$ARCH-$BUILD$TAG.txz

@@ -1,8 +1,9 @@
 #!/bin/sh -x
 
 # variables
-PACKAGER=cyco
-TMP=/tmp/$PACKAGER
+
+TAG=cyco
+TMP=/tmp/$TAG
 CWD=$(pwd)
 OUTPUT=/tmp/
 
@@ -84,4 +85,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz

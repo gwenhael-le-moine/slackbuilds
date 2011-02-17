@@ -7,12 +7,14 @@ PRGNAM=$(basename $CWD)
 VERSION=git_$(date +%Y.%m.%d_%H.%M)
 
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 
 REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 
@@ -95,6 +97,6 @@ $PRGNAM: http://www.pell.portland.or.us/~orc/Code/markdown/
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 )
 

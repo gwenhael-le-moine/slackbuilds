@@ -5,10 +5,11 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=5.0-beta2
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 
-TMP=/tmp/$PACKAGER
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -43,5 +44,5 @@ EOF
 
     chown -R root:root *
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
 )

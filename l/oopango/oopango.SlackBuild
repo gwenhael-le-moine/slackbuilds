@@ -7,9 +7,10 @@ PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 VERSION=svn$(date +%F | sed 's/-//g')
 BUILD=1
-PACKAGER=cyco
 
-TMP=/tmp/$PACKAGER
+
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -79,4 +80,4 @@ EOF
 
 chown -R root:root $PKG
 
-makepkg -c n -l y $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -c n -l y $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

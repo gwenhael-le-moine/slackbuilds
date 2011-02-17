@@ -2,9 +2,10 @@
 
 CWD=$(pwd)
 
-PACKAGER=cyco
 
-TMP=${TMP:-/tmp/$PACKAGER}
+
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
 
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
@@ -95,4 +96,4 @@ $PRGNAM: http://viacam.org
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

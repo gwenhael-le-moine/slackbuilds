@@ -1,6 +1,8 @@
 #!/bin/sh -x
 
 # variables
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
 CWD=$(pwd)
 
@@ -15,7 +17,7 @@ DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 
 ARCH=x86_64
 BUILD=1
-PACKAGER=cyco
+
 
 PREFIX=/usr
 
@@ -89,4 +91,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz

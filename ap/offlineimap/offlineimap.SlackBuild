@@ -35,6 +35,7 @@ SRC_VERSION=${VERSION:=6.2.0}
 PKG_VERSION="$(echo "$SRC_VERSION" | tr '[[:blank:]-]' '_')"
 BUILD=${BUILD:=1cyco}
 SRC_DIR=${SRC_DIR:=$CWD}/$PKG_NAME
+TAG=cyco
 TMP=${TMP:=/tmp}
 PKG=${PKG:=$TMP/pkg-$PKG_NAME}
 REPOS=${REPOS:=$TMP}

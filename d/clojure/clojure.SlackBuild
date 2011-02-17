@@ -7,9 +7,10 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-1.2.0}
 ARCH=${ARCH:-java}
 BUILD=${BUILD:-1}
-PACKAGER=${PACKAGER:-cyco}
 
-TMP=${TMP:-/tmp/$PACKAGER}
+
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
 OUTPUT=${OUTPUT:-/tmp}
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=${PREFIX:-/usr}
@@ -74,4 +75,4 @@ $PRGNAM:
 $PRGNAM: http://clojure.org
 EOF
 
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d - )-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d - )-$ARCH-$BUILD$TAG.txz

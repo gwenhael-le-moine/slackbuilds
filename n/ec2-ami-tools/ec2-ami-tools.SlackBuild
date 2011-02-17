@@ -2,6 +2,7 @@
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
+TAG=cyco
 TMP=${TMP:-/tmp/cyco}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

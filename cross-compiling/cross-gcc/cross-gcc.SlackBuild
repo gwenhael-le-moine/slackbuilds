@@ -33,11 +33,13 @@ PRGNAM=cross-$SRCNAM
 VERSION=${SRCVER}_$CROSS
 
 CWD=$(pwd)
+TAG=cyco
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-GCC_TMP=$TMP/gcc-$(mcookie)
+GCC_TAG=cyco
+TMP=$TMP/gcc-$(mcookie)
 SYSTEM="slackware-linux"
 
 if [ "$ARCH" = "i486" ]; then

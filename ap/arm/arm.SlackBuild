@@ -3,9 +3,10 @@
 # variables
 VERSION=${VERSION:-trunk_$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:-1}
-PACKAGER=${PACKAGER:-cyco}
 
-TMP=/tmp/$PACKAGER
+
+TAG=cyco
+TMP=/tmp/$TAG
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
@@ -71,4 +72,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

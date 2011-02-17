@@ -5,12 +5,13 @@ PRGNAM=nut
 VERSION=${VERSION:-16.5}
 
 BUILD=${BUILD:-1}
-PACKAGER=${PACKAGER:-cyco}
+
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/$PACKAGER}
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
 PKG=${PKG:-$TMP/pkg-$PRGNAM}
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -89,6 +90,6 @@ $PRGNAM: http://nut.sourceforge.net/
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 )
 

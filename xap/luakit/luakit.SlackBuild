@@ -7,11 +7,12 @@ PRGNAM=$(basename $CWD)
 VERSION=git_$(date +%Y.%m.%d_%H.%M)
 
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
-TMP=/tmp/$PACKAGER
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -78,5 +79,5 @@ $PRGNAM: http://www.luakit.org/projects/luakit
 $PRGNAM:
 EOF
 
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 

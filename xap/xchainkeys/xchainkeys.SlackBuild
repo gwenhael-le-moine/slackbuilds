@@ -7,11 +7,12 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-0.5}
 
 BUILD=1
-PACKAGER=cyco
+
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
-TMP=/tmp/$PACKAGER
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -97,6 +98,6 @@ $PRGNAM: http://code.google.com/p/xchainkeys/
 $PRGNAM:
 EOF
 
-    makepkg -l n -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l n -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 )
 

@@ -10,6 +10,7 @@ TAG=${TAG:-cyco}
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
 PKG=$TMP/pkg-$PRGNAM
+TAG=cyco
 TMP=/tmp
 OUTPUT=${OUTPUT:-/tmp}
 

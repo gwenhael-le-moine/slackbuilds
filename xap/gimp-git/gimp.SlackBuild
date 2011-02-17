@@ -28,6 +28,8 @@ BUILD=${BUILD:-1cyco}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-gimp
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
@@ -113,5 +115,5 @@ mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/gimp-$VERSION-$ARCH-$BUILD.txz
+/sbin/makepkg -l y -c n $OUTPUT/gimp-$VERSION-$ARCH-$BUILD.txz
 

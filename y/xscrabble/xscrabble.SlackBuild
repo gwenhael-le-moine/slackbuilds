@@ -14,6 +14,7 @@ TAG=${TAG:-_SBo}
 DEFAULT_LANG=${DEFAULT_LANG:-fr}
 
 CWD=$(pwd)
+TAG=cyco
 TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

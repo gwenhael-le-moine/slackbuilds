@@ -6,9 +6,10 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=hg$(date +%Y.%m.%d_%H.%M)
 BUILD=1
-PACKAGER=cyco
 
-TMP=/tmp/$PACKAGER
+
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -99,5 +100,5 @@ $PRGNAM: required gems:
 $PRGNAM: curb sinatra datamapper archive-tar-minitar ffi subtle-graph subtle-dynamic_icon
 EOF
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
 )

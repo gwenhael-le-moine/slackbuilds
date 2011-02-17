@@ -35,7 +35,7 @@ VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
-PACKAGER=cyco
+
 
 if [ "$ARCH" = "i486" ]; then
   SLKCFLAGS="-O2 -march=i486 -mtune=i686"
@@ -48,6 +48,8 @@ elif [ "$ARCH" = "x86_64" ]; then
 fi
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-$PRGNAM
 REPOSITORIES=/home/cycojesus/projets/packages/repositories/
@@ -228,5 +230,5 @@ Categories=Application;Development;
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 

@@ -7,8 +7,9 @@ PRGNAM=sdcv
 ARCH=$(uname -m)
 VERSION=svn$(date +%Y.%m.%d_%H.%M)
 BUILD=1
-PACKAGER=cyco
 
+
+TAG=cyco
 TMP=/tmp
 PKG=$TMP/pkg-$PRGNAM
 
@@ -74,4 +75,4 @@ EOF
 
 chown -R root:root $PKG
 
-makepkg -c n -l y $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz || exit $ERROR_MKPKG
+makepkg -c n -l y $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz || exit $ERROR_MKPKG

@@ -26,9 +26,11 @@ PKGNAM=grub
 VERSION=1.97.2
 ARCH=${ARCH:-x86_64}
 BUILD=1
-PACKAGER=cyco
+
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-${PKGNAM}
 rm -rf $PKG
@@ -127,4 +129,4 @@ grub:
 EOF
 
 cd $PKG
-makepkg -l y -c n $TMP/grub-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/grub-$VERSION-$ARCH-$BUILD$TAG.txz

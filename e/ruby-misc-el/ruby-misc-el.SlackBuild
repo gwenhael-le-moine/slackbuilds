@@ -6,6 +6,8 @@ BUILD=${BUILD:-1cyco}
 ARCH=emacs
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-ruby-misc-el
 
@@ -45,5 +47,5 @@ ruby-misc-el:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/ruby-misc-el-$(echo $VERSION | tr - _)-$ARCH-$BUILD.txz
+/sbin/makepkg -l y -c n $OUTPUT/ruby-misc-el-$(echo $VERSION | tr - _)-$ARCH-$BUILD.txz
 

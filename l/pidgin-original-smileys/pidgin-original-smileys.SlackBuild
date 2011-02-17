@@ -3,13 +3,15 @@
 # variables
 VERSION=1.9
 BUILD=1
-PACKAGER=cyco
 
+
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 
 ARCH=noarch
 
@@ -62,4 +64,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

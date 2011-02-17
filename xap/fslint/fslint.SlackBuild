@@ -4,13 +4,15 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=svn$(date +%Y.%m.%d_%H.%M)
 BUILD=1
-PACKAGER=cyco
+
 
 ARCH=$(uname -m)
 
 HOME=/home/cycojesus
+TAG=cyco
+OUTPUT=/tmp
 TMP=/tmp
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+PKG=$TMP/$TAG/pkg-$PRGNAM
 REPOSITORIES=$HOME/projets/packages/repositories
 
 rm -fr $PKG $TMP/$PRGNAM-$VERSION
@@ -62,4 +64,4 @@ $PRGNAM:
 EOF
 
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz

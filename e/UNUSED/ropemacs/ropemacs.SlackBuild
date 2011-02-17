@@ -7,9 +7,10 @@ PRGNAM=$(basename $CWD)
 VERSION=0.6
 ARCH=$(uname -m)
 BUILD=1
-PACKAGER=cyco
 
-TMP=/tmp/$PACKAGER
+
+TAG=cyco
+TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
@@ -68,5 +69,5 @@ EOF
 
 # empaquetage
 ( cd $PKG
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$TAG.txz
 )

@@ -29,6 +29,8 @@ NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1cyco}
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-${PKGNAM}
 
@@ -146,5 +148,5 @@ libdrm:
 EOF
 
 cd $TMP/pkg-${PKGNAM}
-/sbin/makepkg -l y -c n $TMP/${PKGNAM}-$VERSION-$ARCH-$BUILD.txz
+/sbin/makepkg -l y -c n $OUTPUT/${PKGNAM}-$VERSION-$ARCH-$BUILD.txz
 

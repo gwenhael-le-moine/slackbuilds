@@ -9,6 +9,7 @@ ARCH=noarch
 BUILD=${BUILD:-1}
 TAG=${TAG:-_SBo}
 CWD=$(pwd)
+TAG=cyco
 TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

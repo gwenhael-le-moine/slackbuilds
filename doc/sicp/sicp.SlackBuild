@@ -5,9 +5,10 @@ CWD=$(pwd)
 
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:-3}
-PACKAGER=${PACKAGER:-cyco}
 
-TMP=${TMP:-/tmp/$PACKAGER}
+
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
 OUTPUT=${OUTPUT:-/tmp}
 
 PRGNAM=${PRGNAM:-$(basename $CWD)}
@@ -77,4 +78,4 @@ $PRGNAM: http://www.neilvandyke.org/sicp-texi/
 EOF
 
 # empaquetage
-makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

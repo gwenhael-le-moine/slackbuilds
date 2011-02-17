@@ -3,6 +3,8 @@
 KEEP_TAR=${KEEP_TAR:-"NO"}
 
 CWD=$(pwd)
+TAG=cyco
+OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-mozilla-firefox
 
@@ -18,7 +20,7 @@ PKG=$TMP/pkg-mozilla-firefox
 
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
-PACKAGER=cyco
+
 
 #BRANCH=latest-tracemonkey
 BRANCH=latest-mozilla-central
@@ -82,5 +84,5 @@ cat $CWD/slack-desc > $PKG/install/slack-desc
 VERSION=${VERSION}_$(echo $BRANCH | sed 's|latest-||')_$(date +"%Y.%m.%d_%H.%M")
 
 cd $PKG
-makepkg -l y -c n $TMP/mozilla-firefox-$(echo $VERSION | tr - _)-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/mozilla-firefox-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
 

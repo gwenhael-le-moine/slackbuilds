@@ -32,6 +32,7 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
+TAG=cyco
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

@@ -8,10 +8,11 @@ BRANCH=master
 VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
-PACKAGER=cyco
 
-TMP=/tmp/$PACKAGER
-PKG=$TMP/$PACKAGER/pkg-$PRGNAM
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/$TAG/pkg-$PRGNAM
 OUTPUT=/tmp
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
@@ -99,4 +100,4 @@ fi
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
