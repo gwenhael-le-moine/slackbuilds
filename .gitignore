@@ -19,8 +19,8 @@ repositories/
 *.txt
 *.epub
 *.mobi
-web/fatfree/fatfree.sourceforge.net/
 *.png
-
+web/fatfree/fatfree.sourceforge.net/
+xap/mozilla-firefox-trunk/slack-desc
 e/divers-el/els/
 n/blerg/blerg.dominionofawesome.com/
