@@ -16,3 +16,10 @@ repositories/
 *.gz
 *.dawg
 *.so
+*.txt
+*.epub
+*.mobi
+web/fatfree/fatfree.sourceforge.net/
+*.png
+
+e/divers-el/els/
