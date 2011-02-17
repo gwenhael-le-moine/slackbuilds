@@ -36,8 +36,6 @@ mkdir -p $PKG/usr/bin $PKG/usr/share/games
 cd $PKG/usr/share/games
 tar xf $CWD/FlashBack.tar.bz2
 cd FlashBack
-chmod 666 DATA/*
-chmod a+w DATA/GLOBAL.FIB DATA/FB_TXT.FNT DATA/LOGOS.POL
 
 cat <<EOF > dosbox.config
 [sdl]
@@ -166,6 +164,8 @@ chmod +x flashback.sh
 
 chown -R root:root $PKG/*
 chmod -R go-w $PKG/usr/share/games/FlashBack/
+chmod 666 $PKG/usr/share/games/FlashBack/DATA/*
+chmod a+w $PKG/usr/share/games/FlashBack/DATA/{GLOBAL.FIB,DATA/FB_TXT.FNT,DATA/LOGOS.POL}
 
 # --- PACKAGE DESCRIPTION ---
 
