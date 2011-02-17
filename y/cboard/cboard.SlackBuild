@@ -76,9 +76,9 @@ cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (ncurses chess frontend)
 $PRGNAM:
 $PRGNAM: CBoard (Curses/Console Board) is an Ncurses frontend to chess engines
-$PRGNAM: supporting the XBoard protocol. It’s still in development, but has quite
-$PRGNAM: a few features that make it usable. Supports reading and writing PGN
+$PRGNAM: supporting the XBoard protocol. Supports reading and writing PGN
 $PRGNAM: including roster tags, RAV, FEN, NAG and comments.
+$PRGNAM: 
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
