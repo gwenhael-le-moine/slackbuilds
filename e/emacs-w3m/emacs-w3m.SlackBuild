@@ -9,17 +9,17 @@ PACKAGER=cyco
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$APP_NAME
+PRGNAM=$(basename $CWD)
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$APP_NAME
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 PREFIX=/usr
 
 EMACS=$(basename $(ls /usr/bin/emacs-2*))
 EMACS_VERSION=$(echo "$EMACS" | grep -o "[0-9\.]*")
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
@@ -30,7 +30,7 @@ if [ ! -e $REPOSITORY ] ; then
         cd $(dirname $REPOSITORY)
         echo "Press [Enter]"
         cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
-        cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co $APP_NAME
+        cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co $PRGNAM
 fi
 
 ( cd $REPOSITORY
@@ -38,16 +38,16 @@ fi
 )
 
 if [ ! -e $REPOSITORY ] ; then
-    [ -e $CWD/$APP_NAME-$VERSION.tar.gz ] && rm $CWD/$APP_NAME-$VERSION.tar.gz
-    wget -c "http://cvs.namazu.org/emacs-w3m.tar.gz?view=tar" -O $CWD/$APP_NAME-$VERSION.tar.gz
+    [ -e $CWD/$PRGNAM-$VERSION.tar.gz ] && rm $CWD/$PRGNAM-$VERSION.tar.gz
+    wget -c "http://cvs.namazu.org/emacs-w3m.tar.gz?view=tar" -O $CWD/$PRGNAM-$VERSION.tar.gz
     ( cd $TMP
-        tar xvf $CWD/$APP_NAME-$VERSION.tar.gz
-        mv $APP_NAME $APP_NAME-$VERSION
+        tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+        mv $PRGNAM $PRGNAM-$VERSION
     )
 else
-    cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
+    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 fi
-( cd $TMP/$APP_NAME-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
     zcat $CWD/widget-mouse-face.patch.gz | patch -p1
     autoreconf
     ./configure \
@@ -74,19 +74,19 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
         |-----handy-ruler------------------------------------------------------|
-$APP_NAME: $APP_NAME (a simple Emacs interface to w3m.)
-$APP_NAME:
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: http://emacs-w3m.namazu.org/
+$PRGNAM: $PRGNAM (a simple Emacs interface to w3m.)
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://emacs-w3m.namazu.org/
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz

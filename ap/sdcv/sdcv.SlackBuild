@@ -3,19 +3,19 @@
 CWD=$(pwd)
 
 # default settings
-APP_NAME=sdcv
+PRGNAM=sdcv
 ARCH=$(uname -m)
 VERSION=svn$(date +%Y.%m.%d_%H.%M)
 BUILD=1cyco
 
 TMP=/tmp
-PKG=$TMP/package-$APP_NAME
+PKG=$TMP/package-$PRGNAM
 
 GZBZ2="bz2"
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
-rm -rf $PKG $TMP/$APP_NAME-$VERSION
+rm -rf $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
 cd $TMP
 
@@ -58,19 +58,19 @@ cat << EOF > install/slack-desc
 # customary to leave one space after the ':'.
 
         |-----handy-ruler-----------------------------------------------------|
-$APP_NAME: $APP_NAME (Dictionaries search tool)
-$APP_NAME:
-$APP_NAME: You can find free (as in Freedom) dictionnaries at www.freedict.org
-$APP_NAME: Vietnamese dictionaries available at http://cctv.sf.net
-$APP_NAME: Others all over the Internet...
-$APP_NAME:
-$APP_NAME: see /usr/doc/$APP_NAME-$VERSION
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME:     for more informations.
-$APP_NAME:
+$PRGNAM: $PRGNAM (Dictionaries search tool)
+$PRGNAM:
+$PRGNAM: You can find free (as in Freedom) dictionnaries at www.freedict.org
+$PRGNAM: Vietnamese dictionaries available at http://cctv.sf.net
+$PRGNAM: Others all over the Internet...
+$PRGNAM:
+$PRGNAM: see /usr/doc/$PRGNAM-$VERSION
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:     for more informations.
+$PRGNAM:
 EOF
 
 chown -R root:root $PKG
 
-makepkg -c n -l y $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD.txz || exit $ERROR_MKPKG
+makepkg -c n -l y $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD.txz || exit $ERROR_MKPKG

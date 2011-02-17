@@ -4,8 +4,8 @@
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=i8kutils
-PKG=$TMP/package-$APP_NAME
+PRGNAM=i8kutils
+PKG=$TMP/package-$PRGNAM
 
 VERSION=1.33
 
@@ -21,14 +21,14 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-tar xf $CWD/$APP_NAME-$VERSION.$EXT
-cd $APP_NAME-$VERSION
+tar xf $CWD/$PRGNAM-$VERSION.$EXT
+cd $PRGNAM-$VERSION
 
 # configuration
 
@@ -85,9 +85,9 @@ chmod +x $PKG/etc/rc.d/rc.i8kmon.new
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 mkdir $PKG/etc
 cp i8kmon.conf $PKG/etc/i8kmon.conf.new
@@ -118,19 +118,19 @@ config() {
 config etc/rc.d/rc.i8kmon.new
 EOF
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (user-space programs for accessing the SMM BIOS of Dell laptops.)
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: http://packages.debian.org/i8kutils
-$APP_NAME:
-$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
-$APP_NAME:
+$PRGNAM: $PRGNAM (user-space programs for accessing the SMM BIOS of Dell laptops.)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://packages.debian.org/i8kutils
+$PRGNAM:
+$PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
+$PRGNAM:
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

@@ -3,33 +3,33 @@
 # variables
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
+PRGNAM=$(basename $CWD)
 VERSION=0.9.2
 ARCH=$(uname -m)
 BUILD=1
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
-PKG=$TMP/pkg-$APP_NAME
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
 PREFIX=/usr
 DOCS="COPYING  MANIFEST.in  PKG-INFO  README.txt"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 ( cd $TMP
-    [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
-        wget -c http://downloads.sourceforge.net/project/$APP_NAME/$APP_NAME/$VERSION/$APP_NAME-$VERSION.tar.gz?use_mirror=jaist \
-        -O $CWD/$APP_NAME-$VERSION.tar.gz
-    tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
+    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
+        wget -c http://downloads.sourceforge.net/project/$PRGNAM/$PRGNAM/$VERSION/$PRGNAM-$VERSION.tar.gz?use_mirror=jaist \
+        -O $CWD/$PRGNAM-$VERSION.tar.gz
+    tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
 )
 
-( cd $TMP/$APP_NAME-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
     # installation
     python setup.py install --root=$PKG
 )
@@ -37,9 +37,9 @@ mkdir -p $PKG
 # correction
 chown -R root:root $PKG/*
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-( cd $TMP/$APP_NAME-$VERSION
-    cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
+    cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 )
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
@@ -53,20 +53,20 @@ find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (a python refactoring library...)
-$APP_NAME:
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME: http://rope.sourceforge.net/
-$APP_NAME:
+$PRGNAM: $PRGNAM (a python refactoring library...)
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: http://rope.sourceforge.net/
+$PRGNAM:
 EOF
 
 # empaquetage
 ( cd $PKG
-    makepkg -l y -c n $OUTPUT/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
 )

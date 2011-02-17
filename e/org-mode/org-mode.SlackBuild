@@ -11,17 +11,17 @@ TMP=/tmp/$PACKAGER
 OUTPUT=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$APP_NAME
+PRGNAM=$(basename $CWD)
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$APP_NAME
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 PREFIX=/usr
 
 EMACS=$(basename $(ls /usr/bin/emacs-2*))
 EMACS_VERSION=$(echo "$EMACS" | grep -o "[0-9\.]*")
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
@@ -37,8 +37,8 @@ fi
     git pull
 )
 
-cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
-( cd $TMP/$APP_NAME-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
     sed -i "s|EMACS=emacs|EMACS=$EMACS|" Makefile
     sed -i "s|prefix=/usr/local|prefix=$PREFIX|" Makefile
     sed -i 's|infodir = $(prefix)/share/info|infodir = $(prefix)/info|' Makefile
@@ -67,8 +67,8 @@ cp -R $REPOSITORY $TMP/$APP_NAME-$VERSION
     # ( cd $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
     #     emacs -batch -f batch-byte-compile-file *.el
     # )
-    mkdir -p $PKG$PREFIX/doc/$APP_NAME
-    cp -R contrib $PKG$PREFIX/doc/$APP_NAME
+    mkdir -p $PKG$PREFIX/doc/$PRGNAM
+    cp -R contrib $PKG$PREFIX/doc/$PRGNAM
 )
 
 # correction
@@ -102,19 +102,19 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
         |-----handy-ruler------------------------------------------------------|
-$APP_NAME: $APP_NAME (an Emacs Mode for Notes, Project Planning, and Authoring)
-$APP_NAME:
-$APP_NAME: Org-mode is for keeping notes, maintaining ToDo lists, doing project
-$APP_NAME: planning, and authoring with a fast and effective plain-text system.
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: http://orgmode.org/
+$PRGNAM: $PRGNAM (an Emacs Mode for Notes, Project Planning, and Authoring)
+$PRGNAM:
+$PRGNAM: Org-mode is for keeping notes, maintaining ToDo lists, doing project
+$PRGNAM: planning, and authoring with a fast and effective plain-text system.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://orgmode.org/
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $OUTPUT/$APP_NAME-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz

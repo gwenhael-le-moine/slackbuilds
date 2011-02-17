@@ -4,8 +4,8 @@
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/package-$APP_NAME
+PRGNAM=$(basename $CWD)
+PKG=$TMP/package-$PRGNAM
 
 VERSION=0.4.0
 
@@ -21,7 +21,7 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
@@ -34,7 +34,7 @@ fi
 
 cd $TMP
 tar xf $CWD/xf86-input-plpevtch-$VERSION.tar.gz
-cd $TMP/$APP_NAME-$VERSION
+cd $TMP/$PRGNAM-$VERSION
 
 patch -p1 -i $CWD/hacks.diff
 
@@ -56,9 +56,9 @@ make install DESTDIR=$PKG
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -72,19 +72,19 @@ cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Xorg Evdev Touchscreen Driver)
-$APP_NAME:
-$APP_NAME: The plpevtch driver is an eventdevice driver for touchscreens under Xorg 7.x.
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME: http://www.plop.at/en/touchscreen.html
-$APP_NAME:
+$PRGNAM: $PRGNAM (Xorg Evdev Touchscreen Driver)
+$PRGNAM:
+$PRGNAM: The plpevtch driver is an eventdevice driver for touchscreens under Xorg 7.x.
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: http://www.plop.at/en/touchscreen.html
+$PRGNAM:
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

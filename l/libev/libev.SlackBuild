@@ -4,8 +4,8 @@
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=libev
-PKG=$TMP/package-$APP_NAME
+PRGNAM=libev
+PKG=$TMP/package-$PRGNAM
 
 VERSION=4.03
 
@@ -21,15 +21,15 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $CWD/$APP_NAME-$VERSION.$EXT ] && wget -c http://dist.schmorp.de/libev/libev-4.03.tar.gz -O $CWD/$APP_NAME-$VERSION.$EXT
-tar xf $CWD/$APP_NAME-$VERSION.$EXT
-cd $APP_NAME-$VERSION
+[ ! -e $CWD/$PRGNAM-$VERSION.$EXT ] && wget -c http://dist.schmorp.de/libev/libev-4.03.tar.gz -O $CWD/$PRGNAM-$VERSION.$EXT
+tar xf $CWD/$PRGNAM-$VERSION.$EXT
+cd $PRGNAM-$VERSION
 
 # configuration
 CFLAGS=$SLCKFLAGS \
@@ -49,9 +49,9 @@ make install DESTDIR=$PKG
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -65,19 +65,19 @@ cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (one line description here)
-$APP_NAME:
-$APP_NAME: More verbose description here, usually from the README file.
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME: see /usr/doc/$APP_NAME-$VERSION for more details
-$APP_NAME:
+$PRGNAM: $PRGNAM (one line description here)
+$PRGNAM:
+$PRGNAM: More verbose description here, usually from the README file.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
+$PRGNAM:
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-APP_NAME=node.js
+PRGNAM=node.js
 VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1cyco}
@@ -13,7 +13,7 @@ PREFIX=/usr
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-$APP_NAME
+PKG=$TMP/package-$PRGNAM
 rm -rf $PKG
 mkdir -p $TMP $PKG
 
@@ -29,23 +29,23 @@ elif [ "$ARCH" = "x86_64" ]; then
 fi
 
 cd $TMP
-rm -rf $APP_NAME-$VERSION
+rm -rf $PRGNAM-$VERSION
 cd $TMP
-if [ -e $CWD/$APP_NAME-$VERSION.$EXT ] ; then
-    tar xf $CWD/$APP_NAME-$VERSION.$EXT
+if [ -e $CWD/$PRGNAM-$VERSION.$EXT ] ; then
+    tar xf $CWD/$PRGNAM-$VERSION.$EXT
 else
-    if [ ! -e $REPOSITORIES/$APP_NAME ] ; then
+    if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
         ( cd $REPOSITORIES
-            git clone git://github.com/ry/node.git $APP_NAME
+            git clone git://github.com/ry/node.git $PRGNAM
         ) ;
     fi
-    ( cd $REPOSITORIES/$APP_NAME
+    ( cd $REPOSITORIES/$PRGNAM
         git pull
     )
-    cp -R $REPOSITORIES/$APP_NAME $TMP/$APP_NAME-$VERSION
+    cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
 fi
 
-cd $APP_NAME-$VERSION || exit 1
+cd $PRGNAM-$VERSION || exit 1
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -63,29 +63,29 @@ make install DESTDIR=$PKG PREFIX=$PREFIX
 mv $PKG$PREFIX/share/man $PKG$PREFIX
 rm -fr $PKG$PREFIX/share
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a \
   AUTHORS COPYING HACKING INSTALL LICENSE NEWS README* docs/Wilber* \
-  $PKG/usr/doc/$APP_NAME-$VERSION
+  $PKG/usr/doc/$PRGNAM-$VERSION
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Evented I/O for V8 javascript.)
-$APP_NAME: 
-$APP_NAME: Node's goal is to provide an easy way to build scalable network programs.
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: http://nodejs.org/
-$APP_NAME: 
+$PRGNAM: $PRGNAM (Evented I/O for V8 javascript.)
+$PRGNAM: 
+$PRGNAM: Node's goal is to provide an easy way to build scalable network programs.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://nodejs.org/
+$PRGNAM: 
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD.txz
+/sbin/makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
 

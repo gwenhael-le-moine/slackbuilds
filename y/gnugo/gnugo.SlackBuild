@@ -4,8 +4,8 @@
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=gnugo
-PKG=$TMP/package-$APP_NAME
+PRGNAM=gnugo
+PKG=$TMP/package-$PRGNAM
 
 VERSION=3.8
 
@@ -21,14 +21,14 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-tar xf $CWD/$APP_NAME-$VERSION.$EXT
-cd $APP_NAME-$VERSION
+tar xf $CWD/$PRGNAM-$VERSION.$EXT
+cd $PRGNAM-$VERSION
 
 # configuration
 CFLAGS=$SLCKFLAGS \
@@ -48,9 +48,9 @@ make install DESTDIR=$PKG
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
@@ -73,19 +73,19 @@ do
 done
 EOF
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Go game)
-$APP_NAME:
-$APP_NAME: GNU Go is a free program that plays the game of Go. GNU Go has played
-$APP_NAME: thousands of games on the NNGS Go server. GNU Go is now also playing
-$APP_NAME: regularly on the Legend Go Server in Taiwan, on the WING server in Japan,
-$APP_NAME: and many volunteers run GNU Go clients on KGS. GNU Go has established itself
-$APP_NAME: as the leading non-commercial go program in the recent tournaments  that it
-$APP_NAME: has taken part in.
-$APP_NAME:
-$APP_NAME: http://www.gnu.org/software/gnugo/gnugo.html
-$APP_NAME:
+$PRGNAM: $PRGNAM (Go game)
+$PRGNAM:
+$PRGNAM: GNU Go is a free program that plays the game of Go. GNU Go has played
+$PRGNAM: thousands of games on the NNGS Go server. GNU Go is now also playing
+$PRGNAM: regularly on the Legend Go Server in Taiwan, on the WING server in Japan,
+$PRGNAM: and many volunteers run GNU Go clients on KGS. GNU Go has established itself
+$PRGNAM: as the leading non-commercial go program in the recent tournaments  that it
+$PRGNAM: has taken part in.
+$PRGNAM:
+$PRGNAM: http://www.gnu.org/software/gnugo/gnugo.html
+$PRGNAM:
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

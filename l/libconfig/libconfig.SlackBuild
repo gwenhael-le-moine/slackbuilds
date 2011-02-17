@@ -4,8 +4,8 @@
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/package-$APP_NAME
+PRGNAM=$(basename $CWD)
+PKG=$TMP/package-$PRGNAM
 
 VERSION=1.4.3
 
@@ -19,17 +19,17 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
-    wget -c http://ftp1.fr.freebsd.org/pub/frugalware/frugalware-current/source/lib-extra/libconfig/$APP_NAME-$VERSION.tar.gz \
-    -O $CWD/$APP_NAME-$VERSION.tar.gz
-tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
-cd $APP_NAME-$VERSION
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
+    wget -c http://ftp1.fr.freebsd.org/pub/frugalware/frugalware-current/source/lib-extra/libconfig/$PRGNAM-$VERSION.tar.gz \
+    -O $CWD/$PRGNAM-$VERSION.tar.gz
+tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
+cd $PRGNAM-$VERSION
 
 # configuration
 CFLAGS=$SLCKFLAGS \
@@ -50,9 +50,9 @@ make install DESTDIR=$PKG
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
@@ -76,19 +76,19 @@ done
 )
 EOF
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Configuration file library for C and C++.)
-$APP_NAME:
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME: http://hyperrealm.com/libconfig/libconfig.html
-$APP_NAME:
+$PRGNAM: $PRGNAM (Configuration file library for C and C++.)
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: http://hyperrealm.com/libconfig/libconfig.html
+$PRGNAM:
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

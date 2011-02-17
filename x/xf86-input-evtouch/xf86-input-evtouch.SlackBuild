@@ -4,8 +4,8 @@
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/package-$APP_NAME
+PRGNAM=$(basename $CWD)
+PKG=$TMP/package-$PRGNAM
 
 VERSION=0.8.8
 
@@ -21,7 +21,7 @@ PREFIX=/usr
 SLCKFLAGS="-O2 $(echo "$ARCH" | grep -q "64" && echo -fPIC)"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
@@ -34,7 +34,7 @@ fi
 
 cd $TMP
 tar xf $CWD/xf86-input-evtouch-$VERSION.tar.bz2
-cd $TMP/$APP_NAME-$VERSION
+cd $TMP/$PRGNAM-$VERSION
 
 patch -p1 -i $CWD/hacks.diff
 
@@ -63,9 +63,9 @@ mkdir -p $PKG$PREFIX/bin
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-cd $TMP/$APP_NAME-$VERSION
-cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -79,19 +79,19 @@ cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (Linux-Touchscreen Driver for X)
-$APP_NAME:
-$APP_NAME: Evtouch is a Touchscreen-Driver for X.
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME: http://www.conan.de/touchscreen/evtouch.html
-$APP_NAME:
+$PRGNAM: $PRGNAM (Linux-Touchscreen Driver for X)
+$PRGNAM:
+$PRGNAM: Evtouch is a Touchscreen-Driver for X.
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: http://www.conan.de/touchscreen/evtouch.html
+$PRGNAM:
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz

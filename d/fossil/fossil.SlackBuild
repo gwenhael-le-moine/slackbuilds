@@ -8,33 +8,33 @@ PACKAGER=cyco
 TMP=/tmp
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
-PKG=$TMP/$PACKAGER/pkg-$APP_NAME
+PRGNAM=$(basename $CWD)
+PKG=$TMP/$PACKAGER/pkg-$PRGNAM
 
 ARCH=$(uname -m)
 
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
-mkdir -p $PKG$PREFIX/doc/$APP_NAME
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
 
 # mise en place
 ( cd $CWD
-    [ ! -e $APP_NAME-src-$VERSION.tar.gz ] && wget -c http://www.$APP_NAME-scm.org/download/$APP_NAME-src-$VERSION.tar.gz
+    [ ! -e $PRGNAM-src-$VERSION.tar.gz ] && wget -c http://www.$PRGNAM-scm.org/download/$PRGNAM-src-$VERSION.tar.gz
 )
 
 ( cd $TMP
-    tar xf $CWD/$APP_NAME-src-$VERSION.tar.gz
-    mv $APP_NAME-src-$VERSION $APP_NAME-$VERSION
-    cd $APP_NAME-$VERSION
+    tar xf $CWD/$PRGNAM-src-$VERSION.tar.gz
+    mv $PRGNAM-src-$VERSION $PRGNAM-$VERSION
+    cd $PRGNAM-$VERSION
 
     make
 
     mkdir -p $PKG$PREFIX/bin $PKG$PREFIX/doc/
-    mv $APP_NAME $PKG$PREFIX/bin
-    cp -R www $PKG$PREFIX/doc/$APP_NAME
+    mv $PRGNAM $PKG$PREFIX/bin
+    cp -R www $PKG$PREFIX/doc/$PRGNAM
 )
 
 # correction
@@ -53,19 +53,19 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
         |-----handy-ruler------------------------------------------------------|
-$APP_NAME: $APP_NAME (distributed software configuration management)
-$APP_NAME:
-$APP_NAME: Simple, high-reliability, distributed software configuration management
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME: http://www.fossil-scm.org
-$APP_NAME: 
+$PRGNAM: $PRGNAM (distributed software configuration management)
+$PRGNAM:
+$PRGNAM: Simple, high-reliability, distributed software configuration management
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.fossil-scm.org
+$PRGNAM: 
 EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$APP_NAME-$VERSION-$ARCH-$BUILD$PACKAGER.txz
+makepkg -l y -c n $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$PACKAGER.txz

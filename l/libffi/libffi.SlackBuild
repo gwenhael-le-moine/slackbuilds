@@ -3,14 +3,14 @@
 # variables
 CWD=$(pwd)
 
-APP_NAME=$(basename $CWD)
+PRGNAM=$(basename $CWD)
 VERSION=3.0.9
 ARCH=$(uname -m)
 BUILD=1
 PACKAGER=cyco
 
 TMP=/tmp/$PACKAGER
-PKG=$TMP/pkg-$APP_NAME
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
 PREFIX=/usr
@@ -25,19 +25,19 @@ case $ARCH in
 esac
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$APP_NAME-$VERSION
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
 # mise en place
 ( cd $TMP
-    [ ! -e $CWD/$APP_NAME-$VERSION.tar.?z* ] && \
-        wget -c ftp://sourceware.org/pub/libffi/$APP_NAME-$VERSION.tar.gz \
-        -O $CWD/$APP_NAME-$VERSION.tar.gz
-    tar xf $CWD/$APP_NAME-$VERSION.tar.?z*
+    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
+        wget -c ftp://sourceware.org/pub/libffi/$PRGNAM-$VERSION.tar.gz \
+        -O $CWD/$PRGNAM-$VERSION.tar.gz
+    tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
 )
 
-( cd $TMP/$APP_NAME-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
     # configuration
     CCPFLAGS=$SLCKFLAGS \
     CFLAGS=$SLCKFLAGS \
@@ -47,7 +47,7 @@ mkdir -p $PKG
         --prefix=$PREFIX \
         --mandir=$PREFIX/man \
         --infodir=$PREFIX/info \
-        --docdir=$PREFIX/doc/$APP_NAME-$VERSION \
+        --docdir=$PREFIX/doc/$PRGNAM-$VERSION \
         --includedir=$PREFIX/include \
         --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64)
 
@@ -56,15 +56,15 @@ mkdir -p $PKG
     # installation
     make install DESTDIR=$PKG
     # WAT‽
-    cp -R $PKG$PREFIX/lib$(echo $ARCH | grep -o 64)/$APP_NAME-$VERSION/include $PKG$PREFIX/
+    cp -R $PKG$PREFIX/lib$(echo $ARCH | grep -o 64)/$PRGNAM-$VERSION/include $PKG$PREFIX/
 )
 
 # correction
 chown -R root:root $PKG/*
 
-mkdir -p $PKG/usr/doc/$APP_NAME-$VERSION
-( cd $TMP/$APP_NAME-$VERSION
-    cp -R $DOCS $PKG/usr/doc/$APP_NAME-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+( cd $TMP/$PRGNAM-$VERSION
+    cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 )
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
@@ -78,20 +78,20 @@ find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$APP_NAME: $APP_NAME (A Portable Foreign Function Interface Library )
-$APP_NAME:
-$APP_NAME: 
-$APP_NAME: 
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME:
-$APP_NAME: http://sourceware.org/libffi/
-$APP_NAME:
+$PRGNAM: $PRGNAM (A Portable Foreign Function Interface Library )
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://sourceware.org/libffi/
+$PRGNAM:
 EOF
 
 # empaquetage
 ( cd $PKG
-    makepkg -l y -c n $OUTPUT/$APP_NAME-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$PACKAGER.txz
 )
