@@ -1,37 +1,22 @@
 #!/bin/sh
 
-# --- INIT ---
-# Set initial variables:
-CWD=`pwd`
-if [ "$TMP" = "" ]; then
-  TAG=cyco
-OUTPUT=/tmp
+CWD=$(pwd)
+TAG=${TAG:-cyco}
+OUTPUT=${OUTPUT:-/tmp}
 TMP=/tmp/$TAG
-fi
 
-PRGNAM=FlashBack
-VERSION=1.0
-ARCH=${ARCH:-dosbox}
-BUILD=1
+PRGNAM=$(basename $(CWD))
+VERSION=${VERSION:-1.0}
+ARCH=${ARCH:-${ARCH:-dosbox}}
+BUILD=${BUILD:-1}
 
 
 PKG=$TMP/pkg-$PRGNAM
-
-# --- PACKAGE BUILDING ---
-
-echo "++"
-echo "|| $PRGNAM-$VERSION"
-echo "++"
 
 rm -rf $PKG $TMP/${PRGNAM}-${VERSION}
 
 cd $TMP
 
-# --- TARBALL EXTRACTION,PATCH,MODIFY ---
-
-#
-# Install all the needed stuff to the package dir
-#
 mkdir -p $PKG/usr/bin $PKG/usr/share/games
 cd $PKG/usr/share/games
 tar xf $CWD/FlashBack.tar.bz2
@@ -160,14 +145,10 @@ dosbox -conf /usr/share/games/FlashBack/dosbox.config
 EOF
 chmod +x flashback.sh
 
-# --- OWNERSHIP, RIGHTS ---
-
 chown -R root:root $PKG/*
 chmod -R go-w $PKG/usr/share/games/FlashBack/
 chmod 666 $PKG/usr/share/games/FlashBack/DATA/*
 chmod a+w $PKG/usr/share/games/FlashBack/DATA/{GLOBAL.FIB,DATA/FB_TXT.FNT,DATA/LOGOS.POL}
-
-# --- PACKAGE DESCRIPTION ---
 
 mkdir -p $PKG/install
 
@@ -193,8 +174,5 @@ ${PRGNAM}: see /usr/doc/${PRGNAM}-${VERSION} for more.
 ${PRGNAM}: 
 EOF
 
-# --- BUILDING ---
-
-# Build the package:
 cd $PKG
 makepkg -l y -c n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}$TAG.txz
