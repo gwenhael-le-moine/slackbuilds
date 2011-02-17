@@ -10,7 +10,7 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-_SBo}
 CWD=$(pwd)
 TMP=${TMP:-/tmp/SBo}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 rm -rf $PKG

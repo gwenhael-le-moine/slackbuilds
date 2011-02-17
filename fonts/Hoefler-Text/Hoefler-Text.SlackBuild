@@ -9,7 +9,7 @@ TAG=${TAG:-cyco}
 CWD=$(pwd)
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 TMP=/tmp
 OUTPUT=${OUTPUT:-/tmp}
 

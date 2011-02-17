@@ -33,7 +33,7 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
 TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 # Just in case:

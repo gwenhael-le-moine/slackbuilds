@@ -4,7 +4,7 @@ CWD=$(pwd)
 TMP=${TMP:-/tmp}
 
 PRGNAM=$(basename $CWD)
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 
 VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-$(uname -m)}

@@ -49,7 +49,7 @@ fi
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 REPOSITORIES=/home/cycojesus/projets/packages/repositories/
 
 rm -rf $PKG

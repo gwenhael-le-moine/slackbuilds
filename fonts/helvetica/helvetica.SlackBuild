@@ -9,7 +9,7 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 # Create working directories:

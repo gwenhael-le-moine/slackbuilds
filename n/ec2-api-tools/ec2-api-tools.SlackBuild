@@ -3,7 +3,7 @@
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 TMP=${TMP:-/tmp/cyco}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 VERSION=${VERSION:-PLACEHOLDER}

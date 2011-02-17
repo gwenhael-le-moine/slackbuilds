@@ -15,7 +15,7 @@ DEFAULT_LANG=${DEFAULT_LANG:-fr}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp/SBo}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 rm -fr $TMP/$PRGNAM $PKG $TMP/$PRGNAM-$VERSION

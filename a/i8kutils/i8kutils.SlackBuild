@@ -5,7 +5,7 @@ TMP=/tmp
 CWD=$(pwd)
 
 PRGNAM=i8kutils
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 
 VERSION=1.33
 
@@ -14,7 +14,8 @@ EXT=tar.gz
 DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README* TODO examples patches"
 
 ARCH=$(uname -m)
-BUILD=2cyco
+BUILD=2
+PACKAGER=cyco
 
 PREFIX=/usr
 
@@ -133,4 +134,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$PACKAGER.txz

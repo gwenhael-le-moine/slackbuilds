@@ -25,7 +25,7 @@
 set -e
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=${PKG:-$TMP/package-ctags}
+PKG=${PKG:-$TMP/pkg-ctags}
 OUT=${OUT:-$TMP/build}
 
 VERSION=${VERSION:-5.8}

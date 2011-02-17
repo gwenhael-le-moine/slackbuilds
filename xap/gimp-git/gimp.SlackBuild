@@ -29,7 +29,7 @@ NUMJOBS=${NUMJOBS:-" -j3 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-gimp
+PKG=$TMP/pkg-gimp
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
 rm -rf $PKG

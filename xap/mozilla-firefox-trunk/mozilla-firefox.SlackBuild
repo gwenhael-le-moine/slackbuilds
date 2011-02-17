@@ -4,7 +4,7 @@ KEEP_TAR=${KEEP_TAR:-"NO"}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-mozilla-firefox
+PKG=$TMP/pkg-mozilla-firefox
 
 # This is not a source build script.  Rather, it builds a Slackware
 # package from the official binary tarball available from mozilla.org.

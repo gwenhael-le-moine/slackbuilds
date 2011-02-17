@@ -7,7 +7,7 @@ ARCH=emacs
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-ruby-misc-el
+PKG=$TMP/pkg-ruby-misc-el
 
 rm -rf $PKG
 mkdir -p $TMP $PKG

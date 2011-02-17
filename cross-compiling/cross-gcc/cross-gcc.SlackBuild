@@ -34,7 +34,7 @@ VERSION=${SRCVER}_$CROSS
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 GCC_TMP=$TMP/gcc-$(mcookie)

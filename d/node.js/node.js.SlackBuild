@@ -13,7 +13,7 @@ PREFIX=/usr
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 rm -rf $PKG
 mkdir -p $TMP $PKG
 

@@ -5,14 +5,15 @@ TMP=/tmp
 CWD=$(pwd)
 
 PRGNAM=matchbox-keyboard
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 
 VERSION=0.1
 
 DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 
 ARCH=$(uname -m)
-BUILD=1cyco
+BUILD=1
+PACKAGER=cyco
 
 PREFIX=/usr
 
@@ -85,4 +86,4 @@ EOF
 
 # empaquetage
 cd $PKG
-makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$PACKAGER.txz
