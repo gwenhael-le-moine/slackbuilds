@@ -1,0 +1,200 @@
+#!/bin/sh
+
+# --- INIT ---
+# Set initial variables:
+CWD=`pwd`
+if [ "$TMP" = "" ]; then
+  TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+fi
+
+PRGNAM=FlashBack
+VERSION=1.0
+ARCH=${ARCH:-dosbox}
+BUILD=1
+
+
+PKG=$TMP/pkg-$PRGNAM
+
+# --- PACKAGE BUILDING ---
+
+echo "++"
+echo "|| $PRGNAM-$VERSION"
+echo "++"
+
+rm -rf $PKG $TMP/${PRGNAM}-${VERSION}
+
+cd $TMP
+
+# --- TARBALL EXTRACTION,PATCH,MODIFY ---
+
+#
+# Install all the needed stuff to the package dir
+#
+mkdir -p $PKG/usr/bin $PKG/usr/share/games
+cd $PKG/usr/share/games
+tar xf $CWD/FlashBack.tar.bz2
+cd FlashBack
+chmod 666 DATA/*
+chmod a+w DATA/GLOBAL.FIB DATA/FB_TXT.FNT DATA/LOGOS.POL
+
+cat <<EOF > dosbox.config
+[sdl]
+# fullscreen -- Start dosbox directly in fullscreen.
+# autolock -- Mouse will automatically lock, if you click on the screen.
+# sensitiviy -- Mouse sensitivity.
+# waitonerror -- Wait before closing the console if dosbox has an error.
+
+fullscreen=false
+autolock=false
+sensitivity=100
+waitonerror=true
+
+[dosbox]
+# language -- Select another language file.
+# memsize -- Amount of memory dosbox has in megabytes.
+
+language=
+memsize=16
+
+[render]
+# frameskip -- How many frames dosbox skips before drawing one.
+# snapdir -- Directory where screenshots get saved.
+# scaler -- Scaler used to enlarge/enhance low resolution modes.
+#           Supported are none,normal2x,advmame2x
+
+frameskip=0
+snapdir=snaps
+scaler=normal2x
+
+[cpu]
+# cycles -- Amount of instructions dosbox tries to emulate each millsecond.
+#           Setting this higher than your machine can handle is bad!
+
+#cycles=2583
+
+[mixer]
+# nosound -- Enable silent mode, sound is still emulated though.
+# rate -- Mixer sample rate, setting any devices higher than this will
+#         probably lower their sound quality.
+# blocksize -- Mixer block size, larger blocks might help sound stuttering
+#              but sound will also be more lagged.
+# wavedir -- Directory where saved sound output goes when you use the
+#            sound record key-combination, check README file.
+
+nosound=false
+rate=22050
+blocksize=2048
+wavedir=waves
+
+[midi]
+# mpu401 -- Enable MPU-401 Emulation.
+# device -- Device that will receive the MIDI data from MPU-401.
+#           This can be default,alsa,oss,win32,coreaudio,none.
+# config -- Special configuration options for the device.
+
+#mpu401=true
+device=default
+config=
+
+[sblaster]
+# sblaster -- Enable the soundblaster emulation.
+# base,irq,dma -- The IO/IRQ/DMA address of the soundblaster.
+# sbrate -- Sample rate of soundblaster emulation.
+# adlib -- Enable the adlib emulation.
+# adlibrate -- Sample rate of adlib emulation.
+# cms -- Enable the Creative Music System/Gameblaster emulation.
+#        Enabling both the adlib and cms might give conflicts!
+# cmsrate -- Sample rate of cms emulation.
+
+sblaster=true
+base=220
+irq=7
+dma=1
+sbrate=22050
+adlib=true
+adlibrate=22050
+cms=false
+cmsrate=22050
+
+[speaker]
+# pcspeaker -- Enable PC-Speaker emulation.
+# pcrate -- Sample rate of the PC-Speaker sound generation.
+# tandy -- Enable Tandy 3-Voice emulation.
+# tandyrate -- Sample rate of the Tandy 3-Voice generation.
+# disney -- Enable Disney Sound Source emulation.
+
+pcspeaker=true
+pcrate=22050
+#tandy=true
+tandyrate=22050
+disney=true
+
+[bios]
+# Nothing to setup yet!
+
+
+[dos]
+# xms -- Enable XMS support.
+# ems -- Enable EMS support.
+# dpmi -- Enable builtin DPMI host support.
+#         This might help in getting some games to work, but might crash others.
+#         So be sure to try both settings.
+
+xms=true
+ems=true
+dpmi=true
+
+[autoexec]
+# Lines in this section will be run at startup.
+mount f /usr/share/games/FlashBack
+f:
+FB.EXE
+exit
+EOF
+
+cd $PKG/usr/bin
+cat <<EOF > flashback.sh
+#!/bin/sh
+
+dosbox -conf /usr/share/games/FlashBack/dosbox.config
+EOF
+chmod +x flashback.sh
+
+# --- OWNERSHIP, RIGHTS ---
+
+chown -R root:root $PKG/*
+chmod -R go-w $PKG/usr/share/games/FlashBack/
+
+# --- PACKAGE DESCRIPTION ---
+
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+            |-----handy-ruler------------------------------------------------------|
+${PRGNAM}: ${PRGNAM} (FlashBack running in DosBox)
+${PRGNAM}:
+${PRGNAM}: 
+${PRGNAM}: 
+${PRGNAM}: 
+${PRGNAM}: 
+${PRGNAM}: 
+${PRGNAM}: 
+${PRGNAM}: 
+${PRGNAM}: see /usr/doc/${PRGNAM}-${VERSION} for more.
+${PRGNAM}: 
+EOF
+
+# --- BUILDING ---
+
+# Build the package:
+cd $PKG
+makepkg -l y -c n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}$TAG.txz
