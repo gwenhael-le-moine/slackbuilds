@@ -140,10 +140,10 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
          |-----handy-ruler------------------------------------------------------|
-cross-gcc: cross-gcc (A Cross-Compiler for $CROSS_ARCH)
+cross-gcc: cross-gcc (A Cross-Compiler for $CROSS)
 cross-gcc:
 cross-gcc: This is a cross compiler setup, which is capable of compiling
-cross-gcc: $CROSS_ARCH apps on a $ARCH host system.
+cross-gcc: $CROSS apps on a $ARCH host system.
 cross-gcc:
 cross-gcc:
 cross-gcc:
