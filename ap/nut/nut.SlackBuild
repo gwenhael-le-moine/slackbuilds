@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=nut
-VERSION=${VERSION:-16.5}
+VERSION=${VERSION:-16.7}
 
 BUILD=${BUILD:-1}
 
