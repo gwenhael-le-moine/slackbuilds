@@ -1,0 +1,48 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=1.0
+BUILD=1
+
+ARCH=noarch
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/thinking-forth-color.pdf ] && mv $CWD/thinking-forth-color.pdf{,.orig}
+wget -c "http://prdownloads.sourceforge.net/thinking-forth/thinking-forth-color.pdf?download" -O $CWD/thinking-forth-color.pdf
+[ -e $CWD/thinking-forth-$VERSION.tar.bz2 ] && mv $CWD/thinking-forth-$VERSION.tar.bz2{,.orig}
+wget -c "http://prdownloads.sourceforge.net/thinking-forth/thinking-forth-$VERSION.tar.bz2?download" -O $CWD/thinking-forth-$VERSION.tar.bz2
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/thinking-forth-{color.pdf,$VERSION.tar.bz2} $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Thinking Forth» book)
+$PRGNAM: 
+$PRGNAM: Thinking Forth is a book about the philosophy of problem solving and programming
+$PRGNAM: style, applied to the unique programming language Forth. Published first in 1984,
+$PRGNAM: it could be among the timeless classics of computer books, such as Fred Brooks'
+$PRGNAM: The Mythical Man-Month and Donald Knuth's The Art of Computer Programming.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://thinking-forth.sourceforge.net
+$PRGNAM: 
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
