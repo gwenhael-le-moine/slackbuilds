@@ -1,0 +1,55 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%M")
+BUILD=1
+
+ARCH=noarch
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    mkdir -p $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack http://home.iae.nl/users/mhx/sf.html
+    )
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack --update
+    )
+fi
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Starting Forth» book)
+$PRGNAM: 
+$PRGNAM: Starting Forth, First Edition is from 1981. These web pages were designed in
+$PRGNAM: 2003, when it became apparent that SF would never be re-issued by the
+$PRGNAM: copyright holder. A small supply of about 500 books was all that was left.
+$PRGNAM: When you can get hold of the original, do so.
+$PRGNAM: In this transcript Forth code has been ANSified. The samples should run on,
+$PRGNAM: at least, iForth and SwiftForth. Where necessary, statements that were valid
+$PRGNAM: in 1981 have been exchanged with statements more appropriate for 2003 (when
+$PRGNAM: this tribute was written).
+$PRGNAM: http://home.iae.nl/users/mhx/sf.html
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
