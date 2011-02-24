@@ -1,0 +1,47 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=$(uname -m)
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ -e $CWD/Learn-eLisp-For-Emacs.pdf ] && mv $CWD/Learn-eLisp-For-Emacs.pdf $CWD/Learn-eLisp-For-Emacs.pdf.orig
+wget -c http://learn-elisp-for-emacs.org/files/Learn-eLisp-For-Emacs.pdf -O $CWD/Learn-eLisp-For-Emacs.pdf
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $CWD/Learn-eLisp-For-Emacs.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Learn eLisp For Emacs» book)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://learn-elisp-for-emacs.org/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+)
