@@ -1,0 +1,55 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%M")
+BUILD=1
+
+ARCH=noarch
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    mkdir -p $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack http://scheme.com/tspl4/
+    )
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack --update
+    )
+fi
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («The Scheme Programming Language» book)
+$PRGNAM: 
+$PRGNAM: Fourth Edition
+$PRGNAM: 
+$PRGNAM: R. Kent Dybvig
+$PRGNAM: 
+$PRGNAM: Illustrations by Jean-Pierre Hébert
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://scheme.com/tspl4/
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
