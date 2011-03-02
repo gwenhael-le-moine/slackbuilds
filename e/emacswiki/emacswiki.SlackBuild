@@ -36,6 +36,7 @@ mkdir -p $PKG/$PREFIX/doc/
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
     for el in \
+        "quick-jump.el" \
         "alarm.el" \
         "multi-term.el" \
         "lusty-explorer.el" \
@@ -71,11 +72,9 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
         "cus-edit+.el" \
         "xml-rpc.el" \
         "weblogger.el" \
-        "color-theme-tango.el" \
-        "color-theme-inkpot.el" \
         "newsticker-notify.el" ;
     do
-        ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
+        [ -e "$PREFIX/doc/$PRGNAM/$el" ] && ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
     done
 )
 
