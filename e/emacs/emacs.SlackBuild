@@ -72,8 +72,6 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
        bzr pull
        # bzr update
     )
-    # FIXME: Hackish hack
-    # cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION
     mkdir -p $TMP/$PRGNAM-$VERSION
     SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
 else
@@ -128,8 +126,8 @@ if [ $ONLY_X11 == 0 ] ; then
 cd $TMP
 rm -rf $PRGNAM-$VERSION
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    # FIXME: Hackish hack
-    cp -R $REPOSITORIES/$PRGNAM/$BRANCH $TMP/$PRGNAM-$VERSION
+    [ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+    mkdir -p $TMP/$PRGNAM-$VERSION
     SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
