@@ -8,7 +8,7 @@ TMP=/tmp/$TAG
 PRGNAM=$(basename $CWD)
 VERSION=1.11-1
 ARCH=${ARCH:-$(uname -m)}
-BUILD=1
+BUILD=2
 
 PKG=$TMP/pkg-$PRGNAM
 
