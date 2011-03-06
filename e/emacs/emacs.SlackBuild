@@ -27,7 +27,7 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
-ONLY_X11=${ONLY_X11:=YES}
+ONLY_X11=${ONLY_X11:=NO}
 
 PRGNAM=emacs
 BRANCH=${BRANCH:=trunk}
