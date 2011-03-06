@@ -28,8 +28,11 @@ make prefix=$PKG/usr mandir=$PKG/usr/man
 
 # Racket also has a 'scribble' binary in /usr/bin
 # Scribble's scribble is in /usr/games but Racket's steal its place in $PATH
-( cd $PKG/usr/games
+( cd $PKG/usr/games/
     ln -s scribble scribble-scrabble
+)
+( cd $PKG/usr/man/man6/
+    ln -s scribble.6.gz scribble-scrabble.6.gz
 )
 
 # Compress the man page(s)
