@@ -26,6 +26,12 @@ find . -perm 777 -exec chmod 755 {} \;
 
 make prefix=$PKG/usr mandir=$PKG/usr/man
 
+# Racket also has a 'scribble' binary in /usr/bin
+# Scribble's scribble is in /usr/games but Racket's steal its place in $PATH
+( cd $PKG/usr/games
+    ln -s scribble scribble-scrabble
+)
+
 # Compress the man page(s)
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
