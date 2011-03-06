@@ -9,7 +9,7 @@ ARCH=emacs
 CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
-TMP=${TMP:-/tmp}
+TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
