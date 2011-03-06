@@ -27,7 +27,7 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
-ONLY_X11=${ONLY_X11:=1}
+ONLY_X11=${ONLY_X11:=YES}
 
 PRGNAM=emacs
 BRANCH=${BRANCH:=trunk}
@@ -96,8 +96,6 @@ $SRCDIR/configure \
   --program-suffix="" \
   --mandir=/usr/man \
   --infodir=/usr/info \
-  --enable-static=no \
-  --enable-shared=yes \
   --with-x \
   --with-x-toolkit=gtk \
   --without-gconf \
@@ -120,7 +118,7 @@ EOF
     chmod +x $PKG/usr/bin/emacs
 )
 
-if [ $ONLY_X11 == 0 ] ; then
+if [ ! "x$ONLY_X11" == "xYES" ] ; then
 # Also add a version of the binary that is not linked to X11:
     cd $TMP
     rm -rf $PRGNAM-$VERSION
@@ -151,8 +149,6 @@ if [ $ONLY_X11 == 0 ] ; then
         --program-suffix="" \
         --mandir=/usr/man \
         --infodir=/usr/info \
-        --enable-static=no \
-        --enable-shared=yes \
         --with-x=no \
         --without-gconf \
         --build=${ARCH}-slackware-linux
