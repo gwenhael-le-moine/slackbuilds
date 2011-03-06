@@ -111,14 +111,14 @@ make install DESTDIR=$PKG || exit 1
 
 EMACS_VERSION=$(echo "$(basename $(ls $PKG/usr/bin/emacs-2*))" | grep -o "[0-9\.]*")
 ( cd $PKG/usr/bin
-  rm emacs
-  mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
-  cat <<EOF > $PKG/usr/bin/emacs
+    rm emacs
+    mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
+    cat <<EOF > $PKG/usr/bin/emacs
 #!/bin/sh
 
 XMODIFIERS= GTK_IM_MODULE= QT_IM_MODULE= /usr/bin/emacs-${EMACS_VERSION}-with-x11 "\$@"
 EOF
-  chmod +x $PKG/usr/bin/emacs
+    chmod +x $PKG/usr/bin/emacs
 )
 
 if [ $ONLY_X11 == 0 ] ; then
