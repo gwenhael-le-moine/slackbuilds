@@ -70,7 +70,6 @@ if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     ( cd $REPOSITORIES/$PRGNAM/$BRANCH
        [ -e Makefile ] && make distclean
        bzr pull
-       # bzr update
     )
     mkdir -p $TMP/$PRGNAM-$VERSION
     SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
