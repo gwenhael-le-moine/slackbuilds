@@ -26,11 +26,8 @@ PREFIX=/usr
 
 # Fetching sources
 ( cd $TMP
-    [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] \
-        && tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
-    # [ ! -e $PRGNAM-$VERSION ] \
-    #     && wget -c http://$PRGNAM.googlecode.com/files/$PRGNAM-$VERSION.tar.bz2 \
-    #     && tar xvf $PRGNAM-$VERSION.tar.?z*
+    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && wget -c http://www.rpl2.net/download/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
+    tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
 )
 
 # Preparation
