@@ -8,7 +8,7 @@ TMP=/tmp/$TAG
 PRGNAM=$(basename $CWD)
 VERSION=1.11-1
 ARCH=${ARCH:-$(uname -m)}
-BUILD=1
+BUILD=3
 
 PKG=$TMP/pkg-$PRGNAM
 
@@ -25,6 +25,15 @@ chown -R root.root *
 find . -perm 777 -exec chmod 755 {} \;
 
 make prefix=$PKG/usr mandir=$PKG/usr/man
+
+# Racket also has a 'scribble' binary in /usr/bin
+# Scribble's scribble is in /usr/games but Racket's steal its place in $PATH
+( cd $PKG/usr/games/
+    ln -s scribble scribble-scrabble
+)
+( cd $PKG/usr/man/man6/
+    ln -s scribble.6.gz scribble-scrabble.6.gz
+)
 
 # Compress the man page(s)
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;

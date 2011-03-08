@@ -1,0 +1,47 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=1.1
+BUILD=1
+
+ARCH=noarch
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $CWD/essentialjsdesignpatterns$VERSION.zip ] && wget -c http://www.addyosmani.com/resources/essentialjsdesignpatterns/book/essentialjsdesignpatterns$VERSION.zip -O $CWD/essentialjsdesignpatterns$VERSION.zip
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+unzip $CWD/essentialjsdesignpatterns$VERSION.zip -d $PKG$PREFIX/doc/$PRGNAM
+rm -fr $PKG$PREFIX/doc/$PRGNAM/__MACOSX
+find $PKG$PREFIX/doc/$PRGNAM/ -name .DS_Store -delete
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Essential JavaScript Patterns» book)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: Authored By Addy Osmani
+$PRGNAM: Copyright 2011 © Addy Osmani.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.addyosmani.com/resources/essentialjsdesignpatterns/book/
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PRGNAM=emacswiki
-VERSION=svn_$(date +"%Y.%m.%d_%H.%M")
+VERSION=$(date +"%Y.%m.%d_%H.%M")
 BUILD=${BUILD:-1}
 
 ARCH=emacs
@@ -9,7 +9,7 @@ ARCH=emacs
 CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
-TMP=${TMP:-/tmp}
+TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
@@ -36,6 +36,7 @@ mkdir -p $PKG/$PREFIX/doc/
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
     for el in \
+        "quick-jump.el" \
         "alarm.el" \
         "multi-term.el" \
         "lusty-explorer.el" \
@@ -71,11 +72,9 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
         "cus-edit+.el" \
         "xml-rpc.el" \
         "weblogger.el" \
-        "color-theme-tango.el" \
-        "color-theme-inkpot.el" \
         "newsticker-notify.el" ;
     do
-        ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
+        [ -e "$PREFIX/doc/$PRGNAM/$el" ] && ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
     done
 )
 
