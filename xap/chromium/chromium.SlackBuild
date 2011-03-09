@@ -28,6 +28,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 VERSION=snapshot
+REVISION=${REVISION:-}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -50,12 +51,14 @@ rm -rf $PKG
 mkdir -p $TMP $PKG/opt $OUTPUT
 
 cd $PKG/opt
+if [ "x$REVISION" == "x" ]; then
 #get latest revision number
-[ -e ./LATEST ] && rm ./LATEST
-wget -c http://build.chromium.org/buildbot/snapshots/$REL/LATEST
-REVISION=$(cat ./LATEST)
+    [ -e ./LATEST ] && rm ./LATEST
+    wget -c http://build.chromium.org/buildbot/snapshots/$REL/LATEST
+    REVISION=$(cat ./LATEST)
+    rm ./LATEST]
+fi
 VERSION=${VERSION}_$REVISION
-rm ./LATEST
 
 #get chromium
 [ -e chrome-linux.zip ] && rm chrome-linux.zip
