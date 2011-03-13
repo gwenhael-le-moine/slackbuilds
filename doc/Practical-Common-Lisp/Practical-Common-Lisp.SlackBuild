@@ -1,0 +1,55 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=noarch
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    mkdir -p $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack http://www.gigamonkeys.com/book/
+    )
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack --update
+    )
+fi
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Practical Common Lisp» book)
+$PRGNAM: 
+$PRGNAM: Practical Common Lisp presents a thorough introduction to Common Lisp,
+$PRGNAM: providing you with an overall understanding of the language features
+$PRGNAM: and how they work.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.apress.com/book/view/1590592395
+$PRGNAM: http://www.gigamonkeys.com/book/
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
