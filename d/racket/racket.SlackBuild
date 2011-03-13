@@ -81,7 +81,7 @@ EOF
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (programming language)
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM: Racket is a programming language.
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
