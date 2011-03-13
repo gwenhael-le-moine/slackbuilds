@@ -1,0 +1,45 @@
+#!/bin/sh -x
+
+CWD=$(pwd)
+VERSION=1.11-1
+BUILD=${BUILD:-1}
+TAG=${TAG:-_SBo}
+
+ARCH=noarch
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/SBo}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+set -e # Exit on most errors
+
+rm -fr $TMP/$PRGNAM-$VERSION $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP
+
+tar xf $CWD/${PRGNAM}_$VERSION.tar.gz
+cd $PRGNAM
+
+chown -R root.root *
+find . -perm 777 -exec chmod 755 {} \;
+
+make prefix=$PKG/usr mandir=$PKG/usr/man
+
+# Racket also has a 'scribble' binary in /usr/bin
+# Scribble's scribble is in /usr/games but Racket's steal its place in $PATH
+( cd $PKG/usr/games/
+    ln -s scribble scribble-scrabble
+)
+( cd $PKG/usr/man/man6/
+    ln -s scribble.6.gz scribble-scrabble.6.gz
+)
+
+chmod -R o-w $PKG
+chown -R root:root $PKG/*
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
