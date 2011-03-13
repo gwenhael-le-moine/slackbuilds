@@ -16,22 +16,16 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
-
 PREFIX=/usr
 
 # Cleaning
-rm -fr $TMP/$PRGNAM-$VERSION
-rm -fr $PKG
+rm -fr $TMP/$PRGNAM-$VERSION $PKG
 mkdir -p $TMP
 cd $TMP
 
 # Fetching sources
-if [ ! -e $CWD/$PRGNAM-$VERSION-src-unix.tgz ] ; then
-    ( cd $CWD
-        wget -c http://download.racket-lang.org/installers/$VERSION/$PRGNAM/$PRGNAM-$VERSION-src-unix.tgz
-    )
-fi
+[ ! -e $CWD/$PRGNAM-$VERSION-src-unix.tgz ] && wget -c http://download.racket-lang.org/installers/$VERSION/$PRGNAM/$PRGNAM-$VERSION-src-unix.tgz -O $CWD/$PRGNAM-$VERSION-src-unix.tgz
+
 tar xvf $CWD/$PRGNAM-$VERSION-src-unix.tgz
 
 # Preparation
@@ -46,6 +40,7 @@ sed -i "s|lib/|lib$LIBSUFFIX/|g" Makefile.in
     --mandir=$PREFIX/man \
     --infodir=$PREFIX/info \
     --libdir=$PREFIX/lib$LIBSUFFIX
+
 # Building
 make
 
