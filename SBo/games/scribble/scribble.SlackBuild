@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 CWD=$(pwd)
 VERSION=1.11-1
