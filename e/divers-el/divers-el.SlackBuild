@@ -38,6 +38,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
         "http://ipython.scipy.org/dist/ipython.el" \
         "http://lumiere.ens.fr/~guerry/u/blorg.el" \
         "http://www.varnish-cache.org/trac/export/5188/trunk/varnish-tools/emacs/vcl-mode.el" \
