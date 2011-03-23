@@ -1,10 +1,9 @@
 #!/bin/sh
-set -x
 
 PRGNAM=nut
-VERSION=${VERSION:-16.8}
+VERSION=${VERSION:-16.9}
 
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -24,59 +23,55 @@ rm -fr $PKG
 [ ! -e $TMP/ ] && mkdir -p $TMP
 
 # Fetching sources
-( cd $TMP
-    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
-        wget -c http://nchc.dl.sourceforge.net/project/$PRGNAM/$PRGNAM/$VERSION/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz
-    tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
-)
+cd $TMP
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
+    wget -c http://nchc.dl.sourceforge.net/project/$PRGNAM/$PRGNAM/$VERSION/$PRGNAM-$VERSION.tar.gz -O $CWD/$PRGNAM-$VERSION.tar.gz
+tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
 
 # Preparation
-( cd $TMP/$PRGNAM-$VERSION
-    chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
-)
+cd $PRGNAM-$VERSION
+chown -R root:root .
+find . \
+    \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+    -exec chmod 755 {} \; -o \
+    \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+    -exec chmod 644 {} \;
 
 # Configuration
-( cd $TMP/$PRGNAM-$VERSION
-    sed -i "s|/usr/local/lib|$PREFIX/lib$LIBSUFFIX|g" Makefile
-)
+sed -i "s|/usr/local/lib|$PREFIX/lib$LIBSUFFIX|g" Makefile fltk/Makefile
 
 # Building
-( cd $TMP/$PRGNAM-$VERSION
-    make
-)
+make
+make -C fltk
 
 # Installation
-mkdir -p $PKG$PREFIX/{bin,lib$LIBSUFFIX/$PRGNAM,man/man1}
-( cd $TMP/$PRGNAM-$VERSION
-    cp $PRGNAM $PKG$PREFIX/bin
-    cp $PRGNAM.1 $PKG$PREFIX/man/man1
-    cp raw.data/* $PKG$PREFIX/lib$LIBSUFFIX/$PRGNAM
+mkdir -p $PKG$PREFIX/{bin,lib$LIBSUFFIX/$PRGNAM,man/man1,doc/$PRGNAM}
+cd $TMP/$PRGNAM-$VERSION
+cp $PRGNAM fltk/Nut $PKG$PREFIX/bin
+( cd $PKG$PREFIX/bin
+    ln -s Nut $PRGNAM-fltk
 )
+cp $PRGNAM.1 $PKG$PREFIX/man/man1
+cp raw.data/* $PKG$PREFIX/lib$LIBSUFFIX/$PRGNAM
+cp $(ls | grep "[A-Z][^a-z]") nut.html nut.xpm $PKG$PREFIX/doc/$PRGNAM
 
 # Cleaning
-( cd $PKG
-    find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-    find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-    find ./man -type f -name "*.?" -exec gzip -9 {} \;
+find ./man -type f -name "*.?" -exec gzip -9 {} \;
 
-    chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
-)
+chown -R root:root .
+find . \
+    \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+    -exec chmod 755 {} \; -o \
+    \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+    -exec chmod 644 {} \;
 
 # Packaging
-( cd $PKG
-    mkdir install
-    cat <<EOF > install/slack-desc
+mkdir install
+cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (open-source free nutrition software)
 $PRGNAM:
 $PRGNAM: $PRGNAM, records what you eat and analyzes your meals for nutrient
@@ -90,6 +85,5 @@ $PRGNAM: http://nut.sourceforge.net/
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
-)
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
 
