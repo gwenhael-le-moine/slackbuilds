@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=3.2.2
+VERSION=3.2.4
 ARCH=$(uname -m)
 BUILD=1
 
@@ -31,40 +31,36 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
 
 # mise en place
-( cd $TMP
-    [ ! -e $CWD/$PRGNAM-$VERSION.tar.xz ] && \
-        wget -c ftp://ftp.gnu.org/gnu/smalltalk/$PRGNAM-$VERSION.tar.xz \
-        -O $CWD/$PRGNAM-$VERSION.tar.xz
-    tar xf $CWD/$PRGNAM-$VERSION.tar.xz
-)
+cd $TMP
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.xz ] && \
+    wget -c ftp://ftp.gnu.org/gnu/smalltalk/$PRGNAM-$VERSION.tar.xz \
+    -O $CWD/$PRGNAM-$VERSION.tar.xz
+tar xf $CWD/$PRGNAM-$VERSION.tar.xz
 
-( cd $TMP/$PRGNAM-$VERSION
-    # configuration
-    CCPFLAGS=$SLCKFLAGS \
-    CFLAGS=$SLCKFLAGS \
-    ./configure \
-        --prefix=$PREFIX \
-        --mandir=$PREFIX/man \
-        --infodir=$PREFIX/info \
-        --docdir=$PREFIX/doc/$PRGNAM-$VERSION \
-        --includedir=$PREFIX/include \
-        --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
-        --enable-disassembler \
-        --enable-preemption
+cd $TMP/$PRGNAM-$VERSION
+# configuration
+CCPFLAGS=$SLCKFLAGS \
+CFLAGS=$SLCKFLAGS \
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man \
+    --infodir=$PREFIX/info \
+    --docdir=$PREFIX/doc/$PRGNAM-$VERSION \
+    --includedir=$PREFIX/include \
+    --libdir=$PREFIX/lib$(echo $ARCH | grep -o 64) \
+    --enable-disassembler \
+    --enable-preemption
 
-    # compilation
-    make -j3 PREFIX=$PREFIX
-    # installation
-    make install DESTDIR=$PKG
-)
+# compilation
+make PREFIX=$PREFIX
+# installation
+make install DESTDIR=$PKG
 
 # correction
 chown -R root:root $PKG/*
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-( cd $TMP/$PRGNAM-$VERSION
-    cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
-)
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
@@ -91,6 +87,5 @@ $PRGNAM:
 EOF
 
 # empaquetage
-( cd $PKG
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$TAG.txz
-)
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d -)-$ARCH-$BUILD$TAG.txz
