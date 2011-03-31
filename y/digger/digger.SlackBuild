@@ -3,7 +3,7 @@
 PRGNAM=digger
 VERSION=${VERSION:-20020314}
 
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-1}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
