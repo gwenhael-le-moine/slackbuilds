@@ -77,8 +77,6 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
     chown -R root:root *
 
     [ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9f {} \;
-    [ -d $PKG$PREFIX/info ] && find $PKG$PREFIX/info -type f -name "*" -exec gzip -9f {} \;
-
 )
 
 # embaumement

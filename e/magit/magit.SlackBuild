@@ -71,6 +71,9 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 cd /usr/info
+[ -e dir ] && rm dir
+[ -e dir.gz ] && rm dir.gz
+[ -e dir.new ] && rm dir.new
 for file in \$(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
 do
     install-info \$file ./dir

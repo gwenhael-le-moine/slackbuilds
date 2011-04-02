@@ -56,7 +56,16 @@ chown -R root:root *
 
 # embaumement
 mkdir -p $PKG/install
-
+cat <<EOF > $PKG/install/doinst.sh
+cd /usr/info
+[ -e dir ] && rm dir
+[ -e dir.gz ] && rm dir.gz
+[ -e dir.new ] && rm dir.new
+for file in \$(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
+do
+    install-info \$file ./dir
+done
+EOF
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line

@@ -59,7 +59,7 @@ cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
-[ -d $PKG/usr/info ] && rm $PKG/usr/info/dir
+[ -d $PKG/usr/info ] && rm $PKG/usr/info/dir{,.gz,.new}
 
 # Strip binaries
 ( cd $PKG
@@ -71,12 +71,14 @@ cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-( cd /usr/info
+cd /usr/info
+[ -e dir ] && rm dir
+[ -e dir.gz ] && rm dir.gz
+[ -e dir.new ] && rm dir.new
 for file in \$(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
 do
     install-info \$file ./dir
 done
-)
 EOF
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (Configuration file library for C and C++.)

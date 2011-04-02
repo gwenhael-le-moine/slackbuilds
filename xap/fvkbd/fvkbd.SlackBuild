@@ -86,8 +86,6 @@ PREFIX=/usr
     find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
     find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
-    find $PKG$PREFIX/info -name "dir" -exec rm {} \;
-    find $PKG$PREFIX/info -type f -exec gzip -9 {} \;
 
     chown -R root:root .
     find . \

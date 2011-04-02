@@ -66,8 +66,6 @@ mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 )
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-[ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*.info*" -exec gzip -9f {} \;
-[ -d $PKG/usr/info ] && rm $PKG/usr/info/dir
 
 # Strip binaries
 find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null

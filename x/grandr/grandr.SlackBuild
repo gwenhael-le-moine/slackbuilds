@@ -53,8 +53,6 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
     chown -R root:root *
 
     [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-    [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*" -exec gzip -9f {} \;
-
 )
 
 # embaumement

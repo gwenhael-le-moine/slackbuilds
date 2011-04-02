@@ -60,8 +60,6 @@ cp -R $REPOSITORY/{AUTHORS,COPYING,NEWS,README,dist,ChangeLog,examples,engines,h
     chown -R root:root *
 
     [ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9f {} \;
-    [ -d $PKG$PREFIX/info ] && find $PKG$PREFIX/info -type f -name "*" -exec gzip -9f {} \;
-
 )
 
 # embaumement
