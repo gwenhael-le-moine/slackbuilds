@@ -33,7 +33,7 @@ mkdir -p $CWD/els
         URL=$1
         FILENAME=$(echo "$URL" | grep -o -e "[/=][A-Za-z0-9+-]*\.el" | tr -d '=' | tr -d '/')
         wget --no-check-certificate -T 10 -t 3 -c "$URL" -O "$FILENAME.new"
-        [[ "$(cat $FILENAME.new | wc -c)" > 0 ]] && mv "$FILENAME.new" "$FILENAME"
+        [ ! -s "$FILENAME.new" ] && mv "$FILENAME.new" "$FILENAME"
         [ -e "$FILENAME.new" ] && rm "$FILENAME.new"
     }
 
