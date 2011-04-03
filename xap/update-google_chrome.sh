@@ -17,4 +17,4 @@ cd $BUILD_DIR
 [ -e google-chrome-${CHANNEL}_current_$ARCH.deb ] && rm google-chrome-${CHANNEL}_current_$ARCH.deb
 wget -c http://dl.google.com/linux/direct/google-chrome-${CHANNEL}_current_$ARCH.deb
 RELEASE=$CHANNEL ./google-chrome.SlackBuild
-[ " x$1" -eq "x--install" ] && upgradepkg --install-new $(ls -ut /tmp/google-chrome-*-$(uname -m)-*.txz | head -n1)
+
