@@ -38,6 +38,7 @@ mkdir -p $CWD/els
     }
 
     for el in \
+        "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
         "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
         "http://ipython.scipy.org/dist/ipython.el" \
         "http://lumiere.ens.fr/~guerry/u/blorg.el" \
