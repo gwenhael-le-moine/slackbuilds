@@ -41,7 +41,7 @@ mkdir -p $CWD/els
         "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
         "http://ipython.scipy.org/dist/ipython.el" \
         "http://lumiere.ens.fr/~guerry/u/blorg.el" \
-        "http://www.varnish-cache.org/trac/export/5188/trunk/varnish-tools/emacs/vcl-mode.el" \
+        "http://www.varnish-cache.org/svn/trunk/varnish-tools/emacs/vcl-mode.el" \
         "http://www.randomsample.de/minimap.el" \
         "http://mumble.net/~campbell/emacs/paredit.el" \
         "http://dishevelled.net/elisp/rainbow-parens.el" \
