@@ -32,9 +32,8 @@ mkdir -p $CWD/els
     elfileget_or_update() {
         URL=$1
         FILENAME=$(echo "$URL" | grep -o -e "[/=][A-Za-z0-9+-]*\.el" | tr -d '=' | tr -d '/')
-        wget --no-check-certificate -T 10 -t 3 -c "$URL" -O "$FILENAME.new"
-        [ ! -s "$FILENAME.new" ] && mv "$FILENAME.new" "$FILENAME"
-        [ -e "$FILENAME.new" ] && rm "$FILENAME.new"
+        wget --no-check-certificate -T 10 -t 3 -c "$URL" -O $FILENAME.new
+        [ -s $FILENAME.new ] && mv $FILENAME.new $FILENAME || rm $FILENAME.new
     }
 
     for el in \
