@@ -1,0 +1,55 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=noarch
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    mkdir -p $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack http://www.cleveralgorithms.com/nature-inspired/index.html
+    )
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack --update
+    )
+fi
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM («Clever Algorithms» book)
+$PRGNAM: 
+$PRGNAM: Clever Algorithms
+$PRGNAM: 
+$PRGNAM: Nature-Inspired Programming Recipes
+$PRGNAM: 
+$PRGNAM: By Jason Brownlee
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://github.com/jbrownlee/CleverAlgorithms
+$PRGNAM: http://www.cleveralgorithms.com/
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
