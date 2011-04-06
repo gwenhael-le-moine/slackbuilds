@@ -1,0 +1,51 @@
+#!/bin/sh
+
+start() {
+    if [ -f /var/run/ulatencyd.pid ]; then
+        echo "ulatencyd is already running"
+        exit 1
+    elif [ -x /usr/sbin/ulatencyd ]; then
+        /usr/sbin/ulatencyd || exit $?
+        pidof Ulatencyd > /var/run/ulatencyd.pid
+        echo "ulatencyd Started"
+    fi
+}
+
+stop() {
+    if [ -f /var/run/ulatencyd.pid ]; then
+        kill $(cat /var/run/ulatencyd.pid) || echo "Unable to stop ulatencyd"
+        rm -f /var/run/ulatencyd.pid
+        echo "ulatencyd Stopped"
+    else
+        echo "ulatencyd is not started"
+    fi
+}
+
+status() {
+    if [ -f /var/run/ulatencyd.pid ]; then
+        echo "ulatencyd Running"
+        echo "PID: $(cat /var/run/ulatencyd.pid)"
+    else
+        echo "ulatencyd is not started"
+    fi
+}
+
+case "$1" in
+    "start")
+        start
+        ;;
+    "stop")
+        stop
+        ;;
+    "status")
+        status
+        ;;
+    "restart")
+    	stop
+	    sleep 1
+    	start
+	;;
+    *)
+        echo "$0 Usage: [start|stop|restart|status]"
+        ;;
+esac
