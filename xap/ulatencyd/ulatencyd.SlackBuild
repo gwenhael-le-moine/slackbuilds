@@ -1,0 +1,105 @@
+#!/bin/sh
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git_$(date +%Y.%m.%d_%H.%M)
+
+BUILD=1
+
+ARCH=$(uname -m)
+LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+
+PREFIX=/usr
+
+# Cleaning
+rm -fr $TMP/$PRGNAM-$VERSION
+rm -fr $PKG
+mkdir -p $TMP
+
+if [ ! -e $REPOSITORY ] ; then
+    mkdir -p $(dirname $REPOSITORY)
+    git clone "git://github.com/poelzi/ulatencyd.git" $REPOSITORY
+else
+    ( cd $REPOSITORY
+        git pull
+    )
+fi
+
+# Preparation
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+chown -R root:root .
+find . \
+    \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+    -exec chmod 755 {} \; -o \
+    \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+    -exec chmod 644 {} \;
+        
+# Building
+cmake -DCMAKE_INSTALL_PREFIX=$PREFIX
+
+# Installation
+make install DESTDIR=$PKG
+chmod +x $PKG$PREFIX/sbin/ulatencyd
+
+# no use for this
+rm -fr $PKG/lib
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -a AUTHORS COPYING ChangeLog NEWS README TODO docs/ $PKG$PREFIX/doc/$PRGNAM
+
+mkdir -p $PKG/etc/rc.d/
+cat $CWD/rc.ulatencyd.new > $PKG/etc/rc.d/rc.ulatencyd.new
+
+# Cleaning
+find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+
+chown -R root:root $PKG
+find $PKG -type f -exec chmod 644 {} \;
+chmod +x $PKG$PREFIX/bin/*
+
+# Packaging
+cd $PKG
+mkdir install
+cat <<EOF > $PKG/install/doinst.sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then # toss the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+config etc/rc.d/rc.ulatencyd.new
+EOF
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (CGroups managing daemon)
+$PRGNAM:
+$PRGNAM: Ulatency is a daemon that controls how the Linux kernel will spend it's
+$PRGNAM: resources on the running processes. It uses dynamic cgroups to give the kernel
+$PRGNAM: hints and limitations on processes.
+$PRGNAM: 
+$PRGNAM: It strongly supports the lua scripting language for writing rules and the
+$PRGNAM: scheduler code.
+$PRGNAM:
+$PRGNAM: https://github.com/poelzi/ulatencyd
+$PRGNAM:
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+
