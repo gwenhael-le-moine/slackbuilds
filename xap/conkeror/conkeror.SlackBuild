@@ -13,7 +13,7 @@ LIBSUFFIX=$(echo $ARCH | grep -o 64)
 TAG=cyco
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
-OUTPUT=$TMP
+OUTPUT=/tmp
 
 REPOSITORIES=/home/cycojesus/projets/packages/repositories
 
@@ -27,24 +27,21 @@ fi
 
 mkdir -p $PKG$PREFIX/libexec/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/libexec/
-( cd $PKG$PREFIX/libexec/$PRGNAM
-    make conkeror-spawn-helper
-    rm -fr .git .gitignore
-)
+cd $PKG$PREFIX/libexec/$PRGNAM
+make conkeror-spawn-helper
+rm -fr .git .gitignore
 
 mkdir -p $PKG$PREFIX/bin
-( cd $PKG$PREFIX/bin
-    ln -s ../libexec/$PRGNAM/conkeror-spawn-helper conkeror-spawn-helper
-    ln -s ../libexec/$PRGNAM/contrib/run-conkeror run-conkeror
-    ln -s run-conkeror conkeror
-)
+cd $PKG$PREFIX/bin
+ln -s ../libexec/$PRGNAM/conkeror-spawn-helper conkeror-spawn-helper
+ln -s ../libexec/$PRGNAM/contrib/run-conkeror run-conkeror
+ln -s run-conkeror conkeror
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-( cd $PKG$PREFIX/doc/$PRGNAM
-    for d in COPYING CREDITS INSTALL help ; do
-        ln -s ../../libexec/$PRGNAM/$d $d
-    done
-)
+cd $PKG$PREFIX/doc/$PRGNAM
+for d in COPYING CREDITS INSTALL help ; do
+    ln -s ../../libexec/$PRGNAM/$d $d
+done
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
@@ -61,6 +58,5 @@ $PRGNAM: http://conkeror.org/
 $PRGNAM: 
 EOF
 
-( cd $PKG
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
-)
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
