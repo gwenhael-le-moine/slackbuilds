@@ -1,0 +1,57 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git$(date +%Y.%m.%d_%H.%M)
+BUILD=1
+
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            git pull
+        )
+    else
+        git clone "https://github.com/chriso/klein.php.git" $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG/srv/www/htdocs
+cp -R $REPOSITORIES/$PRGNAM $PKG/srv/www/htdocs/
+find $PKG/srv/www/htdocs -name \.git\* -exec rm -fr {} \;
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (A lightning fast router for PHP5.3+)
+$PRGNAM: 
+$PRGNAM: klein.php is a lightning fast router for PHP 5.3+. In < 600 lines you get
+$PRGNAM:     Sinatra-like routing
+$PRGNAM:     Almost no overhead = as much speed as you can possibly squeeze from PHP
+$PRGNAM:         (2200 requests/second+)
+$PRGNAM:     A set of boilerplate methods for rapidly building web apps
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://github.com/chriso/klein.php
+$PRGNAM: 
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
