@@ -36,6 +36,7 @@ mkdir -p $PKG/$PREFIX/doc/
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
     for el in \
+		"buffer-move.el" \
 		"goto-last-change.el" \
         "fill-column-indicator.el" \
         "php-mode-improved.el" \
