@@ -36,7 +36,7 @@ fi
 
 mkdir -p $PKG$PREFIX/share/emacs/$EMACS_VERSION/etc/themes
 cp $REPOSITORY/*-theme.el $PKG$PREFIX/share/emacs/$EMACS_VERSION/etc/themes/
-mkdir $PKG$PREFIX/doc/$PRGNAM
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp $REPOSITORY/{LICENSE,README.md,color-theme-solarized.el} $PKG$PREFIX/doc/$PRGNAM
 
 # correction
