@@ -31,7 +31,8 @@ if [ -e $REPOSITORY ]; then
         git pull
     )
 else
-    git clone https://github.com/sellout/emacs-color-theme-solarized.git $REPOSITORY
+    # git clone https://github.com/sellout/emacs-color-theme-solarized.git $REPOSITORY
+    git clone https://github.com/cycojesus/emacs-color-theme-solarized.git $REPOSITORY
 fi
 
 mkdir -p $PKG$PREFIX/share/emacs/$EMACS_VERSION/etc/themes
