@@ -4,8 +4,8 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=2.2.0_01_Beta_Without_JRE
-RELEASE="2.2.0%20update%201"
+VERSION=2.2.3_04_Beta_Without_JRE
+RELEASE="2.2.3%20update%204"
 ARCH=${ARCH:-noarch}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}

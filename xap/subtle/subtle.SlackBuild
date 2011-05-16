@@ -55,6 +55,7 @@ function build_install() {
     find $PKG$PREFIX/man -not -name "*.gz" -exec gzip -9 {} \;
 }
 
+mkdir -p $TMP
 ( cd $TMP
     get_sources_here subtle
     build_install subtle
@@ -66,6 +67,7 @@ function build_install() {
     fi
 )
 
+mkdir -p $PKG$PREFIX/share/subtle/
 ( cd $PKG$PREFIX/share/subtle/
     get_sources_here subtle-contrib
     mv subtle-contrib-$VERSION subtle-contrib
