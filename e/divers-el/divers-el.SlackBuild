@@ -39,7 +39,6 @@ elfileget_or_update() {
     
 cd $CWD/els
 for el in \
-    "http://kanis.fr/hg/lisp/ivan/pomodoro.el" \
     "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
     "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
     "http://ipython.scipy.org/dist/ipython.el" \
