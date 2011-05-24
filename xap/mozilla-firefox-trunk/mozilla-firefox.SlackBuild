@@ -23,7 +23,7 @@ BUILD=1
 
 
 #BRANCH=latest-tracemonkey
-BRANCH=latest-mozilla-central
+BRANCH=${BRANCH:=latest-mozilla-aurora}
 
 if [ $KEEP_TAR == "NO" ]; then
     [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
