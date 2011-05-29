@@ -41,16 +41,11 @@ cd $CWD/els
 for el in \
     "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
     "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
-    "http://ipython.scipy.org/dist/ipython.el" \
-    "http://lumiere.ens.fr/~guerry/u/blorg.el" \
     "http://www.varnish-cache.org/svn/trunk/varnish-tools/emacs/vcl-mode.el" \
     "http://www.randomsample.de/minimap.el" \
     "http://mumble.net/~campbell/emacs/paredit.el" \
-    "http://dishevelled.net/elisp/rainbow-parens.el" \
     "http://nschum.de/src/emacs/guess-style/guess-style.el" \
-    "http://nschum.de/src/emacs/full-ack/full-ack.el" \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
-    "http://repo.or.cz/w/ShellArchive.git?a=blob_plain;hb=HEAD;f=smallurl.el" \
     "http://www.eskimo.com/~seldon/diminish.el" \
     "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
     "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
