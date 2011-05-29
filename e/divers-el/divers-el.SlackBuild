@@ -46,7 +46,6 @@ for el in \
     "http://mumble.net/~campbell/emacs/paredit.el" \
     "http://nschum.de/src/emacs/guess-style/guess-style.el" \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
-    "http://www.eskimo.com/~seldon/diminish.el" \
     "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
     "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
     "http://damtp.cam.ac.uk/user/sje30/emacs/ell.el" \
