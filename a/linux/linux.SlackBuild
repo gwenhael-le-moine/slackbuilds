@@ -17,7 +17,7 @@ OUTPUT=/tmp
 
 NUMJOBS=${NUMJOBS:-" -j2 "}
 
-SRC_URL="http://www.kernel.org/pub/linux/kernel/v2.6$(echo \"$VERSION\" | grep -q \"\-rc\" && echo \"/testing\" )"
+SRC_URL="http://www.kernel.org/pub/linux/kernel/v$(echo  \"$VERSION\" | sed 's|\([0-9]*\.[0-9]*\).*|\1|')$(echo \"$VERSION\" | grep -q \"\-rc\" && echo \"/testing\" )"
 
 rm -fr $PKG
 if [ $CLEAN_SRC != "NO" ] ; then
@@ -59,7 +59,7 @@ make $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
 
 KERNEL_TAG=$(grep "CONFIG_LOCALVERSION=" .config | sed 's|CONFIG_LOCALVERSION=||' | tr -d \" )
-KERNEL_VERSION=$(grep -o "2\.6\..*[0-9]" .config)$KERNEL_TAG
+KERNEL_VERSION=$(grep -o "[0-9]*\.[0-9]*.*" .config)$KERNEL_TAG
 
 mkdir -p $PKG/boot/$KERNEL_VERSION
 cp .config System.map arch/x86/boot/bzImage $PKG/boot/$KERNEL_VERSION
@@ -83,19 +83,21 @@ sed -i "s|default=.*|default=$KERNEL_VERSION|" /etc/lilo.conf
 
 lilo
 EOF
+
+VERSION=$(echo $VERSION | tr - _)
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM-$(echo $VERSION | tr - _): $PRGNAM-$(echo $VERSION | tr - _) (kernel)
-$PRGNAM-$(echo $VERSION | tr - _): 
-$PRGNAM-$(echo $VERSION | tr - _): Linux is a clone of the operating system Unix, written from scratch by
-$PRGNAM-$(echo $VERSION | tr - _): Linus Torvalds with assistance from a loosely-knit team of hackers
-$PRGNAM-$(echo $VERSION | tr - _): across the Net. It aims towards POSIX and Single UNIX Specification
-$PRGNAM-$(echo $VERSION | tr - _): compliance.
-$PRGNAM-$(echo $VERSION | tr - _): 
-$PRGNAM-$(echo $VERSION | tr - _): It has all the features you would expect in a modern fully-fledged Unix
-$PRGNAM-$(echo $VERSION | tr - _): 
-$PRGNAM-$(echo $VERSION | tr - _): http://www.kernel.org
-$PRGNAM-$(echo $VERSION | tr - _): 
+$PRGNAM-$VERSION: $PRGNAM-$VERSION (kernel)
+$PRGNAM-$VERSION: 
+$PRGNAM-$VERSION: Linux is a clone of the operating system Unix, written from scratch by
+$PRGNAM-$VERSION: Linus Torvalds with assistance from a loosely-knit team of hackers
+$PRGNAM-$VERSION: across the Net. It aims towards POSIX and Single UNIX Specification
+$PRGNAM-$VERSION: compliance.
+$PRGNAM-$VERSION: 
+$PRGNAM-$VERSION: It has all the features you would expect in a modern fully-fledged Unix
+$PRGNAM-$VERSION: 
+$PRGNAM-$VERSION: http://www.kernel.org
+$PRGNAM-$VERSION: 
 EOF
 
 cd $PKG
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$(echo $KERNEL_TAG | tr - _)-$ARCH-$BUILD$TAG.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$(echo $KERNEL_TAG | tr - _)-$ARCH-$BUILD$TAG.txz
