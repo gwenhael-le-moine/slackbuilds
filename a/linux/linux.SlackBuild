@@ -59,7 +59,7 @@ make $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
 
 KERNEL_TAG=$(grep "CONFIG_LOCALVERSION=" .config | sed 's|CONFIG_LOCALVERSION=||' | tr -d \" )
-KERNEL_VERSION=$(grep -o "[0-9]*\.[0-9]*.*" .config)$KERNEL_TAG
+KERNEL_VERSION=$(grep -o "[0-9]\+\.[0-9]\+.*[0-9]" .config)$KERNEL_TAG
 
 mkdir -p $PKG/boot/$KERNEL_VERSION
 cp .config System.map arch/x86/boot/bzImage $PKG/boot/$KERNEL_VERSION
