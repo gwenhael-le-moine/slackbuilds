@@ -6,7 +6,7 @@ VERSION=${VERSION:-16.12}
 BUILD=${BUILD:-2}
 
 ARCH=$(uname -m)
-LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
 CWD=$(pwd)
 TAG=cyco
