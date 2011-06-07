@@ -41,8 +41,8 @@ find . \
 sed -i "s|/usr/local/lib|$PREFIX/lib$LIBSUFFIX|g" Makefile fltk/Makefile
 
 # Building
-make
-make -C fltk
+make prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
+make -C fltk prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
 
 # Installation
 mkdir -p $PKG$PREFIX/{bin,lib$LIBSUFFIX/$PRGNAM,man/man1,doc/$PRGNAM}
