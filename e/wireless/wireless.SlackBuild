@@ -31,7 +31,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone "git://gitorious.org/wireless/wireless.git" $PRGNAM
+        git clone "http://git.gitorious.org/wireless/wireless.git" $PRGNAM
 fi
 
 ( cd $REPOSITORY
