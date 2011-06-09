@@ -31,7 +31,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone "git://git.sv.gnu.org/geiser.git" $PRGNAM
+        git clone "http://git.sv.gnu.org/r/geiser.git" $PRGNAM
 else
     ( cd $REPOSITORY
         git pull
