@@ -9,7 +9,7 @@ CWD=$(pwd)
 PRGNAM=libxdg-basedir
 PKG=$TMP/pkg-$PRGNAM
 
-VERSION=1.0.0
+VERSION=$(date +%Y.%m.%d_%H.%M)
 
 EXT=tar.gz
 
@@ -18,6 +18,7 @@ DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 ARCH=$(uname -m)
 BUILD=1
 
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
 
 PREFIX=/usr
 
@@ -30,10 +31,19 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-tar xf $CWD/$PRGNAM-$VERSION.$EXT
+if [ -e $REPOSITORY ]; then
+	( cd $REPOSITORY
+		git pull
+	)
+else
+	git clone http://repo.or.cz/r/libxdg-basedir.git $REPOSITORY
+fi
+cp -R $REPOSITORY $PRGNAM-$VERSION
 cd $PRGNAM-$VERSION
 
 # configuration
+./autogen.sh
+
 CFLAGS=$SLCKFLAGS \
 CPPFLAGS=$SLCKFLAGS \
 ./configure \
