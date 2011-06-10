@@ -31,7 +31,7 @@ if [ -e $REPOSITORY ]; then
         git pull
     )
 else
-    git clone git://git.naquadah.org/naquadah-theme.git $REPOSITORY
+    git clone http://git.naquadah.org/git/naquadah-theme.git $REPOSITORY
 fi
 
 mkdir -p $PKG$PREFIX/share/emacs/$EMACS_VERSION/etc/themes
