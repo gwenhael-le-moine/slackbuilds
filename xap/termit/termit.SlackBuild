@@ -50,8 +50,9 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 # Installation
     make install DESTDIR=$PKG
 
+	mkdir -p $PKG$PREFIX/doc/$PRGNAM
     mv $PKG$PREFIX/share/man mv $PKG$PREFIX/
-    mv $PKG$PREFIX/share/doc/* $PKG$PREFIX/doc/
+    mv $PKG$PREFIX/share/doc/* $PKG$PREFIX/doc/$PRGNAM
     rm -fr $PKG$PREFIX/share/doc
     cp -a ChangeLog INSTALL COPYING TODO $PKG$PREFIX/doc/$PRGNAM
 )
