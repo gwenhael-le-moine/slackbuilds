@@ -13,17 +13,33 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
 PREFIX=/usr
 
 # cleaning
 rm -fr $PKG
 
 # get sources
-[ -e $CWD/LearnPythonTheHardWay.pdf ] && mv $CWD/LearnPythonTheHardWay.pdf $CWD/LearnPythonTheHardWay.pdf.orig
-wget -c http://learnpythonthehardway.org/static/LearnPythonTheHardWay.pdf -O $CWD/LearnPythonTheHardWay.pdf
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    mkdir -p $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack http://learnpythonthehardway.org/book/
+    )
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        httrack --update
+    )
+fi
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R $CWD/LearnPythonTheHardWay.pdf $PKG$PREFIX/doc/$PRGNAM
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+
+# [ -e $CWD/LearnPythonTheHardWay.pdf ] && mv $CWD/LearnPythonTheHardWay.pdf $CWD/LearnPythonTheHardWay.pdf.orig
+# wget -c http://learnpythonthehardway.org/static/LearnPythonTheHardWay.pdf -O $CWD/LearnPythonTheHardWay.pdf
+
+# mkdir -p $PKG$PREFIX/doc/$PRGNAM
+# cp -R $CWD/LearnPythonTheHardWay.pdf $PKG$PREFIX/doc/$PRGNAM
 
 ( cd $PKG
     mkdir -p install
