@@ -29,7 +29,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone git://github.com/parrot/parrot.git parrot
+        git clone https://github.com/parrot/parrot.git parrot
     fi
 )
 

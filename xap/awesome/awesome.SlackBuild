@@ -49,7 +49,7 @@ if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     SRC_PATH=.
     cd $TMP/$PRGNAM-$VERSION
 else
-    git_clone_or_pull git://git.naquadah.org/$PRGNAM.git $PRGNAM
+    git_clone_or_pull http://git.naquadah.org/git/$PRGNAM.git $PRGNAM
     rm -fr $TMP/$PRGNAM-$VERSION
     mkdir -p $TMP/$PRGNAM-$VERSION
     cd $TMP/$PRGNAM-$VERSION

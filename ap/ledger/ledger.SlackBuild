@@ -1,0 +1,95 @@
+#!/bin/sh
+# Slackware build script for ledger
+# Written by Lionel Young (redtricycle at gmail dot com)
+# updated and adapted to my own taste by Gwenhael Le Moine <gwenhael.le.moine-AT-gmail.com>
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:=2.6.3}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG/usr
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c -O $CWD/$PRGNAM-$VERSION.tar.gz http://cloud.github.com/downloads/jwiegley/$PRGNAM/$PRGNAM-$VERSION.tar.gz
+
+tar xvf $CWD/$PRGNAM-$VERSION.tar.gz || exit 1
+cd $PRGNAM-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \;
+
+CFLAGS="$SLKCFLAGS" \
+./configure \
+  --prefix=/usr \
+  --infodir=/usr/info \
+  --libdir=/usr/lib${LIBDIRSUFFIX} \
+  --localstatedir=/var \
+  --build=$ARCH-slackware-linux
+
+# fix a bug where Emacs' binary name isn't detected correctly (with emacs 24)
+sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
+
+make $NUMJOBS || make || exit 1
+make install DESTDIR=$PKG || exit 1
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" \
+  | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
+cp -a \
+  LICENSE NEWS README TODO \
+  $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a scripts/* $PKG/usr/doc/$PRGNAM-$VERSION/scripts
+
+rm -f $PKG/usr/info/dir
+gzip -9 $PKG/usr/info/*.info*
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+ledger: ledger (a command-line accounting program)
+ledger: 
+ledger: Ledger is an accounting program which is invoked from the command-line
+ledger: using a textual ledger file. See the documentation ( use "info ledger"
+ledger: or read ledger.pdf from the website) for full documentation on how to
+ledger: create a ledger file and using Ledger to generate reports.
+ledger: 
+ledger: Homepage: http://wiki.github.com/jwiegley/ledger
+ledger: 
+ledger: 
+ledger: 
+EOF
+
+cd $TMP/package-$PRGNAM
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-tgz}

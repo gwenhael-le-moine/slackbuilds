@@ -31,7 +31,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone "git://github.com/jochu/clojure-mode.git" $PRGNAM
+        git clone "https://github.com/jochu/clojure-mode.git" $PRGNAM
 fi
 
 ( cd $REPOSITORY

@@ -27,7 +27,7 @@ if [ -e $CWD/PRGNAM-$VERSION.tar.$GZBZ2 ] ; then
       tar xvf $CWD/PRGNAM-$VERSION.tar.$GZBZ2
 else
     if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-        git clone git://git.naquadah.org/oopango.git $REPOSITORIES/$PRGNAM
+        git clone http://git.naquadah.org/git/oopango.git $REPOSITORIES/$PRGNAM
     else
         ( cd $REPOSITORIES/$PRGNAM
             git pull

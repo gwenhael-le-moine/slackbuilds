@@ -39,7 +39,7 @@ if [ -e $CWD/$PRGNAM-$VERSION.$EXT ] ; then
 else
     if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
         ( cd $REPOSITORIES
-            git clone git://github.com/joyent/node.git $PRGNAM
+            git clone https://github.com/joyent/node.git $PRGNAM
         ) ;
     fi
     ( cd $REPOSITORIES/$PRGNAM

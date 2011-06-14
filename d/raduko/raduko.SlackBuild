@@ -29,7 +29,7 @@ mkdir -p $TMP $PKG
             git pull
         )
     else
-        git clone git://github.com/rakudo/rakudo.git $REPOSITORIES/$PRGNAM
+        git clone https://github.com/rakudo/rakudo.git $REPOSITORIES/$PRGNAM
     fi
 )
 

@@ -31,7 +31,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone "git://github.com/chrisdone/zencoding.git" $PRGNAM
+        git clone "https://github.com/chrisdone/zencoding.git" $PRGNAM
 fi
 
 ( cd $REPOSITORY

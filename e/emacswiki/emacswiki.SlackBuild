@@ -19,7 +19,7 @@ rm -rf $PKG
 
 ( cd $REPOSITORIES
     if [ ! -e $PRGNAM ] ; then
-        svn checkout "svn://svn.sv.gnu.org/emacswiki/emacswikipages" $PRGNAM
+        svn checkout "http://svn.sv.gnu.org/svn/emacswiki/emacswikipages" $PRGNAM
     else
         ( cd $PRGNAM
             svn update
@@ -37,6 +37,7 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
     for el in \
 		"no-word.el" \
+		"xml-rpc.el" \
 		"buffer-move.el" \
 		"goto-last-change.el" \
         "fill-column-indicator.el" \
