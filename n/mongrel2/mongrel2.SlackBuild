@@ -49,7 +49,7 @@ sed -i 's|sudo ||g' Makefile
 make bin/mongrel2 PREFIX=$PREFIX
 
 mkdir -p $PKG$PREFIX/bin
-make install-bin install-m2sh PREFIX=$PKG$PREFIX
+make install PREFIX=$PKG$PREFIX
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a LICENSE docs/ examples/ $PKG/usr/doc/$PRGNAM-$VERSION

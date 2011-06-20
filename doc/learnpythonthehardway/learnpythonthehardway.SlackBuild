@@ -35,12 +35,6 @@ fi
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
 
-# [ -e $CWD/LearnPythonTheHardWay.pdf ] && mv $CWD/LearnPythonTheHardWay.pdf $CWD/LearnPythonTheHardWay.pdf.orig
-# wget -c http://learnpythonthehardway.org/static/LearnPythonTheHardWay.pdf -O $CWD/LearnPythonTheHardWay.pdf
-
-# mkdir -p $PKG$PREFIX/doc/$PRGNAM
-# cp -R $CWD/LearnPythonTheHardWay.pdf $PKG$PREFIX/doc/$PRGNAM
-
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc

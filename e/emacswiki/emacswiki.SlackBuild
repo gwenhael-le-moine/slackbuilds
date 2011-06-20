@@ -34,6 +34,7 @@ mkdir -p $PKG/$PREFIX/doc/
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 ( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
     for el in \
+		"no-word.el" \
 		"xml-rpc.el" \
 		"buffer-move.el" \
 		"goto-last-change.el" \

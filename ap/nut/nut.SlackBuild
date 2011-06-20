@@ -6,7 +6,7 @@ VERSION=${VERSION:-16.12}
 BUILD=${BUILD:-2}
 
 ARCH=$(uname -m)
-LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
 CWD=$(pwd)
 TAG=cyco
@@ -41,8 +41,8 @@ find . \
 sed -i "s|/usr/local/lib|$PREFIX/lib$LIBSUFFIX|g" Makefile fltk/Makefile
 
 # Building
-make
-make -C fltk
+make prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
+make -C fltk prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
 
 # Installation
 mkdir -p $PKG$PREFIX/{bin,lib$LIBSUFFIX/$PRGNAM,man/man1,doc/$PRGNAM}
