@@ -29,6 +29,9 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && \
+	wget -c -O $CWD/$PRGNAM-$VERSION.tar.gz http://www.sha-bang.de/content/15_emacs/emacs-sokoban-$VERSION.tar.gz
+
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp
 
 ( cd $PKG$PREFIX/share/emacs/site-lisp/
