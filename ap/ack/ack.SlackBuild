@@ -48,6 +48,7 @@ cd $TMP/$PRGNAM-$VERSION
 
 # configuration
 perl Makefile.PL
+sed -i 's|/usr/local|/usr|g' Makefile
 
 # compilation
 make -j3 PREFIX=$PREFIX
