@@ -1,5 +1,7 @@
 #!/bin/sh
 
+FLTK=${FLTK:=NO}
+
 PRGNAM=nut
 VERSION=${VERSION:-16.12}
 
@@ -42,15 +44,18 @@ sed -i "s|/usr/local/lib|$PREFIX/lib$LIBSUFFIX|g" Makefile fltk/Makefile
 
 # Building
 make prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
-make -C fltk prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
+[ "x$FLTK" != "xNO" ] && make -C fltk prefix=$PREFIX libdir=$PREFIX/lib$LIBSUFFIX/nut
 
 # Installation
 mkdir -p $PKG$PREFIX/{bin,lib$LIBSUFFIX/$PRGNAM,man/man1,doc/$PRGNAM}
 cd $TMP/$PRGNAM-$VERSION
-cp $PRGNAM fltk/Nut $PKG$PREFIX/bin
-( cd $PKG$PREFIX/bin
-    ln -s Nut $PRGNAM-fltk
-)
+cp $PRGNAM $PKG$PREFIX/bin
+if [ "x$FLTK" != "xNO" ]; then
+	cp fltk/Nut $PKG$PREFIX/bin
+	( cd $PKG$PREFIX/bin
+		ln -s Nut $PRGNAM-fltk
+	)
+fi
 cp $PRGNAM.1 $PKG$PREFIX/man/man1
 cp raw.data/* $PKG$PREFIX/lib$LIBSUFFIX/$PRGNAM
 cp $(ls | grep "[A-Z][^a-z]") nut.html nut.xpm $PKG$PREFIX/doc/$PRGNAM
