@@ -68,7 +68,7 @@ done
 
 mkdir -p $PKG$PREFIX/share/emacs/$EMACS_VERSION/etc/themes $PKG$PREFIX/share/emacs/site-lisp/
 cd $PKG$PREFIX/share/emacs/site-lisp/
-cp $CWD/els/*.el .
+cp $CWD/els/*.el $CWD/*.el .
 $EMACS -batch -f batch-byte-compile *.el
 cd $PKG$PREFIX/share/emacs/$EMACS_VERSION/etc/themes
 cp $CWD/themes/*.el .
