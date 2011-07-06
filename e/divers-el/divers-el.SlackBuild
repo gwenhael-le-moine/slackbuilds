@@ -49,7 +49,6 @@ for el in \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
     "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
     "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
-    "http://damtp.cam.ac.uk/user/sje30/emacs/ell.el" \
     "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
     "http://www.bobnewell.net/elisp/speedread.el" \
     "http://www.ccs.neu.edu/home/guttman/undoc.el" \
