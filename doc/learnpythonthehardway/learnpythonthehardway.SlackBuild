@@ -24,7 +24,7 @@ rm -fr $PKG
 if [ ! -e $REPOSITORIES/$PRGNAM ]; then
     mkdir -p $REPOSITORIES/$PRGNAM
     ( cd $REPOSITORIES/$PRGNAM
-        httrack http://learnpythonthehardway.org/book/
+        httrack http://learnpythonthehardway.org/book/ -*.dmg -*.exe +*.txt
     )
 else
     ( cd $REPOSITORIES/$PRGNAM
