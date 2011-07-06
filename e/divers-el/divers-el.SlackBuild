@@ -47,7 +47,6 @@ for el in \
     "http://mumble.net/~campbell/emacs/paredit.el" \
     "http://nschum.de/src/emacs/guess-style/guess-style.el" \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
-    "http://live.gnome.org/Vala/Emacs?action=AttachFile&do=get&target=vala-mode.el" \
     "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
     "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
     "http://www.bobnewell.net/elisp/speedread.el" \
