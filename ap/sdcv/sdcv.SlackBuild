@@ -17,16 +17,21 @@ GZBZ2="bz2"
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
+REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+
 rm -rf $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
+
 cd $TMP
 
-# CLI version
-if [ -e $CWD/sdcv-$VERSION.tar.$GZBZ2 ] ; then
-      tar xvf $CWD/sdcv-$VERSION.tar.$GZBZ2
+if [ ! -e $REPOSITORY ] ; then
+      svn co https://sdcv.svn.sourceforge.net/svnroot/sdcv/trunk $REPOSITORY
 else
-      svn co https://sdcv.svn.sourceforge.net/svnroot/sdcv/trunk sdcv-$VERSION
+	( cd $REPOSITORY
+		svn update
+	)
 fi
+cp -R $REPOSITORY sdcv-$VERSION
 cd sdcv-$VERSION
 
 zcat $CWD/sdcv_x86_64.patch.gz | patch -p1
