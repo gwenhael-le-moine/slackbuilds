@@ -69,7 +69,8 @@ sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 ( cd scripts
-	for i in *;do
+	mv README ../README.scripts
+	for i in *; do
 		cp -a $i $PKG/usr/bin/ledger-$i
 	done
 )
@@ -80,7 +81,7 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" \
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
 cp -a \
-  LICENSE NEWS README TODO \
+  LICENSE NEWS README TODO README.scripts \
   $PKG/usr/doc/$PRGNAM-$VERSION
 
 rm -f $PKG/usr/info/dir
