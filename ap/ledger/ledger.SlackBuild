@@ -8,7 +8,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:=2.6.3} #$(date +%Y.%m.%d_%H.%M)}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-cyco}
 
 # REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
@@ -68,6 +68,12 @@ sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
+( cd scripts
+	for i in *;do
+		cp -a $i $PKG/usr/bin/ledger-$i
+	done
+)
+
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
@@ -76,7 +82,6 @@ mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
 cp -a \
   LICENSE NEWS README TODO \
   $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a scripts/* $PKG/usr/doc/$PRGNAM-$VERSION/scripts
 
 rm -f $PKG/usr/info/dir
 gzip -9 $PKG/usr/info/*.info*
