@@ -1,0 +1,58 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=$(uname -m)
+
+REPOSITORIES=/home/cycojesus/projets/packages/repositories
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+( cd $REPOSITORIES
+    if [ -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES/$PRGNAM
+            git pull
+        )
+    else
+        git clone https://github.com/autotelicum/Smooth-CoffeeScript.git $REPOSITORIES/$PRGNAM
+    fi
+)
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (CoffeeScript book)
+$PRGNAM: 
+$PRGNAM: Smooth CoffeeScript is a free book about CoffeeScript and programming.
+$PRGNAM: Over 200 pages to guide you and 35 exercises to solve.
+$PRGNAM: 
+$PRGNAM: Go from scratch through functional programming in Underscore over object
+$PRGNAM: orientation to a client and server web application with HTML5 Canvas
+$PRGNAM: and WebSockets.
+$PRGNAM: 
+$PRGNAM: http://autotelicum.github.com/Smooth-CoffeeScript/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+)
