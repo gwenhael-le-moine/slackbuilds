@@ -3,7 +3,7 @@
 # variables
 VERSION=${VERSION:=$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:=1}
-GIT_TAG=${GIT_TAG:=1.4.0}
+GIT_TAG=${GIT_TAG:=latest}
 
 TAG=${TAG:=cyco}
 OUTPUT=${OUTPUT:=/tmp}
@@ -40,6 +40,9 @@ mkdir -p $PKG
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
 if [ "x$GIT_TAG" != "x" ]; then
+	if [ "x$GIT_TAG" == "xlatest" ]; then
+		GIT_TAG=$(git tag | tail -n1 | grep -o "[0-9\.]*")
+	fi
 	git checkout malabar-$GIT_TAG
 	VERSION=$GIT_TAG
 fi
