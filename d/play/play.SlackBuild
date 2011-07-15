@@ -1,0 +1,52 @@
+#!/bin/sh
+set -x -e
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+ARCH=java
+VERSION=1.2.2
+BUILD=1
+
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+[ ! -e $CWD/$PRGNAM-$VERSION.zip ] && wget -c -O $CWD/$PRGNAM-$VERSION.zip http://download.playframework.org/releases/$PRGNAM-$VERSION.zip
+
+# unpacking
+mkdir -p $PKG/opt $PKG$PREFIX/doc/$PRGNAM $PKG$PREFIX/bin
+cd $PKG/opt
+unzip $CWD/$PRGNAM-$VERSION.zip
+cd $PRGNAM-$VERSION
+rm play.bat
+cd $PKG$PREFIX/doc/$PRGNAM
+ln -s ../../../opt/$PRGNAM-$VERSION/COPYING
+ln -s ../../../opt/$PRGNAM-$VERSION/README.textile
+ln -s ../../../opt/$PRGNAM-$VERSION/documentation
+cd $PKG$PREFIX/bin
+ln -s ../../../opt/$PRGNAM-$VERSION/play
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Java Web framework)
+$PRGNAM: 
+$PRGNAM: The Play framework makes it easier to build Web applications with Java
+$PRGNAM: and Scala.
+$PRGNAM: 
+$PRGNAM: Finally a Java Web framework made by Web developers. Discover a clean
+$PRGNAM: alternative to bloated enterprise Java stacks. Play focuses on developer
+$PRGNAM: productivity and targets RESTful architectures.
+$PRGNAM: 
+$PRGNAM: http://www.playframework.org/
+$PRGNAM: 
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
