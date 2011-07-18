@@ -36,7 +36,7 @@ ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
 
-X_TOOLKIT=${X_TOOLKIT:=gtk}
+X_TOOLKIT=${X_TOOLKIT:=lucid}
 
 if [ "$ARCH" = "i486" ]; then
   SLKCFLAGS="-O2 -march=i486 -mtune=i686"
