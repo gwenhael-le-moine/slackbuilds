@@ -9,7 +9,7 @@ BUILD=1
 
 ARCH=$(uname -m)
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 TAG=cyco
 TMP=/tmp/$TAG

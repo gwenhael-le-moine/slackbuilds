@@ -34,7 +34,7 @@ OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-${PKGNAM}
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 if [ "$ARCH" = "i486" ]; then
   SLKCFLAGS="-O2 -march=i486 -mtune=i686"

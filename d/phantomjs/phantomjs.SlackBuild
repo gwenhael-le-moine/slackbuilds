@@ -14,7 +14,7 @@ TAG=${TAG:-cyco}
 
 PREFIX=/usr
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 if [ "$ARCH" = "i486" ]; then
    SLKCFLAGS="-O2 -march=i486 -mtune=i686"

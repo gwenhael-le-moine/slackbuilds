@@ -32,7 +32,7 @@ TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-gimp
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 rm -rf $PKG
 mkdir -p $TMP $PKG

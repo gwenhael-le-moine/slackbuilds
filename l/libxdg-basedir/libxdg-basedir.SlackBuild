@@ -18,7 +18,7 @@ DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
 ARCH=$(uname -m)
 BUILD=1
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 PREFIX=/usr
 

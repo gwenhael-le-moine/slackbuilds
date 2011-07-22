@@ -19,7 +19,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+REPOSITORIES=/home/installs/SlackBuilds/repositories/
 
 # Cleaning
 ( cd $TMP

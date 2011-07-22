@@ -15,7 +15,7 @@ PKG=${PKG:=$TMP/pkg-$PRGNAM}
 
 ARCH=${ARCH:=java}
 
-REPOSITORY=${REPOSITORY:=/home/cycojesus/projets/packages/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
 PREFIX=${PREFIX:=/usr}
 
 EMACS=$(basename $(ls /usr/bin/emacs-2*))

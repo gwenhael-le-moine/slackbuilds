@@ -17,7 +17,7 @@ GZBZ2="bz2"
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 rm -rf $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG

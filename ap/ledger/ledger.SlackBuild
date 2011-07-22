@@ -11,7 +11,7 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
 TAG=${TAG:-cyco}
 
-# REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+# REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

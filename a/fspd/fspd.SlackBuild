@@ -16,7 +16,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 PREFIX=/usr
 
 # nettoyage préalable

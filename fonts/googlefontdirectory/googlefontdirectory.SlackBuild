@@ -14,7 +14,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+REPOSITORIES=/home/installs/SlackBuilds/repositories/
 
 # Create working directories:
 mkdir -p $OUTPUT          # place for the package to be saved

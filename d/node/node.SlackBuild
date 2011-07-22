@@ -9,7 +9,7 @@ BUILD=${BUILD:-1cyco}
 
 NUMJOBS=${NUMJOBS:-" -j2 "}
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 PREFIX=/usr
 

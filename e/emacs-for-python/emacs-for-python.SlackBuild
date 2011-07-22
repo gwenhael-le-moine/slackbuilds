@@ -14,7 +14,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORY=/home/cycojesus/projets/packages/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 PREFIX=/usr
 
 EMACS=$(basename $(ls /usr/bin/emacs-2*))

@@ -6,7 +6,7 @@ TAG=cyco
 TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM

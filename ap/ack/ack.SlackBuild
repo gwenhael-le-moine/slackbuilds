@@ -25,7 +25,7 @@ PREFIX=/usr
 
 SLCKFLAGS="-fPIC -O2"
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM-$VERSION
 

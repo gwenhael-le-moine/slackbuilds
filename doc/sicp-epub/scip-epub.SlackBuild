@@ -17,7 +17,7 @@ ARCH=${ARCH:-noarch}
 
 PREFIX=${PREFIX:-/usr}
 
-REPOSITORY=${REPOSITORY:=/home/cycojesus/projets/packages/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
 
 # nettoyage préalable
 rm -fr $PKG

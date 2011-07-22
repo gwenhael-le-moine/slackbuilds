@@ -11,7 +11,7 @@ PKG=$TMP/pkg-$PRGNAM
 VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1cyco}
-REPOSITORIES=/home/cycojesus/projets/packages/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 NUMJOBS=${NUMJOBS:-" -j2 "}
 

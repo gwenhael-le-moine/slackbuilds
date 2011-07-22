@@ -16,7 +16,7 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORIES=/home/cycojesus/projets/packages/repositories/
+REPOSITORIES=/home/installs/SlackBuilds/repositories/
 
 PREFIX=/usr
 
