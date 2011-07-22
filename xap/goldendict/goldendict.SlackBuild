@@ -1,0 +1,56 @@
+ #!/bin/sh
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%Y.%m.%d_%H.%M)
+BUILD=1
+
+
+ARCH=$(uname -m)
+
+HOME=/home/cycojesus
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+REPOSITORIES=$HOME/projets/packages/repositories
+
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+[ -e $PKG ] && rm -fr $PKG
+
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    git clone https://github.com/goldendict/goldendict.git $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+fi
+cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+
+cd $TMP/$PRGNAM-$VERSION
+qmake
+sed -i 's|usr/local|usr|g' Makefile
+make
+make install INSTALL_ROOT=$PKG
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install
+$PRGNAM: $PRGNAM (dictionary lookup program)
+$PRGNAM: 
+$PRGNAM: A feature-rich dictionary lookup program, supporting multiple dictionary
+$PRGNAM: formats (StarDict/Babylon/Lingvo/Dictd) and online dictionaries, featuring
+$PRGNAM: perfect article rendering with the complete markup, illustrations and other
+$PRGNAM: content retained, and allowing you to type in words without any accents or
+$PRGNAM: correct case.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://goldendict.org/
+$PRGNAM: 
+EOF
+
+
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
+
