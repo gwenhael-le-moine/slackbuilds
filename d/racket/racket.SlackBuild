@@ -4,19 +4,19 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=5.1.1
+VERSION=${VERSION:=5.1.2}
 
-BUILD=1
+BUILD=${BUILD:=1}
 
-ARCH=$(uname -m)
+ARCH=${ARCH:=$(uname -m)}
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
-TAG=cyco
-OUTPUT=/tmp
-TMP=/tmp/$TAG
+TAG=${TAG:=cyco}
+OUTPUT=${OUTPUT:=/tmp}
+TMP=${TMP:=/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 
-PREFIX=/usr
+PREFIX=${PREFIX:=/usr}
 
 # Cleaning
 rm -fr $TMP/$PRGNAM-$VERSION $PKG
