@@ -6,12 +6,13 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:=2.6.3} #$(date +%Y.%m.%d_%H.%M)}
+BRANCH=${BRANCH:="BETA"}
+VERSION=${VERSION:=2.6.3}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
 TAG=${TAG:-cyco}
 
-# REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
@@ -30,21 +31,21 @@ fi
 rm -rf $PKG
 mkdir -p $TMP $PKG/usr
 cd $TMP
-rm -rf $PRGNAM-$VERSION
+rm -rf $PRGNAM
 
-# if [ ! -e $REPOSITORY ]; then
-# 	git clone https://github.com/jwiegley/ledger.git $REPOSITORY
-# else
-# 	( cd $REPOSITORY
-# 		git pull
-# 	)
-# fi
-# cp -R $REPOSITORY $PRGNAM-$VERSION
+if [ ! -e $REPOSITORY ]; then
+	git clone https://github.com/jwiegley/ledger.git $REPOSITORY
+else
+	( cd $REPOSITORY
+		git pull
+	)
+fi
+cp -R $REPOSITORY $PRGNAM
 
-[ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c -O $CWD/$PRGNAM-$VERSION.tar.gz http://cloud.github.com/downloads/jwiegley/$PRGNAM/$PRGNAM-$VERSION.tar.gz
-tar xvf $CWD/$PRGNAM-$VERSION.tar.gz || exit 1
+# [ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c -O $CWD/$PRGNAM-$VERSION.tar.gz http://cloud.github.com/downloads/jwiegley/$PRGNAM/$PRGNAM-$VERSION.tar.gz
+# tar xvf $CWD/$PRGNAM-$VERSION.tar.gz || exit 1
 
-cd $PRGNAM-$VERSION || exit 1
+cd $PRGNAM || exit 1
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -52,8 +53,31 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
+case $BRANCH in
+	"RELEASE")
+		git checkout v$VERSION
+		;;
+	"CURRENT")
+		git checkout maint
+		;;
+	"BETA")
+		git checkout -b master origin/master
+		;;
+	"ALPHA")
+# 		git checkout -b next origin/next
+ 		git checkout next
+	;;
+	*)
+esac
+[ $BRANCH != "RELEASE" ] && VERSION=${BRANCH}_$(date +%Y.%m.%d_%H.%M)
+
+# we might be held behind a firewall
+sed -i 's|git:|https:|g' $(grep -l "git:" .* -r)
+
+./acprep pull
+
 # we're old fashioned like this
-# ./acprep autoconf
+./acprep autoconf
 
 CFLAGS="$SLKCFLAGS" \
 ./configure \
@@ -68,12 +92,12 @@ sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
-( cd scripts
-	mv README ../README.scripts
-	for i in *; do
-		cp -a $i $PKG/usr/bin/ledger-$i
-	done
-)
+# ( cd scripts
+# 	mv README ../README.scripts
+# 	for i in *; do
+# 		cp -a $i $PKG/usr/bin/ledger-$i
+# 	done
+# )
 
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
