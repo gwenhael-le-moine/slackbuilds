@@ -1,0 +1,58 @@
+#!/bin/sh
+set -x -e
+
+CWD=$(pwd)
+
+PRGNAM=${PRGNAM:=$(basename $CWD)}
+ARCH=${ARCH:=java}
+VERSION=${VERSION:=1.6.3}
+BUILD=${BUILD:=1}
+
+
+TAG=${TAG:=cyco}
+OUTPUT=${OUTPUT:=/tmp}
+TMP=${TMP:=/tmp/$TAG}
+PKG=${PKG:=$TMP/pkg-$PRGNAM}
+PREFIX=${PREFIX:=/usr}
+
+# cleaning
+rm -fr $PKG
+
+[ ! -e $CWD/$PRGNAM-bin-$VERSION.tar.gz ] && wget -c -O $CWD/$PRGNAM-bin-$VERSION.tar.gz http://jruby.org.s3.amazonaws.com/downloads/$VERSION/jruby-bin-$VERSION.tar.gz
+
+# unpacking
+mkdir -p $PKG$PREFIX/libexec/
+( cd $PKG$PREFIX/libexec/
+    tar xf $CWD/$PRGNAM-bin-$VERSION.tar.gz
+	ln -s $PRGNAM-$VERSION $PRGNAM
+)
+
+# installation
+mkdir -p $PKG/etc/profile.d
+cat <<EOF > $PKG/etc/profile.d/$PRGNAM.sh
+#!/bin/sh
+export PATH=\$PATH:$PKG$PREFIX/libexec/$PRGNAM-$VERSION/
+EOF
+cat <<EOF > $PKG/etc/profile.d/$PRGNAM.csh
+#!/bin/csh
+setenv PATH \$PATH:$PKG$PREFIX/libexec/$PRGNAM-$VERSION/
+EOF
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Ruby on the JVM)
+$PRGNAM: 
+$PRGNAM: 100% Pure-Java Implementation of the Ruby Programming Language
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.jruby.org/
+$PRGNAM: 
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
