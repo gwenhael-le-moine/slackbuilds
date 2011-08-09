@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=${PRGNAM:=$(basename $CWD)}
 ARCH=${ARCH:=java}
 VERSION=${VERSION:=1.6.3}
-BUILD=${BUILD:=1}
+BUILD=${BUILD:=2}
 
 
 TAG=${TAG:=cyco}
@@ -25,18 +25,20 @@ mkdir -p $PKG$PREFIX/libexec/
 ( cd $PKG$PREFIX/libexec/
     tar xf $CWD/$PRGNAM-bin-$VERSION.tar.gz
 	ln -s $PRGNAM-$VERSION $PRGNAM
+	rm $PRGNAM-$VERSION/bin/*.bat
 )
 
 # installation
 mkdir -p $PKG/etc/profile.d
 cat <<EOF > $PKG/etc/profile.d/$PRGNAM.sh
 #!/bin/sh
-export PATH=\$PATH:$PKG$PREFIX/libexec/$PRGNAM-$VERSION/
+export PATH=\$PATH:$PKG$PREFIX/libexec/$PRGNAM-$VERSION/bin/
 EOF
 cat <<EOF > $PKG/etc/profile.d/$PRGNAM.csh
 #!/bin/csh
-setenv PATH \$PATH:$PKG$PREFIX/libexec/$PRGNAM-$VERSION/
+setenv PATH \$PATH:$PKG$PREFIX/libexec/$PRGNAM-$VERSION/bin/
 EOF
+chmod +x $PKG/etc/profile.d/$PRGNAM.*sh
 
 # packaging
 cd $PKG
