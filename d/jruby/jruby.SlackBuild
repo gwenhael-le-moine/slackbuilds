@@ -4,7 +4,7 @@ set -x -e
 CWD=$(pwd)
 
 PRGNAM=${PRGNAM:=$(basename $CWD)}
-ARCH=${ARCH:=java}
+ARCH=${ARCH:=$(uname -m)}
 VERSION=${VERSION:=1.6.3}
 BUILD=${BUILD:=2}
 
@@ -26,6 +26,12 @@ mkdir -p $PKG$PREFIX/libexec/
     tar xf $CWD/$PRGNAM-bin-$VERSION.tar.gz
 	ln -s $PRGNAM-$VERSION $PRGNAM
 	rm $PRGNAM-$VERSION/bin/*.bat
+	rm -fr $PKG$PREFIX/libexec/$PRGNAM-$VERSION/lib/native/{Darwin,i386-FreeBSD,i386-OpenBSD,i386-SunOS,i386-Windows,ppc-AIX,sparc-SunOS,sparcv9-SunOS,x86_64-FreeBSD,x86_64-OpenBSD,x86_64-SunOS,x86_64-Windows}
+	if [ "x$ARCH" == "xx86_64" ]; then
+		rm -fr $PKG$PREFIX/libexec/$PRGNAM-$VERSION/lib/native/i386-Linux/
+	else
+		rm -fr $PKG$PREFIX/libexec/$PRGNAM-$VERSION/lib/native/x86_64-Linux/
+	fi
 )
 
 # installation
