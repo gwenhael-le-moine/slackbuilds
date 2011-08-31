@@ -1,0 +1,54 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y%m%d")
+BUILD=1
+
+ARCH=noarch
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+mkdir -p $REPOSITORIES/$PRGNAM/
+for i in ${VERSION}-go.pdf ${VERSION}-go-kindle.pdf; do
+	if [ ! -e $REPOSITORIES/$PRGNAM/$i ]; then
+		find $REPOSITORIES/$PRGNAM/ -name *${i#$VERSION} -delete
+		wget -c -O $REPOSITORIES/$PRGNAM/$i http://www.miek.nl/files/go/$i
+	fi
+done
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R $REPOSITORIES/$PRGNAM/${VERSION}-go*.pdf $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (eBook to learn Go)
+$PRGNAM: 
+$PRGNAM: "Learning Go" is a book that gives an introduction into the Go language
+$PRGNAM: of Google. It is licensed under a copy-left license.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.miek.nl/projects/learninggo/index.html
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+)
