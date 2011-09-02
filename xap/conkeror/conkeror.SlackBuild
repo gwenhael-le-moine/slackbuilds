@@ -22,7 +22,7 @@ if [ -e $REPOSITORIES/$PRGNAM ] ; then
         git pull
     )
 else
-    git clone git://repo.or.cz/conkeror.git $REPOSITORIES/$PRGNAM
+    git clone http://repo.or.cz/r/conkeror.git $REPOSITORIES/$PRGNAM
 fi
 
 mkdir -p $PKG$PREFIX/libexec/
