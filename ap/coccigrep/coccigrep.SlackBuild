@@ -1,0 +1,72 @@
+#!/bin/sh -x
+
+# variables
+TAG=cyco
+TMP=/tmp/$TAG
+CWD=$(pwd)
+OUTPUT=/tmp
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+VERSION=$(date +%Y.%m.%d_%H.%M)
+
+DOCS="ChangeLog INSTALL LICENSE README.rst doc/ editors/"
+
+ARCH=$(uname -m)
+BUILD=1
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+    git clone https://github.com/regit/coccigrep.git $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+fi
+cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+
+# installation
+python ./setup.py install --root=$PKG
+
+mkdir -p mkdir -p $PKG/usr/share/emacs/site-lisp/
+cp editors/*.el $PKG/usr/share/emacs/site-lisp/
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Semantic grep for the C language)
+$PRGNAM:
+$PRGNAM: coccigrep is a semantic grep for the C language based on coccinelle
+$PRGNAM: (http://coccinelle.lip6.fr). It can be used to find where a given structure
+$PRGNAM: is used in code files. coccigrep depends on the spatch program which comes
+$PRGNAM: with coccinelle.
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: http://home.regit.org/software/coccigrep/
+$PRGNAM: 
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
