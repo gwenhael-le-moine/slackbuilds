@@ -41,7 +41,7 @@ cat <<EOF > install/slack-desc
 $PKGNAM: $PKGNAM (Cycojesus' post-install configuration)
 $PKGNAM:
 $PKGNAM: 
-$PKGNAM:
+$PKGNAM: 
 $PKGNAM: 
 $PKGNAM: 
 $PKGNAM:
