@@ -29,9 +29,8 @@ cd $PRGNAM-$VERSION
 [ -e play.bat ] && rm play.bat
 chmod +x play
 cd $PKG$PREFIX/doc/$PRGNAM
-ln -s ../../../opt/$PRGNAM-$VERSION/COPYING
 ln -s ../../../opt/$PRGNAM-$VERSION/README.textile
-ln -s ../../../opt/$PRGNAM-$VERSION/documentation
+ln -s ../../../opt/$PRGNAM-$VERSION/samples
 cd $PKG$PREFIX/bin
 ln -s ../../../opt/$PRGNAM-$VERSION/play
 
