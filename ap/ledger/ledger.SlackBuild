@@ -42,9 +42,6 @@ else
 fi
 cp -R $REPOSITORY $PRGNAM
 
-# [ ! -e $CWD/$PRGNAM-$VERSION.tar.gz ] && wget -c -O $CWD/$PRGNAM-$VERSION.tar.gz http://cloud.github.com/downloads/jwiegley/$PRGNAM/$PRGNAM-$VERSION.tar.gz
-# tar xvf $CWD/$PRGNAM-$VERSION.tar.gz || exit 1
-
 cd $PRGNAM || exit 1
 chown -R root:root .
 find . \
@@ -83,6 +80,7 @@ CFLAGS="$SLKCFLAGS" \
 ./configure \
   --prefix=/usr \
   --infodir=/usr/info \
+  --mandir=/usr/man \
   --libdir=/usr/lib${LIBDIRSUFFIX} \
   --localstatedir=/var \
   --build=$ARCH-slackware-linux
@@ -92,21 +90,23 @@ sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
-# ( cd scripts
-# 	mv README ../README.scripts
-# 	for i in *; do
-# 		cp -a $i $PKG/usr/bin/ledger-$i
-# 	done
-# )
+
+# mv $PKG/usr/share/man $PKG/usr/
+find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
+cp -a \
+  LICENSE NEWS README TODO contrib/ \
+  $PKG/usr/doc/$PRGNAM-$VERSION
+( cd $PKG/usr/bin
+	for i in report; do
+		ln -s ../doc/$PRGNAM-$VERSION/contrib/$i ledger-$i
+	done
+)
 
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
-cp -a \
-  LICENSE NEWS README TODO README.scripts \
-  $PKG/usr/doc/$PRGNAM-$VERSION
 
 rm -f $PKG/usr/info/dir
 gzip -9 $PKG/usr/info/*.info*
