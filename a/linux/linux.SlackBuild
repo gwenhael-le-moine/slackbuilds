@@ -15,7 +15,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-NUMJOBS=${NUMJOBS:-" -j2 "}
+NUMJOBS=${NUMJOBS:-" -j4 "}
 
 SRC_URL="http://www.kernel.org/pub/linux/kernel/v$(echo  \"$VERSION\" | sed 's|\([0-9]*\.[0-9]*\).*|\1|')$(echo \"$VERSION\" | grep -q \"\-rc\" && echo \"/testing\" )"
 

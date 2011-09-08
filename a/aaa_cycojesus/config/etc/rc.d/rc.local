@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.local:  Local system initialization script.
+#
+# Put any local startup commands in here.  Also, if you have
+# anything that needs to be run at shutdown time you can
+# make an /etc/rc.d/rc.local_shutdown script and put those
+# commands in there.
+
+# Start vboxdrv
+# If you do not wish this to be executed here then comment it out,
+# and the installer will skip it next time.
+if [ -x /etc/rc.d/rc.vboxdrv ]; then
+    /etc/rc.d/rc.vboxdrv start
+fi
+
+# Start vboxballoonctrl-service
+# If you do not wish this to be executed here then comment it out,
+# and the installer will skip it next time.
+if [ -x /etc/rc.d/rc.vboxballoonctrl-service ]; then
+    /etc/rc.d/rc.vboxballoonctrl-service start
+fi
+
+# Start vboxweb-service
+# If you do not wish this to be executed here then comment it out,
+# and the installer will skip it next time.
+if [ -x /etc/rc.d/rc.vboxweb-service ]; then
+    /etc/rc.d/rc.vboxweb-service start
+fi
+
