@@ -59,7 +59,8 @@ done
 cd $CWD/themes
 for el in \
     "https://github.com/monotux/emacs-d/raw/master/themes/whiteboard-theme.el" \
-    "https://github.com/djcb/elisp/raw/master/themes/zenburn-theme.el" ;
+	"https://raw.github.com/bbatsov/zenburn-emacs/master/zenburn-theme.el";
+#    "https://github.com/djcb/elisp/raw/master/themes/zenburn-theme.el" ;
 do
     elfileget_or_update "$el"
 done
