@@ -51,7 +51,8 @@ for el in \
     "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
     "http://www.bobnewell.net/elisp/speedread.el" \
     "http://www.ccs.neu.edu/home/guttman/undoc.el" \
-    "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" ;
+    "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" \
+	"http://jblevins.org/projects/deft/deft.el" ;
 do
     elfileget_or_update "$el"
 done
@@ -60,7 +61,6 @@ cd $CWD/themes
 for el in \
     "https://github.com/monotux/emacs-d/raw/master/themes/whiteboard-theme.el" \
 	"https://raw.github.com/bbatsov/zenburn-emacs/master/zenburn-theme.el";
-#    "https://github.com/djcb/elisp/raw/master/themes/zenburn-theme.el" ;
 do
     elfileget_or_update "$el"
 done
