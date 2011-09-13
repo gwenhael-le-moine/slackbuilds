@@ -27,7 +27,7 @@ mkdir -p $TMP
 
 if [ ! -e $REPOSITORY ] ; then
     mkdir -p $(dirname $REPOSITORY)
-    git clone "git://repo.or.cz/cboard.git" $REPOSITORY
+    git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
 else
     ( cd $REPOSITORY
         git pull

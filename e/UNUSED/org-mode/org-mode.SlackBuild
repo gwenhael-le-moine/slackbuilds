@@ -2,7 +2,7 @@
 
 # variables
 BRANCH=master
-VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 
@@ -29,33 +29,31 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
-        mkdir -p $(dirname $REPOSITORY)
-        cd $(dirname $REPOSITORY)
-        git clone git://repo.or.cz/org-mode.git
+    git clone http://repo.or.cz/r/org-mode.git $REPOSITORY
+else
+	( cd $REPOSITORY
+		git pull
+	)
 fi
 
-( cd $REPOSITORY
-    git pull
-)
-
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-( cd $TMP/$PRGNAM-$VERSION
-    sed -i "s|EMACS=emacs|EMACS=$EMACS|" Makefile
-    sed -i "s|prefix=/usr/local|prefix=$PREFIX|" Makefile
-    sed -i 's|infodir = $(prefix)/share/info|infodir = $(prefix)/info|' Makefile
-    make
+cd $TMP/$PRGNAM-$VERSION
+sed -i "s|EMACS=emacs|EMACS=$EMACS|" Makefile
+sed -i "s|prefix=/usr/local|prefix=$PREFIX|" Makefile
+sed -i 's|infodir = $(prefix)/share/info|infodir = $(prefix)/info|' Makefile
+make
 
     # installation
-    sed -i "s|prefix=$PREFIX|prefix=$PKG$PREFIX|" Makefile
+sed -i "s|prefix=$PREFIX|prefix=$PKG$PREFIX|" Makefile
 
     # May we have your ATTENTION please:
     # next line Emacs' bundled org-mode TO BE REPLACED !!
     #sed -i "s|lispdir = \$(prefix)/share/emacs/site-lisp|lispdir = \$(prefix)/share/emacs/$EMACS_VERSION/lisp/org|" Makefile
     # you can now resume your normal existence, cảm ơn lắm.
 
-    make install
-    make install-info
-    rm $PKG$PREFIX/info/dir
+make install
+make install-info
+rm $PKG$PREFIX/info/dir
 
     # # install contrib
     # cp -R contrib/lisp $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib
@@ -68,22 +66,20 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
     # ( cd $PKG$PREFIX/share/emacs/site-lisp/org-mode-contrib/babel
     #     emacs -batch -f batch-byte-compile-file *.el
     # )
-    mkdir -p $PKG$PREFIX/doc/$PRGNAM
-    cp -R contrib $PKG$PREFIX/doc/$PRGNAM
-)
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R contrib $PKG$PREFIX/doc/$PRGNAM
 
 # correction
-( cd $PKG
-    chown -R root:root *
+cd $PKG
+chown -R root:root *
 
-    [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-    [ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*" -exec gzip -9f {} \;
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d $PKG/usr/info ] && find $PKG/usr/info -type f -name "*" -exec gzip -9f {} \;
     # [ -d $PKG$PREFIX/share/emacs/$EMACS_VERSION/lisp/org ] && \
     #     find $PKG$PREFIX/share/emacs/$EMACS_VERSION/lisp/org -type f -name "*.el" -exec gzip -9f {} \;
     # [ -d $PKG$PREFIX/share/emacs/site-lisp ] && \
     #     find $PKG$PREFIX/share/emacs/site-lisp -type f -name "*.el" -exec gzip -9f {} \;
     # gunzip $PKG/usr/info/dir.gz
-)
 
 # embaumement
 mkdir -p $PKG/install
@@ -120,5 +116,4 @@ $PRGNAM: http://orgmode.org/
 EOF
 
 # empaquetage
-cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
