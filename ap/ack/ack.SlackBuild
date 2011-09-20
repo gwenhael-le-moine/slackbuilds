@@ -58,6 +58,9 @@ make install DESTDIR=$PKG
 mv $PKG$PREFIX/share/man $PKG$PREFIX/
 rm -fr $PKG$PREFIX/share/
 
+mkdir -p $PKG/usr/share/zsh/site-functions/
+mv etc/ack.zsh_completion $PKG/usr/share/zsh/site-functions/_ack
+
 # correction
 cd $PKG
 chown -R root:root *
