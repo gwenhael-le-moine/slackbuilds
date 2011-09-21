@@ -25,7 +25,7 @@
 # adapted by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
 PRGNAM=varnish
-VERSION=${VERSION:-2.1.5}
+VERSION=${VERSION:-3.0.1}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
