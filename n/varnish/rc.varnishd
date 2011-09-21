@@ -10,7 +10,7 @@ else
     VARNISH_PIDFILE=/var/run/varnish.pid
     VARNISH_LOCKFILE=/var/lock/subsys/varnish
     VARNISH_DAEMON=/usr/sbin/varnishd
-    VARNISH_PARAM="-p thread_pool_max=1500 -p thread_pools=5 -p listen_depth=512 -p client_http11=off"
+    VARNISH_PARAM="-p thread_pool_max=1500 -p thread_pools=5 -p listen_depth=512"
 
     VARNISH_LOG_PIDFILE=/var/run/varnishlog.pid
     VARNISH_LOG_LOCKFILE=/var/lock/subsys/varnishlog
