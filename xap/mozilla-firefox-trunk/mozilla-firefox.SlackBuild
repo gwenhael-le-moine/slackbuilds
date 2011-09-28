@@ -27,7 +27,7 @@ BRANCH=${BRANCH:=latest-trunk}
 
 if [ $KEEP_TAR == "NO" ]; then
     [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
-    WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date ; quit" | awk '{print $4}' | grep firefox-.\*.en-US.linux-x86_64.tar.bz2 | tail -n1)
+    WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date *.en-US.linux-x86_64.tar.bz2 ; quit" | awk '{print $4}' | head -n1)
     wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
 fi
 
