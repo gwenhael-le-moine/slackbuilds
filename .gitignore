@@ -1,5 +1,6 @@
 repositories/
 *.tar.?z*
+*.deb
 *.zip
 *.tgz
 *.tar
