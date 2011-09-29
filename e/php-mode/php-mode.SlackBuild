@@ -1,9 +1,8 @@
 #!/bin/sh -x
 
 # variables
-VERSION=master_$(date +"%Y.%m.%d_%H.%M")
+VERSION=$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
-
 
 TAG=cyco
 OUTPUT=/tmp
@@ -29,45 +28,29 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
-        mkdir -p $(dirname $REPOSITORY)
-        cd $(dirname $REPOSITORY)
-        svn checkout "https://php-mode.svn.sourceforge.net/svnroot/php-mode/trunk/php-mode-src" $PRGNAM
+        # svn checkout "https://php-mode.svn.sourceforge.net/svnroot/php-mode/trunk/php-mode-src" $REPOSITORY
+		git clone https://github.com/ejmr/php-mode.git $REPOSITORY
+else
+	( cd $REPOSITORY
+    # svn update
+		git pull
+	)
 fi
-
-( cd $REPOSITORY
-    svn update
-)
 
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp
 cp -R $REPOSITORY $PKG$PREFIX/share/emacs/site-lisp
-( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
-    $EMACS -batch -f batch-byte-compile *.el
-    make manuals
-    mkdir -p $PKG$PREFIX/doc/$PRGNAM-$VERSION
-    mv html-manual *.html *.pdf *.ps.gz ChangeLog $PKG$PREFIX/doc/$PRGNAM-$VERSION
-    mkdir -p $PKG$PREFIX/info
-    mv php-mode.info.gz $PKG$PREFIX/info
-    rm -fr $(ls | grep -v \.el)
-    find $PKG -name \.svn -exec rm -fr {} \;
-    find $PKG -name \*\~ -exec rm -fr {} \;
-)
+cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM
+$EMACS -batch -f batch-byte-compile *.el
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+mv Changelog.old $PKG$PREFIX/doc/$PRGNAM
+rm -fr .git
 
 # correction
-( cd $PKG
-    chown -R root:root *
-)
+cd $PKG
+chown -R root:root *
 
 # embaumement
 mkdir -p $PKG/install
-
-cat <<EOF > $PKG/install/doinst.sh
-cd /usr/info
-for file in \$(ls *.gz | grep -v ".*\-[0-9]\+\.gz")
-do
-    install-info \$file ./dir
-done
-EOF
-
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
@@ -85,11 +68,10 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: 
+$PRGNAM: https://github.com/ejmr/php-mode#readme
 $PRGNAM: 
 $PRGNAM: http://php-mode.sourceforge.net/
 EOF
 
 # empaquetage
-cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
