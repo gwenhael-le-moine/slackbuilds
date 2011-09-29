@@ -12,8 +12,7 @@ BUILD=1
 TAG=cyco
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
-
-GZBZ2="bz2"
+OUTPUT=/tmp
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
@@ -80,4 +79,4 @@ EOF
 
 chown -R root:root $PKG
 
-makepkg -c n -l y $TMP/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz || exit $ERROR_MKPKG
+makepkg -c n -l y $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
