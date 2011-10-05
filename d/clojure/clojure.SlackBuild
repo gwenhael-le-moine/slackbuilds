@@ -4,7 +4,7 @@ set -x -e
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-1.3.0-alpha4}
+VERSION=${VERSION:-1.3.0}
 ARCH=${ARCH:-java}
 BUILD=${BUILD:-1}
 
@@ -21,7 +21,7 @@ rm -fr $PKG
 # do we have the sources?
 if [ ! -e $CWD/$PRGNAM-$VERSION.zip ] ; then
    ( cd $CWD
-      wget -c --no-check-certificate http://github.com/downloads/clojure/clojure/$PRGNAM-$VERSION.zip
+      wget -c http://repo1.maven.org/maven2/org/clojure/clojure/$VERSION/clojure-$VERSION.zip
    )
 fi
 
@@ -44,19 +44,18 @@ java -jar $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar \$@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM
 
-( cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
-    mv *.html *.txt test/ $PKG$PREFIX/doc/$PRGNAM-$VERSION
+cd $PKG$PREFIX/libexec/$PRGNAM-$VERSION
+mv doc/ *.html *.txt test/ $PKG$PREFIX/doc/$PRGNAM-$VERSION
 
-    rm *.xml .gitignore
-    rm -r classes src
+rm *.xml #.gitignore
+rm -r src #classes
 
-    rm $PRGNAM.jar
-    ln -s $PRGNAM-$VERSION.jar $PRGNAM.jar
-    rm $PRGNAM-sources.jar
-    ln -s $PRGNAM-sources-$VERSION.jar $PRGNAM-sources.jar
-    rm $PRGNAM-slim.jar
-    ln -s $PRGNAM-slim-$VERSION.jar $PRGNAM-slim.jar
-)
+rm $PRGNAM.jar
+ln -s $PRGNAM-$VERSION.jar $PRGNAM.jar
+    # rm $PRGNAM-sources.jar
+    # ln -s $PRGNAM-sources-$VERSION.jar $PRGNAM-sources.jar
+    # rm $PRGNAM-slim.jar
+    # ln -s $PRGNAM-slim-$VERSION.jar $PRGNAM-slim.jar
 
 # packaging
 cd $PKG

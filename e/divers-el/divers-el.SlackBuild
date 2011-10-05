@@ -39,6 +39,7 @@ elfileget_or_update() {
     
 cd $CWD/els
 for el in \
+	"http://codphilosophy.com/software/auto-indent.el" \
 	"http://kanis.fr/hg/lisp/ivan/verbiste.el" \
     "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
     "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
