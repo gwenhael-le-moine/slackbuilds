@@ -64,6 +64,16 @@ mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
         "jira.el" \
         "folding.el" \
         "sunrise-commander.el" \
+		"sunrise-x-buttons.el" \
+		"sunrise-x-checkpoints.el" \
+		"sunrise-x-loop.el" \
+		"sunrise-x-mirror.el" \
+		"sunrise-x-modeline.el" \
+		"sunrise-x-old-checkpoints.el" \
+		"sunrise-x-popviewer.el" \
+		"sunrise-x-tabs.el" \
+		"sunrise-x-tree.el" \
+		"sunrise-x-w32-addons.el" \
         "typing.el" \
         "wiki.el" \
         "tidy.el" \
