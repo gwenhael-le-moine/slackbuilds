@@ -41,15 +41,12 @@ case "\$1" in
   'start')
     python /var/$PRGNAM/$PRGNAM.py &
     echo \$! > /var/run/$PRGNAM.pid
-    break
   ;;
   'stop')
     [ -e /var/run/$PRGNAM.pid ] && kill <(/var/run/$PRGNAM.pid)
-    break
   ;;
   'restart')
     \$0 stop && sleep 1 && \$0 start
-    break
   ;;
 esac
 EOF
