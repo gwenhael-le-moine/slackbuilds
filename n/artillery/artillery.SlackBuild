@@ -12,7 +12,7 @@ OUTPUT=/tmp
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-ARCH=$(uname -m)
+ARCH=noarch
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
