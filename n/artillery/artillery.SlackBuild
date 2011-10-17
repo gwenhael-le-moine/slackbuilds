@@ -43,10 +43,12 @@ case "\$1" in
     echo \$! > /var/run/$PRGNAM.pid
   ;;
   'stop')
-    [ -e /var/run/$PRGNAM.pid ] && kill <(/var/run/$PRGNAM.pid)
+    [ -e /var/run/$PRGNAM.pid ] && kill \$(cat /var/run/$PRGNAM.pid) && rm /var/run/$PRGNAM.pid
   ;;
   'restart')
-    \$0 stop && sleep 1 && \$0 start
+    \$0 stop
+    sleep 1
+    \$0 start
   ;;
 esac
 EOF
