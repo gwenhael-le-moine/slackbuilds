@@ -7,6 +7,9 @@
 # make an /etc/rc.d/rc.local_shutdown script and put those
 # commands in there.
 
+# dirty hack to let mortals adjust brightness on this laptop
+chmod 666 /sys/class/backlight/intel_backlight/brightness
+
 # Start vboxdrv
 # If you do not wish this to be executed here then comment it out,
 # and the installer will skip it next time.
