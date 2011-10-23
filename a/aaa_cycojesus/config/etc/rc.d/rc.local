@@ -10,6 +10,9 @@
 # dirty hack to let mortals adjust brightness on this laptop
 chmod 666 /sys/class/backlight/intel_backlight/brightness
 
+# no need to keep eth0 busy if it's for nothing
+ifconfig eth0 | grep -q "inet addr:[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" || modprobe -r atl1c
+
 # Start vboxdrv
 # If you do not wish this to be executed here then comment it out,
 # and the installer will skip it next time.
