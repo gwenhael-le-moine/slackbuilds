@@ -56,7 +56,6 @@ cp -R $REPOSITORY $PREFIX/libexec/
     GOROOT=$GOROOT GOBIN=$GOBIN GOOS=$GOOS GOARCH=$GOARCH bash ./all.bash
 
     mv $PREFIX/libexec/$PRGNAM $PKG$PREFIX/libexec/
-    rm -fr $PKG$PREFIX/libexec/go/src
 
     ( cd misc/emacs
         find . -type f -name \*.el -exec emacs -batch -f batch-byte-compile {} \;
