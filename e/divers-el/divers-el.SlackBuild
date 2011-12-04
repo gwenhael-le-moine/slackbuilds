@@ -60,7 +60,8 @@ done
 
 cd $CWD/themes
 for el in \
-    "https://github.com/monotux/emacs-d/raw/master/themes/whiteboard-theme.el";
+    "https://github.com/monotux/emacs-d/raw/master/themes/whiteboard-theme.el" \
+	"http://edward.oconnor.cx/config/elisp/hober2-theme.el" ;
 do
     elfileget_or_update "$el"
 done
