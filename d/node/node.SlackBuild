@@ -7,7 +7,7 @@ VERSION=$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1cyco}
 
-NUMJOBS=${NUMJOBS:-" -j2 "}
+NUMJOBS=${NUMJOBS:-" -j4 "}
 
 REPOSITORIES=/home/installs/SlackBuilds/repositories
 
@@ -15,7 +15,7 @@ PREFIX=/usr
 
 TAG=cyco
 OUTPUT=/tmp
-TMP=${TMP:-/tmp}
+TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -62,7 +62,10 @@ echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscrip
     --prefix=$PREFIX
 
 make $NUMJOBS PREFIX=$PREFIX
-make install DESTDIR=$PKG PREFIX=$PREFIX
+
+sed -i "s|\"node_prefix\": \"/usr\",|\"node_prefix\": \"$PKG/usr\",|g" options.gypi
+
+make install
 mv $PKG$PREFIX/share/man $PKG$PREFIX
 rm -fr $PKG$PREFIX/share
 
