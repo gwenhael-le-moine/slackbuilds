@@ -30,8 +30,8 @@ mkdir -p $PKG$PREFIX/doc/
     || (cd $REPOSITORY; git pull)
 
 cd $PKG$PREFIX/doc/
-cp -R $REPOSITORY $PRGNAM-$VERSION
-cd $PRGNAM-$VERSION
+cp -R $REPOSITORY $PRGNAM
+cd $PRGNAM
 rm -fr .git*
 
 # correction
