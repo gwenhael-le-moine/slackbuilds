@@ -1,0 +1,66 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+BUILD=${BUILD:-1}
+
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
+OUTPUT=${OUTPUT:-/tmp}
+
+PRGNAM=${PRGNAM:-$(basename $CWD)}
+PKG=${PKG:-$TMP/pkg-$PRGNAM}
+
+ARCH=${ARCH:-noarch}
+
+PREFIX=${PREFIX:-/usr}
+
+REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+# nettoyage préalable
+rm -fr $PKG
+
+mkdir -p $PKG$PREFIX/doc/
+
+# mise en place
+[ ! -e $REPOSITORY ] \
+    && git clone https://github.com/charlax/Python-Documentation-Kindle.git $REPOSITORY \
+    || (cd $REPOSITORY; git pull)
+
+cd $PKG$PREFIX/doc/
+cp -R $REPOSITORY $PRGNAM
+cd $PRGNAM
+rm -fr .git*
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (Python documentation on your Kindle)
+$PRGNAM:
+$PRGNAM: This project lets you download a Kindle-optimized version of the
+$PRGNAM: Python documentation. You can also create your own ebook for any
+$PRGNAM: project using Sphinx to generate its documentation.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://github.com/charlax/Python-Documentation-Kindle
+$PRGNAM: 
+EOF
+
+# empaquetage
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
