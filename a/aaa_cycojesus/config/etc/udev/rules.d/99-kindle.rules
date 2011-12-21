@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", SYSFS{idVendor}=="1949", MODE="0666", SYMLINK+="kindle"
