@@ -1,0 +1,55 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%Y.%m.%d_%H.%M)
+BUILD=1
+
+ARCH=$(uname -m)
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+# cleaning
+rm -fr $PKG
+rm -fr $PRGNAM-$VERSION
+mkdir -p $TMP
+
+[ ! -e $REPOSITORY ] \
+	&& git clone https://github.com/kivy/kivy.git $REPOSITORY \
+	|| (cd $REPOSITORY; git pull)
+
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+
+python setup.py build
+python setup.py install --root=$PKG
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R AUTHORS README COPYING doc/ $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (RAD library)
+$PRGNAM: 
+$PRGNAM: Open source library for rapid development of applications
+$PRGNAM: that make use of innovative user interfaces, such as multi-touch apps.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://kivy.org/
+$PRGNAM: 
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
