@@ -28,7 +28,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone https://github.com/jeresig/processing-js.git $REPOSITORIES/$PRGNAM
+        git clone http://github.com/jeresig/processing-js.git $REPOSITORIES/$PRGNAM
     fi
 )
 

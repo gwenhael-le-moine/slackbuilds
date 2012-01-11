@@ -26,7 +26,7 @@ if [ -e $REPOSITORY ] ; then
         git pull
     )
 else
-    git clone https://github.com/diveintomark/diveintohtml5.git $REPOSITORY
+    git clone http://github.com/diveintomark/diveintohtml5.git $REPOSITORY
 fi
 
 mkdir -p $PKG$PREFIX/doc/

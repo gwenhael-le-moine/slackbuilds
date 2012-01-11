@@ -28,7 +28,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone https://github.com/$PRGNAM/$PRGNAM.git $REPOSITORIES/$PRGNAM
+        git clone http://github.com/$PRGNAM/$PRGNAM.git $REPOSITORIES/$PRGNAM
     fi
 )
 

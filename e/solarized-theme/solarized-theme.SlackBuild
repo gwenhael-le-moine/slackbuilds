@@ -31,7 +31,7 @@ if [ -e $REPOSITORY ]; then
         git pull
     )
 else
-	git clone https://github.com/bbatsov/solarized-emacs.git $REPOSITORY
+	git clone http://github.com/bbatsov/solarized-emacs.git $REPOSITORY
 fi
 
 mkdir -p $PKG$PREFIX/share/emacs/{site-lisp/,$EMACS_VERSION/etc/themes/}
@@ -63,7 +63,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/sellout/emacs-color-theme-solarized
+$PRGNAM: http://github.com/sellout/emacs-color-theme-solarized
 $PRGNAM: 
 $PRGNAM: http://ethanschoonover.com/solarized
 $PRGNAM: 

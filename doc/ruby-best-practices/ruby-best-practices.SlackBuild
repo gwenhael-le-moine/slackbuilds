@@ -28,7 +28,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone https://github.com/sandal/rbp-book.git $REPOSITORIES/$PRGNAM
+        git clone http://github.com/sandal/rbp-book.git $REPOSITORIES/$PRGNAM
     fi
 )
 

@@ -29,7 +29,7 @@ mkdir -p $PKG
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
     #git clone git://emacs-jabber.git.sourceforge.net/gitroot/emacs-jabber/emacs-jabber $REPOSITORY
-	git clone https://github.com/semka/emacs-jabber.git $REPOSITORY
+	git clone http://github.com/semka/emacs-jabber.git $REPOSITORY
 else
 	( cd $REPOSITORY
 		git pull

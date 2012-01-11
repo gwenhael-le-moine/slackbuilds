@@ -36,7 +36,7 @@ if [ -e $CWD/$PRGNAM-$VERSION.$EXT ]; then
 else
     [ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
     if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-        git clone https://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
+        git clone http://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
     else
         ( cd $REPOSITORIES/$PRGNAM
             git pull

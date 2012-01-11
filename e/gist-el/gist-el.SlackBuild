@@ -29,7 +29,7 @@ mkdir -p $PKG
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
     mkdir -p $(dirname $REPOSITORY)
-    git clone https://github.com/defunkt/gist.el.git $REPOSITORY
+    git clone http://github.com/defunkt/gist.el.git $REPOSITORY
 else
     ( cd $REPOSITORY
         git pull
@@ -72,7 +72,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/defunkt/gist.el
+$PRGNAM: http://github.com/defunkt/gist.el
 $PRGNAM: 
 EOF
 

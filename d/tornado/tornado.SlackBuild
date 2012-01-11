@@ -22,7 +22,7 @@ rm -fr $PKG
 
 # get sources
 if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-	git clone https://github.com/facebook/tornado.git $REPOSITORIES/$PRGNAM
+	git clone http://github.com/facebook/tornado.git $REPOSITORIES/$PRGNAM
 else
     ( cd $REPOSITORIES/$PRGNAM
 		git pull
