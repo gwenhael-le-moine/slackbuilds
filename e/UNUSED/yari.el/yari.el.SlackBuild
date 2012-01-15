@@ -29,7 +29,7 @@ mkdir -p $PKG
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
     mkdir -p $(dirname $REPOSITORY)
-    git clone https://github.com/hron/yari.el.git $REPOSITORY
+    git clone http://github.com/hron/yari.el.git $REPOSITORY
 else
     ( cd $REPOSITORY
         git pull

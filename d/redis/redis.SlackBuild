@@ -32,7 +32,7 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM-$VERSION
 if [ ! -e $REPOSITORY ]; then
-    git clone https://github.com/antirez/redis.git $REPOSITORY
+    git clone http://github.com/antirez/redis.git $REPOSITORY
 else
     ( cd $REPOSITORY
         git pull

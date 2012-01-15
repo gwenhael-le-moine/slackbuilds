@@ -28,7 +28,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone https://github.com/bryanbibat/rails-3_0-tutorial.git $REPOSITORIES/$PRGNAM
+        git clone http://github.com/bryanbibat/rails-3_0-tutorial.git $REPOSITORIES/$PRGNAM
     fi
 )
 
@@ -48,7 +48,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/bryanbibat/rails-3_0-tutorial
+$PRGNAM: http://github.com/bryanbibat/rails-3_0-tutorial
 $PRGNAM: 
 EOF
 

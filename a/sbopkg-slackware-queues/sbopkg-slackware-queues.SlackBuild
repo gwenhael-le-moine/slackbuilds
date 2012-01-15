@@ -26,7 +26,7 @@ mkdir -p $PKG/var/lib/sbopkg/
 
 # mise en place
 [ ! -e $REPOSITORY ] \
-    && git clone https://git.gitorious.org/sbopkg-slackware-queues/sbopkg-slackware-queues.git $REPOSITORY \
+    && git clone http://git.gitorious.org/sbopkg-slackware-queues/sbopkg-slackware-queues.git $REPOSITORY \
     || (cd $REPOSITORY; git pull)
 
 cd $PKG/var/lib/sbopkg/

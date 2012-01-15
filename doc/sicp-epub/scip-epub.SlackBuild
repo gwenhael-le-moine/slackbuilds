@@ -26,7 +26,7 @@ mkdir -p $PKG$PREFIX/doc/
 
 # mise en place
 [ ! -e $REPOSITORY ] \
-    && git clone https://github.com/ieure/sicp.git $REPOSITORY \
+    && git clone http://github.com/ieure/sicp.git $REPOSITORY \
     || (cd $REPOSITORY; git pull)
 
 cd $PKG$PREFIX/doc/
@@ -60,7 +60,7 @@ $PRGNAM: jacket. One of the bibles of the LISP/Scheme world. Also,
 $PRGNAM: less commonly, known as the Purple Book.
 $PRGNAM: http://mitpress.mit.edu/sicp/
 $PRGNAM: http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/
-$PRGNAM: https://github.com/ieure/sicp
+$PRGNAM: http://github.com/ieure/sicp
 EOF
 
 # empaquetage

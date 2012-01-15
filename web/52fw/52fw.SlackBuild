@@ -28,7 +28,7 @@ rm -fr $PKG
 #             git pull
 #         )
 #     else
-#         git clone https://github.com/bauhouse/fluid960gs.git $REPOSITORIES/$PRGNAM
+#         git clone http://github.com/bauhouse/fluid960gs.git $REPOSITORIES/$PRGNAM
 #     fi
 # )
 

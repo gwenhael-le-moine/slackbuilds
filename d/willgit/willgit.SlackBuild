@@ -29,7 +29,7 @@ cd $TMP
 if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
     mkdir -p $REPOSITORIES
     ( cd $REPOSITORIES
-        git clone https://git.gitorious.org/willgit/mainline.git $PRGNAM
+        git clone http://git.gitorious.org/willgit/mainline.git $PRGNAM
     )
 else
     ( cd $REPOSITORIES/$PRGNAM

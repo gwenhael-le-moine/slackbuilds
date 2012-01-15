@@ -21,7 +21,7 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 [ -e $PKG ] && rm -fr $PKG
 
 if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-    git clone https://github.com/goldendict/goldendict.git $REPOSITORIES/$PRGNAM
+    git clone http://github.com/goldendict/goldendict.git $REPOSITORIES/$PRGNAM
 else
     ( cd $REPOSITORIES/$PRGNAM
         git pull

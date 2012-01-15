@@ -24,7 +24,7 @@ function pull_or_clone() {
             git pull
         )
     else
-        git clone https://github.com/rightjs/$NAM.git $REPOSITORIES/$NAM
+        git clone http://github.com/rightjs/$NAM.git $REPOSITORIES/$NAM
     fi
 }
 

@@ -23,7 +23,7 @@ rm -fr $PRGNAM-$VERSION
 mkdir -p $TMP
 
 [ ! -e $REPOSITORY ] \
-	&& git clone https://github.com/kivy/kivy.git $REPOSITORY \
+	&& git clone http://github.com/kivy/kivy.git $REPOSITORY \
 	|| (cd $REPOSITORY; git pull)
 
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION

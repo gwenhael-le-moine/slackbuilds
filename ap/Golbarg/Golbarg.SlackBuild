@@ -27,7 +27,7 @@ mkdir -p $PKG
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
     mkdir -p $(dirname $REPOSITORY)
-    git clone https://github.com/Schnouki/Golbarg.git $REPOSITORY
+    git clone http://github.com/Schnouki/Golbarg.git $REPOSITORY
 else
 	( cd $REPOSITORY
 		git pull
@@ -75,7 +75,7 @@ $PRGNAM: You can see it in action on my own blog, (source code on Github too).
 $PRGNAM: Golbarg is free software, available under the terms of the GNU GPLv3
 $PRGNAM: license.
 $PRGNAM: 
-$PRGNAM: https://github.com/Schnouki/Golbarg
+$PRGNAM: http://github.com/Schnouki/Golbarg
 $PRGNAM: 
 EOF
 

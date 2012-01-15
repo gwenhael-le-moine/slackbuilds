@@ -28,7 +28,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone https://github.com/shutterstock/rickshaw $REPOSITORIES/$PRGNAM
+        git clone http://github.com/shutterstock/rickshaw $REPOSITORIES/$PRGNAM
     fi
 )
 
@@ -48,7 +48,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/shutterstock/rickshaw
+$PRGNAM: http://github.com/shutterstock/rickshaw
 $PRGNAM: 
 EOF
 

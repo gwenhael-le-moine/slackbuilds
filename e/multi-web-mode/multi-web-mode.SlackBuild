@@ -29,7 +29,7 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
-    git clone https://github.com/fgallina/multi-web-mode.git $REPOSITORY
+    git clone http://github.com/fgallina/multi-web-mode.git $REPOSITORY
 else
 	( cd $REPOSITORY
 		git pull
@@ -68,7 +68,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/fgallina/multi-web-mode
+$PRGNAM: http://github.com/fgallina/multi-web-mode
 $PRGNAM: 
 EOF
 

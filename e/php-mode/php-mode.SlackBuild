@@ -28,8 +28,8 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
-        # svn checkout "https://php-mode.svn.sourceforge.net/svnroot/php-mode/trunk/php-mode-src" $REPOSITORY
-		git clone https://github.com/ejmr/php-mode.git $REPOSITORY
+        # svn checkout "http://php-mode.svn.sourceforge.net/svnroot/php-mode/trunk/php-mode-src" $REPOSITORY
+		git clone http://github.com/ejmr/php-mode.git $REPOSITORY
 else
 	( cd $REPOSITORY
     # svn update
@@ -68,7 +68,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/ejmr/php-mode#readme
+$PRGNAM: http://github.com/ejmr/php-mode#readme
 $PRGNAM: 
 $PRGNAM: http://php-mode.sourceforge.net/
 EOF

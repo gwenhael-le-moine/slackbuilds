@@ -29,7 +29,7 @@ cd $TMP
 if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
     mkdir -p $REPOSITORIES
     ( cd $REPOSITORIES
-        git clone https://github.com/sukria/Dancer.git $PRGNAM
+        git clone http://github.com/sukria/Dancer.git $PRGNAM
     )
 else
     ( cd $REPOSITORIES/$PRGNAM

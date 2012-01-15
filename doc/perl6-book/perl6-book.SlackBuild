@@ -28,7 +28,7 @@ rm -fr $PKG
             git pull
         )
     else
-        git clone https://github.com/perl6/book.git $REPOSITORIES/$PRGNAM
+        git clone http://github.com/perl6/book.git $REPOSITORIES/$PRGNAM
     fi
 )
 
