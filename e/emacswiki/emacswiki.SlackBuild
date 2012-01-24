@@ -38,33 +38,18 @@ cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
 for el in \
 	"task-timer.el" \
 	"no-word.el" \
-	"xml-rpc.el" \
-	"buffer-move.el" \
-	"goto-last-change.el" \
-    "fill-column-indicator.el" \
-    "php-mode-improved.el" \
     "quick-jump.el" \
     "alarm.el" \
-    "multi-term.el" \
     "lusty-explorer.el" \
-    "sml-modeline.el" \
-    "apache-mode.el" \
-    "hexrgb.el" \
     "palette.el" \
-    "pastebin.el" \
     "openpaste.el" \
     "snipplr.el" \
     "legalese.el" \
     "workspaces.el" \
     "auto-complete.el" \
-    "gnugo.el" \
-    "http-post-simple.el" \
-    "facebook.el" \
-    "tumbl.el" \
     "dom.el" \
     "babel.el" \
     "cheezburger.el" \
-    "jira.el" \
     "folding.el" \
     "sunrise-commander.el" \
 	"sunrise-x-buttons.el" \
@@ -76,9 +61,6 @@ for el in \
 	"sunrise-x-popviewer.el" \
 	"sunrise-x-tabs.el" \
 	"sunrise-x-tree.el" \
-    "typing.el" \
-    "wiki.el" \
-    "tidy.el" \
     "fixme-mode.el" \
     "work-timer.el" \
     "showtip.el" \
@@ -86,8 +68,6 @@ for el in \
     "etxt.el" \
     "htmlr.el" \
     "cus-edit+.el" \
-    "xml-rpc.el" \
-    "weblogger.el" \
     "newsticker-notify.el" ;
 do
     [ -e "$PKG$PREFIX/doc/$PRGNAM/$el" ] && ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
