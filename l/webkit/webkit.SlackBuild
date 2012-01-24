@@ -6,7 +6,7 @@ BUILD=1
 
 TAG=cyco
 OUTPUT=/tmp
-TMP=/tmp/$TAG
+TMP=${TMP:=/tmp/$TAG}
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
