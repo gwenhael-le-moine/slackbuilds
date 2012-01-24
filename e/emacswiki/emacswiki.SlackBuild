@@ -1,12 +1,13 @@
 #!/bin/sh
 
-PRGNAM=emacswiki
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
 VERSION=$(date +"%Y.%m.%d_%H.%M")
 BUILD=${BUILD:-1}
 
 ARCH=emacs
 
-CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
@@ -18,90 +19,90 @@ PREFIX=/usr
 rm -rf $PKG
 
 if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-    svn checkout "http://svn.sv.gnu.org/svn/emacswiki/emacswikipages" $REPOSITORIES/$PRGNAM
+    git clone "http://github.com/emacsmirror/emacswiki.org.git" $REPOSITORIES/$PRGNAM
 else
     ( cd $REPOSITORIES/$PRGNAM
-        svn update
+        git pull
     )
 fi
 
 mkdir -p $PKG/$PREFIX/doc/
-( cd $PKG/$PREFIX/doc/
-    cp -R $REPOSITORIES/$PRGNAM $PRGNAM
-    rm -fr $PRGNAM/.svn
-)
+cd $PKG/$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PRGNAM
+cd $PRGNAM
+git checkout master
+rm -fr .git
 
 mkdir -p $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
-( cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
-    for el in \
-		"task-timer.el" \
-		"no-word.el" \
-		"xml-rpc.el" \
-		"buffer-move.el" \
-		"goto-last-change.el" \
-        "fill-column-indicator.el" \
-        "php-mode-improved.el" \
-        "quick-jump.el" \
-        "alarm.el" \
-        "multi-term.el" \
-        "lusty-explorer.el" \
-        "sml-modeline.el" \
-        "apache-mode.el" \
-        "hexrgb.el" \
-        "palette.el" \
-        "pastebin.el" \
-        "openpaste.el" \
-        "snipplr.el" \
-        "legalese.el" \
-        "workspaces.el" \
-        "auto-complete.el" \
-        "gnugo.el" \
-        "http-post-simple.el" \
-        "facebook.el" \
-        "tumbl.el" \
-        "dom.el" \
-        "babel.el" \
-        "cheezburger.el" \
-        "jira.el" \
-        "folding.el" \
-        "sunrise-commander.el" \
-		"sunrise-x-buttons.el" \
-		"sunrise-x-checkpoints.el" \
-		"sunrise-x-loop.el" \
-		"sunrise-x-mirror.el" \
-		"sunrise-x-modeline.el" \
-		"sunrise-x-old-checkpoints.el" \
-		"sunrise-x-popviewer.el" \
-		"sunrise-x-tabs.el" \
-		"sunrise-x-tree.el" \
-        "typing.el" \
-        "wiki.el" \
-        "tidy.el" \
-        "fixme-mode.el" \
-        "work-timer.el" \
-        "showtip.el" \
-        "sdcv.el" \
-        "etxt.el" \
-        "htmlr.el" \
-        "cus-edit+.el" \
-        "xml-rpc.el" \
-        "weblogger.el" \
-        "newsticker-notify.el" ;
-    do
-        [ -e "$PKG$PREFIX/doc/$PRGNAM/$el" ] && ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
-    done
-)
+cd $PKG$PREFIX/share/emacs/site-lisp/$PRGNAM/
+for el in \
+	"task-timer.el" \
+	"no-word.el" \
+	"xml-rpc.el" \
+	"buffer-move.el" \
+	"goto-last-change.el" \
+    "fill-column-indicator.el" \
+    "php-mode-improved.el" \
+    "quick-jump.el" \
+    "alarm.el" \
+    "multi-term.el" \
+    "lusty-explorer.el" \
+    "sml-modeline.el" \
+    "apache-mode.el" \
+    "hexrgb.el" \
+    "palette.el" \
+    "pastebin.el" \
+    "openpaste.el" \
+    "snipplr.el" \
+    "legalese.el" \
+    "workspaces.el" \
+    "auto-complete.el" \
+    "gnugo.el" \
+    "http-post-simple.el" \
+    "facebook.el" \
+    "tumbl.el" \
+    "dom.el" \
+    "babel.el" \
+    "cheezburger.el" \
+    "jira.el" \
+    "folding.el" \
+    "sunrise-commander.el" \
+	"sunrise-x-buttons.el" \
+	"sunrise-x-checkpoints.el" \
+	"sunrise-x-loop.el" \
+	"sunrise-x-mirror.el" \
+	"sunrise-x-modeline.el" \
+	"sunrise-x-old-checkpoints.el" \
+	"sunrise-x-popviewer.el" \
+	"sunrise-x-tabs.el" \
+	"sunrise-x-tree.el" \
+    "typing.el" \
+    "wiki.el" \
+    "tidy.el" \
+    "fixme-mode.el" \
+    "work-timer.el" \
+    "showtip.el" \
+    "sdcv.el" \
+    "etxt.el" \
+    "htmlr.el" \
+    "cus-edit+.el" \
+    "xml-rpc.el" \
+    "weblogger.el" \
+    "newsticker-notify.el" ;
+do
+    [ -e "$PKG$PREFIX/doc/$PRGNAM/$el" ] && ln -s "$PREFIX/doc/$PRGNAM/$el" "$el" ;
+done
 
-( cd $PKG
-    chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
+cd $PKG
+chown -R root:root .
+find . \
+    \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+    -exec chmod 755 {} \; -o \
+    \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+    -exec chmod 644 {} \;
 
-    mkdir -p $PKG/install
-    cat <<EOF > $PKG/install/slack-desc
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (a local mirror of EmacsWiki)
 $PRGNAM:
 $PRGNAM: 
@@ -114,8 +115,6 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 EOF
-)
 
-cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 
