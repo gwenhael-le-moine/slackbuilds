@@ -47,8 +47,7 @@ for el in \
     "http://www.randomsample.de/minimap.el" \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
     "http://www.bobnewell.net/elisp/speedread.el" \
-    "http://www.ccs.neu.edu/home/guttman/undoc.el" \
-    "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" ;
+    "http://www.ccs.neu.edu/home/guttman/undoc.el" ;
 do
     elfileget_or_update "$el"
 done
