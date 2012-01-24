@@ -40,21 +40,15 @@ elfileget_or_update() {
 cd $CWD/els
 for el in \
 	"https://gitorious.org/robmyers/scripts/blobs/raw/master/artbollocks-mode.el" \
-	"http://codphilosophy.com/software/auto-indent.el" \
 	"http://kanis.fr/hg/lisp/ivan/verbiste.el" \
     "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
     "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
     "http://www.varnish-cache.org/svn/trunk/varnish-tools/emacs/vcl-mode.el" \
     "http://www.randomsample.de/minimap.el" \
-    "http://mumble.net/~campbell/emacs/paredit.el" \
-    "http://nschum.de/src/emacs/guess-style/guess-style.el" \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
-    "http://yrk.nfshost.com/repos/analog-clock/analog-clock.el" \
-    "http://code.jblevins.org/markdown-mode/markdown-mode.el" \
     "http://www.bobnewell.net/elisp/speedread.el" \
     "http://www.ccs.neu.edu/home/guttman/undoc.el" \
-    "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" \
-	"http://jblevins.org/projects/deft/deft.el" ;
+    "http://svn.apache.org/repos/asf/subversion/trunk/contrib/client-side/emacs/dsvn.el" ;
 do
     elfileget_or_update "$el"
 done
