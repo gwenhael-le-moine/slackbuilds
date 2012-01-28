@@ -63,7 +63,7 @@ echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscrip
 
 make $NUMJOBS PREFIX=$PREFIX
 
-sed -i "s|\"node_prefix\": \"/usr\",|\"node_prefix\": \"$PKG/usr\",|g" options.gypi
+sed -i "s|/usr|$PKG/usr|g" config.gypi
 
 make install
 mv $PKG$PREFIX/share/man $PKG$PREFIX
