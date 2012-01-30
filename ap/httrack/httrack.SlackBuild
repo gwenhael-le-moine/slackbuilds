@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 PRGNAM=httrack
-VERSION=3.44.1
+VERSION=3.44.4
 
 BUILD=1
 
@@ -34,13 +34,16 @@ find . \
     -exec chmod 644 {} \;
 
 # Building
+LDFLAGS="-L/usr/lib${LIBDIRSUFFIX}" \
 ./configure \
 	--prefix=$PREFIX \
 	--mandir=$PREFIX/man \
 	--libdir=$PREFIX/lib$LIBSUFFIX
 
+LDFLAGS="-L/usr/lib${LIBDIRSUFFIX}" \
 make
 
+LDFLAGS="-L/usr/lib${LIBDIRSUFFIX}" \
 make install DESTDIR=$PKG
 
 # Cleaning
