@@ -4,7 +4,7 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:=5.2}
+VERSION=${VERSION:=5.2.1}
 
 BUILD=${BUILD:=1}
 
