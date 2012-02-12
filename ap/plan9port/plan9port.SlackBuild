@@ -64,16 +64,16 @@ mkdir -p $PKG/etc/profile.d
 cat <<EOF > $PKG/etc/profile.d/$PRGNAM.sh
 #!/bin/sh
 PLAN9=/opt/plan9port
-PATH=$PATH:${PLAN9}
-MANPATH=$MANPATH:${PLAN9}/man
+PATH=\$PATH:\${PLAN9}
+MANPATH=\$MANPATH:\${PLAN9}/man
 export PLAN9 PATH MANPATH
 EOF
 chmod +x $PKG/etc/profile.d/$PRGNAM.sh
 cat <<EOF > $PKG/etc/profile.d/$PRGNAM.csh
 #!/bin/csh
 setenv PLAN9 /opt/plan9port
-setenv PATH ${PATH}:${PLAN9}/bin
-setenv MANPATH ${MANPATH}:${PLAN9}/man
+setenv PATH \${PATH}:\${PLAN9}/bin
+setenv MANPATH \${MANPATH}:\${PLAN9}/man
 EOF
 chmod +x $PKG/etc/profile.d/$PRGNAM.csh
 

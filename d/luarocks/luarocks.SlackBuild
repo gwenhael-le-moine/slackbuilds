@@ -62,12 +62,12 @@ mkdir -p $PKG/etc/profile.d/
 cat <<EOF > $PKG/etc/profile.d/luarocks.sh
 #!/bin/sh
 
-export PATH=$PATH:$PREFIX/lib64/luarocks/bin
+export PATH=\$PATH:$PREFIX/lib64/luarocks/bin
 EOF
 cat <<EOF > $PKG/etc/profile.d/luarocks.csh
 #!/bin/csh
 
-setenv PATH $PATH:$PREFIX/lib64/luarocks/bin
+setenv PATH \$PATH:$PREFIX/lib64/luarocks/bin
 EOF
 chmod +x $PKG/etc/profile.d/*
 
