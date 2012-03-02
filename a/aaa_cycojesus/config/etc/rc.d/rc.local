@@ -34,3 +34,11 @@ if [ -x /etc/rc.d/rc.vboxweb-service ]; then
     /etc/rc.d/rc.vboxweb-service start
 fi
 
+
+[ -x /etc/rc.d/rc.Tether ] && /etc/rc.d/rc.Tether start
+
+# To disable avahi, chmod rc.avahidaemon and rc.avahidnsconfd to 644
+if [ -x /etc/rc.d/rc.avahidaemon -a -x /etc/rc.d/rc.avahidnsconfd ]; then
+  /etc/rc.d/rc.avahidaemon start
+  /etc/rc.d/rc.avahidnsconfd start
+fi
