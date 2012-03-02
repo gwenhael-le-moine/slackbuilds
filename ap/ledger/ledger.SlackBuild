@@ -38,6 +38,7 @@ if [ ! -e $REPOSITORY ]; then
 else
 	( cd $REPOSITORY
 		git pull
+		git submodule update
 	)
 fi
 cp -R $REPOSITORY $PRGNAM
