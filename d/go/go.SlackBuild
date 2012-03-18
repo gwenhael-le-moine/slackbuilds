@@ -4,7 +4,6 @@
 VERSION=hg$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 
-
 TAG=cyco
 OUTPUT=/tmp
 TMP=/tmp/$TAG
@@ -27,7 +26,7 @@ mkdir -p $PKG
 cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
-        hg clone -r release https://go.googlecode.com/hg/ $(dirname $REPOSITORY)/$PRGNAM
+        hg clone -r release https://code.google.com/p/go/ $(dirname $REPOSITORY)/$PRGNAM
 else
     ( cd $REPOSITORY
         hg pull -u
@@ -36,45 +35,45 @@ fi
 
 mkdir -p $PKG$PREFIX/libexec/ $PREFIX/libexec/
 cp -R $REPOSITORY $PREFIX/libexec/
-( cd $PREFIX/libexec/$PRGNAM
-    GOROOT=$(pwd)
-    GOBIN=$GOROOT/bin
-    GOOS=linux
-    case $ARCH in
-        x86_64)
-            GOARCH=amd64
-            ;;
-        "i?86")
-            GOARCH=386
-            ;;
-        *)
-            GOARCH=arm
-    esac
-    mkdir -p $GOBIN
-    find $GOROOT -name ".hg*" -exec rm -fr {} \;
-    cd $GOROOT/src
-    GOROOT=$GOROOT GOBIN=$GOBIN GOOS=$GOOS GOARCH=$GOARCH bash ./all.bash
+cd $PREFIX/libexec/$PRGNAM
+GOROOT=$(pwd)
+GOBIN=$GOROOT/bin
+GOOS=linux
+case $ARCH in
+    x86_64)
+        GOARCH=amd64
+        ;;
+    "i?86")
+        GOARCH=386
+        ;;
+    *)
+        GOARCH=arm
+esac
+mkdir -p $GOBIN
+find $GOROOT -name ".hg*" -exec rm -fr {} \;
+cd $GOROOT/src
+GOROOT=$GOROOT GOBIN=$GOBIN GOOS=$GOOS GOARCH=$GOARCH bash ./all.bash
 
-    mv $PREFIX/libexec/$PRGNAM $PKG$PREFIX/libexec/
+mv $PREFIX/libexec/$PRGNAM $PKG$PREFIX/libexec/
 
-    ( cd misc/emacs
-        find . -type f -name \*.el -exec emacs -batch -f batch-byte-compile {} \;
-    )
-    
-    mkdir -p $PKG$PREFIX/bin
-    ( cd $PKG$PREFIX/bin
-        for i in ../libexec/$PRGNAM/bin/* ; do
-            ln -s $i ;
-        done
-    )
+( cd misc/emacs
+    find . -type f -name \*.el -exec emacs -batch -f batch-byte-compile {} \;
+)
 
-    mkdir -p $PKG$PREFIX/share/emacs/site-lisp/
-    ( cd $PKG$PREFIX/share/emacs/site-lisp/
-        ln -s ../../../libexec/$PRGNAM/misc/emacs golang
-    )
-    
-    mkdir -p $PKG/etc/profile.d
-    cat <<EOF > $PKG/etc/profile.d/go.sh
+mkdir -p $PKG$PREFIX/bin
+( cd $PKG$PREFIX/bin
+    for i in ../libexec/$PRGNAM/bin/* ; do
+        ln -s $i ;
+    done
+)
+
+mkdir -p $PKG$PREFIX/share/emacs/site-lisp/
+( cd $PKG$PREFIX/share/emacs/site-lisp/
+    ln -s ../../../libexec/$PRGNAM/misc/emacs golang
+)
+
+mkdir -p $PKG/etc/profile.d
+cat <<EOF > $PKG/etc/profile.d/go.sh
 GOROOT=$PREFIX/libexec/$PRGNAM
 GOBIN=\$GOROOT/bin
 GOOS=linux
@@ -91,20 +90,18 @@ esac
 
 export GOROOT GOBIN GOOS GOARCH
 EOF
-    chmod +x $PKG/etc/profile.d/go.sh
+chmod +x $PKG/etc/profile.d/go.sh
 
-    mkdir -p $PKG$PREFIX/doc
-    ( cd $PKG$PREFIX/doc
-        ln -s ../libexec/$PRGNAM/doc $PRGNAM-$VERSION
-    )
+mkdir -p $PKG$PREFIX/doc
+( cd $PKG$PREFIX/doc
+    ln -s ../libexec/$PRGNAM/doc $PRGNAM-$VERSION
 )
 
 # correction
-( cd $PKG
-    chown -R root:root *
+cd $PKG
+chown -R root:root *
 
-    [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-)
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
 # embaumement
 mkdir -p $PKG/install
@@ -131,5 +128,4 @@ $PRGNAM: http://golang.org/
 EOF
 
 # empaquetage
-cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
