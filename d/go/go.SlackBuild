@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 # variables
-VERSION=weekly.2012-03-13
+VERSION=go1
 BUILD=1
 
 TAG=cyco
