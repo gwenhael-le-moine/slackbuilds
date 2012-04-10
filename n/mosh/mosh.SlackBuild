@@ -1,0 +1,71 @@
+#!/bin/sh -x
+
+# variables
+TAG=cyco
+TMP=/tmp/$TAG
+CWD=$(pwd)
+OUTPUT=/tmp
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+VERSION=$(date +%Y.%m.%d_%H.%M)
+
+DOCS="AUTHORS COPYING ChangeLog NEWS README.md THANKS"
+
+ARCH=$(uname -m)
+BUILD=1
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+    git clone http://github.com/keithw/mosh $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+fi
+cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+
+./autogen.sh
+./configure \
+	--prefix=$PREFIX \
+	--mandir=$PREFIX/man
+
+make
+make install DESTDIR=$PKG
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (mobile shell)
+$PRGNAM:
+$PRGNAM: Remote terminal application that allows roaming, supports intermittent
+$PRGNAM: connectivity, and provides intelligent local echo and line editing of user
+$PRGNAM: keystrokes.
+$PRGNAM: Mosh is a replacement for SSH. It's more robust and responsive, especially
+$PRGNAM: over Wi-Fi, cellular, and long-distance links.
+$PRGNAM: Mosh is free software, available for GNU/Linux, FreeBSD, and Mac OS X.
+$PRGNAM: 
+$PRGNAM: http://mosh.mit.edu/
+$PRGNAM: 
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
