@@ -39,6 +39,7 @@ elfileget_or_update() {
     
 cd $CWD/els
 for el in \
+	"http://www.bobnewell.net/filez/writer-names.el" \
 	"https://gitorious.org/robmyers/scripts/blobs/raw/master/artbollocks-mode.el" \
 	"http://kanis.fr/hg/lisp/ivan/verbiste.el" \
     "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
