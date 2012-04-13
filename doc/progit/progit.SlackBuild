@@ -1,0 +1,65 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=noarch
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ -e $REPOSITORIES/$PRGNAM/Book ] ; then
+    ( cd $REPOSITORIES/$PRGNAM/Book
+        git pull
+    )
+else
+    git clone https://github.com/progit/progit.git $REPOSITORIES/$PRGNAM/Book
+fi
+if [ -e $REPOSITORIES/$PRGNAM/Examples ] ; then
+    ( cd $REPOSITORIES/$PRGNAM/Examples
+        git pull
+    )
+else
+    git clone https://github.com/progit/book-examples.git $REPOSITORIES/$PRGNAM/Examples
+fi
+[ ! -e $CWD/progit.en.pdf ] && wget -c http://progit.org/ebook/progit.pdf -O $CWD/progit.en.pdf
+[ ! -e $CWD/progit.en.mobi ] && wget -c https://github.s3.amazonaws.com/media/pro-git.en.mobi -O $CWD/progit.en.mobi
+[ ! -e $CWD/progit.en.epub ] && wget -c https://github.s3.amazonaws.com/media/progit.epub -O $CWD/progit.en.epub
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (eBook, Pro Git: professional version control)
+$PRGNAM: 
+$PRGNAM: Pro Git book, written by Scott Chacon and published by Apress.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://progit.org/
+$PRGNAM: 
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+
