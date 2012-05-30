@@ -6,7 +6,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-BRANCH=${BRANCH:="BETA"}
+BRANCH=${BRANCH:="ALPHA"}
 VERSION=${VERSION:=2.6.3}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
@@ -74,22 +74,12 @@ sed -i 's|git:|http:|g' $(grep -l "git:" .* -r)
 
 ./acprep pull
 
-# we're old fashioned like this
-./acprep autoconf
-
-CFLAGS="$SLKCFLAGS" \
-./configure \
-  --prefix=/usr \
-  --infodir=/usr/info \
-  --mandir=/usr/man \
-  --libdir=/usr/lib${LIBDIRSUFFIX} \
-  --localstatedir=/var \
-  --build=$ARCH-slackware-linux
+./acprep opt config --prefix=/usr --python
 
 # fix a bug where Emacs' binary name isn't detected correctly (with emacs 24)
 sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 
-make $NUMJOBS || make || exit 1
+./acprep opt -- make $NUMJOBS || exit 1
 make install DESTDIR=$PKG || exit 1
 
 # mv $PKG/usr/share/man $PKG/usr/
