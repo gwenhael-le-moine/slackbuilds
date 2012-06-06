@@ -82,6 +82,12 @@ sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 ./acprep opt -- make $NUMJOBS || exit 1
 make install DESTDIR=$PKG || exit 1
 
+mkdir -p $PKG/usr/share/emacs/site-lisp/
+cp -R lisp $PKG/usr/share/emacs/site-lisp/ledger
+( cd $PKG/usr/share/emacs/site-lisp/ledger
+	emacs -batch -f batch-byte-compile *.el
+)
+
 # mv $PKG/usr/share/man $PKG/usr/
 find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
