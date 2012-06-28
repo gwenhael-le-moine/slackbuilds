@@ -80,7 +80,7 @@ sed -i 's|git:|http:|g' $(grep -l "git:" .* -r)
 sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 
 ./acprep opt -- make $NUMJOBS || exit 1
-make install DESTDIR=$PKG || exit 1
+./acprep opt -- make install DESTDIR=$PKG || exit 1
 
 mkdir -p $PKG/usr/share/emacs/site-lisp/
 cp -R lisp $PKG/usr/share/emacs/site-lisp/ledger
