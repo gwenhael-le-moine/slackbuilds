@@ -1,0 +1,56 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=noarch
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+if [ -e $REPOSITORIES/$PRGNAM ] ; then
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+else
+    git clone http://github.com/codeguy/php-the-right-way.git $REPOSITORIES/$PRGNAM
+fi
+
+mkdir -p $PKG$PREFIX/doc/
+cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (PHP book)
+$PRGNAM: 
+$PRGNAM: An easy-to-read, quick reference for PHP best practices, accepted coding
+$PRGNAM: standards, and links to authoritative tutorials around the Web
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://github.com/codeguy/php-the-right-way
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+)
