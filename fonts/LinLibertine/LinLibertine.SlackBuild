@@ -1,0 +1,66 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-5.3.0_2012_07_02}
+ARCH=noarch
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+# Place to build (TMP) package (PKG) and output (OUTPUT) the program:
+TMP=${TMP:=/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+# Create working directories:
+rm -rf $PKG
+mkdir -p $OUTPUT
+mkdir -p $PKG
+
+FONTDIR=/usr/share/fonts/
+
+# Move the fonts into place:
+mkdir -p $PKG$FONTDIR $PKG/usr/doc/$PRGNAM
+cd $PKG$FONTDIR/
+for i in TTF OTF; do
+	mkdir -p "$i"
+	[ ! -e $CWD/${PRGNAM}$i_${VERSION}.tgz ] && wget -c http://sourceforge.net/projects/linuxlibertine/files/linuxlibertine/$(echo $VERSION | cut -d_ -f 1)/${PRGNAM}${i}_${VERSION}.tgz/download -O $CWD/${PRGNAM}${i}_${VERSION}.tgz ;
+	( cd $i
+		tar xf $CWD/${PRGNAM}${i}_${VERSION}.tgz
+		mv *.txt README $PKG/usr/doc/$PRGNAM
+	)
+done
+
+# Post-install script:
+mkdir -p $PKG/install
+cat <<EOT > $PKG/install/doinst.sh
+# Update X font indexes and the font cache:
+if [ -x .$XPREF/bin/mkfontdir ]; then
+  chroot . $XPREF/bin/mkfontscale $FONTDIR
+  chroot . $XPREF/bin/mkfontdir $FONTDIR
+fi
+if [ -x .$XPREF/bin/fc-cache ]; then
+  chroot . $XPREF/bin/fc-cache -f $FONTDIR
+fi
+EOT
+
+# Add a package description:
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (font)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.linuxlibertine.org
+$PRGNAM: 
+EOF
+
+# Build the package:
+cd $PKG
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
