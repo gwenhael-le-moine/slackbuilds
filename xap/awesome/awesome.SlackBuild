@@ -57,7 +57,7 @@ fi
 
 # configuration
 cmake \
-    -DPREFIX=$PREFIX \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DSYSCONFDIR=/etc \
     -DAWESOME_DOC_PATH=$PREFIX/doc/$PRGNAM \
     -DAWESOME_MAN_PATH=$PREFIX/man \
