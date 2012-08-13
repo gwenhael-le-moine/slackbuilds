@@ -12,6 +12,10 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 [ -f $userresources ] && /usr/bin/xrdb -merge $userresources
 [ -f $usermodmap ] && /usr/bin/xmodmap $usermodmap
 
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+   eval $(dbus-launch --sh-syntax --exit-with-session)
+fi
+
 if [ -z "$DESKTOP_SESSION" -a -x /usr/bin/ck-launch-session ]; then
     CK_LAUNCH_SESSION= ck-launch-session
 else
