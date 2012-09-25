@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PRGNAM=$(basename $(pwd))
-VERSION=${VERSION:-1}
+VERSION=${VERSION:-1.036}
 ARCH=font
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -23,13 +23,18 @@ rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
 FONTDIR="/usr/share/fonts"
 
 # Move the fonts into place:
-mkdir -p $PKG$FONTDIR/ $PKG/usr/doc/$PRGNAM
+mkdir -p $PKG$FONTDIR/{OTF,TTF} $PKG/usr/doc/$PRGNAM
 cd $PKG$FONTDIR/
-[ ! -e $CWD/${PRGNAM}_FontsOnly.zip ] && \
-	wget -c "http://sourceforge.net/projects/sourcesans.adobe/files/SourceSansPro_FontsOnly.zip/download" \
-	-O $CWD/${PRGNAM}_FontsOnly.zip
-unzip $CWD/${PRGNAM}_FontsOnly.zip
+[ ! -e $CWD/${PRGNAM}_FontsOnly-$VERSION.zip ] && \
+	wget -c --no-check-certificate "https://github.com/downloads/adobe/Source-Sans-Pro/${PRGNAM}_FontsOnly-$VERSION.zip" \
+	-O $CWD/${PRGNAM}_FontsOnly-$VERSION.zip
+unzip $CWD/${PRGNAM}_FontsOnly-$VERSION.zip
+cd ${PRGNAM}_FontsOnly-$VERSION
 mv *.{html,txt} $PKG/usr/doc/$PRGNAM
+mv *.ttf ../TTF
+mv *.otf ../OTF
+cd ..
+rm -fr ${PRGNAM}_FontsOnly-$VERSION
 
 # Post-install script:
 mkdir -p $PKG/install
@@ -56,15 +61,11 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: http://blogs.adobe.com/typblography/2012/08/source-sans-pro.html
+$PRGNAM: https://github.com/adobe/Source-Sans-Pro#readme
 $PRGNAM: 
 EOF
 
 # Build the package:
 cd $PKG
-makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz 2>&1 | tee $OUTPUT/makepkg-${PRGNAM}.log
-cd $OUTPUT
-md5sum ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz > ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz.md5
-cd -
-cat $PKG/install/slack-desc | grep "^${PRGNAM}" > $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txt
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
 
