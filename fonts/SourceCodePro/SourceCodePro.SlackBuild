@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PRGNAM=$(basename $(pwd))
-VERSION=${VERSION:-1.036}
+VERSION=${VERSION:-1.009}
 ARCH=font
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -26,7 +26,7 @@ FONTDIR="/usr/share/fonts"
 mkdir -p $PKG$FONTDIR/{OTF,TTF} $PKG/usr/doc/$PRGNAM
 cd $PKG$FONTDIR/
 [ ! -e $CWD/${PRGNAM}_FontsOnly-$VERSION.zip ] && \
-	wget -c --no-check-certificate "https://github.com/downloads/adobe/Source-Sans-Pro/${PRGNAM}_FontsOnly-$VERSION.zip" \
+	wget -c --no-check-certificate "https://github.com/downloads/adobe/Source-Code-Pro/${PRGNAM}_FontsOnly-$VERSION.zip" \
 	-O $CWD/${PRGNAM}_FontsOnly-$VERSION.zip
 unzip $CWD/${PRGNAM}_FontsOnly-$VERSION.zip
 cd ${PRGNAM}_FontsOnly-$VERSION
@@ -61,7 +61,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: https://github.com/adobe/Source-Sans-Pro#readme
+$PRGNAM: https://github.com/adobe/Source-Code-Pro#readme
 $PRGNAM: 
 EOF
 
