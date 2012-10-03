@@ -56,8 +56,6 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscript tools/wafadmin/Tools/node_addon.py
-
 ./bootstrap.py
 
 mkdir -p $PKG$PREFIX/bin
@@ -73,7 +71,7 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM (Evented I/O for V8 javascript.)
+$PRGNAM: $PRGNAM (Ninja is a small build system with a focus on speed.)
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
