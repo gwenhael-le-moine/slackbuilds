@@ -1,0 +1,91 @@
+#!/bin/sh -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%Y.%m.%d_%H.%M)
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1cyco}
+
+NUMJOBS=${NUMJOBS:-" -j4 "}
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+PREFIX=/usr
+
+TAG=cyco
+OUTPUT=/tmp
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+rm -rf $PKG
+mkdir -p $TMP $PKG
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+fi
+
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+cd $TMP
+if [ -e $CWD/$PRGNAM-$VERSION.$EXT ] ; then
+    tar xf $CWD/$PRGNAM-$VERSION.$EXT
+else
+    if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+        ( cd $REPOSITORIES
+            git clone http://github.com/martine/ninja.git $PRGNAM
+        ) ;
+    fi
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+    cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+fi
+
+cd $PRGNAM-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \;
+
+echo "$ARCH" | grep -q "64" && sed -i 's|${PREFIX}/lib|${PREFIX}/lib64|g' wscript tools/wafadmin/Tools/node_addon.py
+
+./bootstrap.py
+
+mkdir -p $PKG$PREFIX/bin
+cp ninja $PKG$PREFIX/bin
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a \
+  COPYING HACKING.md README doc/ misc/ \
+  $PKG/usr/doc/$PRGNAM-$VERSION
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Evented I/O for V8 javascript.)
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://martine.github.com/ninja/
+$PRGNAM: 
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
