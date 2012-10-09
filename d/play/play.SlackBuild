@@ -5,8 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=java
-VERSION=2.0-preview
-DIRVERSION=2.0
+VERSION=2.0.4
 BUILD=1
 
 TAG=cyco
@@ -24,7 +23,7 @@ rm -fr $PKG
 mkdir -p $PKG/opt $PKG$PREFIX/doc/$PRGNAM $PKG$PREFIX/bin
 cd $PKG/opt
 unzip $CWD/$PRGNAM-$VERSION.zip
-mv $PRGNAM-$DIRVERSION $PRGNAM-$VERSION
+
 cd $PRGNAM-$VERSION
 [ -e play.bat ] && rm play.bat
 chmod +x play
@@ -32,7 +31,7 @@ cd $PKG$PREFIX/doc/$PRGNAM
 ln -s ../../../opt/$PRGNAM-$VERSION/README.textile
 ln -s ../../../opt/$PRGNAM-$VERSION/samples
 cd $PKG$PREFIX/bin
-ln -s ../../../opt/$PRGNAM-$VERSION/play
+ln -s /opt/$PRGNAM-$VERSION/play
 
 # packaging
 cd $PKG
