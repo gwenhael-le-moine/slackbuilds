@@ -34,6 +34,18 @@ fi
 
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+rm -fr $PKG$PREFIX/doc/$PRGNAM/hts-*
+
+ebook-convert $PKG$PREFIX/doc/$PRGNAM/c.learncodethehardway.org/book/index.html \
+	$PKG$PREFIX/doc/$PRGNAM/learncthehardway.epub \
+	--authors="Zed A. Shaw" \
+	--author-sort="Shaw, Zed A." \
+	--title="Learn C The Hard Way" \
+	--title-sort="Learn C The Hard Way" \
+	--language=English \
+	--rating=5 \
+	--series="Learn Code The Hard Way" \
+	--series-index=3
 
 ( cd $PKG
     mkdir -p install
