@@ -45,7 +45,7 @@ ebook-convert $PKG$PREFIX/doc/$PRGNAM/regex.learncodethehardway.org/book/index.h
 	--language=English \
 	--rating=5 \
 	--series="Learn Code The Hard Way" \
-	--series-index=4
+	--series-index=5
 
 ( cd $PKG
     mkdir -p install
