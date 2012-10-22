@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=1.14
+VERSION=2.0
 ARCH=$(uname -m)
 BUILD=1
 
@@ -33,7 +33,7 @@ mkdir -p $PKG
 # mise en place
 ( cd $TMP
     [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && \
-        wget -c http://dl.sv.nongnu.org/releases-noredirect/eliot/releases/$PRGNAM-$VERSION.tar.gz \
+        wget -c http://dl.sv.nongnu.org/releases-noredirect/eliot/releases/$VERSION/$PRGNAM-$VERSION.tar.gz \
         -O $CWD/$PRGNAM-$VERSION.tar.gz
     tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
 )
