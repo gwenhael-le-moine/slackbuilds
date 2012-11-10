@@ -34,7 +34,7 @@ cd $TMP
 rm -rf $PRGNAM
 
 if [ ! -e $REPOSITORY ]; then
-	git clone http://github.com/jwiegley/ledger.git $REPOSITORY
+	git clone http://github.com/ledger/ledger.git $REPOSITORY
 else
 	( cd $REPOSITORY
 		git pull
