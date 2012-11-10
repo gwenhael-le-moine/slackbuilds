@@ -36,7 +36,7 @@ ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
 
-X_TOOLKIT=${X_TOOLKIT:=lucid}
+X_TOOLKIT=${X_TOOLKIT:=gtk3}
 
 if [ "$ARCH" = "i486" ]; then
   SLKCFLAGS="-O2 -march=i486 -mtune=i686"
@@ -103,6 +103,7 @@ $SRCDIR/configure \
   --infodir=/usr/info \
   --with-x \
   --with-x-toolkit=$X_TOOLKIT \
+  --enable-link-time-optimization \
   --without-gconf \
   --build=${ARCH}-slackware-linux
 
