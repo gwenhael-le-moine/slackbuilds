@@ -32,51 +32,15 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-    mkdir -p $REPOSITORIES
-    ( cd $REPOSITORIES
-        git clone http://github.com/petdance/ack.git $PRGNAM
-    )
-else
-    ( cd $REPOSITORIES/$PRGNAM
-        git pull
-    )
-fi
-cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
-
-# configuration
-perl Makefile.PL
-sed -i 's|/usr/local|/usr|g' Makefile
-
-# compilation
-make -j3 PREFIX=$PREFIX
+[ ! -e $CWD/ack-standalone ] && wget -c http://betterthangrep.com/ack-standalone $CWD/ack-standalone
 
 # installation
-make install DESTDIR=$PKG
-mv $PKG$PREFIX/share/man $PKG$PREFIX/
-rm -fr $PKG$PREFIX/share/
-
-mkdir -p $PKG/usr/share/zsh/site-functions/
-mv etc/ack.zsh_completion $PKG/usr/share/zsh/site-functions/_ack
+mkdir -p $PKG$PREFIX/bin
+cp $CWD/ack-standalone $PKG$PREFIX/bin/ack
 
 # correction
 cd $PKG
 chown -R root:root *
-
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
-cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
-
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-
-# Strip binaries
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-
 
 # embaumement
 mkdir -p $PKG/install
@@ -89,7 +53,7 @@ $PRGNAM:
 $PRGNAM: ack is written purely in Perl, and takes advantage of the power of
 $PRGNAM: Perl's regular expressions.
 $PRGNAM:
-$PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
+$PRGNAM: 
 $PRGNAM:
 $PRGNAM: http://betterthangrep.com/
 EOF
