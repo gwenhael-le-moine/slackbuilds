@@ -17,6 +17,8 @@ PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 
+mkdir -p $TMP
+
 # Cleaning
 ( cd $TMP
     rm -fr $PRGNAM-$VERSION
