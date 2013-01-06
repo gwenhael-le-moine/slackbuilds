@@ -42,10 +42,6 @@ for el in \
 	"http://www.bobnewell.net/filez/writer-names.el" \
 	"https://gitorious.org/robmyers/scripts/blobs/raw/master/artbollocks-mode.el" \
 	"http://kanis.fr/hg/lisp/ivan/verbiste.el" \
-    "http://homepages.cs.ncl.ac.uk/phillip.lord/download/emacs/pabbrev.el" \
-    "http://xpt.sourceforge.net/tools/doc-mode/doc-mode.el" \
-    "http://www.varnish-cache.org/svn/trunk/varnish-tools/emacs/vcl-mode.el" \
-    "http://www.randomsample.de/minimap.el" \
     "https://github.com/metajack/jekyll/raw/master/emacs/jekyll.el" \
     "http://www.bobnewell.net/elisp/speedread.el" \
     "http://www.ccs.neu.edu/home/guttman/undoc.el" ;
