@@ -1,0 +1,57 @@
+ #!/bin/sh
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%F | tr - .)
+BUILD=1
+
+ARCH=noarch
+
+HOME=/home/cycojesus
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+PREFIX=/usr
+
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+mkdir -p $TMP
+
+[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+[ -e $PKG ] && rm -fr $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ] ; then
+    mkdir -p $(dirname $REPOSITORY)
+    git clone https://github.com/davidhalter/jedi.git $REPOSITORY
+else
+	( cd $REPOSITORY
+		git pull
+	)
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+
+cd $TMP/$PRGNAM-$VERSION
+python setup.py install --root $PKG
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (an awesome Python auto-completion)
+$PRGNAM: 
+$PRGNAM: Jedi is an autocompletion tool for Python. It works.
+$PRGNAM: With and without syntax errors. Sometimes it sucks, but that's normal
+$PRGNAM: in dynamic languages. But it sucks less than other tools. It
+$PRGNAM: understands almost all of the basic Python syntax elements including
+$PRGNAM: many builtins.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: https://github.com/davidhalter/jedi
+EOF
+
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
+
