@@ -25,7 +25,7 @@ OTFDIR=/usr/share/fonts/OTF
 mkdir -p $PKG$OTFDIR $PKG$TTFDIR $PKG/usr/doc/$PRGNAM
 cd $PKG$TTFDIR/
 
-for i in Aegean600.zip Aegyptus313.zip Gardiner313.zip Symbola605.zip Alfios.zip Aroania.zip Alexander.zip Anaktoria.zip Avdira.zip Atavyros.zip Analecta306.zip Musica306.zip Akkadian256.zip Anatolian306.zip Maya106.zip Unidings605.zip; do
+for i in $(curl http://users.teilar.gr/~g1951d/ | iconv -f utf-16 -t utf-8 | grep -o "[A-Za-z0-9]*\.zip"); do
 	[ ! -e $CWD/$i ] && wget -c http://users.teilar.gr/~g1951d/$i -O $CWD/$i
 	unzip -o $CWD/$i
 done
