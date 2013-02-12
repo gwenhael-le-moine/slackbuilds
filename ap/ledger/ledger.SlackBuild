@@ -74,10 +74,10 @@ sed -i 's|git:|http:|g' $(grep -l "git:" .* -r)
 
 ./acprep pull
 
-./acprep opt config --prefix=/usr --python
+./acprep opt config --prefix=/usr --python --mandir=/usr/man
 
 # fix a bug where Emacs' binary name isn't detected correctly (with emacs 24)
-sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
+#sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
 
 ./acprep opt -- make $NUMJOBS || exit 1
 ./acprep opt -- make install DESTDIR=$PKG || exit 1
