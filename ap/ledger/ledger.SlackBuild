@@ -74,21 +74,13 @@ sed -i 's|git:|http:|g' $(grep -l "git:" .* -r)
 
 ./acprep pull
 
-./acprep opt config --prefix=/usr --python --mandir=/usr/man
+./acprep --prefix=/usr --python opt config -- -DUSE_PYTHON=ON -DUSE_DOXYGEN=ON -DBUILD_EMACSLISP=ON
 
-# fix a bug where Emacs' binary name isn't detected correctly (with emacs 24)
-#sed -i 's|^EMACS = .*$|EMACS = emacs|g' Makefile
+./acprep --prefix=/usr --python opt make || exit 1
+./acprep --prefix=/usr --python opt -- make install DESTDIR=$PKG || exit 1
 
-./acprep opt -- make $NUMJOBS || exit 1
-./acprep opt -- make install DESTDIR=$PKG || exit 1
-
-mkdir -p $PKG/usr/share/emacs/site-lisp/
-cp -R lisp $PKG/usr/share/emacs/site-lisp/ledger
-( cd $PKG/usr/share/emacs/site-lisp/ledger
-	emacs -batch -f batch-byte-compile *.el
-)
-
-# mv $PKG/usr/share/man $PKG/usr/
+mv $PKG/usr/share/man $PKG/usr/
+rm -fr $PKG/usr/share/doc
 find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
