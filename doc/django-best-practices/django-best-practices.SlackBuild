@@ -1,0 +1,58 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=noarch
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ -e $REPOSITORIES/$PRGNAM ] ; then
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+else
+    git clone http://github.com/lincolnloop/django-best-practices.git $REPOSITORIES/$PRGNAM
+fi
+
+mkdir -p $TMP
+cp -R $REPOSITORIES/$PRGNAM $TMP
+cd $TMP/$PRGNAM
+make html
+mkdir -p $PKG$PREFIX/doc/
+mv .build/html $PKG$PREFIX/doc/$PRGNAM
+
+( cd $PKG
+    mkdir -p install
+    cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Django Best Practices)
+$PRGNAM: 
+$PRGNAM: A guide to developing and deploying with the Django Web framework
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://lincolnloop.com/django-best-practices/
+$PRGNAM: 
+EOF
+
+    chown -R root:root *
+
+    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+)
