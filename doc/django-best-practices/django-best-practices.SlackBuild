@@ -36,6 +36,15 @@ make html
 mkdir -p $PKG$PREFIX/doc/
 mv .build/html $PKG$PREFIX/doc/$PRGNAM
 
+ebook-convert $PKG$PREFIX/doc/$PRGNAM/index.html \
+	$PKG$PREFIX/doc/$PRGNAM/$PRGNAM.epub \
+	--authors="Lincoln Loop" \
+	--author-sort="Lincoln Loop" \
+	--title="Django Best Practices" \
+	--title-sort="Django Best Practices" \
+	--language=English \
+	--rating=5
+
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc
