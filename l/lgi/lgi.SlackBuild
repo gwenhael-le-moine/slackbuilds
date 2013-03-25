@@ -36,8 +36,10 @@ else
 fi
 cd $PRGNAM-$VERSION
 
-make PREFIX=/usr
-make install PREFIX=/usr DESTDIR=$PKG
+LUA_VERSION=$(lua -v 2>&1 | grep -o "5\..")
+
+make PREFIX=/usr LUA_VERSION=$LUA_VERSION
+make install PREFIX=/usr DESTDIR=$PKG LUA_VERSION=$LUA_VERSION
 echo "$ARCH" | grep -q 64 && mv $PKG/usr/lib $PKG/usr/lib64
 
 # mkdir -p $PKG/usr/doc/$PRGNAM/
