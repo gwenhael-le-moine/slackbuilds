@@ -1,11 +1,11 @@
 #!/bin/sh
 
-FLTK=${FLTK:=NO}
+FLTK=${FLTK:=YES}
 
 PRGNAM=nut
 VERSION=${VERSION:-18.5}
 
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
