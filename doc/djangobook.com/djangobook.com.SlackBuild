@@ -1,0 +1,59 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=git$(date +"%Y.%m.%d_%H.%M")
+BUILD=1
+
+ARCH=$(uname -m)
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# get sources
+if [ -e $REPOSITORY ] ; then
+    ( cd $REPOSITORY
+        git pull
+    )
+else
+    git clone https://github.com/jacobian/djangobook.com.git $REPOSITORY
+fi
+
+mkdir -p $TMP
+cp -R $REPOSITORY $TMP
+cd $TMP/$PRGNAM
+
+make html epub
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R _build/{html/*,epub/*.epub}  $PKG$PREFIX/doc/$PRGNAM
+
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Django book)
+$PRGNAM: 
+$PRGNAM: a free book about the Django Web framework for the Python programming language.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: http://www.djangobook.com/en/2.0/index.html
+$PRGNAM: 
+EOF
+
+chown -R root:root *
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
