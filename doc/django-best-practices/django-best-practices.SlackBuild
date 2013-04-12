@@ -32,9 +32,10 @@ fi
 mkdir -p $TMP
 cp -R $REPOSITORIES/$PRGNAM $TMP
 cd $TMP/$PRGNAM
-make html
+make html epub
 mkdir -p $PKG$PREFIX/doc/
-mv .build/html $PKG$PREFIX/doc/$PRGNAM
+cp -R .build/html $PKG$PREFIX/doc/$PRGNAM
+cp .build/epub/*.epub $PKG$PREFIX/doc/$PRGNAM
 
 ebook-convert $PKG$PREFIX/doc/$PRGNAM/index.html \
 	$PKG$PREFIX/doc/$PRGNAM/$PRGNAM.epub \
