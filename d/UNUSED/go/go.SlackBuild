@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 # variables
-VERSION=go1
+VERSION=${VERSION:-$(date +%F | tr - .)}
 BUILD=1
 
 TAG=cyco
@@ -15,6 +15,8 @@ PKG=$TMP/pkg-$PRGNAM
 ARCH=$(uname -m)
 
 PREFIX=/usr
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM-$VERSION
@@ -35,11 +37,16 @@ esac
 
 # mise en place
 cd $TMP
-[ ! -e $CWD/$PRGNAM.$VERSION.linux-$GOARCH.tar.gz ] && wget -c http://$PRGNAM.googlecode.com/files/$PRGNAM.$VERSION.linux-$GOARCH.tar.gz -O $CWD/$PRGNAM.$VERSION.linux-$GOARCH.tar.gz
+[ ! -e $REPOSITORY ] \
+	&& hg clone -u release https://code.google.com/p/go $REPOSITORY \
+	|| (cd $REPOSITORY && hg pull -u)
 
-mkdir -p $PKG$PREFIX/
-cd $PKG$PREFIX/
-tar xf $CWD/$PRGNAM.$VERSION.linux-$GOARCH.tar.gz
+mkdir -p $PKG$PREFIX/lib$(echo $ARCH | grep -o "64")
+cp -R $REPOSITORY $PKG$PREFIX/lib$(echo $ARCH | grep -o "64")/
+rm -fr $PKG$PREFIX/lib$(echo $ARCH | grep -o "64")/$PRGNAM/.hg*
+cd $PKG$PREFIX/lib$(echo $ARCH | grep -o "64")/$PRGNAM/src
+./all.bash
+
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 -o -perm 511 \) \

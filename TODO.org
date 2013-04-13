@@ -1,2 +1,2 @@
 * update VERSION of python packages with this (see elpy.SlackBuild):
-VERSION=$(grep -i "^version:" /usr/lib$(uname -m | grep -o 64)/python*/site-packages/$PRGNAM-*-py*.egg-info | grep -o "[0-9.]*")_$VERSION
+VERSION=$(ls /usr/lib$(uname -m | grep -o 64)/python*/site-packages/| grep "jedi-.*-py.*\.egg-info" | grep -o "[0-9.]*" | head -n1)_$VERSION
