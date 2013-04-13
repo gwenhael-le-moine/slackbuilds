@@ -1,0 +1,59 @@
+ #!/bin/sh
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%F | tr - .)
+BUILD=1
+
+ARCH=python
+
+HOME=/home/cycojesus
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+PREFIX=/usr
+
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+mkdir -p $TMP
+
+[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+[ -e $PKG ] && rm -fr $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ] ; then
+    mkdir -p $(dirname $REPOSITORY)
+    git clone https://github.com/jorgenschaefer/elpy.git $REPOSITORY
+else
+	( cd $REPOSITORY
+		git pull
+	)
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+
+cd $TMP/$PRGNAM-$VERSION
+python setup.py install --root $PKG
+
+VERSION=$(grep -i "^version:" /usr/lib$(uname -m | grep -o 64)/python*/site-packages/$PRGNAM-*-py*.egg-info | grep -o "[0-9.]*")_$VERSION
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (Emacs Python Development Environment)
+$PRGNAM: 
+$PRGNAM: Elpy is an Emacs package to bring powerful Python editing to Emacs.
+$PRGNAM: It combines a number of other packages, both written in Emacs Lisp as
+$PRGNAM: well as Python.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://github.com/jorgenschaefer/elpy/wiki
+$PRGNAM:
+$PRGNAM: https://github.com/jorgenschaefer/elpy
+EOF
+
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
+
