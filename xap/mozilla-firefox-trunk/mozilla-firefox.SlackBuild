@@ -21,7 +21,7 @@ PKG=$TMP/pkg-mozilla-firefox
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
-BRANCH=${BRANCH:=latest-mozilla-central}
+BRANCH=${BRANCH:=latest-mozilla-aurora}
 
 if [ $KEEP_TAR == "NO" ]; then
     [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
@@ -74,8 +74,8 @@ cat $CWD/firefox.png > $PKG/usr/share/pixmaps/firefox.png
 mkdir $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
-#VERSION=${VERSION}_$(echo $BRANCH | sed 's|latest-||')_$(date +"%Y.%m.%d_%H.%M")
+VERSION=$(echo $BRANCH | sed 's|latest-mozilla-||g')_${VERSION}
 
 cd $PKG
-makepkg -l y -c n $OUTPUT/mozilla-firefox-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
+makepkg -l y -c n $OUTPUT/mozilla-firefox-$VERSION-$ARCH-$BUILD$TAG.txz
 
