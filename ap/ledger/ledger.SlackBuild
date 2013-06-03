@@ -34,7 +34,7 @@ cd $TMP
 rm -rf $PRGNAM
 
 if [ ! -e $REPOSITORY ]; then
-	git clone http://github.com/ledger/ledger.git $REPOSITORY
+	git clone https://github.com/ledger/ledger.git $REPOSITORY
 else
 	( cd $REPOSITORY
 		git pull
@@ -70,7 +70,7 @@ esac
 [ $BRANCH != "RELEASE" ] && VERSION=${BRANCH}_$(date +%Y.%m.%d_%H.%M)
 
 # we might be held behind a firewall
-sed -i 's|git:|http:|g' $(grep -l "git:" .* -r)
+#sed -i 's|git:|http:|g' $(grep -l "git:" .* -r)
 
 ./acprep pull
 
