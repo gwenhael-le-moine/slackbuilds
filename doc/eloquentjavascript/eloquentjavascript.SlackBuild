@@ -26,6 +26,15 @@ mkdir -p $PKG$PREFIX/doc/
 unzip -d $PKG$PREFIX/doc/ $CWD/$PRGNAM.zip
 mv $PKG$PREFIX/doc/Eloquent\ JavaScript $PKG$PREFIX/doc/$PRGNAM
 
+ebook-convert $PKG$PREFIX/doc/$PRGNAM/index.html \
+	$PKG$PREFIX/doc/$PRGNAM/$PRGNAM.epub \
+	--authors="Marijn Haverbeke" \
+	--author-sort="Haverbeke, Marijn" \
+	--title="Eloquent JavaScript, A Modern Introduction to Programming" \
+	--title-sort="Eloquent JavaScript, A Modern Introduction to Programming" \
+	--language=English \
+	--rating=5
+
 ( cd $PKG
     mkdir -p install
     cat <<EOF > install/slack-desc
