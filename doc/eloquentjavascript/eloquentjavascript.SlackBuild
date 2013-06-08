@@ -22,17 +22,34 @@ rm -fr $PKG
 [ -e $CWD/$PRGNAM.zip ] && mv $CWD/$PRGNAM.zip $CWD/$PRGNAM.zip.orig
 wget -c http://eloquentjavascript.net/Eloquent%20JavaScript.zip -O $CWD/$PRGNAM.zip
 
-mkdir -p $PKG$PREFIX/doc/
-unzip -d $PKG$PREFIX/doc/ $CWD/$PRGNAM.zip
-mv $PKG$PREFIX/doc/Eloquent\ JavaScript $PKG$PREFIX/doc/$PRGNAM
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+unzip -d $PKG$PREFIX/doc/$PRGNAM $CWD/$PRGNAM.zip
+mv $PKG$PREFIX/doc/$PRGNAM/Eloquent\ JavaScript $PKG$PREFIX/doc/$PRGNAM/EN
 
-ebook-convert $PKG$PREFIX/doc/$PRGNAM/index.html \
+ebook-convert $PKG$PREFIX/doc/$PRGNAM/EN/index.html \
 	$PKG$PREFIX/doc/$PRGNAM/$PRGNAM.epub \
 	--authors="Marijn Haverbeke" \
 	--author-sort="Haverbeke, Marijn" \
 	--title="Eloquent JavaScript, A Modern Introduction to Programming" \
 	--title-sort="Eloquent JavaScript, A Modern Introduction to Programming" \
 	--language=English \
+	--rating=5
+
+# French Version
+[ -e $CWD/$PRGNAM.fr.zip ] && mv $CWD/$PRGNAM.fr.zip $CWD/$PRGNAM.fr.zip.orig
+wget -c http://fr.eloquentjavascript.net/Eloquent%20JavaScript.zip -O $CWD/$PRGNAM.fr.zip
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+unzip -d $PKG$PREFIX/doc/$PRGNAM $CWD/$PRGNAM.fr.zip
+mv $PKG$PREFIX/doc/$PRGNAM/Eloquent\ JavaScript $PKG$PREFIX/doc/$PRGNAM/FR
+
+ebook-convert $PKG$PREFIX/doc/$PRGNAM/FR/index.html \
+	$PKG$PREFIX/doc/$PRGNAM/$PRGNAM.FR.epub \
+	--authors="Marijn Haverbeke" \
+	--author-sort="Haverbeke, Marijn" \
+	--title="JavaScript Éloquent, Une introduction moderne à la programmation" \
+	--title-sort="JavaScript Éloquent, Une introduction moderne à la programmation" \
+	--language=French \
 	--rating=5
 
 ( cd $PKG
