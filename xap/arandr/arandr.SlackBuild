@@ -25,7 +25,7 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
         tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
     else
         if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-            git clone git://gitorious.org/arandr/arandr.git $REPOSITORIES/$PRGNAM
+            git clone git://anonscm.debian.org/arandr/arandr.git $REPOSITORIES/$PRGNAM
         else
             ( cd $REPOSITORIES/$PRGNAM
                 git pull
