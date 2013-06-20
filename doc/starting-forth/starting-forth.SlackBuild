@@ -34,6 +34,16 @@ fi
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
 
+ebook-convert $PKG$PREFIX/doc/$PRGNAM/home.iae.nl/users/mhx/sf.html \
+	$PKG$PREFIX/doc/$PRGNAM/$PRGNAM.epub \
+	--authors="Leo Brodie" \
+	--author-sort="Brodie, Leo" \
+	--title="Starting FORTH" \
+	--title-sort="Starting FORTH" \
+	--cover=$PKG$PREFIX/doc/$PRGNAM/home.iae.nl/users/mhx/sf\ front.jpg \
+	--language=English \
+	--rating=5
+
 cd $PKG
 mkdir -p install
 cat <<EOF > install/slack-desc
