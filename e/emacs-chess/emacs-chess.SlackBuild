@@ -1,9 +1,8 @@
 #!/bin/sh -x
 
 # variables
-VERSION=master_$(date +"%Y.%m.%d_%H.%M")
-BUILD=1
-
+VERSION=$(date +"%Y.%m.%d_%H.%M")
+BUILD=2
 
 TAG=cyco
 OUTPUT=/tmp
@@ -32,27 +31,28 @@ if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
         git clone "https://github.com/jwiegley/emacs-chess.git" $PRGNAM
+else
+	( cd $REPOSITORY
+		git pull
+	)
 fi
 
-( cd $REPOSITORY
-    git pull
-)
-
 cp -R $REPOSITORY $TMP
-( cd $TMP/$PRGNAM
-    ./autogen.sh
-    ./configure \
-        --prefix=$PREFIX \
-        --infodir=$PREFIX/info
-    make
-    make install DESTDIR=$PKG
-    rm $PKG$PREFIX/info/dir
-)
+cd $TMP/$PRGNAM
+./autogen.sh
+./configure \
+    --prefix=$PREFIX \
+    --infodir=$PREFIX/info
+make
+make install DESTDIR=$PKG
+rm $PKG$PREFIX/info/dir
+find $PKG$PREFIX/info/ -type f -name \*.info -exec gzip -9 {} \;
+
+VERSION=$(grep version $PKG$PREFIX/share/emacs/site-lisp/_pkg.el | grep -o '[0-9.]*')_$VERSION
 
 # correction
-( cd $PKG
-    chown -R root:root *
-)
+cd $PKG
+chown -R root:root *
 
 # embaumement
 mkdir -p $PKG/install
@@ -88,5 +88,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
