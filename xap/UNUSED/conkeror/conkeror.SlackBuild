@@ -36,8 +36,13 @@ rm -fr .git .gitignore
 mkdir -p $PKG$PREFIX/bin
 cd $PKG$PREFIX/bin
 ln -s ../libexec/$PRGNAM/conkeror-spawn-helper conkeror-spawn-helper
-ln -s ../libexec/$PRGNAM/contrib/run-conkeror run-conkeror
-ln -s run-conkeror conkeror
+
+# "Firefox 3 and later ships with a private XULRunner package, which can run any compatible XULRunner application using the -app switch." -- https://developer.mozilla.org/en-US/docs/XULRunner
+cat <<EOF > $PKG$PREFIX/bin/conkeror
+#!/bin/sh
+exec /usr/bin/firefox -app $PREFIX/libexec/$PRGNAM/application.ini "\$@"
+EOF
+chmod 755 $PKG$PREFIX/bin/conkeror
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cd $PKG$PREFIX/doc/$PRGNAM
