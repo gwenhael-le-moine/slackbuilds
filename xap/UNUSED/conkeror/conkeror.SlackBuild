@@ -25,6 +25,8 @@ else
     git clone http://repo.or.cz/r/conkeror.git $REPOSITORIES/$PRGNAM
 fi
 
+rm -fr $PKG
+
 mkdir -p $PKG$PREFIX/libexec/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/libexec/
 cd $PKG$PREFIX/libexec/$PRGNAM
