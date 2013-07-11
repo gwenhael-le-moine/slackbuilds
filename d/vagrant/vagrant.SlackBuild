@@ -2,33 +2,23 @@
 
 PKGNAM=vagrant
 
-# Allow $ARCH to be preset before running the script.  This is useful in the
-# case where someone is running a 32-bit chroot environment under an x86_64
-# kernel:
 ARCH=${ARCH:-$(uname -m)}
-
-case "$ARCH" in
-  i?86) DEBARCH="i386" ; LIBDIRSUFFIX="" ; ARCH=i386 ;;
-  x86_64) DEBARCH="amd64" ; LIBDIRSUFFIX="64" ; ARCH=x86_64 ;;
-  *) echo "Package for $(uname -m) architecture is not available." ; exit 1 ;;
-esac
-# Get the version from the Debian/Ubuntu .deb (thanks to Fred Richards):
-VERSION=${VERSION:-1.2.2}
+VERSION=${VERSION:-1.2.3}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
-if [ ! $UID = 0 ]; then
-  cat << EOF
-
-This script must be run as root.
-
-EOF
-  exit 1
-fi
+# Allow $ARCH to be preset before running the script.  This is useful in the
+# case where someone is running a 32-bit chroot environment under an x86_64
+# kernel:
+case "$ARCH" in
+  i?86) LIBDIRSUFFIX="" ; ARCH=i386 ;;
+  x86_64) LIBDIRSUFFIX="64" ;;
+  *) echo "Package for $(uname -m) architecture is not available." ; exit 1 ;;
+esac
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/package-$PKGNAM
+PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 rm -rf $PKG
@@ -36,7 +26,6 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $PKG
 
 # Download it by hand...
-#[ ! -e $CWD/vagrant_$VERSION_$ARCH.deb ] && http://files.vagrantup.com/packages/7e400d00a3c5a0fdf2809c8b5001a035415a607b/vagrant_1.2.2_x86_64.deb
 
 ar p $CWD/vagrant_${VERSION}_$ARCH.deb data.tar.gz | gunzip | tar xv || exit 1
 chown -R root:root .
@@ -55,19 +44,19 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
        |-----handy-ruler----------------------------------------------------|
-$PKGNAM: $PKGNAM (Development environments made easy.)
-$PKGNAM:
-$PKGNAM: Create and configure lightweight, reproducible, and portable
-$PKGNAM: development environments.
-$PKGNAM:
-$PKGNAM:
-$PKGNAM:
-$PKGNAM:
-$PKGNAM:
-$PKGNAM: Homepage:  http://www.vagrantup.com/
-$PKGNAM:
+$PRGNAM: $PRGNAM (Development environments made easy.)
+$PRGNAM:
+$PRGNAM: Create and configure lightweight, reproducible, and portable
+$PRGNAM: development environments.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: Homepage:  http://www.vagrantup.com/
+$PRGNAM:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 
