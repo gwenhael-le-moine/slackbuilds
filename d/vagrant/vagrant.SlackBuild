@@ -1,0 +1,73 @@
+#!/bin/sh
+
+PKGNAM=vagrant
+
+# Allow $ARCH to be preset before running the script.  This is useful in the
+# case where someone is running a 32-bit chroot environment under an x86_64
+# kernel:
+ARCH=${ARCH:-$(uname -m)}
+
+case "$ARCH" in
+  i?86) DEBARCH="i386" ; LIBDIRSUFFIX="" ; ARCH=i386 ;;
+  x86_64) DEBARCH="amd64" ; LIBDIRSUFFIX="64" ; ARCH=x86_64 ;;
+  *) echo "Package for $(uname -m) architecture is not available." ; exit 1 ;;
+esac
+# Get the version from the Debian/Ubuntu .deb (thanks to Fred Richards):
+VERSION=${VERSION:-1.2.2}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+if [ ! $UID = 0 ]; then
+  cat << EOF
+
+This script must be run as root.
+
+EOF
+  exit 1
+fi
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PKGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $PKG
+
+# Download it by hand...
+#[ ! -e $CWD/vagrant_$VERSION_$ARCH.deb ] && http://files.vagrantup.com/packages/7e400d00a3c5a0fdf2809c8b5001a035415a607b/vagrant_1.2.2_x86_64.deb
+
+ar p $CWD/vagrant_${VERSION}_$ARCH.deb data.tar.gz | gunzip | tar xv || exit 1
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+# Make sure top-level perms are correct:
+chmod 0755 .
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler----------------------------------------------------|
+$PKGNAM: $PKGNAM (Development environments made easy.)
+$PKGNAM:
+$PKGNAM: Create and configure lightweight, reproducible, and portable
+$PKGNAM: development environments.
+$PKGNAM:
+$PKGNAM:
+$PKGNAM:
+$PKGNAM:
+$PKGNAM:
+$PKGNAM: Homepage:  http://www.vagrantup.com/
+$PKGNAM:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+
