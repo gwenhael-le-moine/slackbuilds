@@ -21,7 +21,7 @@ PREFIX=/usr
 SLCKFLAGS=" -O "
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
