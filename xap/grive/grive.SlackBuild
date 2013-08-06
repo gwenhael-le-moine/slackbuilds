@@ -1,0 +1,86 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ]; then
+    git clone https://github.com/Grive/grive.git $REPOSITORY
+else
+    ( cd $REPOSITORY
+        git pull
+    )
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM
+
+cd $TMP/$PRGNAM
+
+# configuration
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DSYSCONFDIR=/etc \
+    .
+
+# compilation
+make -j3
+
+# installation
+make install DESTDIR=$PKG
+mv $PKG$PREFIX/share/man $PKG$PREFIX
+rm -fr $PKG$PREFIX/share/
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (an open source Linux client for Google Drive)
+$PRGNAM:
+$PRGNAM: Grive can be considered still beta quality. It simply downloads all the files in your
+$PRGNAM: Google Drive into the current directory. After you make some changes to the local files, run
+$PRGNAM: grive again and it will upload your changes back to your Google Drive. New files created locally
+$PRGNAM: Currently Grive will NOT destroy any of your files: it will only move the files to a
+$PRGNAM: directory named .trash or put them in the Google Drive trash. You can always recover them.
+$PRGNAM: 
+$PRGNAM: http://www.lbreda.com/grive/start
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
