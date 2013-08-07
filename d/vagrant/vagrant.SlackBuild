@@ -1,9 +1,9 @@
 #!/bin/sh
 
-PKGNAM=vagrant
+PRGNAM=vagrant
 
 ARCH=${ARCH:-$(uname -m)}
-VERSION=${VERSION:-1.2.3}
+VERSION=${VERSION:-1.2.7}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
@@ -59,4 +59,3 @@ EOF
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
-
