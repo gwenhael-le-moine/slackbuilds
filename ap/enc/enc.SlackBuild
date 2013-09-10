@@ -1,0 +1,79 @@
+#!/bin/sh -x
+
+# variables
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+BUILD=${BUILD:-1}
+
+TAG=cyco
+TMP=/tmp/$TAG
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+ARCH=${ARCH:-$(uname -m)}
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+PREFIX=${PREFIX:-/usr}
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ] ; then
+    mkdir -p $(dirname $REPOSITORY)
+    git clone https://bitbucket.org/erlcash/enc.git $REPOSITORY
+else
+	( cd $REPOSITORY
+		git pull
+	)
+fi
+
+cp -R $REPOSITORY $TMP/
+cd $TMP/$PRGNAM
+
+mkdir -p $PKG$PREFIX/bin
+cp enc.sh $PKG$PREFIX/bin/$PRGNAM
+chmod 755 $PKG$PREFIX/bin/$PRGNAM
+
+# move doc/ to the appropriate location
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp COPYING README enc.conf.example install.sh $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+
+# embaumement
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (EncFS CLI manager.)
+$PRGNAM:
+$PRGNAM: $PRGNAM is a simple manager written in bash simplifying work with EncFS
+$PRGNAM: encryption software.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://bitbucket.org/erlcash/enc/
+$PRGNAM: 
+EOF
+
+# empaquetage
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
