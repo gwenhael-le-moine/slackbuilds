@@ -1,0 +1,69 @@
+#!/bin/sh -x
+
+# variables
+TAG=cyco
+TMP=/tmp/$TAG
+CWD=$(pwd)
+OUTPUT=/tmp
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+VERSION=$(date +%Y.%m.%d_%H.%M)
+
+DOCS="LICENSE README.rst AUTHORS.rst"
+
+ARCH=$(uname -m)
+BUILD=1
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+    git clone https://github.com/jkbr/httpie.git $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+        git pull
+    )
+fi
+cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+
+# installation
+python ./setup.py install --root=$PKG
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (a CLI, cURL-like tool for humans.)
+$PRGNAM:
+$PRGNAM: HTTPie is a command line HTTP client. Its goal is to make CLI interaction
+$PRGNAM: with web services as human-friendly as possible. It provides a simple http
+$PRGNAM: command that allows for sending arbitrary HTTP requests using a simple and
+$PRGNAM: natural syntax, and displays colorized responses. HTTPie can be used for
+$PRGNAM: testing, debugging, and generally interacting with HTTP servers.
+$PRGNAM:
+$PRGNAM: 
+$PRGNAM: http://httpie.org/
+$PRGNAM: 
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
