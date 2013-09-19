@@ -16,11 +16,9 @@ if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
    eval $(dbus-launch --sh-syntax --exit-with-session)
 fi
 
+# Start the window manager:
 if [ -z "$DESKTOP_SESSION" -a -x /usr/bin/ck-launch-session ]; then
-    CK_LAUNCH_SESSION= ck-launch-session
+  exec ck-launch-session /usr/bin/awesome
 else
-    CK_LAUNCH_SESSION=
+  exec /usr/bin/awesome
 fi
-[ -x $HOME/.config/awesome/startup.sh ] \
-	&& exec $CK_LAUNCH_SESSION $HOME/.config/awesome/startup.sh \
-	|| exec $CK_LAUNCH_SESSION awesome
