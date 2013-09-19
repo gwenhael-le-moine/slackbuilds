@@ -1,0 +1,65 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+VERSION=${VERSION:-0.7.4}
+BUILD=${BUILD:-1}
+
+TAG=cyco
+TMP=${TMP:-/tmp/$TAG}
+OUTPUT=${OUTPUT:-/tmp}
+
+PRGNAM=${PRGNAM:-$(basename $CWD)}
+PKG=${PKG:-$TMP/pkg-$PRGNAM}
+
+ARCH=${ARCH:-noarch}
+
+PREFIX=${PREFIX:-/usr}
+
+# nettoyage préalable
+rm -fr $PKG
+
+mkdir -p $PKG/opt/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+
+# mise en place
+[ ! -e $CWD/$PRGNAM-bin-$VERSION.zip ] && wget -c http://sourceforge.net/projects/$PRGNAM/files/$VERSION/$PRGNAM-bin-$VERSION.zip/download -O $CWD/$PRGNAM-bin-$VERSION.zip
+
+cd $PKG/opt/$PRGNAM
+unzip $CWD/$PRGNAM-bin-$VERSION.zip
+
+cd $PKG$PREFIX/doc/$PRGNAM
+for i in COPYING.txt CREDITS.txt LICENSE.txt NEWS.txt README.txt docs; do
+    ln -s /opt/$PRGNAM/$i
+done
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (An EFI boot manager utility)
+$PRGNAM:
+$PRGNAM: rEFInd is a fork of the rEFIt boot manager. Like rEFIt, rEFInd can
+$PRGNAM: auto-detect your installed EFI boot loaders and it presents a pretty
+$PRGNAM: GUI menu of boot options. rEFInd goes beyond rEFIt in that rEFInd
+$PRGNAM: better handles systems with many boot loaders, gives better control
+$PRGNAM: over the boot loader search process, and provides the ability for users
+$PRGNAM: to define their own boot loader entries.
+$PRGNAM: 
+$PRGNAM: http://www.rodsbooks.com/refind/index.html
+$PRGNAM: 
+EOF
+
+# empaquetage
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
