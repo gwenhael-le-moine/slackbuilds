@@ -37,12 +37,12 @@ find . -type d -delete
 mkdir -p $PKG/install
 cat <<EOT > $PKG/install/doinst.sh
 # Update X font indexes and the font cache:
-if [ -x .$XPREF/bin/mkfontdir ]; then
-  chroot . $XPREF/bin/mkfontscale $TTFDIR
-  chroot . $XPREF/bin/mkfontdir $TTFDIR
+if [ -x ./usr/bin/mkfontdir ]; then
+  chroot . /usr/bin/mkfontscale $TTFDIR
+  chroot . /usr/bin/mkfontdir $TTFDIR
 fi
-if [ -x .$XPREF/bin/fc-cache ]; then
-  chroot . $XPREF/bin/fc-cache -f $TTFDIR
+if [ -x ./usr/bin/fc-cache ]; then
+  chroot . /usr/bin/fc-cache -f $TTFDIR
 fi
 EOT
 

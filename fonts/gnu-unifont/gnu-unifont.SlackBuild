@@ -40,12 +40,12 @@ rm -fr unifont-$(echo $VERSION | grep -o "^.\..")
 mkdir -p $PKG/install
 cat <<EOT > $PKG/install/doinst.sh
 # Update X font indexes and the font cache:
-if [ -x .$XPREF/bin/mkfontdir ]; then
-  chroot . $XPREF/bin/mkfontscale $FONTDIR
-  chroot . $XPREF/bin/mkfontdir $FONTDIR
+if [ -x ./usr/bin/mkfontdir ]; then
+  chroot . /usr/bin/mkfontscale $FONTDIR
+  chroot . /usr/bin/mkfontdir $FONTDIR
 fi
-if [ -x .$XPREF/bin/fc-cache ]; then
-  chroot . $XPREF/bin/fc-cache -f $FONTDIR
+if [ -x ./usr/bin/fc-cache ]; then
+  chroot . /usr/bin/fc-cache -f $FONTDIR
 fi
 EOT
 
