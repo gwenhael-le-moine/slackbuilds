@@ -10,7 +10,7 @@ TAG=${TAG:-cyco}
 
 DOCROOT=${DOCROOT:-/var/www/htdocs}
 
-PHPUSER=${PHPUSER:-root}
+PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -41,6 +41,8 @@ cp -a AUTHORS COPYING-AGPL $PKG/usr/doc/$PRGNAM
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/$PRGNAM
 chmod 0750 $PKG/$DOCROOT/$PRGNAM
+chmod 0777 $PKG/$DOCROOT/$PRGNAM/config # FIXME
+
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
