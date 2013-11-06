@@ -41,6 +41,7 @@ cp -a AUTHORS COPYING-AGPL $PKG/usr/doc/$PRGNAM
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/$PRGNAM
 chmod 0750 $PKG/$DOCROOT/$PRGNAM
+chmod 0770 $PKG/$DOCROOT/$PRGNAM/{config,apps}
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
