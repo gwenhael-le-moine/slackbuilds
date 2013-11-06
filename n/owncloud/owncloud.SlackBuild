@@ -10,7 +10,7 @@ TAG=${TAG:-cyco}
 
 DOCROOT=${DOCROOT:-/var/www/htdocs}
 
-PHPUSER=${PHPUSER:-root}
+PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
 
 TMP=${TMP:-/tmp/$TAG}
