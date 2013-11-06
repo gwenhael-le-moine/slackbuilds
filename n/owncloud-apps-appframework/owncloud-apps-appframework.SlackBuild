@@ -44,7 +44,7 @@ find . \
  -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp -a AUTHORS.md CHANGELOG COPYING README.rst $PKG/usr/doc/$PRGNAM
+cp -a AUTHORS COPYING README.rst $PKG/usr/doc/$PRGNAM
 
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud/apps/$PRGNAM
