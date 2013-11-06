@@ -21,6 +21,8 @@ REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 set -eu
 
+APPNAM=${PRGNAM#owncloud-apps-}
+
 rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$DOCROOT/owncloud/apps/
 cd $PKG/$DOCROOT/owncloud/apps/
@@ -32,9 +34,9 @@ if [ -e $REPOSITORIES/$PRGNAM ] ; then
 else
     git clone https://github.com/owncloud/news.git $REPOSITORIES/$PRGNAM
 fi
-cp -R $REPOSITORIES/$PRGNAM ./news
+cp -R $REPOSITORIES/$PRGNAM ./$APPNAM
 
-cd $PRGNAM
+cd $APPNAM
 rm -fr .git
 chown -R root:root .
 find . \
@@ -47,8 +49,8 @@ mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a AUTHORS.md CHANGELOG COPYING README.rst $PKG/usr/doc/$PRGNAM
 
 # Change ownership and perms and create a link.
-chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud/apps/$PRGNAM
-chmod 0750 $PKG/$DOCROOT/owncloud/apps/$PRGNAM
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud/apps/$APPNAM
+chmod 0750 $PKG/$DOCROOT/owncloud/apps/$APPNAM
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
