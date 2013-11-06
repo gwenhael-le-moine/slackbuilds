@@ -32,7 +32,7 @@ if [ -e $REPOSITORIES/$PRGNAM ] ; then
 else
     git clone https://github.com/owncloud/news.git $REPOSITORIES/$PRGNAM
 fi
-cp -R $REPOSITORIES/$PRGNAM .
+cp -R $REPOSITORIES/$PRGNAM ./news
 
 cd $PRGNAM
 rm -fr .git
