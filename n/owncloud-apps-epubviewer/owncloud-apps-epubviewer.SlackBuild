@@ -1,0 +1,61 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +%F | tr - .)}
+ARCH="noarch" 	# hardcode ARCH
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+DOCROOT=${DOCROOT:-/var/www/htdocs}
+
+PHPUSER=${PHPUSER:-apache}
+PHPGROUP=${PHPGROUP:-apache}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+set -eu
+
+APPNAM=files_epubviewer
+
+rm -rf $PKG
+mkdir -p $TMP $OUTPUT $PKG/$DOCROOT/owncloud/apps/
+cd $PKG/$DOCROOT/owncloud/apps/
+
+[ ! -e $CWD/files_epubviewer_oc5.tar.gz ] && wget -c http://www.les-charles.net/files/files_epubviewer_oc5.tar.gz -O $CWD/files_epubviewer_oc5.tar.gz
+tar xf $CWD/files_epubviewer_oc5.tar.gz
+
+cd $APPNAM
+VERSION=$(cat appinfo/version)
+
+chown -R root:root .
+find . \
+ \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+ -exec chmod 750 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+ -exec chmod 640 {} \;
+
+# Change ownership and perms and create a link.
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud/apps/$APPNAM
+chmod 0750 $PKG/$DOCROOT/owncloud/apps/$APPNAM
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (EPUB viewer for ownCloud)
+$PRGNAM:
+$PRGNAM: let you read your ebooks online !
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM: http://apps.owncloud.com/content/show.php/EPub+online+reader+%28oc5%29?content=157609
+$PRGNAM:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
