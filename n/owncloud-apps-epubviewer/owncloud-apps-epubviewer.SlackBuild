@@ -19,14 +19,17 @@ OUTPUT=${OUTPUT:-/tmp}
 
 set -eu
 
+FILENAME=157609-files_epubviewer_oc5.tar.gz
 APPNAM=files_epubviewer
 
 rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$DOCROOT/owncloud/apps/
 cd $PKG/$DOCROOT/owncloud/apps/
 
-[ ! -e $CWD/files_epubviewer_oc5.tar.gz ] && wget -c http://www.les-charles.net/files/files_epubviewer_oc5.tar.gz -O $CWD/files_epubviewer_oc5.tar.gz
-tar xf $CWD/files_epubviewer_oc5.tar.gz
+[ ! -e $CWD/$FILENAME ] && wget -c http://apps.owncloud.com/CONTENT/content-files/$FILENAME -O $CWD/$FILENAME
+tar xf $CWD/$FILENAME
+
+rm $CWD/$FILENAME
 
 cd $APPNAM
 VERSION=$(cat appinfo/version)
@@ -38,8 +41,8 @@ find . \
  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
  -exec chmod 640 {} \;
 
-# Change ownership and perms and create a link.
-chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud/apps/$APPNAM
+# Change ownership and perms
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud
 chmod 0750 $PKG/$DOCROOT/owncloud/apps/$APPNAM
 
 mkdir -p $PKG/install

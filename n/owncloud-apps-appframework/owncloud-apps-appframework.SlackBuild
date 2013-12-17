@@ -17,27 +17,23 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
-
 set -eu
 
+FILENAME=158433-appframework.zip
 APPNAM=${PRGNAM#owncloud-apps-}
 
 rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$DOCROOT/owncloud/apps/
 cd $PKG/$DOCROOT/owncloud/apps/
 
-if [ -e $REPOSITORIES/$PRGNAM ] ; then
-    ( cd $REPOSITORIES/$PRGNAM
-        git pull
-    )
-else
-    git clone https://github.com/owncloud/appframework.git $REPOSITORIES/$PRGNAM
-fi
-cp -R $REPOSITORIES/$PRGNAM $APPNAM
+[ ! -e $CWD/$FILENAME ] && wget -c http://apps.owncloud.com/CONTENT/content-files/$FILENAME -O $CWD/$FILENAME
+unzip $CWD/$FILENAME
+
+rm $CWD/$FILENAME
 
 cd $APPNAM
-rm -fr .git
+VERSION=$(cat appinfo/info.xml | grep -i version\> | sed 's|</\?version>||g' | tr -d \   | sed 's|\t||g' )
+
 chown -R root:root .
 find . \
  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
@@ -48,8 +44,8 @@ find . \
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a AUTHORS COPYING README.rst $PKG/usr/doc/$PRGNAM
 
-# Change ownership and perms and create a link.
-chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud/apps/$APPNAM
+# Change ownership and perms
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud
 chmod 0750 $PKG/$DOCROOT/owncloud/apps/$APPNAM
 
 mkdir -p $PKG/install
