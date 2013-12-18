@@ -40,6 +40,11 @@ mkdir -p $PKG$PREFIX/{sbin,doc/$PRGNAM}
 cp -R scripts/ README $PKG$PREFIX/doc/$PRGNAM
 cp scripts/usr/local/sbin/* $PKG$PREFIX/sbin
 
+mkdir -p $PKG/etc/udev/rules.d/
+cat <<EOF > $PKG/etc/udev/rules.d/97-nvidia-brightness.rules
+KERNEL=="nvidia_backlight", SUBSYSTEM=="backlight", RUN+="/usr/bin/chmod 0666 /sys/class/backlight/%k/brightness"
+EOF
+
 # correction
 cd $PKG
 chown -R root:root *
