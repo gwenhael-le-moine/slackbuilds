@@ -3,7 +3,7 @@
 FLTK=${FLTK:=YES}
 
 PRGNAM=nut
-VERSION=${VERSION:-19.0}
+VERSION=${VERSION:-19.1}
 
 BUILD=${BUILD:-3}
 
@@ -91,4 +91,3 @@ $PRGNAM:
 EOF
 
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
-
