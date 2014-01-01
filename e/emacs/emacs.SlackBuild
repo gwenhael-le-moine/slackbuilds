@@ -104,6 +104,7 @@ $SRCDIR/configure \
   --with-x \
   --with-x-toolkit=$X_TOOLKIT \
   --enable-link-time-optimization \
+  --with-compress-install \
   --without-gconf \
   --build=${ARCH}-slackware-linux
 
@@ -157,6 +158,7 @@ if [ ! "x$ONLY_X11" == "xYES" ] ; then
         --infodir=/usr/info \
         --with-x=no \
         --without-gconf \
+	--with-compress-install \
         --build=${ARCH}-slackware-linux
     
     make $NUMJOBS || make || exit 1
