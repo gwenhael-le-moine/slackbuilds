@@ -62,18 +62,15 @@ rm -rf $PRGNAM-$VERSION
 
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     if [ ! -e $REPOSITORIES/$PRGNAM/$BRANCH ] ; then
-        mkdir -p $REPOSITORIES/$PRGNAM
-        ( cd $REPOSITORIES/$PRGNAM
-            bzr branch --stacked http://bzr.savannah.gnu.org/r/emacs/$BRANCH $BRANCH
-        )
+	git clone git://git.sv.gnu.org/emacs.git $REPOSITORIES/$PRGNAM
+    else
+	( cd $REPOSITORIES/$PRGNAM/$BRANCH
+	  git pull
+	  [ -e Makefile ] && make distclean
+	)
     fi
-
-    ( cd $REPOSITORIES/$PRGNAM/$BRANCH
-       bzr pull
-       [ -e Makefile ] && make distclean
-    )
     mkdir -p $TMP/$PRGNAM-$VERSION
-    SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
+    SRCDIR=$REPOSITORIES/$PRGNAM
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
     SRCDIR=.
@@ -90,7 +87,7 @@ find . \
 ( cd $SRCDIR
     ./autogen.sh
 )
-        
+
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
 $SRCDIR/configure \
@@ -130,37 +127,37 @@ if [ ! "x$ONLY_X11" == "xYES" ] ; then
     cd $TMP
     rm -rf $PRGNAM-$VERSION
     if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-        [ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
-        mkdir -p $TMP/$PRGNAM-$VERSION
-        SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
+	[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
+	mkdir -p $TMP/$PRGNAM-$VERSION
+	SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
     else
-        tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
-        SRCDIR=.
+	tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
+	SRCDIR=.
     fi
 
     cd $PRGNAM-$VERSION || exit 1
     chown -R root:root .
     find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
+	\( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+	-exec chmod 755 {} \; -o \
+	\( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+	-exec chmod 644 {} \;
 
     CFLAGS="$SLKCFLAGS" \
     CXXFLAGS="$SLKCFLAGS" \
     $SRCDIR/configure \
-        --prefix=/usr \
-        --sysconfdir=/etc \
-        --localstatedir=/var \
-        --program-prefix="" \
-        --program-suffix="" \
-        --mandir=/usr/man \
-        --infodir=/usr/info \
-        --with-x=no \
-        --without-gconf \
+	--prefix=/usr \
+	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--program-prefix="" \
+	--program-suffix="" \
+	--mandir=/usr/man \
+	--infodir=/usr/info \
+	--with-x=no \
+	--without-gconf \
 	--with-compress-install \
-        --build=${ARCH}-slackware-linux
-    
+	--build=${ARCH}-slackware-linux
+
     make $NUMJOBS || make || exit 1
 
     # Install the non-x version:
@@ -232,4 +229,3 @@ EOF
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
-
