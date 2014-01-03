@@ -61,10 +61,10 @@ cd $TMP
 rm -rf $PRGNAM-$VERSION
 
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    if [ ! -e $REPOSITORIES/$PRGNAM/$BRANCH ] ; then
+    if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
 	git clone git://git.sv.gnu.org/emacs.git $REPOSITORIES/$PRGNAM
     else
-	( cd $REPOSITORIES/$PRGNAM/$BRANCH
+	( cd $REPOSITORIES/$PRGNAM
 	  git pull
 	  [ -e Makefile ] && make distclean
 	)
