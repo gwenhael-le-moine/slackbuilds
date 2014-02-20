@@ -23,19 +23,21 @@ BUILD=1
 
 BRANCH=${BRANCH:=latest-mozilla-central}
 
-if [ $KEEP_TAR == "NO" ]; then
+if [ $KEEP_TAR == "YES" ]; then
     [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
-    WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date *.en-US.linux-x86_64.tar.bz2 ; quit" | awk '{print $4}' | sort | tail -n1)
-    wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
+else
+    [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && rm firefox-*.en-US.linux-x86_64.tar.bz2
 fi
+WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date *.en-US.linux-x86_64.tar.bz2 ; quit" | awk '{print $4}' | sort | tail -n1)
+wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
 
 VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')
 
 LIBSUFFIX=$(echo "$ARCH" | grep -o "64")
 
-if [ ! -d $TMP ]; then
-  mkdir -p $TMP
-fi
+
+mkdir -p $TMP
+
 rm -rf $PKG
 mkdir -p $PKG/usr/lib$LIBSUFFIX
 ( cd $PKG/usr/lib$LIBSUFFIX
