@@ -12,7 +12,7 @@ PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-ARCH=${ARCH:-$(uname -m)}
+ARCH=noarch
 
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
@@ -68,10 +68,10 @@ $PRGNAM: supports being set as the PAGER environment variable. Displays man
 $PRGNAM: pages, perldocs and python documentation properly. Works on Linux,
 $PRGNAM: Solaris, FreeBSD, NetBSD, OpenBSD, OSX, Cygwin and msys. Should work
 $PRGNAM: on most other systems as well.
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://github.com/rkitover/vimpager
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # empaquetage
