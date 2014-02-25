@@ -3,7 +3,7 @@
 PRGNAM=vagrant
 
 ARCH=${ARCH:-$(uname -m)}
-VERSION=${VERSION:-1.4.0}
+VERSION=${VERSION:-1.4.3}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
