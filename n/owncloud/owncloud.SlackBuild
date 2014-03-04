@@ -50,6 +50,8 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 #!/bin/sh
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
+
+grep -q "/var/www/htdocs/owncloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/htdocs/owncloud/cron.php" >> /var/spool/cron/crontabs/apache
 EOF
 
 cat <<EOF > $PKG/install/slack-desc
