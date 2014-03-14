@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +%F | tr - .)}
+VERSION=v0.1.7-beta
 ARCH="noarch" 	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -19,20 +19,18 @@ OUTPUT=${OUTPUT:-/tmp}
 
 set -eu
 
-FILENAME=160485-music.zip
+FILENAME=$PRGNAM-$VERSION.tar.gz
 APPNAM=${PRGNAM#owncloud-apps-}
 
 rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$DOCROOT/owncloud/apps/
 cd $PKG/$DOCROOT/owncloud/apps/
 
-[ ! -e $CWD/$FILENAME ] && wget -c http://apps.owncloud.com/CONTENT/content-files/$FILENAME -O $CWD/$FILENAME
-unzip $CWD/$FILENAME
-
-rm $CWD/$FILENAME
+[ ! -e $CWD/$FILENAME ] && wget -c https://github.com/owncloud/music/releases/download/$VERSION/music.tar.gz -O $CWD/$FILENAME
+tar xvf $CWD/$FILENAME
 
 cd $APPNAM
-VERSION=$(cat appinfo/info.xml | grep -i version\> | sed 's|</\?version>||g' | tr -d \   | sed 's|\t||g' | tr - _ )
+#VERSION=$(cat appinfo/info.xml | grep -i version\> | sed 's|</\?version>||g' | tr -d \   | sed 's|\t||g' | tr - _ )
 
 chown -R root:root .
 find . \
@@ -64,4 +62,4 @@ $PRGNAM:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
