@@ -17,6 +17,8 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
+ENABLE_PLUGINS=${ENABLE_PLUGINS:-false}
+
 set -eu
 
 rm -rf $PKG
@@ -28,8 +30,10 @@ rm -rf $PRGNAM-$VERSION
 tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
 cd $PRGNAM
 
-[ ! -e $CWD/plugins-$VERSION.tar.gz ] && wget -c http://dl.bintray.com/novik65/generic/plugins-$VERSION.tar.gz -O $CWD/plugins-$VERSION.tar.gz
-tar xvf $CWD/plugins-$VERSION.tar.gz
+if [ "$ENABLE_PLUGINS" = "true" ]; then
+    [ ! -e $CWD/plugins-$VERSION.tar.gz ] && wget -c http://dl.bintray.com/novik65/generic/plugins-$VERSION.tar.gz -O $CWD/plugins-$VERSION.tar.gz
+    tar xvf $CWD/plugins-$VERSION.tar.gz
+fi
 
 chown -R root:root .
 find . \
