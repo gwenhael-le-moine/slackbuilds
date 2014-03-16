@@ -1,0 +1,84 @@
+#!/bin/sh -x
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ ! -e $REPOSITORY ]; then
+    git clone https://github.com/owncloud/mirall.git $REPOSITORY
+else
+    ( cd $REPOSITORY
+	git pull
+    )
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM
+
+cd $TMP/$PRGNAM
+
+# configuration
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DSYSCONFDIR=/etc \
+    .
+
+# compilation
+make -j3
+
+# installation
+make install DESTDIR=$PKG
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (ownCloud Desktop Syncing Client)
+$PRGNAM:
+$PRGNAM: Mirall is a tool to synchronize files from ownCloud Server with
+$PRGNAM: your computer. It uses OCSync as its syncing backend.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/owncloud/mirall
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
