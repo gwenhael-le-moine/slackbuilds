@@ -51,11 +51,6 @@ chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/$PRGNAM
 chmod 0750 $PKG/$DOCROOT/$PRGNAM
 
 mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
-chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
-EOF
-
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (Audio/Video streaming server)
 $PRGNAM:
