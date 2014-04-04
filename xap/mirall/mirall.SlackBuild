@@ -26,16 +26,21 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ ! -e $REPOSITORY ]; then
-    git clone https://github.com/owncloud/mirall.git $REPOSITORY
+if [ -e $CWD/$PRGNAM-$VERSION.tar.bz2 ]; then
+    # wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.bz2
+    tar xf $CWD/$PRGNAM-$VERSION.tar.bz2
 else
-    ( cd $REPOSITORY
-	git pull
-    )
+    if [ ! -e $REPOSITORY ]; then
+	git clone https://github.com/owncloud/mirall.git $REPOSITORY
+    else
+	( cd $REPOSITORY
+	  git pull
+	)
+    fi
+    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 fi
-cp -R $REPOSITORY $TMP/$PRGNAM
 
-cd $TMP/$PRGNAM
+cd $TMP/$PRGNAM-$VERSION
 
 # configuration
 cmake \
