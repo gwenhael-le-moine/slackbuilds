@@ -44,7 +44,7 @@ find . \
  -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp README.md $PKG/usr/doc/$PRGNAM
+mv _docs README.md $PKG/usr/doc/$PRGNAM
 
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/$PRGNAM
