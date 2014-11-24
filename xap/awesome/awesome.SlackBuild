@@ -1,8 +1,5 @@
 #!/bin/sh -x
 
-#set to 0 if you don't want to pack obvious
-INCLUDE_OBVIOUS=0
-
 # variables
 CWD=$(pwd)
 
@@ -11,7 +8,6 @@ BRANCH=master
 VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
-
 
 TAG=cyco
 TMP=/tmp/$TAG
@@ -28,11 +24,11 @@ function git_clone_or_pull() {
     REPO_URL=$1
     REPO_NAME=$2
     if [ ! -e $REPOSITORIES/$REPO_NAME ]; then
-        git clone $REPO_URL $REPOSITORIES/$REPO_NAME
+	git clone $REPO_URL $REPOSITORIES/$REPO_NAME
     else
-        ( cd $REPOSITORIES/$REPO_NAME
-            git pull
-        )
+	( cd $REPOSITORIES/$REPO_NAME
+	    git pull
+	)
     fi
 }
 
@@ -49,7 +45,7 @@ if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     SRC_PATH=.
     cd $TMP/$PRGNAM-$VERSION
 else
-    git_clone_or_pull http://git.naquadah.org/git/$PRGNAM.git $PRGNAM
+    git_clone_or_pull https://github.com/awesomeWM/$PRGNAM.git $PRGNAM
     rm -fr $TMP/$PRGNAM-$VERSION
     mkdir -p $TMP/$PRGNAM-$VERSION
     cd $TMP/$PRGNAM-$VERSION
@@ -73,12 +69,6 @@ mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
 chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
 
-if [ $INCLUDE_OBVIOUS == 1 ] ; then
-    git_clone_or_pull git://git.mercenariesguild.net/obvious.git obvious
-
-    cp -R $REPOSITORIES/obvious $PKG/usr/share/$PRGNAM/lib/
-fi
-
 # correction
 cd $PKG
 chown -R root:root *
@@ -88,11 +78,9 @@ find $PKG -name \.git\* -exec rm -fr {} \;
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
 # Strip binaries
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 # embaumement
 mkdir -p $PKG/install
@@ -104,16 +92,11 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
+$PRGNAM:
 $PRGNAM: http://$PRGNAM.naquadah.org
 $PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
 $PRGNAM:
 EOF
-if [ $INCLUDE_OBVIOUS == 1 ] ; then
-echo "$PRGNAM: [ include obvious ( http://$PRGNAM.naquadah.org/wiki/Obvious ) ]" >> $PKG/install/slack-desc
-else
-echo "$PRGNAM:" >> $PKG/install/slack-desc
-fi
 
 # empaquetage
-cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
