@@ -41,7 +41,7 @@ make
 mkdir -p $PKG$PREFIX/bin
 cp f3read f3write f3write.h2w log-f3wr $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/*
-sed -i "s|^f3|$PREFIX/bin/f3|g" $PKG$PREFIX/bin/log-f3wr
+sed -i "s|^f3|$PREFIX/bin/f3|g" $PKG$PREFIX/bin/{log-f3wr,f3write.h2w}
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
