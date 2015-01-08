@@ -5,6 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+STABLE=${STABLE:-"NO"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -26,8 +27,8 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ -e $CWD/$PRGNAM-$VERSION.tar.bz2 ]; then
-    # wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.bz2
+if [ "x$STABLE" == "xYES" ]; then
+    wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
     tar xf $CWD/$PRGNAM-$VERSION.tar.bz2
 else
     if [ ! -e $REPOSITORY ]; then
