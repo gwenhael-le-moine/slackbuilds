@@ -43,6 +43,10 @@ mv ${PRGNAM} $PKG$PREFIX/bin/
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a *.txt etc/ $PKG/usr/doc/$PRGNAM-$VERSION
 
+mkdir -p $PKG/etc/rc.d/
+cp $CWD/rc.$PRGNAM $PKG/etc/rc.d/
+chmod +x $PKG/etc/rc.d/rc.$PRGNAM
+
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
