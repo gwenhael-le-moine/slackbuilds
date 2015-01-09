@@ -12,9 +12,9 @@ TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-echo $ARCH | grep -q armv7 && SRC_ARCH=armv7 || \
-	echo $ARCH | grep -q 86 && SRC_ARCH=386 || \
-		echo $ARCH | grep -q 64 && SRC_ARCH=amd64
+echo $ARCH | grep -q armv7 && SRC_ARCH=armv7
+echo $ARCH | grep -q 86 && SRC_ARCH=386
+echo $ARCH | grep -q 64 && SRC_ARCH=amd64
 
 
 rm -rf $PKG
