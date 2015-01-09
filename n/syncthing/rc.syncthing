@@ -36,7 +36,7 @@ func_stop() {
 
 func_start() {
     echo -n "Starting $NAME ... "
-    su - $USERNAME -c "$CMD $OPTIONS"
+    su - $USERNAME -c "$CMD $OPTIONS" &
     sleep 2
 
     if [ "$(ps aux | grep $PROCESSNAME | grep -v grep)" ]; then
