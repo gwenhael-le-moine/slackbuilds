@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=git$(date +%Y.%m.%d_%H.%M)
+VERSION=nightly
 BUILD=1
 
 ARCH=$(uname -m)
@@ -22,21 +22,11 @@ rm -fr $PKG
 mkdir -p $TMP $PKG
 
 # get sources
-[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
-if [ -e $REPOSITORIES/$PRGNAM ] ; then
-    ( cd $REPOSITORIES/$PRGNAM
-        git pull
-    )
-else
-    git clone http://github.com/mozilla/rust/ $REPOSITORIES/$PRGNAM
-	( cd $REPOSITORIES/$PRGNAM
-		git submodule init
-		git submodule update
-	)
-fi
+[ "$VERSION" == "nightly" ] && rm $CWD/rustc-${VERSION}-src.tar.gz
+[ ! -e $CWD/rustc-${VERSION}-src.tar.gz ] && wget -c https://static.rust-lang.org/dist/rustc-${VERSION}-src.tar.gz
 
 cd $TMP
-rm -fr $PRGNAM-$VERSION && cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
+tar xvf $CWD/rustc-${VERSION}-src.tar.gz
 
 cd $PRGNAM-$VERSION
 ./configure \
