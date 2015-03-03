@@ -44,7 +44,8 @@ find . \
  -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp -a CHANGELOG COPYING $PKG/usr/doc/$PRGNAM
+chmod 644 *.md *.txt
+cp -a *.md *.txt $PKG/usr/doc/$PRGNAM
 
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/$PRGNAM
