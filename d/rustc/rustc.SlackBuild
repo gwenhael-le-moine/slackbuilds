@@ -21,17 +21,18 @@ PREFIX=/usr
 rm -fr $PKG
 mkdir -p $TMP $PKG
 
-# get
-[ "$VERSION" == "nightly" ] && rm $CWD/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz
-[ ! -e $CWD/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz ] && wget -c https://static.rust-lang.org/dist/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz -O $CWD/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz
+# get sources
+[ "$VERSION" == "nightly" ] && rm $CWD/rustc-${VERSION}-src.tar.gz
+[ ! -e $CWD/rustc-${VERSION}-src.tar.gz ] && wget -c https://static.rust-lang.org/dist/rustc-${VERSION}-src.tar.gz
 
 cd $TMP
-tar xvf $CWD/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz
+tar xvf $CWD/rustc-${VERSION}-src.tar.gz
 
-cd rust-nightly-x86_64-unknown-linux-gnu
-./install.sh --prefix=$PKG/usr
-
-echo "${ARCH}" | grep -q -o 64 && mv $PKG/usr/lib $PKG/usr/lib64
+cd $PRGNAM-$VERSION
+./configure \
+	--prefix=$PREFIX
+make
+make DESTDIR=$PKG install
 mv $PKG/usr/share/man $PKG/usr/
 find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
@@ -39,16 +40,16 @@ cd $PKG
 mkdir -p install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (a safe, concurrent, practical language)
-$PRGNAM:
+$PRGNAM: 
 $PRGNAM:  Rust is a curly-brace, block-structured expression language.
 $PRGNAM: It visually resembles the C language family, but differs significantly in
 $PRGNAM: syntactic and semantic details. Its design is oriented toward concerns of
 $PRGNAM: “programming in the large”, that is, of creating and maintaining boundaries
 $PRGNAM: – both abstract and operational – that preserve large-system integrity,
 $PRGNAM: availability and concurrency.
-$PRGNAM:
+$PRGNAM: 
 $PRGNAM: http://www.rust-lang.org/
-$PRGNAM:
+$PRGNAM: 
 EOF
 
 chown -R root:root *
@@ -57,7 +58,5 @@ chown -R root:root *
 
 find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-
-[ "$VERSION" == "nightly" ] && VERSION=${VERSION}_$(date +%F | tr - .)
 
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
