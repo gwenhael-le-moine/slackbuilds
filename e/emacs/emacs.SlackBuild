@@ -112,7 +112,6 @@ make bootstrap
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-EMACS_VERSION=$(echo "$(basename $(ls $PKG/usr/bin/emacs-2*))" | grep -o "[0-9\.]*")
 ( cd $PKG/usr/bin
     rm emacs
     mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
