@@ -31,7 +31,7 @@ ONLY_X11=${ONLY_X11:=YES}
 
 PRGNAM=emacs
 BRANCH=${BRANCH:=trunk}
-VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
@@ -87,6 +87,8 @@ find . \
 ( cd $SRCDIR
     ./autogen.sh
 )
+
+EMACS_VERSION=$(grep "AC_INIT(GNU Emacs," $SRCDIR/configure.ac | sed 's|AC_INIT(GNU Emacs, \([0-9.]*\), bug-gnu-emacs@gnu.org)|\1|')
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
@@ -228,4 +230,4 @@ Categories=Application;Development;
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$EMACS_VERSION_$VERSION-$ARCH-$BUILD$TAG.txz
