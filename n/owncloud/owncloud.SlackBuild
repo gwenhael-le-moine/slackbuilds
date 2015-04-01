@@ -3,8 +3,8 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-#VERSION=${VERSION:-daily-stable7}
-VERSION=${VERSION:-7.0.2}
+#VERSION=${VERSION:-daily-master}
+VERSION=${VERSION:-8.0.0}
 ARCH="noarch" 	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -49,6 +49,10 @@ cat <<EOF > $PKG/install/doinst.sh
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
 
 grep -q "/var/www/htdocs/owncloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/htdocs/owncloud/cron.php" >> /var/spool/cron/crontabs/apache
+
+( cd /var/www/htdocs/owncloud/
+su $PHPUSER -c 'php ./occ upgrade'
+)
 EOF
 
 cat <<EOF > $PKG/install/slack-desc

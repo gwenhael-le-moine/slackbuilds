@@ -3,9 +3,9 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=0.10.18
+VERSION=${VERSION:-0.10.25}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 TAG=${TAG:-cyco}
 
 TMP=${TMP:-/tmp/SBo}
@@ -13,7 +13,9 @@ PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
-echo $ARCH | grep -q armv7 && SRC_ARCH=armv7
+USERNAME=cycojesus
+
+echo $ARCH | grep -q arm && SRC_ARCH=arm
 echo $ARCH | grep -q 86 && SRC_ARCH=386
 echo $ARCH | grep -q 64 && SRC_ARCH=amd64
 
@@ -34,6 +36,7 @@ find . \
 
 mkdir -p $PKG$PREFIX/bin/
 mv ${PRGNAM} $PKG$PREFIX/bin/
+chown $USERNAME $PKG$PREFIX/bin/${PRGNAM}
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
@@ -44,7 +47,75 @@ mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a *.txt etc/ $PKG/usr/doc/$PRGNAM-$VERSION
 
 mkdir -p $PKG/etc/rc.d/
-cp $CWD/rc.$PRGNAM $PKG/etc/rc.d/
+cat <<EOF > $PKG/etc/rc.d/rc.$PRGNAM
+#!/bin/bash
+#Slackware startup deamon script
+
+# Name of Service
+NAME="Syncthing Daemon"
+
+# Command to run
+CMD="/usr/bin/syncthing"
+
+# Process name of daemon, for killing it.
+PROCESSNAME=\$CMD
+
+# The name of the user that should run Transmission.
+# It's RECOMENDED to run Transmission in it's own user,
+# by default, this is set to 'transmission'.
+# For the sake of security you shouldn't set a password
+# on this user
+USERNAME="$USERNAME"
+
+# Option to run with deamon
+OPTIONS=" -home=/home/\$USERNAME/ "
+
+func_stop() {
+    if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
+	echo -n "Stopping \$NAME ... "
+	killall \$PROCESSNAME
+	sleep 2
+    fi
+
+    if [ ! "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
+	echo "Done!"
+    else
+	echo "Error!"
+    fi
+}
+
+func_start() {
+    echo -n "Starting \$NAME ... "
+    su - \$USERNAME -c "\$CMD \$OPTIONS" &
+    sleep 2
+
+    if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
+	echo "Done!"
+    else
+	echo "Error!"
+    fi
+}
+
+
+case \$1 in
+    "start")
+	func_start
+	;;
+
+    "stop")
+	func_stop
+	;;
+
+    "restart")
+	func_stop
+	sleep 2
+	func_start
+	;;
+    *)
+	echo "Usage; start|stop|restart"
+	;;
+esac
+EOF
 chmod +x $PKG/etc/rc.d/rc.$PRGNAM
 
 mkdir -p $PKG/install
