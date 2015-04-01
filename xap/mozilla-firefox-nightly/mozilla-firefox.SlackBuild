@@ -22,6 +22,7 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
 BRANCH=${BRANCH:=latest-mozilla-central}
+TIMESTAMP=$(date +%F | tr - .)
 
 if [ $KEEP_TAR == "YES" ]; then
     [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
@@ -96,7 +97,7 @@ mozilla-firefox:
 mozilla-firefox:
 EOF
 
-VERSION=$(echo $BRANCH | sed 's|latest-mozilla-||g')_${VERSION}
+#VERSION=$(echo $BRANCH | sed 's|latest-mozilla-||g')_${VERSION}
 
 cd $PKG
-makepkg -l y -c n $OUTPUT/mozilla-firefox-$VERSION-$ARCH-$BUILD$TAG.txz
+makepkg -l y -c n $OUTPUT/mozilla-firefox-${VERSION}_$TIMESTAMP-$ARCH-$BUILD$TAG.txz
