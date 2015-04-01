@@ -234,4 +234,4 @@ Categories=Application;Development;
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$EMACS_VERSION_$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz

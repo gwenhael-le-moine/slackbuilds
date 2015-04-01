@@ -31,7 +31,7 @@ tar xvf $CWD/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz
 cd rust-nightly-x86_64-unknown-linux-gnu
 ./install.sh --prefix=$PKG/usr
 
-echo "${ARCH}" | grep -q -o 64 && mv $PKG/usr/lib $PKG/usr/lib64
+#echo "${ARCH}" | grep -q -o 64 && mv $PKG/usr/lib $PKG/usr/lib64
 mv $PKG/usr/share/man $PKG/usr/
 find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
