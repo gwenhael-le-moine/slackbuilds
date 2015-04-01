@@ -49,6 +49,13 @@ mkdir -p $PKG/usr/lib$LIBSUFFIX
   rm -f defaults/pref/firefox.js.orig
   ln -s ../mozilla/plugins
 ) || exit 1
+if [ ! "/usr/lib$LIBSUFFIX" == "/usr/lib" ]; then
+    mkdir -p $PKG/usr/lib
+    ( cd $PKG/usr/lib
+      ln -s ../lib$LIBSUFFIX/mozilla mozilla
+    )
+fi
+
 mkdir -p $PKG/usr/bin
 ( cd $PKG/usr/bin
   ln -sf /usr/lib$LIBSUFFIX/firefox-$VERSION/firefox .
