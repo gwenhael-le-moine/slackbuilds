@@ -4,6 +4,7 @@ repositories/
 *.deb
 *.zip
 *.tgz
+*.txz
 *.tar
 *.pdf
 *.ttf
