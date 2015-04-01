@@ -181,9 +181,14 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" \
 rm $PKG/usr/info/dir*
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a \
-  AUTHORS COPYING* ChangeLog INSTALL README \
-  $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a  BUGS \
+   CONTRIBUTE \
+   COPYING \
+   ChangeLog \
+   INSTALL \
+   INSTALL.REPO \
+   README \
+   $PKG/usr/doc/$PRGNAM-$VERSION
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
