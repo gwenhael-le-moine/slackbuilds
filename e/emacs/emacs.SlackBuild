@@ -31,7 +31,7 @@ ONLY_X11=${ONLY_X11:=YES}
 
 PRGNAM=emacs
 BRANCH=${BRANCH:=trunk}
-VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
@@ -88,6 +88,8 @@ find . \
     ./autogen.sh
 )
 
+EMACS_VERSION=$(grep "AC_INIT(GNU Emacs," $SRCDIR/configure.ac | sed 's|AC_INIT(GNU Emacs, \([0-9.]*\), bug-gnu-emacs@gnu.org)|\1|')
+
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
 $SRCDIR/configure \
@@ -110,7 +112,6 @@ make bootstrap
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-EMACS_VERSION=$(echo "$(basename $(ls $PKG/usr/bin/emacs-2*))" | grep -o "[0-9\.]*")
 ( cd $PKG/usr/bin
     rm emacs
     mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
@@ -180,9 +181,14 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" \
 rm $PKG/usr/info/dir*
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a \
-  AUTHORS COPYING* ChangeLog INSTALL README \
-  $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a  BUGS \
+   CONTRIBUTE \
+   COPYING \
+   ChangeLog \
+   INSTALL \
+   INSTALL.REPO \
+   README \
+   $PKG/usr/doc/$PRGNAM-$VERSION
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
@@ -228,4 +234,4 @@ Categories=Application;Development;
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz
