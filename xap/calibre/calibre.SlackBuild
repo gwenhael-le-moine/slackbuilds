@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-2.27.0}
+VERSION=${VERSION:-2.28.0}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
