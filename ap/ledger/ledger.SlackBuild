@@ -6,8 +6,8 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-BRANCH=${BRANCH:="RELEASE"}
-VERSION=${VERSION:=2.6.3}
+BRANCH=${BRANCH:="ALPHA"}
+VERSION=${VERSION:=${BRANCH}_$(date +%F | tr - .)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
 TAG=${TAG:-cyco}
