@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=nightly
+VERSION=${VERSION:-1.0.0}
 BUILD=1
 
 ARCH=$(uname -m)
@@ -28,11 +28,12 @@ mkdir -p $TMP $PKG
 cd $TMP
 tar xvf $CWD/rust-${VERSION}-x86_64-unknown-linux-gnu.tar.gz
 
-cd rust-nightly-x86_64-unknown-linux-gnu
+cd rust-${VERSION}-x86_64-unknown-linux-gnu
 ./install.sh --prefix=$PKG/usr
 
-#echo "${ARCH}" | grep -q -o 64 && mv $PKG/usr/lib $PKG/usr/lib64
+echo "${ARCH}" | grep -q -o 64 && mv $PKG/usr/lib $PKG/usr/lib64
 mv $PKG/usr/share/man $PKG/usr/
+mv $PKG/usr/share/doc $PKG/usr/
 find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
 cd $PKG
