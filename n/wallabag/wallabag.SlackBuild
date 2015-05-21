@@ -24,7 +24,7 @@ mkdir -p $TMP $OUTPUT $PKG/$DOCROOT
 cd $PKG/$DOCROOT/
 rm -rf $PRGNAM-$VERSION
 
-REPOSITORY=/home/installs/SlackBuilds/repository/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 if [ -e $REPOSITORY ]; then
     (cd $REPOSITORY; git pull)
