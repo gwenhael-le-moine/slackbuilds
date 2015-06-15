@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-2.28.0}
+VERSION=${VERSION:-$(wget -O - -o /dev/null http://status.calibre-ebook.com/latest)}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
