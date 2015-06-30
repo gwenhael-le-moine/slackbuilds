@@ -83,8 +83,8 @@ find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
 cp -a \
-  LICENSE NEWS README TODO contrib/ \
-  $PKG/usr/doc/$PRGNAM-$VERSION
+   *.md contrib/ doc/ python/ \
+   $PKG/usr/doc/$PRGNAM-$VERSION
 ( cd $PKG/usr/bin
 	for i in report; do
 		ln -s ../doc/$PRGNAM-$VERSION/contrib/$i ledger-$i
