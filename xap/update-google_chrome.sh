@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BUILD_DIR=${BUILD_DIR:=/home/installs/slackware64-current/extra/google-chrome}
+BUILD_DIR=${BUILD_DIR:=/home/installs/mirrors/slackware64-current/extra/google-chrome}
 
 ARCH=${ARCH:=$(uname -m)}
 case $ARCH in
