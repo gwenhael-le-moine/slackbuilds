@@ -68,6 +68,8 @@ case $BRANCH in
 esac
 [ $BRANCH != "RELEASE" ] && VERSION=${BRANCH}_$(date +%Y.%m.%d_%H.%M)
 
+patch -p1 -i $CWD/boost-1.58.diff
+
 ./acprep pull
 
 ./acprep --prefix=/usr --python opt config -- -DUSE_PYTHON=ON -DUSE_DOXYGEN=ON -DBUILD_EMACSLISP=ON
