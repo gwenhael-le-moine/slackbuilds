@@ -22,3 +22,5 @@ RELEASE=$CHANNEL ./google-chrome.SlackBuild
 upgradepkg --install-new /tmp/google-chrome-*-$ARCH-*.txz
 
 rm google-chrome-${CHANNEL}_current_$DEBARCH.deb
+
+/root/clean-tmp.sh
