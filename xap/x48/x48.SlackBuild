@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=x48
-VERSION=0.6.3
+VERSION=${VERSION:-0.6.4}
 
 BUILD=1
 
@@ -15,95 +15,77 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
 PREFIX=/usr
 
 mkdir -p $TMP
 
 # Cleaning
-( cd $TMP
-    rm -fr $PRGNAM-$VERSION
-    rm -fr $PKG
-)
+rm -fr $PRGNAM-$VERSION $PKG
 
 # Fetching sources
-( cd $TMP
-    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && ( cd $CWD
-        wget -c http://download.berlios.de/x48/x48-$VERSION.tar.gz
+
+cd $TMP
+if [ ! -e $REPOSITORY ]; then
+    git clone https://github.com/cycojesus/x48.git $REPOSITORY
+else
+    ( cd $REPOSITORY
+      git pull
     )
-    [ ! -e $CWD/gxrom-r.bz2 ] && ( cd $CWD
-        wget -c http://download.berlios.de/x48/gxrom-r.bz2
-    )
-    # [ ! -e $CWD/sxrom-j.bz2 ] && ( cd $CWD
-    #     wget -c http://download.berlios.de/x48/sxrom-j.bz2
-    # )
-    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && ( cd $CWD
-        wget -c http://download.berlios.de/x48/x48-$VERSION.tar.gz
-    )
-    [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] \
-        && tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
-)
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 
 # Preparation
-( cd $TMP/$PRGNAM-$VERSION
-    chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
-)
+cd $TMP/$PRGNAM-$VERSION
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
 
 # Configuration
-( cd $TMP/$PRGNAM-$VERSION
-	./configure \
-		--prefix=$PREFIX \
-		--mandir=$PREFIX/man \
-		--libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
-        --sysconfdir=/etc
-)
+./autogen.sh
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man \
+    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
+    --sysconfdir=/etc
 
 # Building
-( cd $TMP/$PRGNAM-$VERSION
-    make
-)
+make
 
 # Installation
-( cd $TMP/$PRGNAM-$VERSION
-	make install DESTDIR=$PKG
+make install DESTDIR=$PKG
 
-    mkdir -p $PKG$PREFIX/share/$PRGNAM
-    ( cd $PKG$PREFIX/share/$PRGNAM
-        cp $CWD/*rom* .
-        find . -name "*.bz2" -exec bunzip2 {} \;
-        find . -name "*.gz" -exec gunzip {} \;
-        find . -name "*.zip" -exec unzip {} \;
-    )
-)
+mkdir -p $PKG$PREFIX/share/$PRGNAM
+cd $PKG$PREFIX/share/$PRGNAM
+cp $TMP/$PRGNAM-$VERSION/ROMs/*rom*.bz2 .
+find . -name "*.bz2" -exec bunzip2 {} \;
 
 # Cleaning
-( cd $PKG
-    find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-    find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-    find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
 
-    chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
-)
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
 
 # Packaging
-( cd $PKG
-    mkdir install
-    cat <<EOF > install/slack-desc
+mkdir install
+cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (HP48 emulator)
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: The x48 is an emulator of the Saturn Processor and the I/O of an
-$PRGNAM: HP48 calculator. There is a debugger for the Saturn Processor. 
-$PRGNAM: 
+$PRGNAM: HP48 calculator. There is a debugger for the Saturn Processor.
+$PRGNAM:
 $PRGNAM: initialization:
 $PRGNAM: $ mkdir ~/.hp48 && cp $PREFIX/share/$PRGNAM/gxrom-r ~/.hp48/rom.dump
 $PRGNAM: $ cd ~/.hp48 && x48 -initialize
@@ -112,6 +94,4 @@ $PRGNAM: http://x48.berlios.de/
 $PRGNAM:
 EOF
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
-)
-
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
