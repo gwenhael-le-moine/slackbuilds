@@ -5,8 +5,8 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-VERSION=${VERSION:-0.7.4}
-BUILD=1
+VERSION=${VERSION:-0.7.5}
+BUILD=2
 
 
 TAG=cyco
@@ -25,7 +25,7 @@ mkdir -p $PKG$PREFIX/{doc,libexec/${PRGNAM}}/
 cd $PKG$PREFIX/doc/
 tar xvf $CWD/crystal-${VERSION}-1-linux-${ARCH}.tar.gz
 mv crystal-${VERSION}-1 crystal-${VERSION}
-mv crystal-${VERSION}/embedded $PKG$PREFIX/libexec/${PRGNAM}
+mv crystal-${VERSION}/{embedded,src} $PKG$PREFIX/libexec/${PRGNAM}
 mv crystal-${VERSION}/bin $PKG$PREFIX
 
 sed -i "s|INSTALL_DIR=.*|INSTALL_DIR=$PREFIX/libexec/$PRGNAM|g" $PKG$PREFIX/bin/crystal
