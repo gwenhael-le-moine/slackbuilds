@@ -1,0 +1,48 @@
+#!/bin/sh
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+PRGNAM=$(basename $CWD)
+ARCH=${ARCH:-$(uname -m | grep -q 64 && echo "x86_64" || echo "i386")}
+VERSION=${VERSION:-0.1.3.1}
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+rm -rf $PKG
+mkdir -p $PKG/usr/bin $OUTPUT
+cd $PKG/usr/bin/
+
+wget -c https://github.com/commercialhaskell/stack/releases/download/v${VERSION}/stack-${VERSION}-${ARCH}-linux.gz -O stack.gz
+gunzip stack.gz
+
+# Make sure top-level perms are correct:
+chmod 0755 stack
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler----------------------------------------------------|
+$PRGNAM: $PRGNAM ( The Haskell Tool Stack)
+$PRGNAM:
+$PRGNAM: $PRGNAM is a cross-platform program for developing Haskell projects.
+$PRGNAM: It is aimed at Haskellers both new and experienced.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: Homepage:  https://www.stackage.org/
+$PRGNAM:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
