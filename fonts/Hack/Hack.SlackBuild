@@ -23,15 +23,17 @@ REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 FONTDIR="/usr/share/fonts"
 
 [ ! -e $REPOSITORY ] \
-    && git clone https://github.com/mozilla/Fira.git $REPOSITORY \
-    || (cd $REPOSITORY && git pull)
+    && git clone https://github.com/chrissimpkins/Hack $REPOSITORY \
+	|| (cd $REPOSITORY && git pull)
 
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR/ $PKG/usr/doc/
 cp -R $REPOSITORY $PKG/usr/doc/$PRGNAM
 rm -fr $PKG/usr/doc/$PRGNAM/.git{ignore,}
-mv $PKG/usr/doc/$PRGNAM/ttf $PKG$FONTDIR/TTF
-mv $PKG/usr/doc/$PRGNAM/otf $PKG$FONTDIR/OTF
+mv $PKG/usr/doc/$PRGNAM/build/ttf $PKG$FONTDIR/TTF
+#ln -s $PKG$FONTDIR/TTF $PKG/usr/doc/$PRGNAM/ttf
+mv $PKG/usr/doc/$PRGNAM/build/otf $PKG$FONTDIR/OTF
+#ln -s $PKG$FONTDIR/OTF $PKG/usr/doc/$PRGNAM/otf
 
 # Post-install script:
 mkdir -p $PKG/install
@@ -49,16 +51,16 @@ EOT
 # Add a package description:
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM (Mozilla's new typeface)
+$PRGNAM: $PRGNAM (A typeface designed for source code)
 $PRGNAM:
-$PRGNAM: Mozilla's new typeface, used in Firefox OS
+$PRGNAM: No frills. No gimmicks. Hack is hand groomed and optically balanced to be
+$PRGNAM: a workhorse face for code.
+$PRGNAM:
+$PRGNAM: It has deep roots in the libre, open source typeface community and expands
+$PRGNAM: upon the contributions of the Bitstream Vera & DejaVu projects.
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: http://github.com/mozilla/Fira
-$PRGNAM: http://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/
+$PRGNAM: http://sourcefoundry.org/hack/
 $PRGNAM:
 EOF
 
