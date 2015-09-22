@@ -29,6 +29,9 @@ mv crystal-${VERSION}-1 crystal-${VERSION}
 mv crystal-${VERSION}/{embedded,src} $PKG$PREFIX/libexec/${PRGNAM}
 mv crystal-${VERSION}/bin $PKG$PREFIX
 
+mkdir -p $PKG$PREFIX/share/zsh/site-functions/
+cp -R $PKG$PREFIX/crystal-${VERSION}/etc/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
+
 sed -i "s|INSTALL_DIR=.*|INSTALL_DIR=$PREFIX/libexec/$PRGNAM|g" $PKG$PREFIX/bin/crystal
 
 # packaging
