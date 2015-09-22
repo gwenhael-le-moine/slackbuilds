@@ -5,15 +5,16 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-VERSION=${VERSION:-0.7.5}
 BUILD=2
-
 
 TAG=cyco
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
+
+LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/manastech/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
+VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/[0-9.]*/" | tr -d / | grep -o "[0-9.]*")
 
 # cleaning
 rm -fr $PKG
