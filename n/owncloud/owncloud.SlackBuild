@@ -5,7 +5,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 #VERSION=${VERSION:-daily-master}
 VERSION=${VERSION:-8.0.0}
-ARCH="noarch" 	# hardcode ARCH
+ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
@@ -50,9 +50,11 @@ chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
 
 grep -q "/var/www/htdocs/owncloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/htdocs/owncloud/cron.php" >> /var/spool/cron/crontabs/apache
 
+echo "Upgrading database and applications"
 ( cd /var/www/htdocs/owncloud/
-su $PHPUSER -c 'php ./occ upgrade'
+sudo -u $PHPUSER php ./occ upgrade
 )
+echo "Post-installation process completed"
 EOF
 
 cat <<EOF > $PKG/install/slack-desc
