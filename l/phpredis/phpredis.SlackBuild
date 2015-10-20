@@ -1,0 +1,96 @@
+#!/bin/sh -x
+
+# variables
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+CWD=$(pwd)
+
+PRGNAM=phpredis
+PKG=$TMP/pkg-$PRGNAM
+
+VERSION=$(date +%Y.%m.%d_%H.%M)
+
+EXT=tar.gz
+
+DOCS="AUTHORS ChangeLog COPYING INSTALL NEWS README TODO"
+
+ARCH=$(uname -m)
+BUILD=1
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull
+    )
+else
+    git clone https://github.com/phpredis/phpredis.git $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PRGNAM-$VERSION
+cd $PRGNAM-$VERSION
+
+# configuration
+phpize
+
+CFLAGS=$SLCKFLAGS \
+      CPPFLAGS=$SLCKFLAGS \
+      ./configure \
+      --prefix=$PREFIX \
+      --mandir=$PREFIX/man \
+      --libdir=$PREFIX/lib$( [ $ARCH = "x86_64" ] && echo 64 )
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install DESTDIR=$PKG
+
+# correction
+cd $PKG
+chown -R root:root *
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM ( A PHP extension for Redis)
+$PRGNAM:
+$PRGNAM: The phpredis extension provides an API for communicating with the Redis
+$PRGNAM: key-value store. It is released under the PHP License, version 3.01.
+$PRGNAM: This code has been developed and maintained by Owlient from November 2009 to March 2011.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/phpredis/phpredis
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
