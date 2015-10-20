@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(date +%F | tr - .)}
-ARCH="noarch" 	# hardcode ARCH
+ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
@@ -27,9 +27,15 @@ rm -rf $PRGNAM-$VERSION
 REPOSITORY=/home/installs/SlackBuilds/repository/$PRGNAM
 
 if [ -e $REPOSITORY ]; then
-    (cd $REPOSITORY; git pull)
+    ( cd $REPOSITORY
+      git pull
+      git submodule update
+    )
 else
     git clone https://github.com/SSilence/selfoss.git $REPOSITORY
+    ( cd $REPOSITORY
+      git submodule init
+    )
 fi
 
 cp -R $REPOSITORY $PRGNAM
@@ -38,10 +44,10 @@ cd $PRGNAM
 rm -fr .git .gitignore
 chown -R root:root .
 find . \
- \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
- -exec chmod 750 {} \; -o \
- \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
- -exec chmod 640 {} \;
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+     -exec chmod 750 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+     -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
 mv _docs README.md $PKG/usr/doc/$PRGNAM
@@ -56,10 +62,10 @@ $PRGNAM: $PRGNAM (rss reader)
 $PRGNAM:
 $PRGNAM: The multipurpose rss reader, live stream, mashup, aggregation
 $PRGNAM:   web application
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: http://selfoss.aditu.de
 $PRGNAM:
