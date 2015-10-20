@@ -56,7 +56,7 @@ CFLAGS=$SLCKFLAGS \
 make -j3 PREFIX=$PREFIX
 
 # installation
-make install DESTDIR=$PKG
+make install DESTDIR=$PKG prefix=$PKG/usr
 
 # correction
 cd $PKG
