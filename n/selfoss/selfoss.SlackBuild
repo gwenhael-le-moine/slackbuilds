@@ -29,6 +29,7 @@ REPOSITORY=/home/installs/SlackBuilds/repository/$PRGNAM
 if [ -e $REPOSITORY ]; then
     ( cd $REPOSITORY
       git pull
+      git submodule init
       git submodule update
     )
 else
