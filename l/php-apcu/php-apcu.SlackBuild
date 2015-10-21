@@ -1,0 +1,93 @@
+#!/bin/sh -x
+
+# variables
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+VERSION=$(date +%Y.%m.%d_%H.%M)
+
+EXT=tar.gz
+
+DOCS="CHANGELOG INSTALL LICENSE NOTICE README.md TECHNOTES.txt TODO"
+
+ARCH=$(uname -m)
+BUILD=1
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull
+    )
+else
+    git clone https://github.com/krakjoe/apcu.git $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PRGNAM-$VERSION
+cd $PRGNAM-$VERSION
+
+# configuration
+phpize
+
+CFLAGS=$SLCKFLAGS \
+      CPPFLAGS=$SLCKFLAGS \
+      ./configure \
+      --enable-static=no \
+      --enable-shared=yes \
+      --enable-apcu \
+      --disable-valgrind-checks \
+      --host=$ARCH-slackware-linux \
+      --build=$ARCH-slackware-linux \
+      --prefix=$PREFIX \
+      --mandir=$PREFIX/man \
+      --libdir=$PREFIX/lib$( [ $ARCH = "x86_64" ] && echo 64 )
+
+# compilation
+make -j3 prefix=$PREFIX
+
+# installation
+make install INSTALL_ROOT=$PKG
+
+# correction
+cd $PKG
+chown -R root:root *
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (APC User Cache)
+$PRGNAM:
+$PRGNAM: APCu is userland caching: APC stripped of opcode caching in preparation for the
+$PRGNAM: deployment of Zend Optimizer+ as the primary solution to opcode caching in
+$PRGNAM: future versions of PHP.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/krakjoe/apcu
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
