@@ -6,7 +6,7 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 CWD=$(pwd)
 
-PRGNAM=phpredis
+PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
 VERSION=$(date +%Y.%m.%d_%H.%M)
