@@ -28,11 +28,11 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 if [ "x$STABLE" == "xYES" ]; then
-    wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
-    tar xf $CWD/$PRGNAM-$VERSION.tar.bz2
+    wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.xz -O $CWD/$PRGNAM-$VERSION.tar.xz
+    tar xf $CWD/$PRGNAM-$VERSION.tar.xz
 else
     if [ ! -e $REPOSITORY ]; then
-	git clone https://github.com/owncloud/mirall.git $REPOSITORY
+	git clone https://github.com/owncloud/client.git $REPOSITORY
     else
 	( cd $REPOSITORY
 	  git pull
