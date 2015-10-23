@@ -75,13 +75,13 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (ownCloud Desktop Syncing Client)
 $PRGNAM:
-$PRGNAM: Mirall is a tool to synchronize files from ownCloud Server with
-$PRGNAM: your computer. It uses OCSync as its syncing backend.
+$PRGNAM: The ownCloud Desktop Client is a tool to synchronize files from
+$PRGNAM: ownCloud Server with your computer.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/owncloud/mirall
+$PRGNAM: https://github.com/owncloud/client
 $PRGNAM:
 EOF
 
