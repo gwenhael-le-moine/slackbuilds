@@ -34,7 +34,7 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
        |-----handy-ruler----------------------------------------------------|
-$PRGNAM: $PRGNAM ( The Haskell Tool Stack)
+$PRGNAM: $PRGNAM (The Haskell Tool Stack)
 $PRGNAM:
 $PRGNAM: $PRGNAM is a cross-platform program for developing Haskell projects.
 $PRGNAM: It is aimed at Haskellers both new and experienced.

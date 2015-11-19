@@ -1,9 +1,0 @@
-1.  Download the file jdk-6u*-linux-i586.bin from
-    java.com and put it in the directory.
-
-2.  Run jdk.SlackBuild to package it as an installable
-    .txz package.
-
-Newer (or older) versions may be packaged by editing the
-version number in jdk.SlackBuild first.
-
