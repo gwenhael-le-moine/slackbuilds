@@ -22,6 +22,9 @@ mkdir -p $PKG/usr/bin
 
 $PKG/opt/calibre/calibre_postinstall --root=$PKG/usr
 
+mkdir -p $PKG/etc/rc.d/
+cp $CWD/rc.calibre-server $PKG/etc/rc.d/
+
 cd $PKG/usr/bin
 find . -type l -exec sh -c 'rm "$1"; ln -s ../../opt/calibre/$(basename $1)' _ {} \;
 
@@ -34,7 +37,7 @@ cat <<EOF > $PKG/install/slack-desc
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
 
-	 |-----handy-ruler------------------------------------------------------|
+         |-----handy-ruler------------------------------------------------------|
 ${PRGNAM}: ${PRGNAM} (e-book library management application)
 ${PRGNAM}:
 ${PRGNAM}: ${PRGNAM} is meant to be a complete e-library solution.

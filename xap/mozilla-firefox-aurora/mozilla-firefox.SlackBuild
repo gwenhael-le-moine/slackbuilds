@@ -1,7 +1,5 @@
 #!/bin/sh -x
 
-KEEP_TAR=${KEEP_TAR:-"NO"}
-
 CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
@@ -23,11 +21,9 @@ BUILD=1
 
 BRANCH=${BRANCH:=latest-mozilla-aurora}
 
-if [ $KEEP_TAR == "NO" ]; then
-    [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && for f in firefox-*.en-US.linux-x86_64.tar.bz2 ; do mv $f $f.orig ; done
-    WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date *.en-US.linux-x86_64.tar.bz2 ; quit" | awk '{print $4}' | sort | tail -n1)
-    wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
-fi
+[ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && rm firefox-*.en-US.linux-x86_64.tar.bz2
+WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date *.en-US.linux-x86_64.tar.bz2 ; quit" | awk '{print $4}' | sort | tail -n1)
+wget -c http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/$WHICH_TAR
 
 VERSION=$(ls -ut firefox-*.tar.bz2 | head -n1 | cut -d - -f 2 | sed 's|.en||')
 

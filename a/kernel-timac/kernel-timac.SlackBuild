@@ -2,13 +2,14 @@
 
 CLEAN_SRC=${CLEAN_SRC:-NO}
 
-PRGNAM=linux
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(echo linux-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 
 ARCH=$(uname -m)
 
-CWD=$(pwd)
 SOURCES=/usr/src/
 TAG=cyco
 TMP=/tmp/$TAG
@@ -21,27 +22,17 @@ SRC_URL="http://www.kernel.org/pub/linux/kernel/v$(echo  \"$VERSION\" | sed 's|\
 
 rm -fr $PKG
 if [ $CLEAN_SRC != "NO" ] ; then
-    rm -fr $SOURCES/$PRGNAM-$VERSION
+    rm -fr $SOURCES/linux-$VERSION
 fi
 
 if [ $CLEAN_SRC != "NO" ]; then
-    [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] && wget -c "$SRC_URL/$PRGNAM-$VERSION.tar.bz2" -O $CWD/$PRGNAM-$VERSION.tar.bz2
+    [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.bz2" -O $CWD/linux-$VERSION.tar.xz
     [ ! -e $SOURCES ] && mkdir -p $SOURCES
-    tar xf $CWD/$PRGNAM-$VERSION.tar.?z* -C $SOURCES
+    tar xf $CWD/linux-$VERSION.tar.?z* -C $SOURCES
 fi
 
-cd $SOURCES/$PRGNAM-$VERSION
+cd $SOURCES/linux-$VERSION
 
-if [ $CLEAN_SRC != "NO" ]; then
-    [ -e $CWD/patches/ ] && \
-        for p in $CWD/patches/*.{diff,patch} ; do
-        patch -p1 -i $p || exit 1 # if patching fail we want to know
-    done
-    [ -e $CWD/patches/$VERSION ] && \
-        for p in $CWD/patches/$VERSION/*.{diff,patch} ; do
-        patch -p1 -i $p || exit 1 # if patching fail we want to know
-    done
-fi
 if [ $CLEAN_SRC != "NO" ] || [ ! -e .config ] ; then
     if [ -e $CWD/config-$VERSION ] ; then
         cp $CWD/config-$VERSION .config
@@ -61,28 +52,31 @@ make modules_install INSTALL_MOD_PATH=$PKG
 KERNEL_TAG=$(grep "CONFIG_LOCALVERSION=" .config | sed 's|CONFIG_LOCALVERSION=||' | tr -d \" )
 KERNEL_VERSION=$(grep -o "[0-9]\+\.[0-9]\+.*[0-9]" .config)$KERNEL_TAG
 
-mkdir -p $PKG/boot/$KERNEL_VERSION
-cp .config System.map arch/x86/boot/bzImage $PKG/boot/$KERNEL_VERSION
-mv $PKG/boot/$KERNEL_VERSION/{.,}config
+mkdir -p $PKG/boot/
+for i in .config System.map; do
+    cp $i $PKG/boot/${i}-$KERNEL_VERSION
+done
+mv $PKG/boot/{.,}config-$KERNEL_VERSION
+cp  arch/x86/boot/bzImage $PKG/boot/vmlinuz-$KERNEL_VERSION
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
-cp /etc/lilo.conf /etc/lilo.conf.orig
-grep -q "image = /boot/$KERNEL_VERSION/bzImage" /etc/lilo.conf || \
-cat <<EOLILO >> /etc/lilo.conf
-# Linux bootable partition config begins
-image = /boot/$KERNEL_VERSION/bzImage
-  root = /dev/sda1
-  label = $KERNEL_VERSION
-  read-only
-# Linux bootable partition config ends
+# mkdir -p $PKG/install
+# cat <<EOF > $PKG/install/doinst.sh
+# cp /etc/lilo.conf /etc/lilo.conf.orig
+# grep -q "image = /boot/$KERNEL_VERSION/bzImage" /etc/lilo.conf || \
+# cat <<EOLILO >> /etc/lilo.conf
+# # Linux bootable partition config begins
+# image = /boot/$KERNEL_VERSION/bzImage
+#   root = /dev/sda1
+#   label = $KERNEL_VERSION
+#   read-only
+# # Linux bootable partition config ends
 
-EOLILO
+# EOLILO
 
-sed -i "s|default=.*|default=$KERNEL_VERSION|" /etc/lilo.conf
+# sed -i "s|default=.*|default=$KERNEL_VERSION|" /etc/lilo.conf
 
-lilo
-EOF
+# lilo
+# EOF
 
 VERSION=$(echo $VERSION | tr - _)
 cat <<EOF > $PKG/install/slack-desc
