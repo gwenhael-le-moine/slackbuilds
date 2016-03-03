@@ -1,0 +1,73 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +%F | tr - .)}
+ARCH="noarch"   # hardcode ARCH
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+DOCROOT=${DOCROOT:-/var/www/htdocs}
+
+PHPUSER=${PHPUSER:-apache}
+PHPGROUP=${PHPGROUP:-apache}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+set -eu
+
+APPNAM=${PRGNAM#owncloud-apps-}
+
+rm -rf $PKG
+mkdir -p $TMP $OUTPUT $PKG/$DOCROOT/owncloud/apps/
+cd $PKG/$DOCROOT/owncloud/apps/
+
+if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
+    git clone https://github.com/owncloud/bookmarks.git $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+      git pull
+    )
+fi
+cp -R $REPOSITORIES/$PRGNAM $APPNAM
+
+cd $APPNAM
+rm -fr .git .travis.yml
+#VERSION=$(cat appinfo/info.xml | grep -i version\> | sed 's|</\?version>||g' | tr -d \   | sed 's|\t||g' )
+
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+     -exec chmod 750 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+     -exec chmod 640 {} \;
+
+mkdir -p $PKG/usr/doc/$PRGNAM
+cp -a COPYING README.md CONTRIBUTING.md $PKG/usr/doc/$PRGNAM
+
+# Change ownership and perms
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/owncloud
+chmod 0750 $PKG/$DOCROOT/owncloud/apps/$APPNAM
+
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Bookmarks manager for ownCloud)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://apps.owncloud.com/content/show.php/Bookmarks?content=168710
+$PRGNAM: https://github.com/owncloud/bookmarks#readme
+$PRGNAM:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
