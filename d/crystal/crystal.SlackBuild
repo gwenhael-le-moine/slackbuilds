@@ -13,7 +13,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
-LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/manastech/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
+LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
 VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/[0-9.]*/" | tr -d / | grep -o "[0-9.]*")
 
 # cleaning
