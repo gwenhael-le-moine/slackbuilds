@@ -9,6 +9,7 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
 VHOST=${VHOST:-vhosts/$PRGNAM/}
+VHOSTROOT=/var/www/${VHOST}
 DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
 
 PHPUSER=${PHPUSER:-apache}
@@ -21,8 +22,8 @@ OUTPUT=${OUTPUT:-/tmp}
 set -eu
 
 rm -rf $PKG
-mkdir -p $TMP $OUTPUT $PKG/$DOCROOT
-cd $PKG/$DOCROOT/
+mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
+cd $PKG/$VHOSTROOT/
 rm -rf $PRGNAM-$VERSION
 
 REPOSITORY=/home/installs/SlackBuilds/repository/$PRGNAM
@@ -40,9 +41,9 @@ else
     )
 fi
 
-cp -R $REPOSITORY $PRGNAM
+cp -R $REPOSITORY htdocs
 
-cd $PRGNAM
+cd htdocs
 rm -fr .git .gitignore
 chown -R root:root .
 find . \
