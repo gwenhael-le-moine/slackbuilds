@@ -1,3 +1,4 @@
+
 #!/bin/sh
 
 CWD=$(pwd)
@@ -35,6 +36,11 @@ fi
 cp -R $REPOSITORY $PRGNAM
 
 cd $PRGNAM
+
+git checkout 2.0.1
+SYMFONY_ENV=prod composer install --no-dev -o --prefer-dist
+php bin/console wallabag:install --env=prod
+
 rm -fr .git .gitignore
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
@@ -49,6 +55,7 @@ cp -a *.md $PKG/usr/doc/$PRGNAM
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT/$PRGNAM
 chmod 0750 $PKG/$DOCROOT/$PRGNAM
 
+mkdir -p $PKG/install/
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (open source self hostable read-it-later web app)
 $PRGNAM:

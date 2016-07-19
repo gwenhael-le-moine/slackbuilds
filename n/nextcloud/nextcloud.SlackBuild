@@ -8,7 +8,8 @@ ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
-DOCROOT=${DOCROOT:-/var/www/htdocs}
+VHOST=${VHOST:-vhosts/$PRGNAM/}
+DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
 
 PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
@@ -52,10 +53,10 @@ cat <<EOF > $PKG/install/doinst.sh
 #!/bin/sh
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
 
-grep -q "/var/www/htdocs/nextcloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/htdocs/nextcloud/cron.php" >> /var/spool/cron/crontabs/apache
+grep -q "/var/www/${VHOST}htdocs/nextcloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}htdocs/nextcloud/cron.php" >> /var/spool/cron/crontabs/apache
 
 echo "Upgrading database and applications"
-( cd /var/www/htdocs/nextcloud/
+( cd /var/www/${VHOST}htdocs/nextcloud/
 sudo -u $PHPUSER php ./occ upgrade
 )
 echo "Post-installation process completed"
@@ -76,4 +77,4 @@ $PRGNAM:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)_$(date +%F | tr - .)-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}

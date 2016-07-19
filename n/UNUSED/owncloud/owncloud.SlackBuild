@@ -9,7 +9,8 @@ ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
-DOCROOT=${DOCROOT:-/var/www/htdocs}
+VHOST=${VHOST:-vhosts/$PRGNAM/}
+DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
 
 PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
@@ -48,10 +49,10 @@ cat <<EOF > $PKG/install/doinst.sh
 #!/bin/sh
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
 
-grep -q "/var/www/htdocs/owncloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/htdocs/owncloud/cron.php" >> /var/spool/cron/crontabs/apache
+grep -q "/var/www/${VHOST}htdocs/owncloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}htdocs/owncloud/cron.php" >> /var/spool/cron/crontabs/apache
 
 echo "Upgrading database and applications"
-( cd /var/www/htdocs/owncloud/
+( cd /var/www/${VHOST}htdocs/owncloud/
 sudo -u $PHPUSER php ./occ upgrade
 )
 echo "Post-installation process completed"

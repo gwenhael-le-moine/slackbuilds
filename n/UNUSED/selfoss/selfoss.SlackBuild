@@ -8,7 +8,8 @@ ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
-DOCROOT=${DOCROOT:-/var/www/htdocs}
+VHOST=${VHOST:-vhosts/$PRGNAM/}
+DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
 
 PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
