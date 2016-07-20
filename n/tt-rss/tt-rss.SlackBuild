@@ -21,9 +21,8 @@ OUTPUT=${OUTPUT:-/tmp}
 
 set -eu
 
-rm -rf $PKG
+rm -rf $PKG $PRGNAM-$VERSION
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
-rm -rf $PRGNAM-$VERSION
 
 REPOSITORIES=/home/installs/SlackBuilds/repositories
 REPOSITORY=${REPOSITORIES}/$PRGNAM
