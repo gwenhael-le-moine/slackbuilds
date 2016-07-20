@@ -25,7 +25,8 @@ rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 rm -rf $PRGNAM-$VERSION
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=${REPOSITORIES}/$PRGNAM
 
 if [ -e $REPOSITORY ]; then
     ( cd $REPOSITORY
@@ -35,6 +36,38 @@ else
 fi
 
 cp -R $REPOSITORY $PKG$DOCROOT
+
+# 3rd party themes and plugins
+# - clean-greader
+REPOSITORY=${REPOSITORIES}/clean-greader
+
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull )
+else
+    git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+( cd $PKG$DOCROOT/themes.local/
+  ln -s ./clean-greader/clean-greader.css )
+
+# - tt-rss-feedly-theme
+REPOSITORY=${REPOSITORIES}/tt-rss-feedly-theme
+
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull )
+else
+    git clone https://github.com/levito/tt-rss-feedly-theme $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+( cd $PKG$DOCROOT/themes.local/
+  ln -s ./tt-rss-feedly-theme/feedly/
+  ln -s ./tt-rss-feedly-theme/feedly.css )
+
+# /back to standard SlackBuild
 
 cd $PKG$DOCROOT
 rm -fr .git .gitignore
@@ -60,9 +93,9 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (rss reader)
 $PRGNAM:
-$PRGNAM:
 $PRGNAM: Web-based news feed aggregator, designed to allow you to read news from
 $PRGNAM: any location, while feeling as close to a real desktop application as possible.
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
