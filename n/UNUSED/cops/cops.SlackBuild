@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(date +%F | tr - .)}
-ARCH="noarch" 	# hardcode ARCH
+ARCH="noarch"   # hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
@@ -24,7 +24,7 @@ mkdir -p $TMP $OUTPUT $PKG/$DOCROOT
 cd $PKG/$DOCROOT/
 rm -rf $PRGNAM-$VERSION
 
-REPOSITORY=/home/installs/SlackBuilds/repository/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 if [ -e $REPOSITORY ]; then
     (cd $REPOSITORY; git pull)
@@ -38,10 +38,10 @@ cd $PRGNAM
 rm -fr .git .gitignore
 chown -R root:root .
 find . \
- \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
- -exec chmod 750 {} \; -o \
- \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
- -exec chmod 640 {} \;
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+     -exec chmod 750 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+     -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a CHANGELOG COPYING $PKG/usr/doc/$PRGNAM
@@ -55,11 +55,11 @@ cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (Calibre OPDS (and HTML) PHP Server)
 $PRGNAM:
 $PRGNAM: light alternative to Calibre content server / Calibre2OPDS
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: http://blog.slucas.fr/en/oss/calibre-opds-php-server
 $PRGNAM:

@@ -25,7 +25,7 @@ rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 rm -rf $PRGNAM-$VERSION
 
-REPOSITORY=/home/installs/SlackBuilds/repository/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 if [ -e $REPOSITORY ]; then
     ( cd $REPOSITORY
@@ -60,7 +60,7 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (rss reader)
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: Web-based news feed aggregator, designed to allow you to read news from
 $PRGNAM: any location, while feeling as close to a real desktop application as possible.
 $PRGNAM:
