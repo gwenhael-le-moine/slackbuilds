@@ -49,6 +49,7 @@ else
 fi
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+rm $PKG$DOCROOT/themes.local/clean-greader/.git
 ( cd $PKG$DOCROOT/themes.local/
   ln -s ./clean-greader/clean-greader.css )
 
@@ -63,6 +64,7 @@ else
 fi
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+rm $PKG$DOCROOT/themes.local/tt-rss-feedly-theme/.git
 ( cd $PKG$DOCROOT/themes.local/
   ln -s ./tt-rss-feedly-theme/feedly/
   ln -s ./tt-rss-feedly-theme/feedly.css )
