@@ -27,9 +27,9 @@ rm -fr $PKG
     && git clone https://github.com/RPi-Distro/firmware-nonfree.git $REPOSITORY \
     || (cd $REPOSITORY; git pull)
 
-mkdir -p $PKG/lib/firmware/bcrm
+mkdir -p $PKG/lib/firmware
 
-cp $REPOSITORY/brcm80211/brcm/brcmfmac43430-sdio.* $PKG/lib/firmware/bcrm
+cp -R $REPOSITORY/brcm80211/brcm $PKG/lib/firmware/
 
 # correction
 cd $PKG
