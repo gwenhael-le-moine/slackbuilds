@@ -4,7 +4,7 @@ LATEST_VERSION=$(wget -c "https://get.adobe.com/fr/flashplayer/download/?install
 
 cd /home/installs/mirrors/slackware64-current/extra/flashplayer-plugin
 VERSION=$LATEST_VERSION ./flashplayer-plugin.SlackBuild
-rm install_flash_player_11_linux.x86_64.tar.gz
+rm install_flash_player*.tar.gz
 
-upgradepkg --install-new --reinstall /tmp/flashplayer-plugin-$LATEST_VERSION-x86_64-1alien.txz
+upgradepkg --install-new --reinstall /tmp/flashplayer-plugin-$LATEST_VERSION-x86_64-*.txz
 /root/clean-tmp.sh
