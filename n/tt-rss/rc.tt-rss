@@ -1,0 +1,55 @@
+#!/bin/sh
+
+NAME="Tiny Tiny RSS"
+
+USER="apache"
+COMMAND="php /srv/www/vhosts/tt-rss/htdocs/update_daemon2.php"
+PID_FILE="/tmp/tt-rss.pid"	# $USER needs to have writing right
+
+func_start() {
+    echo -n "Starting $NAME..."
+    if [ ! -e $PID_FILE ]; then
+	sudo -u $USER $COMMAND 2>&1 > /dev/null &
+	echo "$!" > $PID_FILE
+    else
+	echo "$NAME already started"
+    fi
+}
+
+func_stop() {
+    if [ -e $PID_FILE ];then
+	kill $(cat $PID_FILE) && rm $PID_FILE
+    else
+	echo "$NAME not running"
+    fi
+}
+
+func_status() {
+    if [ -e $PID_FILE ];then
+	echo "$NAME running"
+    else
+	echo "$NAME not running"
+    fi
+}
+
+case $1 in
+    "start")
+        func_start
+	;;
+
+    "stop")
+        func_stop
+	;;
+
+    "restart")
+        func_stop
+	sleep 2
+	func_start
+	;;
+    "status")
+	func_status
+	;;
+    *)
+	echo "Usage; start|stop|restart|status"
+	;;
+esac

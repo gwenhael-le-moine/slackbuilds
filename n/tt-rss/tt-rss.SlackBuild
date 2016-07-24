@@ -1,0 +1,109 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +%F | tr - .)}
+ARCH="noarch"	# hardcode ARCH
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+VHOST=${VHOST:-vhosts/$PRGNAM/}
+VHOSTROOT=/var/www/${VHOST}
+DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
+
+PHPUSER=${PHPUSER:-apache}
+PHPGROUP=${PHPGROUP:-apache}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+set -eu
+
+rm -rf $PKG $PRGNAM-$VERSION
+mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=${REPOSITORIES}/$PRGNAM
+
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull )
+else
+    git clone https://tt-rss.org/git/tt-rss.git $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PKG$DOCROOT
+
+# 3rd party themes and plugins
+# - clean-greader
+REPOSITORY=${REPOSITORIES}/clean-greader
+
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull )
+else
+    git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
+( cd $PKG$DOCROOT/themes.local/
+  ln -s ./clean-greader/clean-greader.css )
+
+# - tt-rss-feedly-theme
+REPOSITORY=${REPOSITORIES}/tt-rss-feedly-theme
+
+if [ -e $REPOSITORY ]; then
+    ( cd $REPOSITORY
+      git pull )
+else
+    git clone https://github.com/levito/tt-rss-feedly-theme $REPOSITORY
+fi
+
+cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+rm -fr $PKG$DOCROOT/themes.local/tt-rss-feedly-theme/.git
+( cd $PKG$DOCROOT/themes.local/
+  ln -s ./tt-rss-feedly-theme/feedly/
+  ln -s ./tt-rss-feedly-theme/feedly.css )
+
+# /back to standard SlackBuild
+
+cd $PKG$DOCROOT
+rm -fr .git .gitignore
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+     -exec chmod 750 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+     -exec chmod 640 {} \;
+
+mkdir -p $PKG/usr/doc/$PRGNAM
+mv $PKG$DOCROOT/README.md $PKG/usr/doc/$PRGNAM
+
+mkdir -p $PKG/etc/rc.d
+cp $CWD/rc.tt-rss $PKG/etc/rc.d/
+chmod 755 $PKG/etc/rc.d/rc.tt-rss
+
+# Change ownership and perms and create a link.
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
+chmod 0750 $PKG/$DOCROOT
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (rss reader)
+$PRGNAM:
+$PRGNAM: Web-based news feed aggregator, designed to allow you to read news from
+$PRGNAM: any location, while feeling as close to a real desktop application as possible.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://tt-rss.org
+$PRGNAM:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
