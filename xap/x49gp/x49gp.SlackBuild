@@ -1,0 +1,105 @@
+#!/bin/sh
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +%F | tr - .)}
+
+BUILD=1
+
+ARCH=$(uname -m)
+LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+mkdir -p $TMP
+
+# Cleaning
+rm -fr $PRGNAM-$VERSION $PKG
+
+# Fetching sources
+
+cd $TMP
+if [ ! -e $REPOSITORY ]; then
+    git clone https://github.com/cycojesus/x49gp.git $REPOSITORY
+else
+    ( cd $REPOSITORY
+      git pull
+    )
+fi
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+
+# Preparation
+cd $TMP/$PRGNAM-$VERSION
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Building
+make
+make sdcard
+
+# # Installation
+# make install DESTDIR=$PKG
+
+mkdir -p $PKG$PREFIX/share/$PRGNAM
+cp 4950_215.bin config.tmpl hp50g.png $PKG$PREFIX/share/$PRGNAM
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp config.tmpl flash-50g newconfig s3c2410-sram sdcard sram $PKG$PREFIX/doc/$PRGNAM
+
+mv $PKG$PREFIX/doc/$PRGNAM/config.tmpl $PKG$PREFIX/doc/$PRGNAM/config
+sed -i "s|image=hp50g.png|image=$PREFIX/share/$PRGNAM/hp50g.png|" $PKG$PREFIX/doc/$PRGNAM/config
+
+mkdir -p $PKG$PREFIX/bin/
+cp x49gp $PKG$PREFIX/bin/x49gp-bin
+cp $CWD/bootstrap-config.sh $PKG$PREFIX/bin/x49gp-bootstrap-config
+cat <<EOF > $PKG$PREFIX/bin/x49gp
+#!/bin/sh
+
+x49gp-bin ~/.x49gp/config
+EOF
+chmod +x $PKG$PREFIX/bin/x49gp $PKG$PREFIX/bin/x49gp-bootstrap-config
+
+# Cleaning
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Packaging
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (HP49/50 emulator)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: $ x49gp-bootstrap-config
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://sourceforge.net/projects/x49gp/
+$PRGNAM: https://github.com/cycojesus/x49gp
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
