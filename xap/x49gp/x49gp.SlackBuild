@@ -23,7 +23,7 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $PRGNAM-$VERSION $PKG
+rm -fr $TMP/$PRGNAM-$VERSION $PKG
 
 # Fetching sources
 
@@ -50,9 +50,7 @@ find . \
 make
 make sdcard
 
-# # Installation
-# make install DESTDIR=$PKG
-
+# Installing
 mkdir -p $PKG$PREFIX/share/$PRGNAM
 cp 4950_215.bin config.tmpl hp50g.png $PKG$PREFIX/share/$PRGNAM
 
@@ -67,6 +65,11 @@ cp x49gp $PKG$PREFIX/bin/x49gp-bin
 cp $CWD/bootstrap-config.sh $PKG$PREFIX/bin/x49gp-bootstrap-config
 cat <<EOF > $PKG$PREFIX/bin/x49gp
 #!/bin/sh
+
+if [ ! -e ~/.x49gp/config ]; then
+   echo "Please run x49gp-bootstrap-config first"
+   exit
+fi
 
 x49gp-bin ~/.x49gp/config
 EOF
@@ -91,12 +94,12 @@ mkdir install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (HP49/50 emulator)
 $PRGNAM:
+$PRGNAM: Emulator of the newer Hewlett Packard Handheld Calculator Models with ARM CPU
+$PRGNAM: (HP49g+ HP50).
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
+$PRGNAM: Post-installation setup:
 $PRGNAM: $ x49gp-bootstrap-config
-$PRGNAM:
-$PRGNAM:
 $PRGNAM:
 $PRGNAM: https://sourceforge.net/projects/x49gp/
 $PRGNAM: https://github.com/cycojesus/x49gp
