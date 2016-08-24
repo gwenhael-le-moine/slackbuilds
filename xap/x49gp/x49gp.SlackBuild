@@ -55,7 +55,7 @@ mkdir -p $PKG$PREFIX/share/$PRGNAM
 cp 4950_215.bin config.tmpl hp50g.png $PKG$PREFIX/share/$PRGNAM
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp config.tmpl flash-50g newconfig s3c2410-sram sdcard sram $PKG$PREFIX/doc/$PRGNAM
+cp README* config.tmpl flash-50g s3c2410-sram sdcard sram $PKG$PREFIX/doc/$PRGNAM
 
 mv $PKG$PREFIX/doc/$PRGNAM/config.tmpl $PKG$PREFIX/doc/$PRGNAM/config
 sed -i "s|image=hp50g.png|image=$PREFIX/share/$PRGNAM/hp50g.png|" $PKG$PREFIX/doc/$PRGNAM/config
