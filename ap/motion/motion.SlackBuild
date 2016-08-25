@@ -99,11 +99,11 @@ find $PKG/usr/man -type f -exec gzip -9 {} \;
 for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
 # Let's not clobber the config file
-mv $PKG/etc/motion-dist.conf $PKG/etc/motion-dist.conf.new
+[ -e $PKG/etc/motion-dist.conf ] && mv $PKG/etc/motion-dist.conf $PKG/etc/motion-dist.conf.new
 
 mkdir $PKG/usr/doc
-mv $PKG/usr/share/doc/motion-* $PKG/usr/doc/$PRGNAM-$VERSION
-mv $PKG/usr/share/$PRGNAM-*/examples $PKG/usr/doc/$PRGNAM-$VERSION/
+mv $PKG/usr/share/doc/motion $PKG/usr/doc/$PRGNAM-$VERSION
+mv $PKG/usr/share/$PRGNAM/examples $PKG/usr/doc/$PRGNAM-$VERSION/
 rm -rf $PKG/usr/share # We moved the docs from there
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 

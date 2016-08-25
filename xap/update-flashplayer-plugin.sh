@@ -6,5 +6,5 @@ cd /home/installs/mirrors/slackware64-current/extra/flashplayer-plugin
 VERSION=$LATEST_VERSION ./flashplayer-plugin.SlackBuild
 rm install_flash_player*.tar.gz
 
-upgradepkg --install-new --reinstall /tmp/flashplayer-plugin-$LATEST_VERSION-x86_64-*.txz
+upgradepkg --install-new --reinstall /tmp/flashplayer-plugin-*.txz
 /root/clean-tmp.sh
