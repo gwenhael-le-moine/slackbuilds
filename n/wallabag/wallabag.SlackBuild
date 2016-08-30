@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 CWD=$(pwd)
@@ -39,15 +38,11 @@ cp -R $REPOSITORY htdocs
 
 cd htdocs
 
-git checkout master
-SYMFONY_ENV=prod composer install --no-dev -o --prefer-dist
-php bin/console wallabag:install --env=prod
+# Change ownership and perms
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
+chmod 0750 $PKG/$DOCROOT
 
-cd $PRGNAM
-
-git checkout 2.0.1
-SYMFONY_ENV=prod composer install --no-dev -o --prefer-dist
-php bin/console wallabag:install --env=prod
+sudo -u $PHPUSER 'SYMFONY_ENV=prod composer install --no-dev -o --prefer-dist'
 
 rm -fr .git .gitignore
 find . \
@@ -58,10 +53,6 @@ find . \
 
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a *.md $PKG/usr/doc/$PRGNAM
-
-# Change ownership and perms and create a link.
-chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
-chmod 0750 $PKG/$DOCROOT
 
 mkdir -p $PKG/install/
 cat <<EOF > $PKG/install/slack-desc
