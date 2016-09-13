@@ -1,0 +1,12 @@
+--- goldendict-1.0.1-src/processwrapper.cc	2010-12-04 00:12:46.000000000 +0300
++++ goldendict-1.0.1-src.new/processwrapper.cc	2015-06-22 18:53:56.087395804 +0300
+@@ -94,6 +94,9 @@
+ 
+ #else
+ 
++#include <sys/types.h>
++#include <unistd.h>
++
+ unsigned int ProcessWrapper::currentProcessId()
+ {
+     return getpid();
