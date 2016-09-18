@@ -8,7 +8,7 @@ BUILD=1
 
 ARCH=noarch
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 TAG=cyco
 TMP=/tmp/$TAG
@@ -21,45 +21,38 @@ PREFIX=/usr
 rm -fr $PKG
 
 # get sources
-if [ -e $REPOSITORIES/$PRGNAM/Book ] ; then
-    ( cd $REPOSITORIES/$PRGNAM/Book
-        git pull
-    )
-else
-    git clone https://github.com/progit/progit.git $REPOSITORIES/$PRGNAM/Book
-fi
-if [ -e $REPOSITORIES/$PRGNAM/Examples ] ; then
-    ( cd $REPOSITORIES/$PRGNAM/Examples
-        git pull
-    )
-else
-    git clone https://github.com/progit/book-examples.git $REPOSITORIES/$PRGNAM/Examples
-fi
+[ ! -e $REPOSITORY/Book ] && git clone https://github.com/progit/progit.git $REPOSITORY/Book
+( cd $REPOSITORY/Book && git pull )
+VERSION="$( cd $REPOSITORY/Book && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+[ ! -e $REPOSITORY/Examples ] && git clone https://github.com/progit/book-examples.git $REPOSITORY/Examples
+( cd $REPOSITORY/Examples && git pull )
+
+
 [ ! -e $CWD/progit.en.pdf ] && wget -c http://progit.org/ebook/progit.pdf -O $CWD/progit.en.pdf
 [ ! -e $CWD/progit.en.mobi ] && wget -c https://github.s3.amazonaws.com/media/pro-git.en.mobi -O $CWD/progit.en.mobi
 [ ! -e $CWD/progit.en.epub ] && wget -c https://github.s3.amazonaws.com/media/progit.epub -O $CWD/progit.en.epub
 
 mkdir -p $PKG$PREFIX/doc/
-cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+cp -R $REPOSITORY $PKG$PREFIX/doc/$PRGNAM
 find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
 
 cd $PKG
 mkdir -p install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (eBook, Pro Git: professional version control)
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: Pro Git book, written by Scott Chacon and published by Apress.
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://progit.org/
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 chown -R root:root *
 
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
-

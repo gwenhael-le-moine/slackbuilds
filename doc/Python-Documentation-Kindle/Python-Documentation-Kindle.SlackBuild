@@ -25,9 +25,9 @@ rm -fr $PKG
 mkdir -p $PKG$PREFIX/doc/
 
 # mise en place
-[ ! -e $REPOSITORY ] \
-    && git clone http://github.com/charlax/Python-Documentation-Kindle.git $REPOSITORY \
-    || (cd $REPOSITORY; git pull)
+[ ! -e $REPOSITORY ] && git clone http://github.com/charlax/Python-Documentation-Kindle.git $REPOSITORY
+(cd $REPOSITORY && git pull)
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cd $PKG$PREFIX/doc/
 cp -R $REPOSITORY $PRGNAM
@@ -54,12 +54,12 @@ $PRGNAM:
 $PRGNAM: This project lets you download a Kindle-optimized version of the
 $PRGNAM: Python documentation. You can also create your own ebook for any
 $PRGNAM: project using Sphinx to generate its documentation.
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://github.com/charlax/Python-Documentation-Kindle
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # empaquetage

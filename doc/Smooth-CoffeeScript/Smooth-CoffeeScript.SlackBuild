@@ -8,7 +8,7 @@ BUILD=1
 
 ARCH=noarch
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 TAG=cyco
 TMP=/tmp/$TAG
@@ -21,36 +21,31 @@ PREFIX=/usr
 rm -fr $PKG
 
 # get sources
-[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
-if [ -e $REPOSITORIES/$PRGNAM ] ; then
-    ( cd $REPOSITORIES/$PRGNAM
-        git pull
-    )
-else
-    git clone http://github.com/autotelicum/Smooth-CoffeeScript.git $REPOSITORIES/$PRGNAM
-fi
+[ ! -e $REPOSITORY ] && git clone http://github.com/autotelicum/Smooth-CoffeeScript.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/doc/
-cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+cp -R $REPOSITORY $PKG$PREFIX/doc/$PRGNAM
 find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
 
 ( cd $PKG
-    mkdir -p install
-    cat <<EOF > install/slack-desc
+  mkdir -p install
+  cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (A book on functional programming in CoffeeScript)
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: Smooth CoffeeScript is a free book about CoffeeScript and programming.
 $PRGNAM: No previous programming knowledge is required. Over 200 pages and
 $PRGNAM: 35 exercises. Download includes book and full source code with
 $PRGNAM: and without solutions.
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://github.com/autotelicum/Smooth-CoffeeScript#readme
-$PRGNAM: 
+$PRGNAM:
 EOF
 
-    chown -R root:root *
+  chown -R root:root *
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+  makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 )

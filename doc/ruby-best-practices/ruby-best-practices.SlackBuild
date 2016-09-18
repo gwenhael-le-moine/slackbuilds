@@ -8,7 +8,7 @@ BUILD=1
 
 ARCH=$(uname -m)
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 TAG=cyco
 TMP=/tmp/$TAG
@@ -21,45 +21,30 @@ PREFIX=/usr
 rm -fr $PKG
 
 # get sources
-[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
-( cd $REPOSITORIES
-    if [ -e $REPOSITORIES/$PRGNAM ] ; then
-        ( cd $REPOSITORIES/$PRGNAM
-            git pull
-        )
-    else
-        git clone http://github.com/sandal/rbp-book.git $REPOSITORIES/$PRGNAM
-    fi
-)
+[ -e $REPOSITORY ] && git clone http://github.com/sandal/rbp-book.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/doc/
-cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
+cp -R $REPOSITORY $PKG$PREFIX/doc/$PRGNAM
 find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
 
-# TODO
-# ( cd $PKG$PREFIX/doc/$PRGNAM/oreilly_final
-#     asciidoc book.xml
-#     cd ..
-#     ln -s oreilly_final/book.html
-# )
-
-( cd $PKG
-    mkdir -p install
-    cat <<EOF > install/slack-desc
+cd $PKG
+mkdir -p install
+cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (Ruby Best Practices book)
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://rubybestpractices.com/
-$PRGNAM: 
+$PRGNAM:
 EOF
 
-    chown -R root:root *
+chown -R root:root *
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
-)
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
