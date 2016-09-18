@@ -25,22 +25,17 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-if [ -e $REPOSITORY ]; then
-    ( cd $REPOSITORY
-      git pull
-    )
-else
-    git clone https://github.com/krakjoe/apcu.git $REPOSITORY
-fi
+[ ! -e $REPOSITORY ] && git clone https://github.com/krakjoe/apcu.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-cp -R $REPOSITORY $PRGNAM-$VERSION
-cd $PRGNAM-$VERSION
+cp -R $REPOSITORY $PRGNAM
+cd $PRGNAM
 
 # configuration
 phpize
@@ -68,9 +63,9 @@ make install INSTALL_ROOT=$PKG
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
-cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM
+cd $TMP/$PRGNAM
+cp -R $DOCS $PKG/usr/doc/$PRGNAM
 
 # embaumement
 mkdir -p $PKG/install

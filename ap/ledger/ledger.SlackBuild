@@ -18,14 +18,14 @@ PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 if [ "$ARCH" = "i486" ]; then
-  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
-  LIBDIRSUFFIX=""
+    SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+    LIBDIRSUFFIX=""
 elif [ "$ARCH" = "s390" ]; then
-  SLKCFLAGS="-O2"
-  LIBDIRSUFFIX=""
+    SLKCFLAGS="-O2"
+    LIBDIRSUFFIX=""
 elif [ "$ARCH" = "x86_64" ]; then
-  SLKCFLAGS="-O2 -fPIC"
-  LIBDIRSUFFIX="64"
+    SLKCFLAGS="-O2 -fPIC"
+    LIBDIRSUFFIX="64"
 fi
 
 rm -rf $PKG
@@ -33,40 +33,34 @@ mkdir -p $TMP $PKG/usr
 cd $TMP
 rm -rf $PRGNAM
 
-if [ ! -e $REPOSITORY ]; then
-	git clone https://github.com/ledger/ledger.git $REPOSITORY
-else
-	( cd $REPOSITORY
-		git pull
-		git submodule update
-	)
-fi
+[ ! -e $REPOSITORY ] && git clone https://github.com/ledger/ledger.git $REPOSITORY
+( cd $REPOSITORY && git pull && git submodule update --init )
 cp -R $REPOSITORY $PRGNAM
 
 cd $PRGNAM || exit 1
 chown -R root:root .
 find . \
-  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-  -exec chmod 755 {} \; -o \
-  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-  -exec chmod 644 {} \;
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
 
 case $BRANCH in
-	"RELEASE")
-	    git checkout -b stable v$VERSION
-	    ;;
-	"CURRENT")
-	    git checkout -b master origin/master
-	    ;;
-	"BETA")
-	    git checkout -b $VERSION release/$VERSION
-	    ;;
-	"ALPHA")
-	    git checkout -b next origin/next
-	    ;;
-	*)
+    "RELEASE")
+        git checkout -b stable v$VERSION
+        ;;
+    "CURRENT")
+        git checkout -b master origin/master
+        ;;
+    "BETA")
+        git checkout -b $VERSION release/$VERSION
+        ;;
+    "ALPHA")
+        git checkout -b next origin/next
+        ;;
+    *)
 esac
-[ $BRANCH != "RELEASE" ] && VERSION=${BRANCH}_$(date +%Y.%m.%d_%H.%M)
+[ $BRANCH != "RELEASE" ] && VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 ./acprep pull
 
@@ -84,33 +78,26 @@ cp -a \
    *.md contrib/ doc/ python/ \
    $PKG/usr/doc/$PRGNAM-$VERSION
 ( cd $PKG/usr/bin
-	for i in report; do
-		ln -s ../doc/$PRGNAM-$VERSION/contrib/$i ledger-$i
-	done
+  for i in report; do
+      ln -s ../doc/$PRGNAM-$VERSION/contrib/$i ledger-$i
+  done
 )
 
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
-  | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+    | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 rm -f $PKG/usr/info/dir
-gzip -9 $PKG/usr/info/*.info*
+find $PKG/usr/info/ -type f -exec gzip -9 {} \;
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-# HOW TO EDIT THIS FILE:
-# The "handy ruler" below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|'
-# on the right side marks the last column you can put a character in.  You must
-# make exactly 11 lines for the formatting to be correct.  It's also
-# customary to leave one space after the ':'.
-
-      |-----handy-ruler------------------------------------------------------|
+|-----handy-ruler------------------------------------------------------|
 ledger: ledger (a command-line accounting program)
 ledger:
 ledger: Ledger is an accounting program which is invoked from the command-line
 ledger: using a textual ledger file. See the documentation ( use "info ledger"
-ledger: or read ledger.pdf from the website) for full documentation on how to
+                                                             ledger: or read ledger.pdf from the website) for full documentation on how to
 ledger: create a ledger file and using Ledger to generate reports.
 ledger:
 ledger: Homepage: http://wiki.github.com/jwiegley/ledger

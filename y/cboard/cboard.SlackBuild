@@ -4,7 +4,6 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=$(date +%Y.%m.%d_%H.%M)
 
 BUILD=1
 
@@ -25,39 +24,33 @@ rm -fr $TMP/$PRGNAM-$VERSION
 rm -fr $PKG
 mkdir -p $TMP
 
-if [ ! -e $REPOSITORY ] ; then
-    mkdir -p $(dirname $REPOSITORY)
-    git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
-else
-    ( cd $REPOSITORY
-        git pull
-    )
-fi
+[ ! -e $REPOSITORY ] && git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Preparation
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-( cd $TMP/$PRGNAM-$VERSION
-    chown -R root:root .
-    find . \
-        \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-        -exec chmod 755 {} \; -o \
-        \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-        -exec chmod 644 {} \;
+cd $TMP/$PRGNAM-$VERSION
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
 
-    rm -fr debian
-    ./autogen.sh
-    ./configure \
-        --prefix=$PREFIX \
-        --mandir=$PREFIX/man
+rm -fr debian
+./autogen.sh
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man
 
-    make
+make
 
 # Installation
-    make install DESTDIR=$PKG
+make install DESTDIR=$PKG
 
-    mkdir -p $PKG$PREFIX/doc/$PRGNAM
-    cp COPYING NEWS doc/config.example INSTALL README KnownBugs THANKS TODO $PKG$PREFIX/doc/$PRGNAM
-)
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp COPYING NEWS doc/config.example INSTALL README KnownBugs THANKS TODO $PKG$PREFIX/doc/$PRGNAM
 
 # Cleaning
 find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
@@ -78,7 +71,7 @@ $PRGNAM:
 $PRGNAM: CBoard (Curses/Console Board) is an Ncurses frontend to chess engines
 $PRGNAM: supporting the XBoard protocol. Supports reading and writing PGN
 $PRGNAM: including roster tags, RAV, FEN, NAG and comments.
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
@@ -87,4 +80,3 @@ $PRGNAM:
 EOF
 
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
-

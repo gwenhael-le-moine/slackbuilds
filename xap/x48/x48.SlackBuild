@@ -22,22 +22,17 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $PRGNAM-$VERSION $PKG
+rm -fr $PRGNAM $PKG
 
 # Fetching sources
+[ ! -e $REPOSITORY ] && git clone https://github.com/cycojesus/x48.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-cd $TMP
-if [ ! -e $REPOSITORY ]; then
-    git clone https://github.com/cycojesus/x48.git $REPOSITORY
-else
-    ( cd $REPOSITORY
-      git pull
-    )
-fi
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
 
 # Preparation
-cd $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM
 chown -R root:root .
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -61,7 +56,7 @@ make install DESTDIR=$PKG
 
 mkdir -p $PKG$PREFIX/share/$PRGNAM
 cd $PKG$PREFIX/share/$PRGNAM
-cp $TMP/$PRGNAM-$VERSION/ROMs/*rom*.bz2 .
+cp $TMP/$PRGNAM/ROMs/*rom*.bz2 .
 find . -name "*.bz2" -exec bunzip2 {} \;
 
 # Cleaning

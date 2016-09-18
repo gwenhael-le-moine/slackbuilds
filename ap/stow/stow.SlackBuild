@@ -24,18 +24,12 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    git clone http://github.com/aspiers/stow.git $REPOSITORY
-else
-    ( cd $REPOSITORY
-      git pull
-    )
-fi
+[ ! -e $REPOSITORY ] && git clone http://github.com/aspiers/stow.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
-
-VERSION=$(git describe --long | tr - _)
 
 autoconf
 aclocal --force

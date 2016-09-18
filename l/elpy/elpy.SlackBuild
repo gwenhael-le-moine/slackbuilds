@@ -15,25 +15,17 @@ PKG=$TMP/pkg-$PRGNAM
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 PREFIX=/usr
 
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $TMP
 
-[ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
-[ -e $PKG ] && rm -fr $PKG
-
 # mise en place
-cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    mkdir -p $(dirname $REPOSITORY)
-    git clone https://github.com/jorgenschaefer/elpy.git $REPOSITORY
-else
-	( cd $REPOSITORY
-		git pull
-	)
-fi
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+[ ! -e $REPOSITORY ] && git clone https://github.com/jorgenschaefer/elpy.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+
+cd $TMP/$PRGNAM
 python setup.py install --root $PKG
 
 VERSION=$(ls /usr/lib$(uname -m | grep -o 64)/python*/site-packages/| grep "$PRGNAM-.*-py.*\.egg-info" | grep -o "[0-9.]*" | head -n1)_$VERSION
@@ -42,11 +34,11 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: $PRGNAM (Emacs Python Development Environment)
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: Elpy is an Emacs package to bring powerful Python editing to Emacs.
 $PRGNAM: It combines a number of other packages, both written in Emacs Lisp as
 $PRGNAM: well as Python.
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: Install elpy in Emacs as well through Marmalade as described on the
 $PRGNAM: homepage.
 $PRGNAM: https://github.com/jorgenschaefer/elpy/wiki
@@ -56,4 +48,3 @@ EOF
 
 cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
-

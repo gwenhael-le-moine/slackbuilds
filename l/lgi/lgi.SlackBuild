@@ -18,23 +18,20 @@ REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
-rm -rf $PKG $TMP/$PRGNAM-$VERSION
+rm -rf $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 cd $TMP
 
 if [ -e $CWD/$PRGNAM-$VERSION.tar.xz ] ; then
-      tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+    tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
 else
-    if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-        git clone https://github.com/pavouk/lgi.git $REPOSITORIES/$PRGNAM
-    else
-        ( cd $REPOSITORIES/$PRGNAM
-            git pull
-        )
-    fi
-    cp -R $REPOSITORIES/$PRGNAM $PRGNAM-$VERSION
+    [ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/pavouk/lgi.git $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORIES/$PRGNAM && git pull )
+    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+    cp -R $REPOSITORIES/$PRGNAM $PRGNAM
 fi
-cd $PRGNAM-$VERSION
+cd $PRGNAM
 
 LUA_VERSION=$(lua -v 2>&1 | grep -o "5\..")
 
@@ -63,13 +60,13 @@ cat << EOF > install/slack-desc
        |-----handy-ruler-----------------------------------------------------|
 $PRGNAM: $PRGNAM (Dynamic Lua binding to GObject libraries)
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: https://github.com/pavouk/lgi
 $PRGNAM:
 EOF

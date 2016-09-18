@@ -29,28 +29,29 @@ if [ -e $REPOSITORIES/$PRGNAM ] ; then
 else
     git clone http://github.com/andrewvc/learn-ruby-zeromq.git $REPOSITORIES/$PRGNAM
 fi
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORIES/$PRGNAM $PKG$PREFIX/doc/$PRGNAM
 find $PKG$PREFIX/doc/$PRGNAM -name \.git\* -exec rm -fr {} \;
 
 ( cd $PKG
-    mkdir -p install
-    cat <<EOF > install/slack-desc
+  mkdir -p install
+  cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (a book about 0MQ and Ruby)
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://github.com/andrewvc/learn-ruby-zeromq#readme
-$PRGNAM: 
+$PRGNAM:
 EOF
 
-    chown -R root:root *
+  chown -R root:root *
 
-    makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+  makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 )

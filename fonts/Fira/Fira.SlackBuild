@@ -12,19 +12,19 @@ CWD=$(pwd)
 TMP=${TMP:=/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+FONTDIR="/usr/share/fonts"
 
 # Create working directories:
 mkdir -p $OUTPUT          # place for the package to be saved
 mkdir -p $PKG             # place for the package to be built
 rm -rf $PKG/*             # always erase old package's contents
 rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
-			  # remove old log files
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
-FONTDIR="/usr/share/fonts"
 
-[ ! -e $REPOSITORY ] \
-    && git clone https://github.com/mozilla/Fira.git $REPOSITORY \
-    || (cd $REPOSITORY && git pull)
+
+[ ! -e $REPOSITORY ] && git clone https://github.com/mozilla/Fira.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR/ $PKG/usr/doc/

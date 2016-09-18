@@ -16,24 +16,21 @@ BUILD=1
 
 PREFIX=/usr
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-    git clone https://github.com/beetbox/beets.git $REPOSITORIES/$PRGNAM
-else
-    ( cd $REPOSITORIES/$PRGNAM
-      git pull
-    )
-fi
-cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+GIT_URL="https://github.com/beetbox/beets.git"
+[ ! -e $REPOSITORY ] && git clone "$GIT_URL" $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 
 python ./setup.py build
 

@@ -56,25 +56,25 @@ REPOSITORIES=/home/installs/SlackBuilds/repositories
 rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
-rm -rf $PRGNAM-$VERSION
+rm -rf $PRGNAM
 
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-        git clone git://git.sv.gnu.org/emacs.git $REPOSITORIES/$PRGNAM
-    else
-        ( cd $REPOSITORIES/$PRGNAM
-          git pull
-          [ -e Makefile ] && make distclean
-        )
-    fi
-    mkdir -p $TMP/$PRGNAM-$VERSION
+    [ ! -e $REPOSITORIES/$PRGNAM ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORIES/$PRGNAM
+
+    ( cd $REPOSITORIES/$PRGNAM
+      git pull
+      [ -e Makefile ] && make distclean
+    )
+    VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+    cd $TMP
+    mkdir -p $TMP/$PRGNAM
     SRCDIR=$REPOSITORIES/$PRGNAM
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
     SRCDIR=.
 fi
 
-cd $PRGNAM-$VERSION || exit 1
+cd $PRGNAM || exit 1
 chown -R root:root .
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -89,22 +89,22 @@ find . \
 EMACS_VERSION=$(grep "AC_INIT(GNU Emacs," $SRCDIR/configure.ac | sed 's|AC_INIT(GNU Emacs, \([0-9.]*\), bug-gnu-emacs@gnu.org)|\1|')
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-$SRCDIR/configure \
-  --prefix=/usr \
-  --sysconfdir=/etc \
-  --localstatedir=/var \
-  --program-prefix="" \
-  --program-suffix="" \
-  --mandir=/usr/man \
-  --infodir=/usr/info \
-  --with-x \
-  --with-x-toolkit=gtk3 \
-  --with-xwidgets \
-  --enable-link-time-optimization \
-  --with-compress-install \
-  --without-gconf \
-  --build=${ARCH}-slackware-linux
+      CXXFLAGS="$SLKCFLAGS" \
+      $SRCDIR/configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --program-prefix="" \
+      --program-suffix="" \
+      --mandir=/usr/man \
+      --infodir=/usr/info \
+      --with-x \
+      --with-x-toolkit=gtk3 \
+      --with-xwidgets \
+      --enable-link-time-optimization \
+      --with-compress-install \
+      --without-gconf \
+      --build=${ARCH}-slackware-linux
 
 make bootstrap
 
@@ -123,19 +123,19 @@ EOF
 )
 
 if [ ! "x$ONLY_X11" == "xYES" ] ; then
-# Also add a version of the binary that is not linked to X11:
+    # Also add a version of the binary that is not linked to X11:
     cd $TMP
-    rm -rf $PRGNAM-$VERSION
+    rm -rf $PRGNAM
     if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-        [ -e $TMP/$PRGNAM-$VERSION ] && rm -fr $TMP/$PRGNAM-$VERSION
-        mkdir -p $TMP/$PRGNAM-$VERSION
+        [ -e $TMP/$PRGNAM ] && rm -fr $TMP/$PRGNAM
+        mkdir -p $TMP/$PRGNAM
         SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
     else
         tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
         SRCDIR=.
     fi
 
-    cd $PRGNAM-$VERSION || exit 1
+    cd $PRGNAM || exit 1
     chown -R root:root .
     find . \
          \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -179,7 +179,7 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" \
 
 rm $PKG/usr/info/dir*
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a  BUGS \
    CONTRIBUTE \
    COPYING \
@@ -187,7 +187,7 @@ cp -a  BUGS \
    INSTALL \
    INSTALL.REPO \
    README \
-   $PKG/usr/doc/$PRGNAM-$VERSION
+   $PKG/usr/doc/$PRGNAM
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
