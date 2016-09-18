@@ -51,7 +51,7 @@ TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORIES=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -59,16 +59,16 @@ cd $TMP
 rm -rf $PRGNAM
 
 if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    [ ! -e $REPOSITORIES/$PRGNAM ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORIES/$PRGNAM
+    [ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
-    ( cd $REPOSITORIES/$PRGNAM
+    ( cd $REPOSITORY
       git pull
       [ -e Makefile ] && make distclean
     )
-    VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
     cd $TMP
     mkdir -p $TMP/$PRGNAM
-    SRCDIR=$REPOSITORIES/$PRGNAM
+    SRCDIR=$REPOSITORY
 else
     tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
     SRCDIR=.
@@ -129,7 +129,7 @@ if [ ! "x$ONLY_X11" == "xYES" ] ; then
     if [ ! -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
         [ -e $TMP/$PRGNAM ] && rm -fr $TMP/$PRGNAM
         mkdir -p $TMP/$PRGNAM
-        SRCDIR=$REPOSITORIES/$PRGNAM/$BRANCH
+        SRCDIR=$REPOSITORY/$BRANCH
     else
         tar xvf $CWD/$PRGNAM-$VERSION.tar.?z* || exit 1
         SRCDIR=.
