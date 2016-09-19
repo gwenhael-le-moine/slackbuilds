@@ -23,9 +23,9 @@ REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
 rm -fr $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] \
-    && git clone https://github.com/RPi-Distro/firmware-nonfree.git $REPOSITORY \
-    || (cd $REPOSITORY; git pull)
+[ ! -e $REPOSITORY ] && git clone https://github.com/RPi-Distro/firmware-nonfree.git $REPOSITORY
+( cd $REPOSITORY; git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG/lib/firmware
 
@@ -48,15 +48,15 @@ cat <<EOF > $PKG/install/slack-desc
         |-----handy-ruler------------------------------------------------------|
 $PRGNAM: $PRGNAM (Non-free firmwares for Raspberry Pi 3)
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: https://github.com/RPi-Distro/firmware-nonfree
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # empaquetage

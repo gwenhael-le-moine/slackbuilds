@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=awesome
 BRANCH=master
-VERSION=${VERSION:-${BRANCH}_$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-${BRANCH}}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -23,13 +23,11 @@ SLCKFLAGS=""
 function git_clone_or_pull() {
     REPO_URL=$1
     REPO_NAME=$2
-    if [ ! -e $REPOSITORIES/$REPO_NAME ]; then
-	git clone $REPO_URL $REPOSITORIES/$REPO_NAME
-    else
-	( cd $REPOSITORIES/$REPO_NAME
-	    git pull
-	)
-    fi
+    [ ! -e $REPOSITORIES/$REPO_NAME ] && git clone $REPO_URL $REPOSITORIES/$REPO_NAME
+
+    ( cd $REPOSITORIES/$REPO_NAME
+      git pull
+    )
 }
 
 # nettoyage préalable
@@ -37,9 +35,10 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 
 mkdir -p $PKG
 
+SRC_PATH=$REPOSITORIES/$PRGNAM
+
 # mise en place
 cd $TMP
-SRC_PATH=$REPOSITORIES/$PRGNAM
 if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
     tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
     SRC_PATH=.
@@ -49,6 +48,7 @@ else
     rm -fr $TMP/$PRGNAM-$VERSION
     mkdir -p $TMP/$PRGNAM-$VERSION
     cd $TMP/$PRGNAM-$VERSION
+    VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 fi
 
 # configuration

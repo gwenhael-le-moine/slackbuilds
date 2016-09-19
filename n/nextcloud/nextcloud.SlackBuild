@@ -25,23 +25,22 @@ rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
 if [ "x$1" == "x--git" ]; then
-    VERSION="git_$(date +%F | tr - .)"
     REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
-    if [ ! -e $REPOSITORY ]; then
-	git clone https://github.com/nextcloud/server $REPOSITORY
-    fi
+    [ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/server $REPOSITORY
     ( cd $REPOSITORY
       git pull
       git submodule init
       git submodule update )
 
+    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
     cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
     rm -fr $PKG/$VHOSTROOT/htdocs/.git
 else if [ "x$1" == "x--daily" ]; then
-	 VERSION="daily_$(date +%F | tr - .)"
-	 wget -c https://download.nextcloud.com/server/daily/latest.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
+         VERSION="daily_$(date +%F | tr - .)"
+         wget -c https://download.nextcloud.com/server/daily/latest.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
      else
-	 [ ! -e $CWD/$PRGNAM-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
+         [ ! -e $CWD/$PRGNAM-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
      fi
      cd $PKG/$VHOSTROOT
      tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
@@ -51,13 +50,13 @@ fi
 cd $PKG/$VHOSTROOT/htdocs
 chown -R root:root .
 find . \
- \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
- -exec chmod 750 {} \; -o \
- \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
- -exec chmod 640 {} \;
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+     -exec chmod 750 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+     -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp -a AUTHORS COPYING-AGPL $PKG/usr/doc/$PRGNAM
+cp -a AUTHORS CONTRIBUTING.md COPYING* README* $PKG/usr/doc/$PRGNAM
 
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
@@ -81,12 +80,12 @@ EOF
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (self-hosted cloud platform)
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: http://nextcloud.org
 $PRGNAM:

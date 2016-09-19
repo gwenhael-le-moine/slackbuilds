@@ -20,29 +20,26 @@ PREFIX=/usr
 
 SLCKFLAGS="-fPIC -O2"
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-if [ ! -e $REPOSITORIES/$PRGNAM ] ; then
-    git clone https://github.com/jkbr/httpie.git $REPOSITORIES/$PRGNAM
-else
-    ( cd $REPOSITORIES/$PRGNAM
-        git pull
-    )
-fi
-cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+GIT_URL="https://github.com/jkbr/httpie.git"
+[ ! -e $REPOSITORY ] && git clone "$GIT_URL" $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 
 # installation
 python ./setup.py install --root=$PKG
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM
+cp -R $DOCS $PKG/usr/doc/$PRGNAM
 
 # correction
 cd $PKG
@@ -59,9 +56,9 @@ $PRGNAM: command that allows for sending arbitrary HTTP requests using a simple 
 $PRGNAM: natural syntax, and displays colorized responses. HTTPie can be used for
 $PRGNAM: testing, debugging, and generally interacting with HTTP servers.
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: http://httpie.org/
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # empaquetage

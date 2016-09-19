@@ -31,15 +31,15 @@ if [ "x$STABLE" == "xYES" ]; then
     wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.xz -O $CWD/$PRGNAM-$VERSION.tar.xz
     tar xf $CWD/$PRGNAM-$VERSION.tar.xz
 else
-    if [ ! -e $REPOSITORY ]; then
-        git clone https://github.com/nextcloud/client_theming.git $REPOSITORY
-    fi
+    [ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/client_theming.git $REPOSITORY
+
     ( cd $REPOSITORY
       git pull
       git submodule update --init
       cd client
       git submodule update --init )
 
+    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
     cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 fi
 

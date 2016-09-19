@@ -24,14 +24,9 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    mkdir -p $(dirname $REPOSITORY)
-    git clone git://git.kernel.org/pub/scm/utils/dtc/dtc.git $REPOSITORY
-else
-	( cd $REPOSITORY
-		git pull
-	)
-fi
+[ ! -e $REPOSITORY ] && git clone git://git.kernel.org/pub/scm/utils/dtc/dtc.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
@@ -65,8 +60,8 @@ $PRGNAM:
 $PRGNAM: The source tree contains the Device Tree Compiler (dtc) toolchain for
 $PRGNAM: working with device tree source and binary files and also libfdt, a
 $PRGNAM: utility library for reading and manipulating the binary format.
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: http://devicetree.org/Device_Tree_Compiler

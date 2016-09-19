@@ -27,12 +27,9 @@ mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 REPOSITORIES=/home/installs/SlackBuilds/repositories
 REPOSITORY=${REPOSITORIES}/$PRGNAM
 
-if [ -e $REPOSITORY ]; then
-    ( cd $REPOSITORY
-      git pull )
-else
-    git clone https://tt-rss.org/git/tt-rss.git $REPOSITORY
-fi
+[ ! -e $REPOSITORY ] && git clone https://tt-rss.org/git/tt-rss.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $PKG$DOCROOT
 
@@ -40,12 +37,8 @@ cp -R $REPOSITORY $PKG$DOCROOT
 # - clean-greader
 REPOSITORY=${REPOSITORIES}/clean-greader
 
-if [ -e $REPOSITORY ]; then
-    ( cd $REPOSITORY
-      git pull )
-else
-    git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
-fi
+[ ! -e $REPOSITORY ] && git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
+( cd $REPOSITORY && git pull )
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
@@ -55,12 +48,9 @@ rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
 # - tt-rss-feedly-theme
 REPOSITORY=${REPOSITORIES}/tt-rss-feedly-theme
 
-if [ -e $REPOSITORY ]; then
-    ( cd $REPOSITORY
-      git pull )
-else
-    git clone https://github.com/levito/tt-rss-feedly-theme $REPOSITORY
-fi
+
+[ ! -e $REPOSITORY ] && git clone https://github.com/levito/tt-rss-feedly-theme $REPOSITORY
+( cd $REPOSITORY && git pull )
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/tt-rss-feedly-theme/.git

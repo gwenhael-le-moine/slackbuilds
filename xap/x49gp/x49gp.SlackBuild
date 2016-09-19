@@ -23,22 +23,16 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $TMP/$PRGNAM-$VERSION $PKG
+rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
-
-cd $TMP
-if [ ! -e $REPOSITORY ]; then
-    git clone https://github.com/cycojesus/x49gp.git $REPOSITORY
-else
-    ( cd $REPOSITORY
-      git pull
-    )
-fi
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+[ ! -e $REPOSITORY ] && git clone https://github.com/cycojesus/x49gp.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cp -R $REPOSITORY $TMP/$PRGNAM
 
 # Preparation
-cd $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM
 chown -R root:root .
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \

@@ -4,7 +4,6 @@
 VERSION=master_$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 
-
 TAG=cyco
 OUTPUT=/tmp
 TMP=/tmp/$TAG
@@ -27,27 +26,20 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    mkdir -p $(dirname $REPOSITORY)
-    git clone git://pwmt.org/girara.git $REPOSITORY
-fi
-
-( cd $REPOSITORY
-    git pull
-)
+[ ! -e $REPOSITORY ] && git clone git://pwmt.org/girara.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
-( cd $TMP/$PRGNAM
-    make
-    make install DESTDIR=$PKG MANPREFIX=$PREFIX/man LIBDIR=$PREFIX/lib$(uname -m | grep -o 64)
-)
+
+cd $TMP/$PRGNAM
+make
+make install DESTDIR=$PKG MANPREFIX=$PREFIX/man LIBDIR=$PREFIX/lib$(uname -m | grep -o 64)
 
 # correction
-( cd $PKG
-    chown -R root:root *
-    find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
-)
+cd $PKG
+chown -R root:root *
+find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install
@@ -67,13 +59,12 @@ $PRGNAM: girara is a library that implements a user interface that focuses on
 $PRGNAM: simplicity and minimalism. Currently based on GTK+, a cross-platform
 $PRGNAM: widget toolkit
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://pwmt.org/girara/
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # empaquetage
-cd $PKG
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

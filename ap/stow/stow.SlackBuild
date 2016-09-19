@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 # variables
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+# VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:-1}
 
 TAG=cyco
@@ -18,37 +18,42 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    mkdir -p $(dirname $REPOSITORY)
-    git clone https://bitbucket.org/erlcash/enc.git $REPOSITORY
-else
-	( cd $REPOSITORY
-		git pull
-	)
-fi
+[ ! -e $REPOSITORY ] && git clone http://github.com/aspiers/stow.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
 
-mkdir -p $PKG$PREFIX/bin
-cp enc.sh $PKG$PREFIX/bin/$PRGNAM
-chmod 755 $PKG$PREFIX/bin/$PRGNAM
+autoconf
+aclocal --force
+automake --add-missing
+
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man \
+    --infodir=$PREFIX/info
+
+make
+make install DESTDIR=$PKG
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp COPYING README enc.conf.example install.sh $PKG$PREFIX/doc/$PRGNAM
+cp AUTHORS COPYING INSTALL* MANIFEST* NEWS README* THANKS TODO $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
 chown -R root:root *
 
-find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+find $PKG$PREFIX/man -type f -exec gzip -9 {} \;
+find $PKG$PREFIX/info -type f -name dir -delete
+find $PKG$PREFIX/info -type f -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install
@@ -62,17 +67,17 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (EncFS CLI manager.)
+$PRGNAM: $PRGNAM (a symlink farm manager program)
 $PRGNAM:
-$PRGNAM: $PRGNAM is a simple manager written in bash simplifying work with EncFS
-$PRGNAM: encryption software.
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: https://bitbucket.org/erlcash/enc/
-$PRGNAM: 
+$PRGNAM: GNU Stow is a symlink farm manager which takes distinct packages of
+$PRGNAM: software and/or data located in separate directories on the
+$PRGNAM: filesystem, and makes them appear to be installed in the same place.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/aspiers/stow
+$PRGNAM: http://www.gnu.org/software/stow/
+$PRGNAM:
 EOF
 
 # empaquetage

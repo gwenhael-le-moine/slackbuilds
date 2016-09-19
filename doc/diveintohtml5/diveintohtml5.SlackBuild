@@ -21,13 +21,9 @@ PREFIX=/usr
 rm -fr $PKG
 
 # get sources
-if [ -e $REPOSITORY ] ; then
-    ( cd $REPOSITORY
-        git pull
-    )
-else
-    git clone http://github.com/diveintomark/diveintohtml5.git $REPOSITORY
-fi
+[ ! -e $REPOSITORY ] && git clone http://github.com/diveintomark/diveintohtml5.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORY $PKG$PREFIX/doc/$PRGNAM
@@ -37,19 +33,18 @@ cd $PKG
 mkdir -p install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (a book about HTML5)
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://diveintohtml5.info
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 chown -R root:root *
 
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
-

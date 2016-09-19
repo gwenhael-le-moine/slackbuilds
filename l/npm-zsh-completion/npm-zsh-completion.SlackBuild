@@ -23,14 +23,9 @@ rm -fr $PKG $TMP/$PRGNAM-$VERSION
 mkdir -p $PKG
 
 # mise en place
-cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    git clone "https://github.com/kuno/npm-zsh-completion" $REPOSITORY
-else
-    ( cd $REPOSITORY
-      git pull
-    )
-fi
+[ ! -e $REPOSITORY ] && git clone https://github.com/kuno/npm-zsh-completion.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/share/zsh/site-functions/
 cp $REPOSITORY/npm-zsh-completion.sh $PKG$PREFIX/share/zsh/site-functions/_npm

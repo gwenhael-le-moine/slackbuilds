@@ -13,18 +13,18 @@ TMP=${TMP:=/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+FONTDIR="/usr/share/fonts"
+
 # Create working directories:
 mkdir -p $OUTPUT          # place for the package to be saved
 mkdir -p $PKG             # place for the package to be built
 rm -rf $PKG/*             # always erase old package's contents
 rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
-                          # remove old log files
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
-FONTDIR="/usr/share/fonts"
 
-[ ! -e $REPOSITORY ] \
-	&& git clone https://github.com/FortAwesome/Font-Awesome.git $REPOSITORY \
-	|| (cd $REPOSITORY && git pull)
+[ ! -e $REPOSITORY ] && git clone https://github.com/FortAwesome/Font-Awesome.git $REPOSITORY
+(cd $REPOSITORY && git pull)
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR/{OTF,TTF} $PKG/usr/doc/
@@ -50,19 +50,18 @@ EOT
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (Iconic font)
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: The iconic font designed for use with Twitter Bootstrap
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: http://fortawesome.github.com/Font-Awesome/
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # Build the package:
 cd $PKG
 makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
-

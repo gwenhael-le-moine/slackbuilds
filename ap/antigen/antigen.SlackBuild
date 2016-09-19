@@ -24,13 +24,9 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ ! -e $REPOSITORY ] ; then
-    git clone git://github.com/zsh-users/antigen.git $REPOSITORY
-else
-    ( cd $REPOSITORY
-      git pull
-    )
-fi
+[ ! -e $REPOSITORY ] && git clone git://github.com/zsh-users/antigen.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/share/antigen/
 cp $REPOSITORY/antigen.zsh $PKG$PREFIX/share/antigen/

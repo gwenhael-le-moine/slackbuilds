@@ -11,14 +11,10 @@ PKG=$TMP/pkg-$PRGNAM
 
 VERSION=$(date +%Y.%m.%d_%H.%M)
 
-DOCS="LICENSE README.*"
-
 ARCH=$(uname -m)
 BUILD=1
 
 PREFIX=/usr
-
-SLCKFLAGS="-fPIC -O2"
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
@@ -28,18 +24,24 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/doloopwhile/PyExecJS.git $REPOSITORY
+GIT_URL="https://github.com/beetbox/beets.git"
+[ ! -e $REPOSITORY ] && git clone "$GIT_URL" $REPOSITORY
 ( cd $REPOSITORY && git pull )
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-cp -R $REPOSITORIES/${PRGNAM} $TMP/$PRGNAM
+cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
+
+python ./setup.py build
 
 # installation
 python ./setup.py install --root=$PKG
 
+mkdir -p $PKG$PREFIX/share/zsh/site-functions/
+cp extra/_beet $PKG$PREFIX/share/zsh/site-functions/
+
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp -R $DOCS $PKG/usr/doc/$PRGNAM
+cp -R LICENSE README.rst docs/ extra/ $PKG/usr/doc/$PRGNAM
 
 # correction
 cd $PKG
@@ -48,16 +50,16 @@ chown -R root:root *
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM ( Run JavaScript code from Python)
+$PRGNAM: $PRGNAM (music library manager and MusicBrainz tagger)
 $PRGNAM:
-$PRGNAM: PyExecJS is a porting of ExecJS from Ruby. PyExecJS automatically picks
-$PRGNAM: the best runtime available to evaluate your JavaScript program, then
-$PRGNAM: returns the result to you as a Python object.
+$PRGNAM: Beets is the media library management system for obsessive-compulsive music geeks.
+$PRGNAM:
+$PRGNAM: The purpose of beets is to get your music collection right once and for all. It
+$PRGNAM: catalogs your collection, automatically improving its metadata as it goes. It
+$PRGNAM: then provides a bouquet of tools for manipulating and accessing your music.
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: https://github.com/doloopwhile/PyExecJS
+$PRGNAM: http://beets.io/
 $PRGNAM:
 EOF
 
