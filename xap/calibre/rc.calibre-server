@@ -4,31 +4,34 @@ CALIBRE_LIBRARY_PATH="/home/cycojesus/BKP/tibou/Documents/eBooks/Livres/"
 PIDFILE=/tmp/calibre-server.pid
 USER=cycojesus
 PORT=8081
+AUTH=""
+# uncomment and adapt to enable authtentication
+# AUTH=" --username=\"$USER\" --password=\"password\""
 
 start() {
     echo "Starting Calibre server..."
-    su $USER -c "calibre-server --with-library=\"$CALIBRE_LIBRARY_PATH\" -p $PORT --pidfile=$PIDFILE --daemonize" &
+    su $USER -c "calibre-server --with-library=\"$CALIBRE_LIBRARY_PATH\" -p $PORT --pidfile=$PIDFILE --daemonize $AUTH" &
     if [ $? -ne 0 ]; then
-	echo "Could not start calibre-server."
+        echo "Could not start calibre-server."
     fi
 }
 
 stop() {
     echo "Stopping Calibre server..."
     if [ -e $PIDFILE ]; then
-	read PID < $PIDFILE
-	ps aux | grep "$PID" | grep 'calibre-server' > /dev/null
-	RUNNING=$?
-	if [ $RUNNING -eq 0 ]; then
-	    kill $PID
-	    if [ $? -eq 0 ]; then
-		rm $PIDFILE
-	    fi
-	else
-	    echo "Could not find a calibre-server process with PID $PID."
-	fi
+        read PID < $PIDFILE
+        ps aux | grep "$PID" | grep 'calibre-server' > /dev/null
+        RUNNING=$?
+        if [ $RUNNING -eq 0 ]; then
+            kill $PID
+            if [ $? -eq 0 ]; then
+                rm $PIDFILE
+            fi
+        else
+            echo "Could not find a calibre-server process with PID $PID."
+        fi
     else
-	echo "Could not find pidfile: $PIDFILE"
+        echo "Could not find pidfile: $PIDFILE"
     fi
 }
 
@@ -39,10 +42,10 @@ restart() {
 
 status() {
     if [ -e $PIDFILE ]; then
-	read PID < $PIDFILE
-	echo "calibre-server is running with PID $PID."
+        read PID < $PIDFILE
+        echo "calibre-server is running with PID $PID."
     else
-	echo "calibre-server is not running."
+        echo "calibre-server is not running."
     fi
 }
 
@@ -53,18 +56,18 @@ unknown() {
 
 case $1 in
     start )
-	start
-	;;
+        start
+        ;;
     stop )
-	stop
-	;;
+        stop
+        ;;
     restart )
-	restart
-	;;
+        restart
+        ;;
     status )
-	status
-	;;
+        status
+        ;;
     * )
-	unknown
-	;;
+        unknown
+        ;;
 esac

@@ -51,7 +51,7 @@ TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
-REPOSITORIES=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
