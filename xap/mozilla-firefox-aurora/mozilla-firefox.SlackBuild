@@ -90,7 +90,6 @@ mozilla-firefox:
 mozilla-firefox:
 EOF
 
-VERSION=$(echo $BRANCH | sed 's|latest-mozilla-||g')_${VERSION}
-
 cd $PKG
+VERSION=${VERSION}_$(cat $PKG/usr/lib$LIBSUFFIX/firefox/platform.ini | grep BuildID | cut -d= -f2)
 makepkg -l y -c n $OUTPUT/mozilla-firefox-$VERSION-$ARCH-$BUILD$TAG.txz
