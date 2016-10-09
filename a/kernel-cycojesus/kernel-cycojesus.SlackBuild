@@ -10,7 +10,7 @@ BUILD=${BUILD:-1}
 
 ARCH=$(uname -m)
 
-SOURCES=/usr/src/
+SOURCES=/usr/src
 TAG=cyco
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
