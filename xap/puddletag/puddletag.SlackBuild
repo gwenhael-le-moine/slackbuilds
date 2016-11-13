@@ -38,7 +38,7 @@ python ./setup.py build
 python ./setup.py install --root=$PKG
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp -R HACKING LICENSE MANIFEST NEWS README THANKS TODO changelog  $PKG/usr/doc/$PRGNAM
+cp -R HACKING LICENSE MANIFEST NEWS README THANKS TODO changelog $PKG/usr/doc/$PRGNAM
 
 # correction
 cd $PKG
