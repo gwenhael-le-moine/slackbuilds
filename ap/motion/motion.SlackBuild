@@ -44,13 +44,13 @@ OUTPUT=${OUTPUT:-/tmp}
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 if [ "$ARCH" = "i486" ]; then
-   SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+    SLKCFLAGS="-O2 -march=i486 -mtune=i686"
 elif [ "$ARCH" = "i686" ]; then
-   SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+    SLKCFLAGS="-O2 -march=i686 -mtune=i686"
 elif [ "$ARCH" = "x86_64" ]; then
-   SLKCFLAGS="-O2 -fPIC"
+    SLKCFLAGS="-O2 -fPIC"
 elif [ "$ARCH" = "arm" ]; then
-   SLKCFLAGS="-O2 -march=armv7"
+    SLKCFLAGS="-O2"
 fi
 
 set -e
