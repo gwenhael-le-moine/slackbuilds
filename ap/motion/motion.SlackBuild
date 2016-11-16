@@ -60,7 +60,7 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM
 
-[ ! -e $REPOSITORY ] && git clone https://github.com/Mr-Dave/motion $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/Motion-Project/motion $REPOSITORY
 ( cd $REPOSITORY && git pull )
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
