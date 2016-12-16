@@ -25,6 +25,8 @@ wget -c https://raw.github.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -O $PKG$P
 
 chmod 0755 $PKG$PREFIX/bin/wp-cli
 
+VERSION=$($PKG$PREFIX/bin/wp-cli cli version | cut -d\  -f2)
+
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
