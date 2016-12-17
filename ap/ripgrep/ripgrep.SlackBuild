@@ -65,9 +65,9 @@ $PRGNAM: a line oriented search tool that combines the usability of The Silver
 $PRGNAM: Searcher (an ack clone) with the raw speed of GNU grep. ripgrep works
 $PRGNAM: by recursively searching your current directory for a regex pattern.
 $PRGNAM:
-$PRGNAM: ripgrep's regex engine uses finite automata and guarantees linear
-$PRGNAM: time searching. Because of this, features like backreferences and
-$PRGNAM: arbitrary lookaround are not supported.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: https://github.com/BurntSushi/ripgrep
 EOF
