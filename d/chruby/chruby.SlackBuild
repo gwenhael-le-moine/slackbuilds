@@ -20,9 +20,6 @@ PREFIX=/usr
 
 SLCKFLAGS="-fPIC -O2"
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
-
 mkdir -p $PKG
 
 # mise en place
@@ -30,8 +27,11 @@ mkdir -p $PKG
 ( cd $REPOSITORY && git pull )
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
 
 
 # compilation
