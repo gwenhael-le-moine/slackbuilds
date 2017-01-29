@@ -14,7 +14,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
@@ -25,11 +25,11 @@ cd $TMP
 if [ -e $CWD/$PRGNAM-$VERSION.tar.xz ] ; then
     tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
 else
-    [ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/pavouk/lgi.git $REPOSITORIES/$PRGNAM
-    ( cd $REPOSITORIES/$PRGNAM && git pull )
+    [ ! -e $REPOSITORY ] && git clone https://github.com/pavouk/lgi.git $REPOSITORY
+    ( cd $REPOSITORY && git pull )
     VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-    cp -R $REPOSITORIES/$PRGNAM $PRGNAM
+    cp -R $REPOSITORY $PRGNAM
 fi
 cd $PRGNAM
 
