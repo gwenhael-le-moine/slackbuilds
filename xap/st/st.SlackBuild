@@ -42,7 +42,8 @@ find . \
 
 # Building
 make config.h
-sed -i 's|Liberation Mono:pixelsize=12:antialias=true|Terminus:pixelsize=10:antialias=false|' config.h
+patch -p1 -i $CWD/config.patch
+
 make
 
 # Installing
