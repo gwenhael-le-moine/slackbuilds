@@ -35,8 +35,6 @@ chmod 755 $PKG$PREFIX/bin/*
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp $REPOSITORY/LICENSE $REPOSITORY/README.md $PKG$PREFIX/doc/$PRGNAM
 
-VERSION=$(grep 'VERSION="\(.*\)"' $PKG$PREFIX/bin/getssl | sed 's|VERSION=||' | tr -d \")
-
 # correction
 cd $PKG
 chown -R root:root *
