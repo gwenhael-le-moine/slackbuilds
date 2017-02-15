@@ -10,7 +10,7 @@ BUILD=${BUILD:-1}
 
 ARCH=$(uname -m)
 
-SOURCES=/usr/src/
+SOURCES=/usr/src
 TAG=cyco
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
@@ -18,7 +18,7 @@ OUTPUT=/tmp
 
 NUMJOBS=${NUMJOBS:-" -j4 "}
 
-SRC_URL="http://www.kernel.org/pub/linux/kernel/v$(echo  \"$VERSION\" | sed 's|\([0-9]*\.[0-9]*\).*|\1|')$(echo \"$VERSION\" | grep -q \"\-rc\" && echo \"/testing\" )"
+SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v4.x"
 
 rm -fr $PKG
 if [ $CLEAN_SRC != "NO" ] ; then
@@ -26,7 +26,7 @@ if [ $CLEAN_SRC != "NO" ] ; then
 fi
 
 if [ $CLEAN_SRC != "NO" ]; then
-    [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.bz2" -O $CWD/linux-$VERSION.tar.xz
+    [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.xz" -O $CWD/linux-$VERSION.tar.xz
     [ ! -e $SOURCES ] && mkdir -p $SOURCES
     tar xf $CWD/linux-$VERSION.tar.?z* -C $SOURCES
 fi

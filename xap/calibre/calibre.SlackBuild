@@ -18,12 +18,14 @@ mkdir -p $PKG/opt/${PRGNAM}
 
 tar xvf $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz -C $PKG/opt/${PRGNAM}
 
+rm $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz
+
 mkdir -p $PKG/usr/bin
 
 $PKG/opt/calibre/calibre_postinstall --root=$PKG/usr
 
 mkdir -p $PKG/etc/rc.d/
-cp $CWD/rc.calibre-server $PKG/etc/rc.d/
+cp $CWD/rc.calibre-server $PKG/etc/rc.d/rc.calibre-server.new
 
 cd $PKG/usr/bin
 find . -type l -exec sh -c 'rm "$1"; ln -s ../../opt/calibre/$(basename $1)' _ {} \;

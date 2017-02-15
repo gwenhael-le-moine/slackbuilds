@@ -13,16 +13,14 @@ TMP=${TMP:=/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-# Create working directories:
-mkdir -p $OUTPUT          # place for the package to be saved
-mkdir -p $PKG             # place for the package to be built
-rm -rf $PKG/*             # always erase old package's contents
+mkdir -p $OUTPUT
+mkdir -p $PKG
+rm -rf $PKG/*
 rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
-			  # remove old log files
 
 FONTDIR="/usr/share/fonts"
 
-[ ! -e $CWD/Noto-hinted.zip ] && wget -c http://www.google.com/get/noto/pkgs/Noto-hinted.zip -O $CWD/Noto-hinted.zip
+[ ! -e $CWD/Noto-hinted.zip ] && wget -c https://noto-website.storage.googleapis.com/pkgs/Noto-hinted.zip -O $CWD/Noto-hinted.zip
 
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR/{TTF,OTF} $PKG/usr/doc/$PRGNAM/

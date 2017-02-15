@@ -1,0 +1,85 @@
+#!/bin/sh
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +%F | tr - .)}
+
+BUILD=1
+
+ARCH=$(uname -m)
+LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+mkdir -p $TMP
+
+# Cleaning
+rm -fr $TMP/$PRGNAM $PKG
+
+# Fetching sources
+[ ! -e $REPOSITORY ] && git clone git://git.suckless.org/st $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cp -R $REPOSITORY $TMP/$PRGNAM
+
+# Preparation
+cd $TMP/$PRGNAM
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Building
+make config.h
+patch -p1 -i $CWD/config.patch
+
+make
+
+# Installing
+make install DESTDIR=$PKG PREFIX=$PREFIX MANPREFIX=$PREFIX/man
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp FAQ LEGACY LICENSE README TODO st.info $PKG$PREFIX/doc/$PRGNAM
+
+# Cleaning
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Packaging
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (a simple terminal implementation for X.)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://st.suckless.org/
+$PRGNAM:
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
