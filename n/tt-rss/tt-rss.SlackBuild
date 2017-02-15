@@ -42,12 +42,11 @@ REPOSITORY=${REPOSITORIES}/clean-greader
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
-( cd $PKG$DOCROOT/themes.local/
-  ln -s ./clean-greader/clean-greader.css )
+# ( cd $PKG$DOCROOT/themes.local/
+#   ln -s ./clean-greader/clean-greader.css )
 
 # - tt-rss-feedly-theme
 REPOSITORY=${REPOSITORIES}/tt-rss-feedly-theme
-
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/levito/tt-rss-feedly-theme $REPOSITORY
 ( cd $REPOSITORY && git pull )
@@ -57,6 +56,29 @@ rm -fr $PKG$DOCROOT/themes.local/tt-rss-feedly-theme/.git
 ( cd $PKG$DOCROOT/themes.local/
   ln -s ./tt-rss-feedly-theme/feedly/
   ln -s ./tt-rss-feedly-theme/feedly.css )
+
+# - tt-rss_reeder_theme
+REPOSITORY=${REPOSITORIES}/tt-rss_reeder_theme
+
+[ ! -e $REPOSITORY ] && git clone https://github.com/tschinz/tt-rss_reeder_theme $REPOSITORY
+( cd $REPOSITORY && git pull )
+
+cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+rm -fr $PKG$DOCROOT/themes.local/tt-rss_reeder_theme/.git
+( cd $PKG$DOCROOT/themes.local/
+  ln -s ./tt-rss_reeder_theme/reeder/
+  ln -s ./tt-rss_reeder_theme/reeder.css )
+
+# - clean-greader
+REPOSITORY=${REPOSITORIES}/clean-greader
+
+[ ! -e $REPOSITORY ] && git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
+( cd $REPOSITORY && git pull )
+
+cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
+rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
+( cd $PKG$DOCROOT/themes.local/
+  ln -s ./clean-greader/clean-greader.css )
 
 # /back to standard SlackBuild
 
