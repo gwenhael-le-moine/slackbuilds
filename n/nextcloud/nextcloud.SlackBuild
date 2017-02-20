@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-10.0.1}
+VERSION=${VERSION:-11.0.1}
 ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -56,7 +56,9 @@ find . \
      -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp -a AUTHORS CONTRIBUTING.md COPYING* README* $PKG/usr/doc/$PRGNAM
+for i in  AUTHORS CONTRIBUTING.md COPYING* README*; do
+    [ -e $i ] && cp -a $i $PKG/usr/doc/$PRGNAM
+done
 
 # Change ownership and perms and create a link.
 chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
