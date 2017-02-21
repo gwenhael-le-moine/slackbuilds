@@ -19,7 +19,7 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-ACTIVE_APPS="audioplayer calendar contacts deck direct_menu gallery news ocsms"
+ACTIVE_APPS="audioplayer bookmarks calendar contacts deck direct_menu gallery news ocsms"
 set -eu
 
 rm -rf $PKG
