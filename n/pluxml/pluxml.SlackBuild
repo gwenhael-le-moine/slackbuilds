@@ -1,0 +1,70 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+ARCH="noarch"	# hardcode ARCH
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+VHOST=${VHOST:-vhosts/$PRGNAM/}
+VHOSTROOT=/var/www/${VHOST}
+DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
+
+PHPUSER=${PHPUSER:-apache}
+PHPGROUP=${PHPGROUP:-apache}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+set -eu
+
+rm -rf $PKG
+mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+[ ! -e $REPOSITORY ] && git clone https://github.com/pluxml/PluXml $REPOSITORY
+( cd $REPOSITORY
+  git pull )
+
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
+rm -fr $PKG/$VHOSTROOT/htdocs/.git
+
+cd $PKG/$VHOSTROOT/htdocs
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \
+     -exec chmod 750 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 -o -perm 644 \) \
+     -exec chmod 640 {} \;
+
+mkdir -p $PKG/usr/doc/$PRGNAM
+for i in README*; do
+    [ -e $i ] && cp -a $i $PKG/usr/doc/$PRGNAM
+done
+
+# Change ownership and perms and create a link.
+chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
+chmod 0750 $PKG/$DOCROOT
+
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Moteur de Blog et CMS à l'XML sans base de données)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://pluxml.org
+$PRGNAM:
+EOF
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
