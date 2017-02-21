@@ -32,6 +32,7 @@ VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d 
 
 cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
 rm -fr $PKG/$VHOSTROOT/htdocs/.git
+mv $PKG/$VHOSTROOT/install.php $PKG/$VHOSTROOT/install.php.disabled
 
 cd $PKG/$VHOSTROOT/htdocs
 chown -R root:root .
@@ -55,8 +56,8 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (Moteur de Blog et CMS à l'XML sans base de données)
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: (rename $VHOSTROOT/install.php.disabled into
+$PRGNAM:  $VHOSTROOT/install.php if it's your first installation)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
