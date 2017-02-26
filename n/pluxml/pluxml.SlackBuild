@@ -43,7 +43,7 @@ find . \
      -exec chmod 640 {} \;
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-for i in README*; do
+for i in README* readme; do
     [ -e $i ] && cp -a $i $PKG/usr/doc/$PRGNAM
 done
 
