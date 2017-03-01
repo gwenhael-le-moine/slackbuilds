@@ -4,7 +4,7 @@ CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
-PKG=$TMP/pkg-mozilla-firefox
+PKG=$TMP/pkg-mozilla-firefox-aurora
 
 # This is not a source build script.  Rather, it builds a Slackware
 # package from the official binary tarball available from mozilla.org.
@@ -76,7 +76,7 @@ cat <<EOF $CWD/slack-desc > $PKG/install/slack-desc
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
 
-	       |-----handy-ruler------------------------------------------------------|
+               |-----handy-ruler------------------------------------------------------|
 mozilla-firefox: mozilla-firefox (Mozilla Firefox Web browser)
 mozilla-firefox:
 mozilla-firefox: This project is a redesign of the Mozilla browser component written
@@ -92,4 +92,4 @@ EOF
 
 cd $PKG
 VERSION=${VERSION}_$(cat $PKG/usr/lib$LIBSUFFIX/firefox/platform.ini | grep BuildID | cut -d= -f2)
-makepkg -l y -c n $OUTPUT/mozilla-firefox-$VERSION-$ARCH-$BUILD$TAG.txz
+makepkg -l y -c n $OUTPUT/mozilla-firefox-aurora-$VERSION-$ARCH-$BUILD$TAG.txz
