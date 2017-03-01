@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # variables
 VERSION=20100318142033 #$(date +"%Y%m%d")

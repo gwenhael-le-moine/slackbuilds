@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 CLEAN_SRC=${CLEAN_SRC:-NO}
 

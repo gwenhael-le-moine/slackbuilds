@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 PRGNAM=httrack
 VERSION=3.45.1

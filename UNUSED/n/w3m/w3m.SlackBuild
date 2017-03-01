@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # Slackware build script for w3m
 # Written by slakmagik <jsun@freeshell.org>

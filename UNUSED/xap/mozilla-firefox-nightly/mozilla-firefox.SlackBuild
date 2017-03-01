@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 KEEP_TAR=${KEEP_TAR:-"NO"}
 

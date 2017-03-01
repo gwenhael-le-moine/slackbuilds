@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # variables
 VERSION=1.5
