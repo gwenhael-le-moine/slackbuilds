@@ -19,7 +19,7 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-ACTIVE_APPS="audioplayer bookmarks calendar contacts deck direct_menu files_markdown gallery news ocsms tasks"
+ACTIVE_APPS="audioplayer bookmarks calendar contacts deck direct_menu files_markdown gallery news ocsms tasks mail"
 
 set -eu
 
@@ -76,10 +76,10 @@ grep -q "/var/www/${VHOST}htdocs/cron.php" /var/spool/cron/crontabs/apache || ec
 
 echo "Upgrading database and applications"
 ( cd /var/www/${VHOST}htdocs/
-  sudo -u $PHPUSER php ./occ upgrade
-  for a in $ACTIVE_APPS; do
-    sudo -u $PHPUSER php ./occ app:enable \$a
-  done
+  sudo -u $PHPUSER php ./occ upgrade --quiet --no-interaction --no-app-disable
+  # for a in $ACTIVE_APPS; do
+  #   sudo -u $PHPUSER php ./occ app:enable \$a
+  # done
 )
 echo "Post-installation process completed"
 EOF
