@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-1.0.0}
+VERSION=${VERSION:-1.16.0}
 BUILD=1
 
 ARCH=$(uname -m)
@@ -41,7 +41,7 @@ mkdir -p install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (a safe, concurrent, practical language)
 $PRGNAM:
-$PRGNAM:  Rust is a curly-brace, block-structured expression language.
+$PRGNAM: Rust is a curly-brace, block-structured expression language.
 $PRGNAM: It visually resembles the C language family, but differs significantly in
 $PRGNAM: syntactic and semantic details. Its design is oriented toward concerns of
 $PRGNAM: “programming in the large”, that is, of creating and maintaining boundaries
