@@ -28,7 +28,7 @@ mkdir -p $PKG
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/bin
-cp $REPOSITORY/getssl $REPOSITORY/create-getssl-config $PKG$PREFIX/bin/
+cp $REPOSITORY/getssl $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
@@ -38,8 +38,6 @@ cp $REPOSITORY/LICENSE $REPOSITORY/README.md $PKG$PREFIX/doc/$PRGNAM
 # correction
 cd $PKG
 chown -R root:root *
-
-find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install
