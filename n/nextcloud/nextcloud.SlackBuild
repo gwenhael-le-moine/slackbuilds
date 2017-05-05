@@ -19,8 +19,6 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-ACTIVE_APPS="audioplayer bookmarks calendar contacts deck direct_menu files_markdown gallery news ocsms tasks mail"
-
 set -eu
 
 rm -rf $PKG
@@ -40,7 +38,7 @@ if [ "x$1" == "x--git" ]; then
     rm -fr $PKG/$VHOSTROOT/htdocs/.git
 else if [ "x$1" == "x--daily" ]; then
          VERSION="daily_$(date +%F | tr - .)"
-         wget -c https://download.nextcloud.com/server/daily/latest.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
+         wget -c https://download.nextcloud.com/server/daily/latest-master.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
      else
          [ ! -e $CWD/$PRGNAM-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
      fi
@@ -77,9 +75,6 @@ grep -q "/var/www/${VHOST}htdocs/cron.php" /var/spool/cron/crontabs/apache || ec
 echo "Upgrading database and applications"
 ( cd /var/www/${VHOST}htdocs/
   sudo -u $PHPUSER php ./occ upgrade --quiet --no-interaction --no-app-disable
-  # for a in $ACTIVE_APPS; do
-  #   sudo -u $PHPUSER php ./occ app:enable \$a
-  # done
 )
 echo "Post-installation process completed"
 EOF
