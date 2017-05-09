@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-1.16.0}
+VERSION=${VERSION:-1.17.0}
 BUILD=1
 
 ARCH=$(uname -m)

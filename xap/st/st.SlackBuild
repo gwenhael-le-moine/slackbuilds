@@ -40,9 +40,13 @@ find . \
      \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
      -exec chmod 644 {} \;
 
+# Patching
+for i in $CWD/patches/*.diff; do
+    patch -p1 -i $i
+done
+
 # Building
 make config.h
-patch -p1 -i $CWD/config.patch
 
 make
 
