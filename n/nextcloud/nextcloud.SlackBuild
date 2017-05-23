@@ -24,28 +24,51 @@ set -eu
 rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
-if [ "x$1" == "x--git" ]; then
-    REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
-    [ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/server $REPOSITORY
-    ( cd $REPOSITORY
-      git pull
-      git submodule init
-      git submodule update )
+case $1 in
+    --git)
+        REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+        [ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/server $REPOSITORY
+        ( cd $REPOSITORY
+          git pull
+          git submodule init
+          git submodule update )
 
-    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+        VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-    cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
-    rm -fr $PKG/$VHOSTROOT/htdocs/.git
-else if [ "x$1" == "x--daily" ]; then
+        cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
+        rm -fr $PKG/$VHOSTROOT/htdocs/.git
+        ;;
+
+    --daily)
          VERSION="daily_$(date +%F | tr - .)"
          wget -c https://download.nextcloud.com/server/daily/latest-master.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
-     else
+         cd $PKG/$VHOSTROOT
+         tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
+         rm $CWD/$PRGNAM-$VERSION.tar.bz2
+         mv $PRGNAM htdocs
+         ;;
+
+    --prerelease)
+
+         ;;
+
+    --stable)
+         VERSION="stable_$(date +%F | tr - .)"
+         wget -c https://download.nextcloud.com/server/releases/latest.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
+         cd $PKG/$VHOSTROOT
+         tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
+         rm $CWD/$PRGNAM-$VERSION.tar.bz2
+         mv $PRGNAM htdocs
+         ;;
+
+    *)
          [ ! -e $CWD/$PRGNAM-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
-     fi
-     cd $PKG/$VHOSTROOT
-     tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
-     mv $PRGNAM htdocs
-fi
+         cd $PKG/$VHOSTROOT
+         tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
+         rm $CWD/$PRGNAM-$VERSION.tar.bz2
+         mv $PRGNAM htdocs
+         ;;
+esac
 
 cd $PKG/$VHOSTROOT/htdocs
 chown -R root:root .
