@@ -40,7 +40,7 @@ $PRGNAM: $PRGNAM is a cross-platform program for developing Haskell projects.
 $PRGNAM: It is aimed at Haskellers both new and experienced.
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
+$PRGNAM: $ stack setup
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: Homepage:  https://www.stackage.org/
