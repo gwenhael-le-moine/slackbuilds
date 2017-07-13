@@ -16,9 +16,11 @@ if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
    eval $(dbus-launch --sh-syntax --exit-with-session)
 fi
 
+[ -x $HOME/.config/awesome/run-before.sh ] && $HOME/.config/awesome/run-before.sh
+
 # Start the window manager:
 if [ -z "$DESKTOP_SESSION" -a -x /usr/bin/ck-launch-session ]; then
-  exec ck-launch-session /usr/bin/awesome
+    exec ck-launch-session /usr/bin/awesome
 else
-  exec /usr/bin/awesome
+    exec /usr/bin/awesome
 fi
