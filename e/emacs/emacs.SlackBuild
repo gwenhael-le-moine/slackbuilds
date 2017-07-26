@@ -100,7 +100,6 @@ CFLAGS="$SLKCFLAGS" \
       --infodir=/usr/info \
       --with-x \
       --with-x-toolkit=gtk3 \
-      --with-xwidgets \
       --enable-link-time-optimization \
       --with-compress-install \
       --without-gconf \
