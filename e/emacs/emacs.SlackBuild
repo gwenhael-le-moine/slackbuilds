@@ -28,6 +28,7 @@
 # Modified by Gwenhael Le Moine <gwenhael.le.moine@gmail.com>
 
 ONLY_X11=${ONLY_X11:=YES}
+X_TOOLKIT=${X_TOOLKIT:=lucid}
 
 PRGNAM=emacs
 BRANCH=${BRANCH:=trunk}
@@ -99,7 +100,7 @@ CFLAGS="$SLKCFLAGS" \
       --mandir=/usr/man \
       --infodir=/usr/info \
       --with-x \
-      --with-x-toolkit=gtk3 \
+      --with-x-toolkit=$X_TOOLKIT \
       --enable-link-time-optimization \
       --with-compress-install \
       --without-gconf \
