@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-BUILD=2
+BUILD=3
 
 TAG=cyco
 OUTPUT=/tmp
@@ -14,18 +14,18 @@ PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
 LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
-VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/[0-9.]*/" | tr -d / | grep -o "[0-9.]*")
+VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
 
 # cleaning
 rm -fr $PKG
 
-[ ! -e $CWD/crystal-${VERSION}-1-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/${VERSION}/crystal-${VERSION}-1-linux-${ARCH}.tar.gz -O $CWD/crystal-${VERSION}-1-linux-${ARCH}.tar.gz
+[ ! -e $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz
 
 # installation
 mkdir -p $PKG$PREFIX/{doc,libexec/${PRGNAM}}/
 cd $PKG$PREFIX/doc/
-tar xvf $CWD/crystal-${VERSION}-1-linux-${ARCH}.tar.gz
-mv crystal-${VERSION}-1 crystal-${VERSION}
+tar xvf $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz
+#mv crystal-${VERSION} crystal-${VERSION}
 mv crystal-${VERSION}/{embedded,src} $PKG$PREFIX/libexec/${PRGNAM}
 mv crystal-${VERSION}/bin $PKG$PREFIX
 
@@ -51,4 +51,4 @@ $PRGNAM:
 $PRGNAM: http://crystal-lang.org/
 EOF
 
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr '-' '_')-$ARCH-$BUILD$TAG.txz
