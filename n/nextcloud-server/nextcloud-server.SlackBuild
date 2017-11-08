@@ -11,6 +11,7 @@ TAG=${TAG:-cyco}
 VHOST=${VHOST:-vhosts/$PRGNAM/}
 VHOSTROOT=/var/www/${VHOST}
 DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
+DATAROOT=${DATAROOT:-/home/nextcloud/data}
 
 PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
@@ -61,9 +62,36 @@ chown -R $PHPUSER:$PHPGROUP $PKG/$DOCROOT
 chmod 0750 $PKG/$DOCROOT
 chmod 0770 $PKG/$DOCROOT/{config,apps}
 
+mkdir -p $PKG/etc/logrotate.d/
+cat <<EOF > $PKG/etc/logrotate.d/nextcloud.new
+$DATAROOT/nextcloud.log {
+       monthly
+       rotate 6
+       delaycompress
+       compress
+       notifempty
+       missingok
+}
+EOF
+
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 #!/bin/sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then
+    # toss the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+
+config etc/logrotate.d/nextcloud.new
+
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/apps
 
 grep -q "/var/www/${VHOST}htdocs/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}htdocs/cron.php" >> /var/spool/cron/crontabs/apache
