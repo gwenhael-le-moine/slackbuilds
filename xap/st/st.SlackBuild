@@ -24,12 +24,13 @@ PREFIX=/usr
 SLCKFLAGS=""
 
 if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-    hg clone http://hg.suckless.org/st $REPOSITORIES/$PRGNAM
+    git clone git://git.suckless.org/st $REPOSITORIES/$PRGNAM
 else
     ( cd $REPOSITORIES/$PRGNAM
-        hg pull -u
+      git pull
     )
 fi
+VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM-$VERSION
@@ -43,17 +44,28 @@ if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
 else
     cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
 fi
+
+# Getting official patches
+mkdir -p $CWD/patches/
+cd $CWD/patches/
+wget -c https://st.suckless.org/patches/scrollback/st-scrollback-20170329-149c0d3.diff
+wget -c https://st.suckless.org/patches/scrollback/st-scrollback-mouse-20170427-5a10aca.diff
+wget -c https://st.suckless.org/patches/vertcenter/st-vertcenter-20170601-5a10aca.diff
+
 cd $TMP/$PRGNAM-$VERSION
 
 # configuration
-
+for i in $(ls $CWD/patches); do
+    echo "Applying patch $i"
+    patch -p1 < $CWD/patches/$i
+done
+sed -i 's|Liberation Mono:pixelsize=12:antialias=true:autohint=true|Terminus:pixelsize=12:antialias=true:autohint=true|g' *
 
 # compilation
 make -j3 PREFIX=$PREFIX
 
 # installation
 make install DESTDIR=$PKG PREFIX=$PREFIX MANPREFIX=$PREFIX/man
-
 
 # correction
 cd $PKG
@@ -75,9 +87,9 @@ mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (st is a simple terminal implementation for X.)
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
