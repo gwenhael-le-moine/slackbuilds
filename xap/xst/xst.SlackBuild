@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $(pwd))
+BRANCH=
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+DOCS="*.txt"
+
+PREFIX=/usr
+
+SLCKFLAGS=""
+
+if [ ! -e $REPOSITORIES/$PRGNAM ]; then
+    git clone https://github.com/neeasade/xst $REPOSITORIES/$PRGNAM
+else
+    ( cd $REPOSITORIES/$PRGNAM
+      git pull
+    )
+fi
+VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
+    tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
+else
+    cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
+fi
+
+cd $TMP/$PRGNAM-$VERSION
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install DESTDIR=$PKG PREFIX=$PREFIX MANPREFIX=$PREFIX/man
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.hg\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (xst is an in progress st fork, a simple terminal implementation for X.)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/neeasade/xst
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
