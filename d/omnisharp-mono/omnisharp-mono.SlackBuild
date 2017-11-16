@@ -11,7 +11,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
-VERSION=${VERSION:-1.16.1}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/OmniSharp/omnisharp-roslyn/releases/latest | grep tag_name | grep -o "v[0-9.]*" | tr -d v)}
 
 ARCH='mono'
 BUILD=1
