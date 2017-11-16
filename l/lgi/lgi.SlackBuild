@@ -35,12 +35,18 @@ cd $PRGNAM
 
 LUA_VERSION=$(lua -v 2>&1 | grep -o "5\..")
 
-make PREFIX=/usr LUA_VERSION=$LUA_VERSION
-make install PREFIX=/usr DESTDIR=$PKG LUA_VERSION=$LUA_VERSION
-echo "$ARCH" | grep -q 64 && mv $PKG/usr/lib $PKG/usr/lib64
+sed -i \
+    -e "s|/usr/local|/usr|" \
+    -e "s|/lib/lua/|/share/lua/|" \
+    -e "s|LUA_VERSION=5.1|LUA_VERSION=$LUA_VERSION|" \
+    lgi/Makefile
 
-# mkdir -p $PKG/usr/doc/$PRGNAM/
-# cp $DOCS $PKG/usr/doc/$PRGNAM/
+make LUA_LIBDIR=/usr/lib/lua/$LUA_VERSION \
+     LUA_SHAREDIR=/usr/share/lua/$LUA_VERSION \
+     PREFIX=/usr CFLAGS="$SLKCFLAGS"
+make LUA_LIBDIR=/usr/lib/lua/$LUA_VERSION \
+     LUA_SHAREDIR=/usr/share/lua/$LUA_VERSION \
+     DESTDIR=$PKG install
 
 cd $PKG
 
