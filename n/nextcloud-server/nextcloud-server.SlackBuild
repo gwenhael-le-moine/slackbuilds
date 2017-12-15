@@ -27,22 +27,23 @@ mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
 case $VERSION in
     "stable")
-        wget -c https://download.nextcloud.com/server/releases/latest.tar.bz2 -O $CWD/latest.tar.bz2
-        cd $PKG/$VHOSTROOT
-        tar xvf $CWD/latest.tar.bz2
-        rm $CWD/latest.tar.bz2
-        mv nextcloud htdocs
-        VERSION=$(grep VersionString htdocs/version.php | grep -o "[0-9.]*")
+        wget -c https://download.nextcloud.com/server/releases/latest.tar.bz2 -O $CWD/nextcloud.tar.bz2
+        ;;
+
+    "master")
+        wget -c https://download.nextcloud.com/server/daily/latest-master.tar.bz2 -O $CWD/nextcloud.tar.bz2
         ;;
 
     *)
-        [ ! -e $CWD/nextcloud-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/nextcloud-$VERSION.tar.bz2 -O $CWD/nextcloud-$VERSION.tar.bz2
-        cd $PKG/$VHOSTROOT
-        tar xvf $CWD/nextcloud-$VERSION.tar.bz2
-        rm $CWD/nextcloud-$VERSION.tar.bz2
-        mv nextcloud htdocs
+        [ ! -e $CWD/nextcloud-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/nextcloud-$VERSION.tar.bz2 -O $CWD/nextcloud.tar.bz2
         ;;
 esac
+
+cd $PKG/$VHOSTROOT
+tar xvf $CWD/nextcloud.tar.bz2
+rm $CWD/nextcloud.tar.bz2
+mv nextcloud htdocs
+VERSION=$(grep "Version =" htdocs/version.php | grep -o "[0-9,]*" | tr , .)
 
 cd $PKG/$VHOSTROOT/htdocs
 chown -R root:root .
