@@ -26,7 +26,7 @@ mkdir -p $TMP
 rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
-[ ! -e $REPOSITORY ] && git clone https://github.com/cycojesus/x49gp.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/gwenhael-le-moine/x49gp.git $REPOSITORY
 ( cd $REPOSITORY && git pull )
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 cp -R $REPOSITORY $TMP/$PRGNAM
@@ -96,7 +96,7 @@ $PRGNAM: Post-installation setup:
 $PRGNAM: $ x49gp-bootstrap-config
 $PRGNAM:
 $PRGNAM: https://sourceforge.net/projects/x49gp/
-$PRGNAM: https://github.com/cycojesus/x49gp
+$PRGNAM: https://github.com/gwenhael-le-moine/x49gp
 EOF
 
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
