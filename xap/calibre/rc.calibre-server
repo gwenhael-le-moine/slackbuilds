@@ -7,11 +7,12 @@ PORT=8081
 AUTH=""
 # uncomment and adapt to enable authtentication
 # AUTH=" --username=\"$USER\" --password=\"password\""
-OPTIONS=" --enable-local-writes"
+OPTIONS=" --enable-local-write"
+LOGFILE=/home/$USER/.calibre-server.log
 
 start() {
     echo "Starting Calibre server..."
-    su $USER -c "calibre-server --with-library=\"$CALIBRE_LIBRARY_PATH\" -p $PORT --pidfile=$PIDFILE --daemonize $AUTH $OPTIONS" &
+    su $USER -c "calibre-server --port=$PORT --pidfile=$PIDFILE --log=$LOGFILE --daemonize $AUTH $OPTIONS \"$CALIBRE_LIBRARY_PATH\"" &
     if [ $? -ne 0 ]; then
         echo "Could not start calibre-server."
     fi
