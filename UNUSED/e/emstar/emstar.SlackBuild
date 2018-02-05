@@ -31,7 +31,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        git clone "https://github.com/cycojesus/emstar.git" $PRGNAM
+        git clone "https://github.com/gwenhael-le-moine/emstar.git" $PRGNAM
 fi
 
 ( cd $REPOSITORY
@@ -71,7 +71,7 @@ $PRGNAM:
 $PRGNAM: 
 $PRGNAM: 
 $PRGNAM: 
-$PRGNAM: http://github.com/cycojesus/emstar
+$PRGNAM: http://github.com/gwenhael-le-moine/emstar
 $PRGNAM: 
 EOF
 
