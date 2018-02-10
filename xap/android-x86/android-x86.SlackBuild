@@ -1,0 +1,81 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-7.1-r1}
+BUILD=1
+TAG=cyco
+ARCH=$(uname -m)
+
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+
+PREFIX=/usr
+
+mkdir -p $TMP
+
+# Cleaning
+rm -fr $PRGNAM $PKG
+
+# Fetching binaries
+[ ! -e $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c http://bdownload.fosshub.com/programs/${PRGNAM}-${VERSION}.${ARCH}.rpm
+
+# Installation
+mkdir -p $PKG$PREFIX/share/
+cd $PKG$PREFIX/share/
+rpm2targz $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm
+tar xvf ${PRGNAM}-${VERSION}.${ARCH}.tar.gz
+rm ${PRGNAM}-${VERSION}.${ARCH}.tar.gz
+
+rm -fr usr
+mv android-${VERSION} ${PRGNAM}
+
+mkdir -p $PKG$PREFIX/bin/
+cp $CWD/${PRGNAM}.sh $PKG$PREFIX/bin/
+chmod 755 $PKG$PREFIX/bin/${PRGNAM}.sh
+
+mkdir -p $PKG$PREFIX/doc/${PRGNAM}
+cat <<EOF > $PKG$PREFIX/doc/${PRGNAM}/create-data-img.sh
+#!/bin/sh
+
+SIZE=\${SIZE:-128G}
+
+mkdir -p \$HOME/.android-x86
+qemu-img create -f \$HOME/.android-x86/qcow2 data.img $SIZE
+EOF
+
+cat <<EOF > $PKG$PREFIX/doc/${PRGNAM}/create-data-dir.sh
+#!/bin/sh
+
+mkdir -p \$HOME/.android-x86/data
+EOF
+chmod 755 $PKG$PREFIX/doc/${PRGNAM}/*.sh
+
+# Cleaning
+cd $PKG
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Packaging
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Run Android in QEMU)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: http://www.android-x86.org/
+$PRGNAM:
+EOF
+
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz

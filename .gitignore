@@ -33,3 +33,4 @@ a/linux/latest.sh
 a/linux/patches/
 xap/st/patches/st-scrollback*
 xap/st/patches/st-vertcenter*
+*.rpm
