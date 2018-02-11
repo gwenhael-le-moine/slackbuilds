@@ -44,6 +44,7 @@ elif [ -d $ANDROID_DATA_DIR/data ]; then
 fi
 
 NET="-net nic,model=e1000 -net user -netdev user,id=mynet,hostfwd=tcp::5555-:5555 -device virtio-net-pci,netdev=mynet"
+DISPLAY="-vga std -display gtk"
 
 run_qemu()
 {
@@ -59,10 +60,8 @@ run_qemu()
           -drive index=1,if=virtio,id=ramdisk,file=$ANDROID_DIR/ramdisk.img,format=raw,readonly \
           $DATA \
           $NET \
+          $DISPLAY \
           $@
 }
 
-# Try to run QEMU in several VGA modes
-#run_qemu -vga std -display gtk,gl=on $@
-run_qemu -vga std -display gtk $@ || \
-    run_qemu $@
+run_qemu $@
