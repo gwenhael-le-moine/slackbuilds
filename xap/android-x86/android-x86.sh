@@ -15,7 +15,7 @@ continue_or_stop()
 }
 
 QEMU_ARCH=`uname -m`
-QEMU=qemu-system-${QEMU_ARCH}
+QEMU="xterm -e qemu-system-${QEMU_ARCH}"
 
 which $QEMU > /dev/null 2>&1 || QEMU=qemu-system-i386
 if ! which $QEMU > /dev/null 2>&1; then
