@@ -3,14 +3,15 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +%F | tr - .)}
+VERSION=${VERSION:-master}
 ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
 
 VHOST=${VHOST:-vhosts/$PRGNAM/}
 VHOSTROOT=/var/www/${VHOST}
-DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
+SUBDIR=${SUBDIR:-""}
+DOCROOT=${DOCROOT:-${VHOSTROOT}htdocs/${SUBDIR}}
 
 PHPUSER=${PHPUSER:-apache}
 PHPGROUP=${PHPGROUP:-apache}
@@ -22,7 +23,7 @@ OUTPUT=${OUTPUT:-/tmp}
 set -eu
 
 rm -rf $PKG $PRGNAM-$VERSION
-mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
+mkdir -p $TMP $OUTPUT $PKG/$(dirname $DOCROOT)
 
 REPOSITORIES=/home/installs/SlackBuilds/repositories
 REPOSITORY=${REPOSITORIES}/$PRGNAM
