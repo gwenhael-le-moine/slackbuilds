@@ -45,6 +45,9 @@ rm $CWD/nextcloud.tar.bz2
 mv nextcloud htdocs
 VERSION=$(grep "Version =" htdocs/version.php | grep -o "[0-9,]*" | tr , .)
 
+cp $CWD/nextcloud-news-updater.rb .
+chmod +x nextcloud-news-updater.rb
+
 cd $PKG/$VHOSTROOT/htdocs
 chown -R root:root .
 find . \
@@ -96,6 +99,7 @@ config etc/logrotate.d/nextcloud.new
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/apps
 
 grep -q "/var/www/${VHOST}htdocs/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}htdocs/cron.php" >> /var/spool/cron/crontabs/apache
+grep -q "/var/www/${VHOST}nextcloud-news-updater.rb" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}nextcloud-news-updater.rb" >> /var/spool/cron/crontabs/apache
 
 echo "Upgrading database and applications"
 ( cd /var/www/${VHOST}htdocs/
