@@ -31,13 +31,14 @@ cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
 
 git submodule update --init --recursive
-./build.py \
+TERM=xterm \
+    ./build.py \
     --js-completer \
     --go-completer \
     --java-completer \
     --clang-completer \
-    --rust-completer #\
-    # --cs-completer
+    --rust-completer \
+    --cs-completer
 
 mkdir -p $PKG$PREFIX/libexec
 cp -R ycmd $PKG$PREFIX/libexec/
