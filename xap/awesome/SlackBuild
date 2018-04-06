@@ -69,6 +69,19 @@ mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
 chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
 
+### obvious
+git_clone_or_pull https://github.com/hoelzro/obvious.git obvious
+cp -R $REPOSITORIES/obvious $PKG$PREFIX/share/awesome/lib/
+( cd $PKG$PREFIX/share/awesome/lib/obvious
+  rm -fr .git
+  make
+)
+
+### vicious
+git_clone_or_pull https://github.com/Mic92/vicious.git vicious
+cp -R $REPOSITORIES/vicious $PKG$PREFIX/share/awesome/lib/
+rm -fr $PKG$PREFIX/share/awesome/lib/vicious/.git
+
 # correction
 cd $PKG
 chown -R root:root *
