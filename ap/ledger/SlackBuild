@@ -17,6 +17,8 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
+PYTHON=""                       # " --python "
+
 if [ "$ARCH" = "i486" ]; then
     SLKCFLAGS="-O2 -march=i486 -mtune=i686"
     LIBDIRSUFFIX=""
@@ -64,10 +66,10 @@ esac
 
 ./acprep pull
 
-./acprep --prefix=/usr --python opt config -- -DUSE_PYTHON=ON -DUSE_DOXYGEN=ON
+./acprep --prefix=/usr $PYTHON opt config -- -DUSE_DOXYGEN=ON #  -DUSE_PYTHON=ON
 
-./acprep --prefix=/usr --python opt make || exit 1
-./acprep --prefix=/usr --python opt -- make install DESTDIR=$PKG || exit 1
+./acprep --prefix=/usr $PYTHON opt make || exit 1
+./acprep --prefix=/usr $PYTHON opt -- make install DESTDIR=$PKG || exit 1
 
 mv $PKG/usr/share/man $PKG/usr/
 rm -fr $PKG/usr/share/doc
