@@ -92,4 +92,5 @@ EOF
 
 cd $PKG
 VERSION=${VERSION}_$(cat $PKG/usr/lib$LIBSUFFIX/firefox/platform.ini | grep BuildID | cut -d= -f2)
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/mozilla-firefox-aurora-$VERSION-$ARCH-$BUILD$TAG.txz

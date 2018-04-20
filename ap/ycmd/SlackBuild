@@ -79,4 +79,5 @@ $PRGNAM: https://valloric.github.io/ycmd/
 EOF
 
 # empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

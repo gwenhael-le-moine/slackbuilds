@@ -75,4 +75,5 @@ EOF
 
 # empaquetage
 cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

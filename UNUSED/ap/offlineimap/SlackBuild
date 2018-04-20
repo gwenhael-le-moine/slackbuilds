@@ -169,6 +169,7 @@ EODESC
 
 # Build the package
 cd "$PKG"
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n "$REPOS/$PKG_NAME-$PKG_VERSION-$ARCH-$BUILD.tgz" || exit $ERROR_MKPKG
 
 # Delete source and build directories if requested

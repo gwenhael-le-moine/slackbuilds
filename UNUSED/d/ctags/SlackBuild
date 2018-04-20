@@ -150,6 +150,7 @@ chown -R root.root .
 find . -perm 664 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 mkdir -p $OUT
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg -l y -c n $OUT/ctags-$VERSION-$ARCH-$BUILD.tgz
 rm -rf $PKG
 rm -rf $TMP/ctags-$VERSION

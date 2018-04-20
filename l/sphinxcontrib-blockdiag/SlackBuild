@@ -48,5 +48,6 @@ $PRGNAM: http://bitbucket.org/birkenfeld/sphinx-contrib
 EOF
 
 cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
 

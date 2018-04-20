@@ -76,4 +76,5 @@ $PRGNAM:
 $PRGNAM: http://aws.amazon.com/developertools/368
 EOF
 
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz

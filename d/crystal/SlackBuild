@@ -54,4 +54,5 @@ $PRGNAM:
 $PRGNAM: http://crystal-lang.org/
 EOF
 
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$CLEAN_VERSION-$ARCH-$BUILD$TAG.txz

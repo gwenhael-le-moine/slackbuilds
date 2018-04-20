@@ -69,5 +69,6 @@ EOF
 
 # Build the package:
 cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
 

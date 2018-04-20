@@ -47,5 +47,6 @@ ruby-misc-el:
 EOF
 
 cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg -l y -c n $OUTPUT/ruby-misc-el-$(echo $VERSION | tr - _)-$ARCH-$BUILD.txz
 

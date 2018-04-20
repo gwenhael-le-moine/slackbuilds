@@ -79,4 +79,5 @@ EOF
 
 chown -R root:root $PKG
 
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -c n -l y $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

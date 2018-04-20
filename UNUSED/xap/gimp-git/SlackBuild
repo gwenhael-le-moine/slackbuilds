@@ -115,5 +115,6 @@ mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg -l y -c n $OUTPUT/gimp-$VERSION-$ARCH-$BUILD.txz
 

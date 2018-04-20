@@ -54,5 +54,6 @@ find . -type f -exec chmod 644 {} \;
 
 chmod 755 $PKG/opt/$PRGNAM/$PRGNAM $PKG/usr/bin/*
 
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
 

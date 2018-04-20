@@ -148,5 +148,6 @@ libdrm:
 EOF
 
 cd $TMP/pkg-${PKGNAM}
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg -l y -c n $OUTPUT/${PKGNAM}-$VERSION-$ARCH-$BUILD.txz
 

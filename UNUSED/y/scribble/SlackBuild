@@ -66,4 +66,5 @@ ${PRGNAM}: http://packages.debian.org/unstable/games/scribble
 EOF
 
 cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-$(echo ${VERSION} | tr - _)-${ARCH}-${BUILD}$TAG.txz

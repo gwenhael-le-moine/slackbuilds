@@ -83,4 +83,5 @@ $PRGNAM: ftp://WebUser:pGL7E6v@208.70.202.219/cn/wlan/
 $PRGNAM: ftp://WebUser:pGL7E6v@218.210.127.132/cn/wlan/
 EOF
 
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz

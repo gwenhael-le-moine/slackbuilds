@@ -61,4 +61,5 @@ $PRGNAM: http://github.com/twcamper/sicp-kindle
 EOF
 
 # empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
