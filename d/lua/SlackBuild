@@ -103,11 +103,11 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
 find $PKG/usr/man -type f -exec gzip -9 {} \;
 for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/{extras,html}
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/html
 cp -a README $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a doc/*.html doc/logo.gif doc/lua.css $PKG/usr/doc/$PRGNAM-$VERSION/html
 
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/SlackBuild
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc

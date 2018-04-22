@@ -75,7 +75,7 @@ ln -s /opt/google/musicmanager/google-musicmanager.desktop \
   $PKG/usr/share/applications/google-musicmanager.desktop
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/SlackBuild
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc

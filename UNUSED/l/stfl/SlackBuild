@@ -50,7 +50,7 @@ make prefix=/usr mandir=/usr/man DESTDIR=$PKG libdir=/lib$(echo $ARCH | grep -o 
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a COPYING README $PKG/usr/doc/$PRGNAM-$VERSION
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/SlackBuild
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
@@ -63,16 +63,16 @@ cat <<EOF > $PKG/install/slack-desc
 
     |-----handy-ruler--------------------------------------------------------|
 stfl: STFL (the Structured Terminal Forms Language/Library)
-stfl: 
+stfl:
 stfl: STFL is a library which implements a curses-based widget set for text
 stfl: terminals. The STFL API can be used from C, SPL, Python, Perl and
 stfl: Ruby. The public STFL API is only 14 simple function calls big and and
 stfl: there are already generic SWIG bindings. Thus it is very easy to port
 stfl: to additional scripting languages.
-stfl: 
+stfl:
 stfl: Homepage: http://www.clifford.at/stfl/
-stfl: 
-stfl: 
+stfl:
+stfl:
 EOF
 
 cd $PKG

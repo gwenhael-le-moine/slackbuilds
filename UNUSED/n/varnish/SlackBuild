@@ -47,7 +47,7 @@ fi
 set -e
 
 rm -rf $PKG
-mkdir -p $TMP $PKG $OUTPUT 
+mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM-$VERSION
 tar xvf $CWD/$PRGNAM-$VERSION.tar.gz || exit 1
@@ -86,7 +86,7 @@ cat $CWD/rc.varnishd > $PKG/etc/rc.d/rc.varnishd.new
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a ChangeLog INSTALL LICENSE README doc/*.{xml,xsl,html,css} $PKG/usr/doc/$PRGNAM-$VERSION
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/SlackBuild
 
 ( cd $PKG/usr/man
   find . -type f -exec gzip -9 {} \;
@@ -130,16 +130,16 @@ cat <<EOF > $PKG/install/slack-desc
 
        |-----handy-ruler------------------------------------------------------|
 varnish: VARNISH (high-performance HTTP accelerator)
-varnish: 
+varnish:
 varnish: Varnish is targeted primarily at the FreeBSD 6 and
 varnish: Linux 2.6 platforms, and will take full advantage
 varnish: of the virtual memory system and advanced I/O
 varnish: features offered by these operating systems.
-varnish:   
+varnish:
 varnish: Homepage: http://varnish.projects.linpro.no/
-varnish:  
-varnish: 
-varnish: 
+varnish:
+varnish:
+varnish:
 
 EOF
 

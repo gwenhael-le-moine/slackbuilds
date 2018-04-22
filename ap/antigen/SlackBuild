@@ -33,7 +33,7 @@ cp $REPOSITORY/antigen.zsh $PKG$PREFIX/share/antigen/
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -R $REPOSITORY/*.{txt,mkd} $PKG$PREFIX/doc/$PRGNAM/
-cp $CWD/*.SlackBuild $PKG$PREFIX/doc/$PRGNAM/
+cp $CWD/SlackBuild $PKG$PREFIX/doc/$PRGNAM/
 
 # correction
 cd $PKG

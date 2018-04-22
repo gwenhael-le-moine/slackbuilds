@@ -61,7 +61,7 @@ make DESTDIR=$PKG install
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a [ACNT]* doc/* $PKG/usr/doc/$PRGNAM-$VERSION
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/SlackBuild
 find $PKG/usr/man/ -type f -exec gzip -9 {} \;
 
 mkdir -p $PKG/install
@@ -75,7 +75,7 @@ cat <<EOF > $PKG/install/slack-desc
 
    |-----handy-ruler--------------------------------------------------------|
 w3m: w3m (text-mode browser)
-w3m: 
+w3m:
 w3m: w3m is a World Wide Web (WWW) text based client. It has English and
 w3m: Japanese help files and an option menu and can be configured to use
 w3m: either language. It will display hypertext markup language (HTML)
@@ -83,7 +83,7 @@ w3m: documents containing links to files residing on the local system, as
 w3m: well as files residing on remote systems. It can display HTML tables,
 w3m: frames, and images, and supports tabbed browsing. In addition, it can
 w3m: be used as a "pager" in much the same manner as "more" or "less".
-w3m: 
+w3m:
 w3m: Homepage: http://w3m.sourceforge.net/
 EOF
 

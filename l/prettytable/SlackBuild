@@ -29,10 +29,10 @@ TAG=${TAG:-cyco} # the "_SBo" is required
 
 if [ -z "$ARCH" ]; then
     case "$( uname -m )" in
-	i?86) ARCH=i486 ;;
-	arm*) ARCH=arm ;;
-	# Unless $ARCH is already set, use uname -m for all other archs:
-	*) ARCH=$( uname -m ) ;;
+        i?86) ARCH=i486 ;;
+        arm*) ARCH=arm ;;
+        # Unless $ARCH is already set, use uname -m for all other archs:
+        *) ARCH=$( uname -m ) ;;
     esac
 fi
 
@@ -55,14 +55,14 @@ else
   LIBDIRSUFFIX=""
 fi
 
-set -e 
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM-$VERSION
 
-[ ! -e $CWD/$PRGNAM-$VERSION.tar.bz2 ] && wget -c https://pypi.python.org/packages/source/P/PrettyTable/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2 
+[ ! -e $CWD/$PRGNAM-$VERSION.tar.bz2 ] && wget -c https://pypi.python.org/packages/source/P/PrettyTable/$PRGNAM-$VERSION.tar.bz2 -O $CWD/$PRGNAM-$VERSION.tar.bz2
 
 tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
 cd $PRGNAM-$VERSION
@@ -78,7 +78,7 @@ python setup.py install --root=$PKG
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a README CHANGELOG COPYING \
    $PKG/usr/doc/$PRGNAM-$VERSION
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/SlackBuild
 
 # Copy the slack-desc (and a custom doinst.sh if necessary) into ./install
 mkdir -p $PKG/install
