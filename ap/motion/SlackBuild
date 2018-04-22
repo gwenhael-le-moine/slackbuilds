@@ -100,7 +100,6 @@ mkdir $PKG/usr/doc
 mv $PKG/usr/share/doc/motion $PKG/usr/doc/$PRGNAM
 mv $PKG/usr/share/$PRGNAM/examples $PKG/usr/doc/$PRGNAM/
 rm -rf $PKG/usr/share # We moved the docs from there
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
