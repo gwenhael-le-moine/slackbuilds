@@ -34,6 +34,7 @@ VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
+BRANCH=${BRANCH:-"emacs-26"}
 
 TAG=cyco
 OUTPUT=/tmp
@@ -53,10 +54,12 @@ rm -rf $PRGNAM
 [ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
 ( cd $REPOSITORY
+  git checkout $BRANCH
   git pull
   [ -e Makefile ] && make distclean
 )
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
 cd $TMP
 mkdir -p $TMP/$PRGNAM
 SRCDIR=$REPOSITORY
