@@ -1,0 +1,70 @@
+#!/bin/sh
+
+# variables
+#VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+BUILD=${BUILD:-1}
+
+TAG=cyco
+TMP=/tmp/$TAG
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+ARCH=${ARCH:-$(uname -m)}
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+PREFIX=${PREFIX:-/usr}
+
+# nettoyage préalable
+rm -fr $PKG
+
+mkdir -p $PKG $TMP
+
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/crystal-community/icr.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+make
+make install PREFIX=$PKG$PREFIX
+
+# move doc/ to the appropriate location
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp *.md *.txt $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (Interactive console for Crystal programming language)
+$PRGNAM:
+$PRGNAM: It's like irb, but for Crystal
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/crystal-community/icr
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
