@@ -41,6 +41,7 @@ mv $PKG$PREFIX/share/man $PKG$PREFIX/man
 mkdir -p $PKG$PREFIX/bin/
 ( cd $PKG$PREFIX/bin/
   ln -s ../share/gem_home/gem_home.sh gem_home
+  chmod +x gem_home
 )
 
 cd $PKG
