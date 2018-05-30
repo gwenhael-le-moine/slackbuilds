@@ -90,9 +90,13 @@ CFLAGS="$SLKCFLAGS" \
       --infodir=/usr/info \
       --with-x \
       --with-x-toolkit=$X_TOOLKIT \
+      --without-toolkit-scroll-bars \
       --enable-link-time-optimization \
       --with-compress-install \
       --without-gconf \
+      --with-gameuser=":games" \
+      --disable-libsystemd \
+      --disable-build-details \
       --build=${ARCH}-slackware-linux
 
 make bootstrap
