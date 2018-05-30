@@ -116,9 +116,13 @@ make install DESTDIR=$PKG || exit 1
 #   chmod +x $PKG/usr/bin/emacs
 )
 
-# I don't care for broken permissions.
-chmod 755 $PKG/var/games/emacs
-chown -R games:root $PKG/var/games/emacs
+# Seems like this nonsense is finally obsolete:
+if [ -d $PKG/var/games/emacs ]; then
+    # I don't care for broken permissions.
+    chmod 755 $PKG/var/games/emacs
+    chown -R root:games $PKG/var/games/emacs
+    chmod 664 $PKG/var/games/emacs/*
+fi
 
 # This avoids a collision with Exuberant Ctags...
 mv $PKG/usr/bin/ctags $PKG/usr/bin/ctags-emacs
