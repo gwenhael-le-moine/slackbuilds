@@ -13,16 +13,18 @@ PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
-USERNAME=cycojesus
+# Check if the gitea user and group exist. If not, then bail.
+if [ "$(id -g gitea 2> /dev/null)" != "817" -o "$(id -u gitea 2> /dev/null)" != "817" ]; then
+    echo "  You must have an 'gitea' user and group to run this script."
+    echo "    # groupadd -g 817 gitea"
+    echo "    # useradd -d /var/lib/gitea -g gitea -s /bin/bash -u 817 gitea"
+    exit 1
+fi
 
 echo $ARCH | grep -q arm && SRC_ARCH=arm-7
 echo $ARCH | grep -q 86 && SRC_ARCH=386
 echo $ARCH | grep -q 64 && SRC_ARCH=amd64
-
-rm -rf $PKG
-mkdir -p $TMP $PKG $OUTPUT
-cd $TMP
-[ -e $CWD/gitea-${VERSION}-linux-${SRC_ARCH} ] && rm $CWD/gitea-${VERSION}-linux-${SRC_ARCH}
+ea-${VERSION}-linux-${SRC_ARCH} ] && rm $CWD/gitea-${VERSION}-linux-${SRC_ARCH}
 wget -c https://dl.gitea.io/gitea/${VERSION}/gitea-${VERSION}-linux-${SRC_ARCH}.xz -O $CWD/gitea-${VERSION}-linux-${SRC_ARCH}.xz
 xz -d $CWD/gitea-${VERSION}-linux-${SRC_ARCH}.xz
 
@@ -32,6 +34,13 @@ wget -c https://raw.githubusercontent.com/go-gitea/gitea/master/custom/conf/app.
 mkdir -p $PKG$PREFIX/bin/
 mv $CWD/gitea-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/${PRGNAM}
 chmod +x $PKG$PREFIX/bin/${PRGNAM}
+
+mkdir -p $PKG/var/lib/gitea/{custom,data,indexers,public,log}
+chown gitea:gitea $PKG/var/lib/gitea/{data,indexers,log}
+chmod 750 $PKG/var/lib/gitea/{data,indexers,log}
+mkdir $PKG/etc/gitea
+chown root:gitea $PKG/etc/gitea
+chmod 770 $PKG/etc/gitea
 
 mkdir -p $PKG/etc/gitea/conf/
 mv $CWD/app.ini.sample $PKG/etc/gitea/conf/
@@ -108,7 +117,8 @@ chmod +x $PKG/etc/rc.d/rc.$PRGNAM
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-           # HOW TO EDIT THIS FILE:
+           # HOW TO EDIT
+THIS FILE:
            # The "handy ruler" below makes it easier to edit a package description.  Line
            # up the first '|' above the ':' following the base package name, and the '|'
            # on the right side marks the last column you can put a character in.  You must
