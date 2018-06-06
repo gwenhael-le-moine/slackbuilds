@@ -31,18 +31,20 @@ xz -d $CWD/gitea-${VERSION}-linux-${SRC_ARCH}.xz
 [ -e $CWD/app.ini.sample ] && rm $CWD/app.ini.sample
 wget -c https://raw.githubusercontent.com/go-gitea/gitea/master/custom/conf/app.ini.sample -O $CWD/app.ini.sample
 
-mkdir -p $PKG$PREFIX/bin/
+mkdir -p $PKG$PREFIX/bin/custom/conf/
 mv $CWD/gitea-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/${PRGNAM}
 chmod +x $PKG$PREFIX/bin/${PRGNAM}
 
 mkdir -p $PKG/var/lib/gitea/{custom,data,indexers,public,log}
 chown -R gitea:gitea $PKG/var/lib/gitea/{data,indexers,log}
 chmod 750 $PKG/var/lib/gitea/{data,indexers,log}
-mkdir -p $PKG/etc/gitea/conf
-chown -R root:gitea $PKG/etc/gitea
-chmod 770 $PKG/etc/gitea
-
-mv $CWD/app.ini.sample $PKG/etc/gitea/conf/
+mkdir -p $PKG/etc/
+# chown -R root:gitea $PKG/etc/gitea
+# chmod 770 $PKG/etc/gitea
+(cd $PKG/etc/
+ ln -s ../$PREFIX/bin/custom/conf/ gitea
+)
+mv $CWD/app.ini.sample $PKG$PREFIX/bin/custom/conf/
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
