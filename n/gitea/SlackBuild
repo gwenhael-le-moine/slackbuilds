@@ -36,13 +36,12 @@ mv $CWD/gitea-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/${PRGNAM}
 chmod +x $PKG$PREFIX/bin/${PRGNAM}
 
 mkdir -p $PKG/var/lib/gitea/{custom,data,indexers,public,log}
-chown gitea:gitea $PKG/var/lib/gitea/{data,indexers,log}
+chown -R gitea:gitea $PKG/var/lib/gitea/{data,indexers,log}
 chmod 750 $PKG/var/lib/gitea/{data,indexers,log}
-mkdir $PKG/etc/gitea
-chown root:gitea $PKG/etc/gitea
+mkdir -p $PKG/etc/gitea/conf
+chown -R root:gitea $PKG/etc/gitea
 chmod 770 $PKG/etc/gitea
 
-mkdir -p $PKG/etc/gitea/conf/
 mv $CWD/app.ini.sample $PKG/etc/gitea/conf/
 
 ( cd $PKG
