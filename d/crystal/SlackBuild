@@ -26,7 +26,7 @@ rm -fr $PKG
 mkdir -p $PKG
 cd $PKG
 tar xvf $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz
-mv crystal-$(echo $VERSION | cut -d- -f1) $PKG$PREFIX
+mv crystal-$VERSION $PKG$PREFIX
 mkdir -p $PKG$PREFIX/doc/
 mv $PKG$PREFIX/share/doc $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
