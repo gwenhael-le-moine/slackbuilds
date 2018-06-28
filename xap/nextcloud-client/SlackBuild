@@ -4,9 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
-STABLE=${STABLE:-"NO"}
-ARCH=${ARCH:-$(uname -m)}
+ARCH="AppImage"
 BUILD=1
 
 TAG=cyco
@@ -14,60 +12,29 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
-
 PREFIX=/usr
-
-SLCKFLAGS=" -O "
 
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 
-mkdir -p $PKG
+mkdir -p $PKG/opt/$PRGNAM
 
 # mise en place
-cd $TMP
-if [ "x$STABLE" == "xYES" ]; then
-    wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.xz -O $CWD/$PRGNAM-$VERSION.tar.xz
-    tar xf $CWD/$PRGNAM-$VERSION.tar.xz
-else
-    [ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/client_theming.git $REPOSITORY
+cd $PKG/opt/$PRGNAM
 
-    ( cd $REPOSITORY
-      git pull
-      git submodule update --init --recursive )
+wget -c https://download.nextcloud.com/desktop/daily/Linux/latest.AppImage -O ${PRGNAM}.AppImage
+chmod +x ${PRGNAM}.AppImage
+VERSION=$( ./${PRGNAM}.AppImage --help | grep version | sed 's/Nextcloud version //' | sed 's/ (build /_/' | tr -d \))
 
-    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
-    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-fi
-
-cd $TMP/$PRGNAM-$VERSION/client
-
-# configuration
-cmake \
-    -DCMAKE_INSTALL_PREFIX=$PREFIX \
-    -DSYSCONFDIR=/etc \
-    -D OEM_THEME_DIR=`pwd`/../nextcloudtheme \
-    .
-
-# compilation
-make -j3
-
-# installation
-make install DESTDIR=$PKG
+mkdir -p $PKG$PREFIX/bin/
+( cd $PKG$PREFIX/bin/
+  # ln -s ../../opt/$PRGNAM/${PRGNAM}.AppImage $PRGNAM
+  ln -s ../../opt/$PRGNAM/${PRGNAM}.AppImage nextcloud
+)
 
 # correction
 cd $PKG
 chown -R root:root *
-
-find $PKG -name \.git\* -exec rm -fr {} \;
-
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-
-# Strip binaries
-cd $PKG
-find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 # embaumement
 mkdir -p $PKG/install
@@ -85,5 +52,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
