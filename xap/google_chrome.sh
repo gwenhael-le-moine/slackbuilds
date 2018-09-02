@@ -23,4 +23,4 @@ upgradepkg --install-new --reinstall /tmp/google-chrome-*-$ARCH-*.txz
 
 rm google-chrome-${CHANNEL}_current_$DEBARCH.deb
 
-/root/clean-tmp.sh
+#/root/clean-tmp.sh
