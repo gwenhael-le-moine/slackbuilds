@@ -1,0 +1,54 @@
+ #!/bin/sh
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+VERSION=$(date +%F | tr - .)
+BUILD=1
+
+ARCH=noarch
+
+HOME=/home/cycojesus
+TAG=cyco
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+PREFIX=/usr
+
+rm -fr $PKG $TMP/$PRGNAM
+mkdir -p $TMP
+
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/espressif/esptool.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+
+cd $TMP/$PRGNAM
+
+python setup.py install --root $PKG
+
+python3 setup.py install --root $PKG
+
+VERSION=$(ls /usr/lib$(uname -m | grep -o 64)/python*/site-packages/| grep "$PRGNAM-.*-py.*\.egg-info" | grep -o "[0-9.]*" | head -n1)_$VERSION
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (ESP8266 and ESP32 serial bootloader utility)
+$PRGNAM:
+$PRGNAM: A Python-based, open source, platform independent, utility to
+$PRGNAM: communicate with the ROM bootloader in Espressif ESP8266 & ESP32
+$PRGNAM: chips.
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/espressif/esptool
+EOF
+
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
