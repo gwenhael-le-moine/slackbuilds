@@ -39,7 +39,7 @@ chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp CHANGELOG.md COPYING LICENSE-MIT README.md UNLICENSE doc $PKG$PREFIX/doc/$PRGNAM
+cp -r doc/ CHANGELOG.md COPYING LICENSE-MIT README.md UNLICENSE $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
