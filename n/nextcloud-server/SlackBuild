@@ -103,7 +103,7 @@ grep -q "/var/www/${VHOST}nextcloud-news-updater.rb" /var/spool/cron/crontabs/ap
 
 echo "Upgrading database and applications"
 ( cd /var/www/${VHOST}htdocs/
-  sudo -u $PHPUSER php ./occ upgrade --quiet --no-interaction --no-app-disable
+  sudo -u $PHPUSER php ./occ upgrade --quiet --no-interaction
 )
 echo "Post-installation process completed"
 EOF

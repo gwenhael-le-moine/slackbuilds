@@ -4,7 +4,7 @@ CWD=$(pwd)
 TAG=cyco
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
-PKG=$TMP/pkg-mozilla-firefox-aurora
+PKG=$TMP/pkg-mozilla-firefox-central
 
 # This is not a source build script.  Rather, it builds a Slackware
 # package from the official binary tarball available from mozilla.org.
@@ -19,7 +19,7 @@ PKG=$TMP/pkg-mozilla-firefox-aurora
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
-BRANCH=${BRANCH:=latest-mozilla-aurora}
+BRANCH=${BRANCH:=latest-mozilla-central}
 
 [ -e firefox-*.en-US.linux-x86_64.tar.bz2 ] && rm firefox-*.en-US.linux-x86_64.tar.bz2
 WHICH_TAR=$(lftp http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/$BRANCH/ -e "cls --date *.en-US.linux-x86_64.tar.bz2 ; quit" | awk '{print $4}' | sort | tail -n1)
@@ -92,5 +92,4 @@ EOF
 
 cd $PKG
 VERSION=${VERSION}_$(cat $PKG/usr/lib$LIBSUFFIX/firefox/platform.ini | grep BuildID | cut -d= -f2)
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg -l y -c n $OUTPUT/mozilla-firefox-aurora-$VERSION-$ARCH-$BUILD$TAG.txz
+makepkg -l y -c n $OUTPUT/mozilla-firefox-central_$VERSION-$ARCH-$BUILD$TAG.txz
