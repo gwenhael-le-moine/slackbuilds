@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-BUILD=4
+BUILD=5
 
 TAG=cyco
 OUTPUT=/tmp
@@ -20,7 +20,10 @@ CLEAN_VERSION=$(echo $VERSION | tr '-' '_')
 # cleaning
 rm -fr $PKG
 
+# download
 [ ! -e $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz
+
+[ ! -e $CWD/completion.zsh ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O $CWD/completion.zsh
 
 # installation
 mkdir -p $PKG
@@ -32,8 +35,8 @@ mv $PKG$PREFIX/share/doc $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/share/man $PKG$PREFIX/
 
-# mkdir -p $PKG$PREFIX/share/zsh/site-functions/
-# cp -R $PKG$PREFIX/doc/crystal-${CLEAN_VERSION}/etc/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
+mkdir -p $PKG$PREFIX/share/zsh/site-functions/
+cp -R $CWD/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
 
 # sed -i "s|INSTALL_DIR=.*|INSTALL_DIR=$PREFIX/libexec/$PRGNAM|g" $PKG$PREFIX/bin/crystal
 
