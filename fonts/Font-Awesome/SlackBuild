@@ -27,11 +27,9 @@ rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Move the fonts into place:
-mkdir -p $PKG$FONTDIR/{OTF,TTF} $PKG/usr/doc/
-cp -R $REPOSITORY $PKG/usr/doc/$PRGNAM
-rm -fr $PKG/usr/doc/$PRGNAM/.git{ignore,}
-cp $REPOSITORY/font/*.ttf $PKG$FONTDIR/TTF
-cp $REPOSITORY/font/*.otf $PKG$FONTDIR/OTF
+mkdir -p $PKG$FONTDIR/OTF $PKG/usr/doc/$PRGNAM
+cp $REPOSITORY/*.{md,txt} $PKG/usr/doc/$PRGNAM
+cp $REPOSITORY/otfs/*.otf $PKG$FONTDIR/OTF
 
 # Post-install script:
 mkdir -p $PKG/install
