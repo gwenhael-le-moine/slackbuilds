@@ -1,0 +1,68 @@
+#!/bin/sh
+
+PRGNAM=$(basename $(pwd))
+ARCH=font
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+
+CWD=$(pwd)
+
+# Place to build (TMP) package (PKG) and output (OUTPUT) the program:
+TMP=${TMP:=/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+FONTDIR="/usr/share/fonts"
+
+# Create working directories:
+mkdir -p $OUTPUT          # place for the package to be saved
+mkdir -p $PKG             # place for the package to be built
+rm -rf $PKG/*             # always erase old package's contents
+rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+
+[ ! -e $REPOSITORY ] &&
+    git clone https://github.com/Tecate/bitmap-fonts.git $REPOSITORY
+(cd $REPOSITORY && git pull)
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+# Move the fonts into place:
+mkdir -p $PKG$FONTDIR/misc $PKG/usr/doc/$PRGNAM
+cp $REPOSITORY/README.md $PKG/usr/doc/$PRGNAM
+find $REPOSITORY/bitmap/ -name \*.pcf\* -exec mv {} $PKG$FONTDIR/misc/ \;
+
+find $PKG$FONTDIR/misc/ -name \*.pcf -exec gzip {} \;
+
+# Post-install script:
+mkdir -p $PKG/install
+cat <<EOT > $PKG/install/doinst.sh
+#!/bin/sh
+# Update the X font indexes:
+if [ -x /usr/bin/mkfontdir -o -x /usr/X11R6/bin/mkfontdir ]; then
+  mkfontdir usr/share/fonts/misc 2> /dev/null
+fi
+if [ -x /usr/bin/fc-cache ]; then
+  /usr/bin/fc-cache -f 2> /dev/null
+fi
+EOT
+
+# Add a package description:
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Monospaced bitmap fonts for X11, good for terminal use.)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/Tecate/bitmap-fonts
+$PRGNAM:
+EOF
+
+# Build the package:
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz

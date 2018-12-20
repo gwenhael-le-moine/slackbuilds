@@ -13,14 +13,15 @@ case $ARCH in
 esac
 CHANNEL=${CHANNEL:=stable}
 
-cd $BUILD_DIR
+#cd $BUILD_DIR
 [ -e google-chrome-${CHANNEL}_current_$ARCH.deb ] && rm google-chrome-${CHANNEL}_current_$DEBARCH.deb
 wget -c --no-check-certificate https://dl.google.com/linux/direct/google-chrome-${CHANNEL}_current_$DEBARCH.deb
+cp $BUILD_DIR/google-chrome.SlackBuild .
 
 RELEASE=$CHANNEL ./google-chrome.SlackBuild
 
 upgradepkg --install-new --reinstall /tmp/google-chrome-*-$ARCH-*.txz
 
-rm google-chrome-${CHANNEL}_current_$DEBARCH.deb
+rm google-chrome.SlackBuild google-chrome-${CHANNEL}_current_$DEBARCH.deb
 
 #/root/clean-tmp.sh
