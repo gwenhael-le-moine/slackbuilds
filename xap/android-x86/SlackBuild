@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-8.1-rc2}
+VERSION=${VERSION:-8.1-r1}
 BUILD=1
 TAG=cyco
 ARCH=$(uname -m)
@@ -20,7 +20,7 @@ mkdir -p $TMP
 rm -fr $PRGNAM $PKG
 
 # Fetching binaries
-[ ! -e $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c http://onet.dl.osdn.jp/android-x86/69704/android-x86-8.1-rc2.x86_64.rpm # http://bdownload.fosshub.com/programs/${PRGNAM}-${VERSION}.${ARCH}.rpm
+[ ! -e $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c https://osdn.net/projects/android-x86/downloads/69704/android-x86-8.1-r1.x86_64.rpm -O $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm
 
 # Installation
 mkdir -p $PKG$PREFIX/share/
@@ -43,7 +43,7 @@ cat <<EOF > $PKG$PREFIX/share/${PRGNAM}/create-data-img.sh
 SIZE=\${SIZE:-128G}
 
 mkdir -p \$HOME/.android-x86
-qemu-img create -f qcow2 \$HOME/.android-x86/data.img $SIZE
+qemu-img create -f qcow2 \$HOME/.android-x86/data.img \$SIZE
 EOF
 
 cat <<EOF > $PKG$PREFIX/share/${PRGNAM}/create-data-dir.sh
