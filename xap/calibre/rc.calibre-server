@@ -1,13 +1,13 @@
 #!/bin/bash
 
-CALIBRE_LIBRARY_PATH="/home/cycojesus/BKP/tibou/Documents/eBooks/Livres/"
+CALIBRE_LIBRARY_PATH="/home/gwh/BKP/tibou/Documents/eBooks/Livres/"
 PIDFILE=/tmp/calibre-server.pid
-USER=cycojesus
+USER=gwh
 PORT=8081
 AUTH=""
 # uncomment and adapt to enable authtentication
 # AUTH=" --username=\"$USER\" --password=\"password\""
-OPTIONS=" --enable-local-write"
+OPTIONS=" --enable-local-writes"
 LOGFILE=/home/$USER/.calibre-server.log
 
 start() {
