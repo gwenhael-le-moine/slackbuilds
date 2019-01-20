@@ -36,3 +36,4 @@ xap/st/patches/st-vertcenter*
 *.rpm
 /d/crystal/completion.zsh
 *.pk3
+*.pk4

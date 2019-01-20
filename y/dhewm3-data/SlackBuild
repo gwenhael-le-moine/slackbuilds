@@ -1,0 +1,49 @@
+#!/bin/sh
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+
+BUILD=1
+VERSION=1
+ARCH="noarch"
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# Cleaning
+rm -fr $PKG
+mkdir -p $PKG$PREFIX/share/games/dhewm3/
+
+# Installation
+cp -R $CWD/base $PKG$PREFIX/share/games/dhewm3/
+
+# Cleaning
+chown -R root:root $PKG
+find $PKG -type f -exec chmod 644 {} \;
+chmod +x $PKG$PREFIX/bin/*
+
+# Packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Official data for dhewm3)
+$PRGNAM:
+$PRGNAM: Doom 3
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/dhewm/dhewm3
+$PRGNAM:
+EOF
+
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
