@@ -10,7 +10,7 @@ TMP=/tmp/$TAG
 fi
 
 PRGNAM=REminiscence
-VERSION=0.1.9
+VERSION=0.3.7
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -38,6 +38,8 @@ rm -rf $PKG $TMP/${PRGNAM}-${VERSION}
 cd $TMP
 
 # --- TARBALL EXTRACTION,PATCH,MODIFY ---
+[ ! -e $CWD/${PRGNAM}-${VERSION}.tar.bz2 ] && wget -c -O $CWD/${PRGNAM}-${VERSION}.tar.bz2 http://cyxdown.free.fr/reminiscence/REminiscence-${VERSION}.tar.bz2
+[ ! -e $CWD/flashback-x86_64.tar.gz ] & wget -c -O $CWD/flashback-x86_64.tar.gz https://lutris.net/files/games/flashback/flashback-x86_64.tar.gz
 
 echo "Extracting the program tarball for $PRGNAM..."
 tar xf $CWD/${PRGNAM}-${VERSION}.tar.bz2
@@ -47,7 +49,7 @@ cd ${PRGNAM}-${VERSION}
 chown -R root.root *
 find . -perm 777 -exec chmod 755 {} \;
 
-zcat $CWD/nices_path-$VERSION.patch.gz | patch -p1
+zcat $CWD/nices_path.patch.gz | patch -p1
 #zcat $CWD/bad_crc.diff.gz | patch -p1
 
 # --- BUILDING ---
@@ -60,40 +62,32 @@ make
 #
 # Install all the needed stuff to the package dir
 #
-mkdir -p $PKG/usr/games $PKG/usr/share/games/ $PKG/var/lib/REminiscence
+mkdir -p $PKG/usr/games $PKG/usr/share/games/ $PKG/var/lib/$PRGNAM
 mv rs $PKG/usr/games/
 
-(
-		cd $PKG/usr/games/
-		ln -s rs REminiscence
-		ln -s rs flashback
-)
+cd $PKG/usr/games/
+ln -s rs REminiscence
+ln -s rs flashback
 
-(
-		cd $PKG/usr/share/games/
-		tar xf $CWD/../FlashBack/FlashBack.tar.bz2 # jeu lui-même
-)
+cd $PKG/usr/share/games/
+tar xf $CWD/flashback-x86_64.tar.gz # jeu lui-même
+mv flashback $PRGNAM
 
 mkdir -p $PKG/usr/share/pixmaps
 cp $CWD/flashback.png $PKG/usr/share/pixmaps
 
 # --- DOCUMENTATION ---
 cd $TMP/${PRGNAM}-${VERSION}
-DOCS="README COPYING"
-
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a README.txt $PKG/usr/doc/$PRGNAM-$VERSION
 chmod -R a-w $PKG/usr/doc/$PRGNAM-$VERSION/*
 
 # Compress the man page(s)
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
 # Strip binaries
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-
+find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 # --- OWNERSHIP, RIGHTS ---
 
@@ -119,13 +113,13 @@ ${PRGNAM}: ${PRGNAM} (Flashback game engine)
 ${PRGNAM}:
 ${PRGNAM}: ${PRGNAM} is a re-implementation of the engine used in the game
 ${PRGNAM}: Flashback made by Delphine Software and released in 1992.
-${PRGNAM}: 
+${PRGNAM}:
 ${PRGNAM}: You will need the original files.
-${PRGNAM}: 
+${PRGNAM}:
 ${PRGNAM}: Original files included.
-${PRGNAM}: 
+${PRGNAM}:
 ${PRGNAM}: see /usr/doc/${PRGNAM}-${VERSION} for more.
-${PRGNAM}: 
+${PRGNAM}: http://cyxdown.free.fr/reminiscence/
 EOF
 
 # --- BUILDING ---
