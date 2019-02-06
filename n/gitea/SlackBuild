@@ -17,7 +17,7 @@ PREFIX=/usr
 if [ "$(id -g gitea 2> /dev/null)" != "817" -o "$(id -u gitea 2> /dev/null)" != "817" ]; then
     echo "  You must have an 'gitea' user and group to run this script."
     echo "    # groupadd -g 817 gitea"
-    echo "    # useradd -d /var/lib/gitea -g gitea -s /bin/bash -u 817 gitea --disabled-password --system "
+    echo "    # useradd -d /var/lib/gitea -g gitea -s /bin/bash -u 817 gitea --system "
     exit 1
 fi
 
