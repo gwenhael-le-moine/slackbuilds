@@ -139,7 +139,7 @@ $PRGNAM:
 $PRGNAM: Gitea is a community managed fork of Gogs, lightweight code hosting
 $PRGNAM: solution written in Go and published under the MIT license.
 $PRGNAM:
-$PRGNAM: edit /etc/gitea/conf/app.ini
+$PRGNAM: edit /etc/gitea/app.ini
 $PRGNAM: see https://docs.gitea.io/en-us/config-cheat-sheet/
 $PRGNAM:
 $PRGNAM:
