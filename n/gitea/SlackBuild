@@ -37,14 +37,18 @@ chmod +x $PKG$PREFIX/bin/${PRGNAM}
 
 mkdir -p $PKG/etc/gitea/
 mv $CWD/app.ini.sample $PKG/etc/gitea/
-sed -i "s|^APP_ID|;APP_ID|g" $PKG/etc/gitea/app.ini
-sed -i "s|^TRUSTED_FACETS|;TRUSTED_FACETS|g" $PKG/etc/gitea/app.ini
+cp $CWD/app.ini $PKG/etc/gitea/app.ini.new
+sed -i "s|^APP_ID|;APP_ID|g" $PKG/etc/gitea/app.ini.sample
+sed -i "s|^TRUSTED_FACETS|;TRUSTED_FACETS|g" $PKG/etc/gitea/app.ini.sample
 chown -R gitea:gitea $PKG/etc/gitea
 chmod 770 $PKG/etc/gitea
 
-mkdir -p $PKG/var/lib/gitea/{custom,data,indexers,public,log,.ssh}
-chown -R gitea:gitea $PKG/var/lib/gitea/{data,indexers,log}
+mkdir -p $PKG/var/lib/gitea/{custom,data/gitea-repositories,indexers,public,log,.ssh}
+chown -R gitea:gitea $PKG/var/lib/gitea #/{data,indexers,log}
 chmod 750 $PKG/var/lib/gitea/{data,indexers,log}
+
+mkdir -p $PKG/var/log/gitea
+chown -R gitea:gitea $PKG/var/log/gitea
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
@@ -61,6 +65,9 @@ NAME="Gitea Daemon"
 
 # Command to run
 CMD="/usr/bin/gitea"
+
+# user used to run the daemon
+USERNAME=gitea
 
 # Process name of daemon, for killing it.
 PROCESSNAME=\$CMD
