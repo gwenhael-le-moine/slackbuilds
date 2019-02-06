@@ -70,15 +70,15 @@ PROCESSNAME=\$CMD
 # Option to run with deamon
 OPTIONS=" --config /etc/gitea/app.ini"
 
-PIDFILE=/var/run/gitea.pid
+PIDFILE=/var/lib/gitea/gitea.pid
 
 func_stop() {
     [ -e \$PIDFILE ] && kill \$(cat \$PIDFILE)
-    if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
-        echo -n "Stopping \$NAME ... "
-        killall \$PROCESSNAME
-        sleep 2
-    fi
+    # if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
+    #     echo -n "Stopping \$NAME ... "
+    #     killall \$PROCESSNAME
+    #     sleep 2
+    # fi
 
     if [ ! "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
         echo "Done!"
@@ -89,7 +89,7 @@ func_stop() {
 
 func_start() {
     echo -n "Starting \$NAME ... "
-    su - \$USERNAME -c "\$CMD \$OPTIONS" --pid \$PIDFILE &
+    su - \$USERNAME -c "\$CMD --pid \$PIDFILE \$OPTIONS" &
     sleep 2
 
     if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
