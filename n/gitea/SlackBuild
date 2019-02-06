@@ -35,8 +35,6 @@ chmod +x $PKG$PREFIX/bin/${PRGNAM}
 
 mkdir -p $PKG/etc/gitea/
 cp $CWD/app.ini $PKG/etc/gitea/app.ini.new
-sed -i "s|^APP_ID|;APP_ID|g" $PKG/etc/gitea/app.ini.sample
-sed -i "s|^TRUSTED_FACETS|;TRUSTED_FACETS|g" $PKG/etc/gitea/app.ini.sample
 chown -R gitea:gitea $PKG/etc/gitea
 chmod 770 $PKG/etc/gitea
 
