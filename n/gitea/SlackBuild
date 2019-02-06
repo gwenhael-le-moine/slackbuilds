@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-master}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/go-${PRGNAM}/${PRGNAM}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-cyco}
@@ -27,8 +27,6 @@ echo $ARCH | grep -q 64 && SRC_ARCH=amd64
 wget -c https://dl.gitea.io/gitea/${VERSION}/gitea-${VERSION}-linux-${SRC_ARCH}.xz -O $CWD/gitea-${VERSION}-linux-${SRC_ARCH}.xz
 xz -d $CWD/gitea-${VERSION}-linux-${SRC_ARCH}.xz
 
-wget -c https://raw.githubusercontent.com/go-gitea/gitea/master/custom/conf/app.ini.sample -O $CWD/app.ini.sample
-
 rm -fr $PKG
 
 mkdir -p  $PKG$PREFIX/bin
@@ -36,7 +34,6 @@ mv $CWD/gitea-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/${PRGNAM}
 chmod +x $PKG$PREFIX/bin/${PRGNAM}
 
 mkdir -p $PKG/etc/gitea/
-mv $CWD/app.ini.sample $PKG/etc/gitea/
 cp $CWD/app.ini $PKG/etc/gitea/app.ini.new
 sed -i "s|^APP_ID|;APP_ID|g" $PKG/etc/gitea/app.ini.sample
 sed -i "s|^TRUSTED_FACETS|;TRUSTED_FACETS|g" $PKG/etc/gitea/app.ini.sample
@@ -44,7 +41,7 @@ chown -R gitea:gitea $PKG/etc/gitea
 chmod 770 $PKG/etc/gitea
 
 mkdir -p $PKG/var/lib/gitea/{custom,data/gitea-repositories,indexers,public,log,.ssh}
-chown -R gitea:gitea $PKG/var/lib/gitea #/{data,indexers,log}
+chown -R gitea:gitea $PKG/var/lib/gitea
 chmod 750 $PKG/var/lib/gitea/{data,indexers,log}
 
 mkdir -p $PKG/var/log/gitea
@@ -75,7 +72,10 @@ PROCESSNAME=\$CMD
 # Option to run with deamon
 OPTIONS=" --config /etc/gitea/app.ini"
 
+PIDFILE=/var/run/gitea.pid
+
 func_stop() {
+    [ -e \$PIDFILE ] && kill \$(cat \$PIDFILE)
     if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
         echo -n "Stopping \$NAME ... "
         killall \$PROCESSNAME
@@ -91,7 +91,7 @@ func_stop() {
 
 func_start() {
     echo -n "Starting \$NAME ... "
-    su - \$USERNAME -c "\$CMD \$OPTIONS" &
+    su - \$USERNAME -c "\$CMD \$OPTIONS" --pid \$PIDFILE &
     sleep 2
 
     if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
@@ -150,5 +150,4 @@ EOF
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 
-VERSION=${VERSION}_$($PKG$PREFIX/bin/${PRGNAM} --version | cut -d\  -f3)
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
