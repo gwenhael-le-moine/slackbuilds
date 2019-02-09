@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+ARCH="AppImage"
+BUILD=1
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG/opt/$PRGNAM
+
+# mise en place
+cd $PKG/opt/$PRGNAM
+
+wget -c https://download.nextcloud.com/desktop/daily/Linux/latest.AppImage -O ${PRGNAM}.AppImage
+chmod +x ${PRGNAM}.AppImage
+VERSION=$( ./${PRGNAM}.AppImage --help | grep version | sed 's/Nextcloud version //' | sed 's/ (build /_/' | tr -d \))
+
+mkdir -p $PKG$PREFIX/bin/
+( cd $PKG$PREFIX/bin/
+  # ln -s ../../opt/$PRGNAM/${PRGNAM}.AppImage $PRGNAM
+  ln -s ../../opt/$PRGNAM/${PRGNAM}.AppImage nextcloud
+)
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (NextCloud Desktop Syncing Client)
+$PRGNAM:
+$PRGNAM: nextcloud themed desktop client
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/nextcloud/client_theming
+$PRGNAM:
+EOF
+
+# empaquetage
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
