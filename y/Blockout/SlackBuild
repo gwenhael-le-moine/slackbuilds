@@ -24,7 +24,8 @@ cd $PKG/usr/share/games
 unzip $CWD/Blockout_1989.zip
 mv blkout $PRGNAM
 cd $PRGNAM
-chmod a+w /usr/share/games/$PRGNAM/*
+touch $PKG/usr/share/games/Blockout/BLSCORE.IDX
+chmod a+w $PKG/usr/share/games/$PRGNAM/*
 
 cat <<EOF > dosbox.config
 [sdl]
@@ -148,12 +149,7 @@ dosbox -conf /usr/share/games/$PRGNAM/dosbox.config
 EOF
 chmod +x $PRGNAM.sh
 
-cp $CWD/*.pdf $CWD/*.gif $PKG/usr/doc/$PRGNAM/
-
 chown -R root:root $PKG/*
-chmod -R go-w $PKG/usr/share/games/Another_World/
-chmod 666 $PKG/usr/share/games/Another_World/DATA/*
-chmod a+w $PKG/usr/share/games/Another_World/DATA/{GLOBAL.FIB,DATA/FB_TXT.FNT,DATA/LOGOS.POL}
 
 mkdir -p $PKG/install
 
