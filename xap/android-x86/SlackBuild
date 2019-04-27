@@ -85,10 +85,10 @@ $PRGNAM: $PRGNAM (Run Android in QEMU)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: Host:
+$PRGNAM: qemu-img create -f qcow2 $HOME/.android-x86/data.img 128G
+$PRGNAM: Guest:
+$PRGNAM: # mke2fs -t ext4 -j -L DATA /dev/block/vdc
 $PRGNAM:
 $PRGNAM: http://www.android-x86.org/
 $PRGNAM:
