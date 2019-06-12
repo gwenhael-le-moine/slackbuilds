@@ -59,7 +59,6 @@ cmake \
     -DAWESOME_MAN_PATH=$PREFIX/man \
     $SRC_PATH
 
-
 # compilation
 make -j3
 
@@ -69,18 +68,23 @@ mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
 chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
 
-### obvious
-git_clone_or_pull https://github.com/hoelzro/obvious.git obvious
-cp -R $REPOSITORIES/obvious $PKG$PREFIX/share/awesome/lib/
-( cd $PKG$PREFIX/share/awesome/lib/obvious
-  rm -fr .git
-  make
-)
+# ### obvious
+# git_clone_or_pull https://github.com/hoelzro/obvious.git obvious
+# cp -R $REPOSITORIES/obvious $PKG$PREFIX/share/awesome/lib/
+# ( cd $PKG$PREFIX/share/awesome/lib/obvious
+#   rm -fr .git
+#   make
+# )
 
-### vicious
-git_clone_or_pull https://github.com/Mic92/vicious.git vicious
-cp -R $REPOSITORIES/vicious $PKG$PREFIX/share/awesome/lib/
-rm -fr $PKG$PREFIX/share/awesome/lib/vicious/.git
+# ### vicious
+# git_clone_or_pull https://github.com/Mic92/vicious.git vicious
+# cp -R $REPOSITORIES/vicious $PKG$PREFIX/share/awesome/lib/
+# rm -fr $PKG$PREFIX/share/awesome/lib/vicious/.git
+
+# ### copycats
+# git_clone_or_pull https://github.com/lcpz/awesome-copycats.git copycats
+# cp -R $REPOSITORIES/copycats $PKG$PREFIX/share/awesome/lib/
+# rm -fr $PKG$PREFIX/share/awesome/lib/copycats/.git
 
 # correction
 cd $PKG
