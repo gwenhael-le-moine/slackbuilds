@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-8.1-r1}
+VERSION=${VERSION:-8.1-r2}
 BUILD=1
 TAG=cyco
 ARCH=$(uname -m)
@@ -20,7 +20,7 @@ mkdir -p $TMP
 rm -fr $PRGNAM $PKG
 
 # Fetching binaries
-[ ! -e $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c https://osdn.net/projects/android-x86/downloads/69704/android-x86-8.1-r1.x86_64.rpm -O $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm
+[ ! -e $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c https://osdn.net/dl/android-x86/android-x86-${VERSION}.x86_64.rpm -O $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm
 
 # Installation
 mkdir -p $PKG$PREFIX/share/
