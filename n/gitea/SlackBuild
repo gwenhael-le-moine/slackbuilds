@@ -13,6 +13,8 @@ PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
+GITEA_WORK_DIR=/var/lib/gitea
+
 # Check if the gitea user and group exist. If not, then bail.
 if [ "$(id -g gitea 2> /dev/null)" != "817" -o "$(id -u gitea 2> /dev/null)" != "817" ]; then
     echo "  You must have an 'gitea' user and group to run this script."
@@ -38,9 +40,9 @@ cp $CWD/app.ini $PKG/etc/gitea/app.ini.new
 chown -R gitea:gitea $PKG/etc/gitea
 chmod 770 $PKG/etc/gitea
 
-mkdir -p $PKG/var/lib/gitea/{custom,data/gitea-repositories,indexers,public,log,.ssh}
+mkdir -p $PKG${GITEA_WORK_DIR}/{custom,data/gitea-repositories,indexers,public,log,.ssh}
 chown -R gitea:gitea $PKG/var/lib/gitea
-chmod 750 $PKG/var/lib/gitea/{data,indexers,log}
+chmod 750 $PKG${GITEA_WORK_DIR}/{data,indexers,log}
 
 mkdir -p $PKG/var/log/gitea
 chown -R gitea:gitea $PKG/var/log/gitea
@@ -72,6 +74,8 @@ OPTIONS=" --config /etc/gitea/app.ini"
 
 PIDFILE=/var/lib/gitea/gitea.pid
 
+GITEA_WORK_DIR=$GITEA_WORK_DIR
+
 func_stop() {
     [ -e \$PIDFILE ] && kill \$(cat \$PIDFILE)
     # if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
@@ -89,7 +93,7 @@ func_stop() {
 
 func_start() {
     echo -n "Starting \$NAME ... "
-    su - \$USERNAME -c "\$CMD --pid \$PIDFILE \$OPTIONS" &
+    su - \$USERNAME -c "GITEA_WORK_DIR=$GITEA_WORK_DIR \$CMD --pid \$PIDFILE \$OPTIONS" &
     sleep 2
 
     if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
