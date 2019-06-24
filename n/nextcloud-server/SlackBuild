@@ -3,6 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
+RELEASE_TYPE=${RELEASE_TYPE:-releases}
 VERSION=${VERSION:-stable}
 ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
@@ -27,7 +28,7 @@ mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
 case $VERSION in
     "stable")
-        wget -c https://download.nextcloud.com/server/releases/latest.tar.bz2 -O $CWD/nextcloud.tar.bz2
+        wget -c https://download.nextcloud.com/server/${RELEASE_TYPE}/latest.tar.bz2 -O $CWD/nextcloud.tar.bz2
         ;;
 
     "master")
@@ -35,7 +36,7 @@ case $VERSION in
         ;;
 
     *)
-        [ ! -e $CWD/nextcloud-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/releases/nextcloud-$VERSION.tar.bz2 -O $CWD/nextcloud.tar.bz2
+        [ ! -e $CWD/nextcloud-$VERSION.tar.bz2 ] && wget -c https://download.nextcloud.com/server/${RELEASE_TYPE}/nextcloud-$VERSION.tar.bz2 -O $CWD/nextcloud.tar.bz2
         ;;
 esac
 
