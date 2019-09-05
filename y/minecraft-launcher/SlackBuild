@@ -1,0 +1,53 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-2.1.5965} #$(wget -O - -o /dev/null http://status.calibre-ebook.com/latest)}
+ARCH=$(uname -m)
+BUILD=${BUILD:-1}
+TAG=${TAG:-cyco}
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+[ ! -e $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $CWD/${PRGNAM}.tar.gz https://launcher.mojang.com/download/Minecraft.tar.gz
+
+rm -fr $PKG
+mkdir -p $PKG/opt/${PRGNAM}
+
+tar xvf $CWD/${PRGNAM}.tar.gz -C $PKG/opt/
+
+rm $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz
+
+mkdir -p $PKG/usr/bin
+cd $PKG/usr/bin
+ln -s ../../opt/minecraft-launcher/minecraft-launcher
+
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+         |-----handy-ruler------------------------------------------------------|
+${PRGNAM}: ${PRGNAM} (Game)
+${PRGNAM}:
+${PRGNAM}: WHAT IS MINECRAFT?
+${PRGNAM}: IT’S A GAME ABOUT PLACING BLOCKS AND GOING ON ADVENTURES
+${PRGNAM}:
+${PRGNAM}: It’s set in infinitely-generated worlds of wide open terrain - icy
+${PRGNAM}: mountains, swampy bayous, vast pastures and much more - filled with
+${PRGNAM}: secrets, wonders and peril!
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}: ${PRGNAM} home: http://minecraft.net/
+EOF
+
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
