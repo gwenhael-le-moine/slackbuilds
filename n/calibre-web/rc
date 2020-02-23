@@ -1,7 +1,7 @@
 #!/bin/bash
 #Slackware startup deamon script
 
-USER=root
+USER=RUNNING_USER
 
 DAEMON="python3 /opt/calibre-web/cps.py"
 PIDFILE=/var/run/calibre-web.pid
