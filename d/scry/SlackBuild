@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=cyco
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-*
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://github.com/crystal-lang-tools/scry.git $REPOSITORY
+
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+
+cd $TMP/$PRGNAM-$VERSION
+
+# compilation
+shards build --verbose --release
+
+# installation
+mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM}/
+cp bin/scry $PKG$PREFIX/bin/
+cp bin/ci $PKG$PREFIX/bin/scry-ci
+cp bin/format $PKG$PREFIX/bin/scry-format
+cp CHANGELOG.md LICENSE README.md $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Scry is a code analysis server for Crystal)
+$PRGNAM:
+$PRGNAM: Scry is a code analysis server for Crystal. It is an implementation of a
+$PRGNAM: common language protocol. It is being built as a server for VSCode, but
+$PRGNAM: is compatible with any client that implements this protocol.
+$PRGNAM:
+$PRGNAM: The server is implemented in Crystal.
+$PRGNAM:
+$PRGNAM: https://github.com/crystal-lang-tools/scry
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
