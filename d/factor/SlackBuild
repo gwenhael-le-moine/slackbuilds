@@ -5,9 +5,8 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-VERSION=$(curl http://downloads.factorcode.org/releases/ | grep -o "[0-9.]*/" | grep -v "^/" | tr -d / | sort | tail -n1)
+VERSION=$(curl -s https://api.github.com/repos/factor/factor/releases/latest | grep tag_name | grep -o "[0-9.]*")
 BUILD=1
-
 
 TAG=cyco
 OUTPUT=/tmp

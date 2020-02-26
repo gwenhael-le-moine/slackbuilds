@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal true
 require "json"
-require "thwait"
+require "thwait"                # gem install e2mmap thwait
 
 NC_ROOT = "/srv/www/vhosts/nextcloud-server/htdocs".freeze
 NB_THREADS = 2

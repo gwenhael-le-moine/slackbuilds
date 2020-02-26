@@ -26,25 +26,24 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/louisrubet/rpn.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/mint-lang/mint.git $REPOSITORY
 
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 
 cd $TMP/$PRGNAM-$VERSION
 
-sed -i 's|git@github.com:|https://github.com/|g' $(grep -l git@ .*)
-
 # configuration
-cmake \
-    -DCMAKE_INSTALL_PREFIX=$PREFIX \
-    .
+shards install
 
 # compilation
-make -j3
+crystal build src/mint.cr -o mint -p --error-trace
+make documentation
 
 # installation
-make install DESTDIR=$PKG
+mkdir -p $PKG$PREFIX/{bin,doc}/
+cp mint $PKG$PREFIX/bin/
+cp -R docs $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
@@ -62,15 +61,15 @@ find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs st
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM (Math functional language, inspired by HP RPL language)
+$PRGNAM: $PRGNAM (A refreshing programming language for the front-end web.)
 $PRGNAM:
-$PRGNAM: rpn - Reverse Polish Notation language
+$PRGNAM: A refreshing programming language for the front-end web, aiming to solve the most
+$PRGNAM: common issues of Single Page Applications (SPAs) at a language level.
+$PRGNAM: While focusing on: Developer happiness, Fast compilation, Readability
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: https://github.com/louisrubet/rpn
+$PRGNAM: https://www.mint-lang.com/
 $PRGNAM:
 EOF
 

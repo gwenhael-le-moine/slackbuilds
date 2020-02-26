@@ -95,6 +95,7 @@ CFLAGS="$SLKCFLAGS" \
       --with-compress-install \
       --without-gconf \
       --with-gameuser=":games" \
+      --with-modules \
       --disable-libsystemd \
       --disable-build-details \
       --build=${ARCH}-slackware-linux

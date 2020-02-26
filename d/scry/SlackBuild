@@ -26,25 +26,22 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/louisrubet/rpn.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/crystal-lang-tools/scry.git $REPOSITORY
 
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 
 cd $TMP/$PRGNAM-$VERSION
 
-sed -i 's|git@github.com:|https://github.com/|g' $(grep -l git@ .*)
-
-# configuration
-cmake \
-    -DCMAKE_INSTALL_PREFIX=$PREFIX \
-    .
-
 # compilation
-make -j3
+shards build --verbose --release
 
 # installation
-make install DESTDIR=$PKG
+mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM}/
+cp bin/scry $PKG$PREFIX/bin/
+cp bin/ci $PKG$PREFIX/bin/scry-ci
+cp bin/format $PKG$PREFIX/bin/scry-format
+cp CHANGELOG.md LICENSE README.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
@@ -62,15 +59,15 @@ find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs st
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM (Math functional language, inspired by HP RPL language)
+$PRGNAM: $PRGNAM (Scry is a code analysis server for Crystal)
 $PRGNAM:
-$PRGNAM: rpn - Reverse Polish Notation language
+$PRGNAM: Scry is a code analysis server for Crystal. It is an implementation of a
+$PRGNAM: common language protocol. It is being built as a server for VSCode, but
+$PRGNAM: is compatible with any client that implements this protocol.
 $PRGNAM:
+$PRGNAM: The server is implemented in Crystal.
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: https://github.com/louisrubet/rpn
+$PRGNAM: https://github.com/crystal-lang-tools/scry
 $PRGNAM:
 EOF
 
