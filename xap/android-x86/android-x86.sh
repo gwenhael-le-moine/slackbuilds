@@ -43,7 +43,7 @@ elif [ -d $ANDROID_DATA_DIR/data ]; then
     fi
 fi
 
-NET="-net nic,model=e1000 -net user -netdev user,id=mynet,hostfwd=tcp::5555-:5555 -device virtio-net-pci,netdev=mynet"
+NET="-netdev user,id=mynet,hostfwd=tcp::$port-:5555 -device virtio-net-pci,netdev=mynet"
 QEMU_DISPLAY="-vga std -display gtk"
 
 run_qemu()

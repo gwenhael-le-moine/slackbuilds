@@ -1,6 +1,8 @@
 #!/bin/sh
 
 # variables
+RUNNING_USER=${RUNNING_USER:-gwh}
+RUNNING_GROUP=${RUNNING_GROUP:-users}
 BUILD=${BUILD:-1}
 
 TAG=cyco
@@ -28,9 +30,11 @@ VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d 
 
 mkdir -p $PKG/opt
 cp -r $REPOSITORY $PKG/opt/
+chown -R ${RUNNING_USER}:${RUNNING_GROUP} $PKG/opt/$PRGNAM
 
 mkdir -p $PKG/etc/rc.d/
 cp -r $CWD/rc $PKG/etc/rc.d/rc.$PRGNAM
+sed -i "s|RUNNING_USER|$RUNNING_USER|" $PKG/etc/rc.d/rc.$PRGNAM
 
 cd $PKG/opt/$PRGNAM
 # change default password
@@ -40,11 +44,13 @@ pip3 install --target vendor -r requirements.txt
 
 # correction
 cd $PKG
-chown -R root:root *
 
 # embaumement
 mkdir -p $PKG/install
 
+# cat <<EOF > $PKG/install/doinst
+# chown -R ${RUNNING_USER}:${RUNNING_GROUP} /opt/$PRGNAM
+# EOF
 
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
