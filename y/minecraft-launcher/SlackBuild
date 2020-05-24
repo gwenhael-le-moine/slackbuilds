@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-2.1.11314}
+VERSION=${VERSION:-$(curl -s https://minecraft.gamepedia.com/Launcher_version_history | grep Linux | head -n 1 | grep -o ">[0-9.]*</a>$" | sed 's|>\([0-9.]*\)</a>$|\1|')}
 
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
@@ -12,19 +12,35 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-[ ! -e $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $CWD/${PRGNAM}.tar.gz https://launcher.mojang.com/download/Minecraft.tar.gz
-
+[ ! -e $CWD/minecraft-launcher_${VERSION}.tar.gz ] && wget -c -O $CWD/minecraft-launcher_${VERSION}.tar.gz https://launcher.mojang.com/download/linux/x86_64/minecraft-launcher_${VERSION}.tar.gz
+[ ! -e $CWD/minecraft-launcher.svg ] && wget -c -O $CWD/minecraft-launcher.svg https://launcher.mojang.com/download/minecraft-launcher.svg
 rm -fr $PKG
 mkdir -p $PKG/opt/${PRGNAM}
 
-tar xvf $CWD/${PRGNAM}.tar.gz -C $PKG/opt/
+tar xvf $CWD/minecraft-launcher_${VERSION}.tar.gz -C $PKG/opt/
 
-rm $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz
+# rm $CWD/minecraft-launcher_${VERSION}.tar.gz
 
 mkdir -p $PKG/usr/bin
 cd $PKG/usr/bin
 ln -s ../../opt/minecraft-launcher/minecraft-launcher
 
+mkdir -p $PKG/usr/share/icons/hicolor/symbolic/apps/
+cp $CWD/minecraft-launcher.svg $PKG/usr/share/icons/hicolor/symbolic/apps/
+
+mkdir -p $PKG/usr/share/applications/
+cat <<EOF > $PKG/usr/share/applications/minecraft-launcher.desktop
+[Desktop Entry]
+Type=Application
+Version=${VERSION}
+Name=Minecraft Launcher
+Comment=Official Minecraft Launcher
+Exec=/opt/minecraft-launcher/minecraft-launcher
+Path=/opt/minecraft-launcher/
+Icon=minecraft-launcher
+Terminal=false
+Categories=Game;Application;
+EOF
 mkdir -p $PKG/install
 
 cat <<EOF > $PKG/install/slack-desc
