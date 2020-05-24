@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# variables
+TAG=cyco
+TMP=/tmp/$TAG
+CWD=$(pwd)
+OUTPUT=/tmp
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+ARCH=$(uname -m)
+BUILD=1
+
+PREFIX=/usr
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/kovidgoyal/kitty.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM/
+
+# installation
+mkdir -p $PKG/
+python3 setup.py linux-package --update-check-interval=0
+mv linux-package $PKG/usr
+
+mkdir -p $PKG/usr/doc/$PRGNAM
+cp -R *.md *.rst LICENSE $PKG/usr/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (A cross-platform, fast, feature full, GPU based terminal emulator)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://sw.kovidgoyal.net/kitty/
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
