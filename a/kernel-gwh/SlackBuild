@@ -2,17 +2,13 @@
 
 set -e
 
-CLEAN_SRC=${CLEAN_SRC:-NO}
-
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.]*: stable" | head -n1 | cut -d: -f1)}
 BUILD=${BUILD:-1}
 
 ARCH=$(uname -m)
 
-SOURCES=/usr/src
 TAG=cyco
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
@@ -20,32 +16,42 @@ OUTPUT=/tmp
 
 NUMJOBS=${NUMJOBS:-" -j4 "}
 
-SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
+GIT=${GIT:-"NO"}
 
 rm -fr $PKG
-if [ $CLEAN_SRC != "NO" ] ; then
-    rm -fr $SOURCES/linux-$VERSION
 
+if [ $GIT == "YES" ]; then
+    REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+    [ ! -e $REPOSITORY ] && git clone https://github.com/torvalds/linux.git $REPOSITORY
+
+    cd $REPOSITORY
+    git pull
+    VERSION="$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+else
+    VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.]*: stable" | head -n1 | cut -d: -f1)}
+
+    SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
     [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.xz" -O $CWD/linux-$VERSION.tar.xz
-    [ ! -e $SOURCES ] && mkdir -p $SOURCES
-    tar xf $CWD/linux-$VERSION.tar.xz -C $SOURCES
+    mkdir -p $PKG/usr/src/
+    tar xf $CWD/linux-$VERSION.tar.xz -C $PKG/usr/src/
+
+    cd $PKG/usr/src/linux-$VERSION
 fi
 
-cd $SOURCES/linux-$VERSION
-
-if [ $CLEAN_SRC != "NO" ] || [ ! -e .config ] ; then
-    if [ -e $CWD/config-$VERSION ] ; then
-        cp $CWD/config-$VERSION .config
+if [ -e $CWD/config-$VERSION ] ; then
+    cp $CWD/config-$VERSION .config
+else
+    if [ -e $CWD/config ]; then
+        cp $CWD/config .config
     else
-        if [ -e $CWD/config ]; then
-            cp $CWD/config .config
-        else
-            zcat /proc/config.gz > .config
-        fi
+        zcat /proc/config.gz > .config
     fi
 fi
 
 make oldconfig $*
+
+[ ! -e $CWD/config-$VERSION ] && cp .config $CWD/config-$VERSION
+
 make $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
 
@@ -56,6 +62,8 @@ cp arch/${ARCH}/boot/bzImage $PKG/boot/vmlinuz-gwh-$VERSION
 ( cd $PKG/boot/
   ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
 )
+
+make clean
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
