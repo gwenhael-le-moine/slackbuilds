@@ -22,7 +22,7 @@ mkdir -p $TMP
 rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
-VERSION=1.15.0
+VERSION=1.15.1
 
 [ ! -e $CWD/makemkv-bin-$VERSION.tar.gz ] && wget -c https://www.makemkv.com/download/makemkv-bin-$VERSION.tar.gz -O $CWD/makemkv-bin-$VERSION.tar.gz
 [ ! -e $CWD/makemkv-oss-$VERSION.tar.gz ] && wget -c https://www.makemkv.com/download/makemkv-oss-$VERSION.tar.gz -O $CWD/makemkv-oss-$VERSION.tar.gz
