@@ -29,7 +29,7 @@ BUILD=1
 
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-${PKGNAM}
@@ -71,7 +71,7 @@ CFLAGS="${SLKCFLAGS}" \
 make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-[ -e $CWD/50_cycojesus ] && cp $CWD/50_cycojesus $PKG/etc/grub.d/ && chmod +x $PKG/etc/grub.d/$CWD/50_cycojesus
+[ -e $CWD/50_gwh ] && cp $CWD/50_gwh $PKG/etc/grub.d/ && chmod +x $PKG/etc/grub.d/$CWD/50_gwh
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null

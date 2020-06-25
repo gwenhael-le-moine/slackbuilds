@@ -5,7 +5,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-9.0-r2}
 BUILD=1
-TAG=cyco
+TAG=gwh
 ARCH=$(uname -m)
 
 OUTPUT=/tmp

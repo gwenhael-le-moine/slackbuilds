@@ -2,7 +2,7 @@
 
 # variables
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 CWD=$(pwd)
 OUTPUT=/tmp/

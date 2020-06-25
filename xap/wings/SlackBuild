@@ -4,7 +4,7 @@
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:-1}
 
-TAG=cyco
+TAG=gwh
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)

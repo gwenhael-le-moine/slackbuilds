@@ -11,7 +11,7 @@ BUILD=${BUILD:=1}
 ARCH=${ARCH:=$(uname -m)}
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
-TAG=${TAG:=cyco}
+TAG=${TAG:=gwh}
 OUTPUT=${OUTPUT:=/tmp}
 TMP=${TMP:=/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM

@@ -26,10 +26,10 @@ PKGNAM=libdrm
 VERSION=${VERSION:-git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
 NUMJOBS=${NUMJOBS:-" -j3 "}
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-${PKGNAM}

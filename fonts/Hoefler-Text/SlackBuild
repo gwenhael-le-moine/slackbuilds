@@ -4,12 +4,12 @@ PRGNAM=Hoefler-Text
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=font
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 CWD=$(pwd)
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
-TAG=cyco
+TAG=gwh
 TMP=${TMP:=/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

@@ -12,7 +12,7 @@ BUILD=1
 
 ARCH=$(uname -m)
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp

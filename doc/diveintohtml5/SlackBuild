@@ -10,7 +10,7 @@ ARCH=noarch
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp

@@ -6,7 +6,7 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(date +%F | tr - .)}
 ARCH="noarch" 	# hardcode ARCH
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 DOCROOT=${DOCROOT:-/var/www/htdocs}
 

@@ -4,7 +4,7 @@ PRGNAM=$(basename $(pwd))
 VERSION=${VERSION:-$(date +%F | tr - .)}
 ARCH=font
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 CWD=$(pwd)
 

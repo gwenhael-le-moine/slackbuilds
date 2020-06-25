@@ -10,8 +10,8 @@ BUILD=1
 ARCH=$(uname -m)
 
 CWD=$(pwd)
-HOME=/home/cycojesus
-TAG=cyco
+HOME=/home/gwh
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM

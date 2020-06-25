@@ -5,7 +5,7 @@ RUNNING_USER=${RUNNING_USER:-gwh}
 RUNNING_GROUP=${RUNNING_GROUP:-users}
 BUILD=${BUILD:-1}
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 CWD=$(pwd)
 

@@ -7,7 +7,7 @@ PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 BUILD=5
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM

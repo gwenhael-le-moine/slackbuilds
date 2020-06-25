@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 OUTPUT=/tmp
 

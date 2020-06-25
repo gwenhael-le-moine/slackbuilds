@@ -4,7 +4,7 @@
 VERSION=master_$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 CWD=$(pwd)

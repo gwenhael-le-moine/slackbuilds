@@ -23,7 +23,7 @@
 PKGNAM=u-boot-tools
 SRCNAM=u-boot
 VERSION=${VERSION:-2014.01}
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 

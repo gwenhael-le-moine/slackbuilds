@@ -8,7 +8,7 @@ BUILD=${BUILD:-1}
 
 ARCH=emacs
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM

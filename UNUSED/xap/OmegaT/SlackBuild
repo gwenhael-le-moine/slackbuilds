@@ -8,9 +8,9 @@ VERSION=2.2.3_04_Beta_Without_JRE
 RELEASE="2.2.3%20update%204"
 ARCH=${ARCH:-noarch}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

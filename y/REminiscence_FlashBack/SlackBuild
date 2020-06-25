@@ -4,7 +4,7 @@
 # Set initial variables:
 CWD=`pwd`
 if [ "$TMP" = "" ]; then
-  TAG=cyco
+  TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 fi

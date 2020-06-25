@@ -8,10 +8,10 @@ PRGNAM=newsbeuter
 VERSION=${VERSION:-2.5}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

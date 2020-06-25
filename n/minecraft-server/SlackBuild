@@ -14,7 +14,7 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(curl https://www.minecraft.net/en-us/download/server | grep "minecraft_server.*\.jar" -o | grep -o "[0-9][0-9.]*[0-9]" | head -n1)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM

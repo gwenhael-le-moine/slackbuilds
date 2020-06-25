@@ -6,14 +6,14 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-0.10.25}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-3}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
-USERNAME=cycojesus
+USERNAME=gwh
 
 echo $ARCH | grep -q arm && SRC_ARCH=arm
 echo $ARCH | grep -q 86 && SRC_ARCH=386

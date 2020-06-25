@@ -5,7 +5,7 @@ VERSION=${VERSION:-trunk_$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:-1}
 
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 CWD=$(pwd)
 

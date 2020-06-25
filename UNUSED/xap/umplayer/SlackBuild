@@ -26,7 +26,7 @@
 PRGNAM=umplayer
 VERSION=${VERSION:-$(date +%Y.%m.%d_%H.%M)}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in

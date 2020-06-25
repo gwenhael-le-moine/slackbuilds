@@ -7,7 +7,7 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)

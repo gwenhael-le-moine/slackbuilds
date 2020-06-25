@@ -9,7 +9,7 @@ VERSION=svn$(date +%F | sed 's/-//g')
 BUILD=1
 
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp

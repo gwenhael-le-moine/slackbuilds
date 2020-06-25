@@ -8,7 +8,7 @@ ARCH=$(uname -m)
 VERSION=$(curl -s https://api.github.com/repos/factor/factor/releases/latest | grep tag_name | grep -o "[0-9.]*")
 BUILD=1
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM

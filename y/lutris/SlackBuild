@@ -28,7 +28,7 @@
 PRGNAM=lutris
 VERSION=${VERSION:-$(curl https://lutris.net/releases/ | grep tar\.xz | tail -n1 | grep -o "[0-9.]*" | head -n1 | sed 's|.$||')}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in

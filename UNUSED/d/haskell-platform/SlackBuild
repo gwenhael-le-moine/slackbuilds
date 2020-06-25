@@ -8,7 +8,7 @@
 PRGNAM=haskell-platform
 VERSION=${VERSION:-2013.2.0.0}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 if [ -z "$ARCH" ]; then
     case "$(uname -m)" in

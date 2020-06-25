@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 
 
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 
 PRGNAM=$(basename $CWD)

@@ -9,7 +9,7 @@ BUILD=1
 VERSION=1
 ARCH="noarch"
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp

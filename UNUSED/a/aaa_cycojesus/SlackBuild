@@ -10,7 +10,7 @@ BUILD=${BUILD:-1}
 
 ARCH=noarch
 
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
 OUTPUT=${OUTPUT:-/tmp}
@@ -26,7 +26,7 @@ cp -a $CWD/config/etc $PKG/
 
 # Activate some non-default fonts adjustements
 (cd $PKG/etc/fonts/conf.d
-	ln -s ../conf.avail/35-cycojesus.conf
+	ln -s ../conf.avail/35-gwh.conf
 	ln -s ../conf.avail/10-sub-pixel-rgb.conf
 	ln -s ../conf.avail/10-autohint.conf
 )

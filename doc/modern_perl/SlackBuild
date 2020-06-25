@@ -8,7 +8,7 @@ BUILD=${BUILD:-1}
 
 ARCH=${ARCH:-$(uname -m)}
 
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 PKG=${PKG:-$TMP/pkg-$PRGNAM}
 OUTPUT=${OUTPUT:-/tmp}

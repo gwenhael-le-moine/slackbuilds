@@ -6,7 +6,7 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-5.3.0_2012_07_02}
 ARCH=noarch
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 # Place to build (TMP) package (PKG) and output (OUTPUT) the program:
 TMP=${TMP:=/tmp/$TAG}

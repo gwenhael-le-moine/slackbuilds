@@ -25,7 +25,7 @@
 PRGNAM=prettytable
 VERSION=${VERSION:-0.7.2}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco} # the "_SBo" is required
+TAG=${TAG:-gwh} # the "_SBo" is required
 
 if [ -z "$ARCH" ]; then
     case "$( uname -m )" in

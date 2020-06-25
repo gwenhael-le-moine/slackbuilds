@@ -23,12 +23,12 @@
 
 VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 
 NUMJOBS=${NUMJOBS:-" -j3 "}
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-gimp

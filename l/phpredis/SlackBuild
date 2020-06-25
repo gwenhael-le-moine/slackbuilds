@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # variables
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 CWD=$(pwd)

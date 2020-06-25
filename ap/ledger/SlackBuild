@@ -10,7 +10,7 @@ BRANCH=${BRANCH:="CURRENT"}
 VERSION=${VERSION:=${BRANCH}_$(date +%F | tr - .)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 TMP=${TMP:-/tmp/$TAG}

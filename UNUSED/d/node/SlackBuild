@@ -5,7 +5,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-x86_64}
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 
 NUMJOBS=${NUMJOBS:-" -j4 "}
 
@@ -13,7 +13,7 @@ REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 PREFIX=/usr
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM

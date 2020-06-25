@@ -5,7 +5,7 @@ PRGNAM=vagrant
 ARCH=${ARCH:-$(uname -m)}
 VERSION=${VERSION:-1.4.3}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 # Allow $ARCH to be preset before running the script.  This is useful in the
 # case where someone is running a 32-bit chroot environment under an x86_64

@@ -15,10 +15,10 @@ PROCESSNAME=$CMD
 # by default, this is set to 'transmission'.
 # For the sake of security you shouldn't set a password
 # on this user
-USERNAME="cycojesus"
+USERNAME="gwh"
 
 # Option to run with deamon
-OPTIONS=" -home=/home/cycojesus/ "
+OPTIONS=" -home=/home/gwh/ "
 
 func_stop() {
     if [ "$(ps aux | grep $PROCESSNAME | grep -v grep)" ]; then

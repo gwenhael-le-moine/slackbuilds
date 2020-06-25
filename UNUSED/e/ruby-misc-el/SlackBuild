@@ -1,12 +1,12 @@
 #!/bin/sh
 
 VERSION=$(echo ruby-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1,2 -d - | rev)
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 
 ARCH=emacs
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-ruby-misc-el

@@ -27,7 +27,7 @@
 PRGNAM=motion
 VERSION=$(date +%F | tr - .)
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in

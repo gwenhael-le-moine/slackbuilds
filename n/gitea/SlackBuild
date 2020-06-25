@@ -6,7 +6,7 @@ PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/go-${PRGNAM}/${PRGNAM}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM

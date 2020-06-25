@@ -9,7 +9,7 @@ ARCH=${ARCH:-java}
 BUILD=${BUILD:-1}
 
 
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 OUTPUT=${OUTPUT:-/tmp}
 PKG=$TMP/pkg-$PRGNAM

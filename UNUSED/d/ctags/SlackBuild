@@ -24,7 +24,7 @@
 
 set -e
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp}
 PKG=${PKG:-$TMP/pkg-ctags}
 OUT=${OUT:-$TMP/build}
@@ -34,7 +34,7 @@ VERSION=${VERSION:-5.8}
 # target
 ARCH=${ARCH:-$(uname -m)}
 TARGET=${TARGET:-$(uname -m)}
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 
 # set tarball download link
 SOURCE=${SOURCE:-http://switch.dl.sourceforge.net/sourceforge/ctags/ctags-$VERSION.tar.gz}

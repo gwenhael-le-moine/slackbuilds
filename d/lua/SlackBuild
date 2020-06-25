@@ -16,7 +16,7 @@ PRGNAM=lua
 VERSION=${VERSION:-5.3.4}
 MAJOR_VERSION=${VERSION%.*}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in

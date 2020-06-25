@@ -7,8 +7,8 @@ BUILD=1
 
 ARCH=python
 
-HOME=/home/cycojesus
-TAG=cyco
+HOME=/home/gwh
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM

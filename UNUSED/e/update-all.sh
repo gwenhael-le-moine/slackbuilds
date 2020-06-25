@@ -17,4 +17,4 @@ for i in $(find . -type d -maxdepth 1 -not -name UNUSED -not -name . -not -name 
     )
 done
 
-rm -fr /tmp/{cyco,emacs-*,package-*,ruby-*}
+rm -fr /tmp/{gwh,emacs-*,package-*,ruby-*}

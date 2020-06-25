@@ -5,7 +5,7 @@ VERSION=${VERSION:=$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:=1}
 GIT_TAG=${GIT_TAG:=latest}
 
-TAG=${TAG:=cyco}
+TAG=${TAG:=gwh}
 OUTPUT=${OUTPUT:=/tmp}
 TMP=/tmp/$TAG
 CWD=$(pwd)

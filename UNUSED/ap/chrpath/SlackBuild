@@ -25,7 +25,7 @@
 
 # ftp://ftp.hungry.com/pub/hungry/chrpath/
 
-PACKAGER_ID=cyco
+PACKAGER_ID=gwh
 
 
 # Set YES for native build with gcc >= 4.2
@@ -35,7 +35,7 @@ SB_NATIVE=${SB_NATIVE:-YES}
 SB_REP=${SB_REP:-YES}
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp}
 if [ ! -d ${TMP} ]; then
   mkdir -p ${TMP}

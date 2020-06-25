@@ -9,7 +9,7 @@ PRGNAM=$(basename $CWD)
 ARCH=${ARCH:-$(uname -m | grep -q 64 && echo "x86_64" || echo "i386")}
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/commercialhaskell/stack/releases/latest | grep tag_name | grep -o "v[0-9.]*" | tr -d v)}
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 rm -rf $PKG
 mkdir -p $PKG/usr/{bin,doc} $OUTPUT

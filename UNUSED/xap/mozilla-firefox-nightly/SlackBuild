@@ -3,7 +3,7 @@
 KEEP_TAR=${KEEP_TAR:-"NO"}
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 PKG=$TMP/pkg-mozilla-firefox

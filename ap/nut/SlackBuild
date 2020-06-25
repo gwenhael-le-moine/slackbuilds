@@ -11,7 +11,7 @@ ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o 64)
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 TMP=${TMP:-/tmp/$TAG}
 PKG=${PKG:-$TMP/pkg-$PRGNAM}
 OUTPUT=${OUTPUT:-/tmp}

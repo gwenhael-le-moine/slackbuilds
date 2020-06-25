@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 BUILD=1
-TAG=cyco
+TAG=gwh
 ARCH=noarch
 
 OUTPUT=/tmp

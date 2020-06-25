@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CWD=$(pwd)
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 TMP=/tmp/$TAG
 

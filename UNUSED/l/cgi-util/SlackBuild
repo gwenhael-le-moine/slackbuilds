@@ -5,7 +5,7 @@ VERSION=2.2.1
 BUILD=1
 
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 CWD=$(pwd)
 OUTPUT=/tmp

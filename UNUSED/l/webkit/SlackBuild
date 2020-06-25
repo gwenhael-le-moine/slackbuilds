@@ -4,7 +4,7 @@
 VERSION=git_$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:=/tmp/$TAG}
 CWD=$(pwd)

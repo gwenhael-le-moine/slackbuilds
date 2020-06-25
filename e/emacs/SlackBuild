@@ -36,7 +36,7 @@ NUMJOBS=${NUMJOBS:-" -j3 "}
 BUILD=${BUILD:-1}
 BRANCH=${BRANCH:-"master"}
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM

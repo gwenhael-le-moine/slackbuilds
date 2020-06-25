@@ -49,7 +49,7 @@ esac
 VERSION=$(ar p $CWD/$PRGNAM-${RELEASE}_current_${DEBARCH}.deb control.tar.gz 2> /dev/null | tar zxO ./control 2> /dev/null | grep Version | awk '{print $2}' | cut -d- -f1)
 
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT

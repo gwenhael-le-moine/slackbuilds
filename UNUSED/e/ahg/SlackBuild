@@ -6,7 +6,7 @@ VERSION=master_$(date +"%Y.%m.%d_%H.%M")
 BUILD=1
 
 
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 CWD=$(pwd)
@@ -32,7 +32,7 @@ cd $TMP
 if [ ! -e $REPOSITORY ] ; then
         mkdir -p $(dirname $REPOSITORY)
         cd $(dirname $REPOSITORY)
-        hg clone https://cycojesus@bitbucket.org/agriggio/ahg $PRGNAM
+        hg clone https://gwh@bitbucket.org/agriggio/ahg $PRGNAM
 fi
 
 ( cd $REPOSITORY

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CWD=$(pwd)
-TAG=cyco
+TAG=gwh
 OUTPUT=/tmp
 TMP=${TMP:-/tmp}
 
@@ -10,7 +10,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 VERSION=git$(date +%Y.%m.%d_%H.%M)
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1cyco}
+BUILD=${BUILD:-1gwh}
 REPOSITORIES=/home/installs/SlackBuilds/repositories
 
 NUMJOBS=${NUMJOBS:-" -j2 "}

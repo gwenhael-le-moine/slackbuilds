@@ -3,7 +3,7 @@
 # variables
 BUILD=${BUILD:-1}
 
-TAG=cyco
+TAG=gwh
 TMP=/tmp/$TAG
 CWD=$(pwd)
 

@@ -4,7 +4,7 @@ PRGNAM=$(basename $(pwd))
 VERSION=${VERSION:-$(date +%Y.%m.%d_%H.%M)}
 ARCH=noarch
 BUILD=${BUILD:-1}
-TAG=${TAG:-cyco}
+TAG=${TAG:-gwh}
 
 CWD=$(pwd)
 
