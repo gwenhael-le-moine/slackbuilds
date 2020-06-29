@@ -34,12 +34,12 @@ cd $TMP/$PRGNAM
 cargo build --release
 
 mkdir -p $PKG$PREFIX/bin
-cp target/release/exa $PKG$PREFIX/bin/
+cp target/release/$PRGNAM $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENCE README.md $PKG$PREFIX/doc/$PRGNAM
+cp LICENCE* *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG

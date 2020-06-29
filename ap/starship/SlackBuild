@@ -24,7 +24,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/sharkdp/fd.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/starship/starship.git $REPOSITORY
 ( cd $REPOSITORY && git pull )
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
@@ -59,17 +59,17 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (fd is a simple, fast and user-friendly alternative to find)
-$PRGNAM:
-$PRGNAM: While it does not seek to mirror all of find's powerful functionality,
-$PRGNAM: it provides sensible (opinionated) defaults for 80% of the use cases.
+$PRGNAM: $PRGNAM (Minimal, fast, and customizable prompt for any shell!)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/sharkdp/fd
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://starship.rs/
 EOF
 
 # empaquetage
