@@ -20,6 +20,9 @@ PREFIX=/usr
 
 SLCKFLAGS=""
 
+REQUIRES="lua luarocks lgi"
+# for rock in luafilesystem penlight ldoc busted luacheck luacov; do luarocks install $rock; done
+
 function git_clone_or_pull() {
     REPO_URL=$1
     REPO_NAME=$2
