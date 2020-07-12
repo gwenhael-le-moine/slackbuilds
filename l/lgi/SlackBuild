@@ -41,10 +41,12 @@ sed -i \
     -e "s|LUA_VERSION=5.1|LUA_VERSION=$LUA_VERSION|" \
     lgi/Makefile
 
-make LUA_LIBDIR=/usr/lib/lua/$LUA_VERSION \
+LIBDIRSUFFIX=$( uname -m | grep -o 64 )
+
+make LUA_LIBDIR=/usr/lib$LIBDIRSUFFIX/lua/$LUA_VERSION \
      LUA_SHAREDIR=/usr/share/lua/$LUA_VERSION \
      PREFIX=/usr CFLAGS="$SLKCFLAGS"
-make LUA_LIBDIR=/usr/lib/lua/$LUA_VERSION \
+make LUA_LIBDIR=/usr/lib$LIBDIRSUFFIX/lua/$LUA_VERSION \
      LUA_SHAREDIR=/usr/share/lua/$LUA_VERSION \
      DESTDIR=$PKG install
 
