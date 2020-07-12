@@ -18,23 +18,47 @@ REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
+if [ -z "$ARCH" ]; then
+case "$( uname -m )" in
+  i?86) ARCH=i586 ;;
+  arm*) ARCH=arm ;;
+  *) ARCH=$( uname -m ) ;;
+esac
+fi
+
+if [ "$ARCH" = "i586" ]; then
+    SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+    LIBDIRSUFFIX=""
+elif [ "$ARCH" = "i686" ]; then
+    SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+    LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+    SLKCFLAGS="-O2 -fPIC"
+    LIBDIRSUFFIX="64"
+elif [ "$ARCH" = "aarch64" ]; then
+    SLKCFLAGS="-O2 -fPIC"
+    LIBDIRSUFFIX="64"
+else
+    SLKCFLAGS="-O2 -fPIC"
+    LIBDIRSUFFIX="64"
+fi
+
 rm -rf $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 cd $TMP
 
-if [ -e $CWD/$PRGNAM-$VERSION.tar.xz ] ; then
-    tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
-else
-    [ ! -e $REPOSITORY ] && git clone https://github.com/stevedonovan/Penlight.git $REPOSITORY
-    ( cd $REPOSITORY && git pull )
-    VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+[ ! -e $REPOSITORY ] && git clone https://github.com/stevedonovan/Penlight.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-    cp -R $REPOSITORY $PRGNAM
-fi
+cp -R $REPOSITORY $PRGNAM
 cd $PRGNAM
 
-mkdir -p $PKG/usr/share/lua/5.1/
-cp -R lua/pl $PKG/usr/share/lua/5.1/
+LUA_VERSION=$(lua -v 2>&1 | grep -o "5\..")
+
+mkdir -p $PKG/usr/share/lua/$LUA_VERSION
+
+cp -R lua/pl $PKG/usr/share/lua/$LUA_VERSION/
 
 cd $PKG
 
