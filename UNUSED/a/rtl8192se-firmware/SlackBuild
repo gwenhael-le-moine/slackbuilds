@@ -79,4 +79,4 @@ $PKGNAM: ftp://WebUser:pGL7E6v@218.210.127.132/cn/wlan/
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg -l y -c n $OUTPUT/$PKGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PKGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz

@@ -20,7 +20,7 @@ FONTDIR="/usr/share/fonts"
 mkdir -p $OUTPUT          # place for the package to be saved
 mkdir -p $PKG             # place for the package to be built
 rm -rf $PKG/*             # always erase old package's contents
-rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+rm -rf $OUTPUT/{configure,make,install,error,/sbin/makepkg}-$PRGNAM.log
 
 [ ! -e $REPOSITORY ] &&
     git clone https://github.com/domtronn/all-the-icons.el.git $REPOSITORY
@@ -65,4 +65,4 @@ EOF
 # Build the package:
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
+/sbin/makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz

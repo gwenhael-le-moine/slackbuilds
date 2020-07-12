@@ -17,7 +17,7 @@ OUTPUT=${OUTPUT:-/tmp}
 mkdir -p $OUTPUT          # place for the package to be saved
 mkdir -p $PKG             # place for the package to be built
 rm -rf $PKG/*             # always erase old package's contents
-rm -rf $OUTPUT/{configure,make,install,error,makepkg}-$PRGNAM.log
+rm -rf $OUTPUT/{configure,make,install,error,/sbin/makepkg}-$PRGNAM.log
                           # remove old log files
 
 FONTDIR="/usr/share/fonts/TTF"
@@ -63,7 +63,7 @@ EOF
 # Build the package:
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz 2>&1 | tee $OUTPUT/makepkg-${PRGNAM}.log
+/sbin/makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz 2>&1 | tee $OUTPUT//sbin/makepkg-${PRGNAM}.log
 cd $OUTPUT
 md5sum ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz > ${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.tgz.md5
 cd -

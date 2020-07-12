@@ -99,4 +99,4 @@ $PRGNAM: curb sinatra datamapper archive-tar-minitar ffi subtle-graph subtle-dyn
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - .)-$ARCH-$BUILD$TAG.txz

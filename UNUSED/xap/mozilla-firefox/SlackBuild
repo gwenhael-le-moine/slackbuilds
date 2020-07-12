@@ -92,4 +92,4 @@ EOF
 
 cd $PKG
 VERSION=${VERSION}_$(cat $PKG/usr/lib$LIBSUFFIX/firefox/platform.ini | grep BuildID | cut -d= -f2)
-makepkg -l y -c n $OUTPUT/mozilla-firefox-central_$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/mozilla-firefox-central_$VERSION-$ARCH-$BUILD$TAG.txz

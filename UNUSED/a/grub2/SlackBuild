@@ -130,4 +130,4 @@ EOF
 
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg -l y -c n $OUTPUT/grub-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/grub-$VERSION-$ARCH-$BUILD$TAG.txz

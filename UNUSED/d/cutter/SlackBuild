@@ -94,4 +94,4 @@ $PRGNAM:
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg -l n -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l n -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz

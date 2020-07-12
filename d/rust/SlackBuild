@@ -62,4 +62,4 @@ find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs st
 [ "$VERSION" == "nightly" ] && VERSION=${VERSION}_$(date +%F | tr - .)
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

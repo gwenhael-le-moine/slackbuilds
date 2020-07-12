@@ -43,4 +43,4 @@ cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
