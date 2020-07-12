@@ -7,13 +7,10 @@ TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)
 REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=$REPOSITORIES/$PRGNAM
 
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
-
-VERSION=$(date +%Y.%m%d_%H.%M)
-
-EXT=tar.gz
 
 DOCS="COPYING* README*"
 
@@ -25,26 +22,22 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ -e $CWD/$PRGNAM-$VERSION.$EXT ]; then
-    tar xf $CWD/$PRGNAM-$VERSION.$EXT
-else
-    [ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
-    if [ ! -e $REPOSITORIES/$PRGNAM ]; then
-        git clone http://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
-    else
-        ( cd $REPOSITORIES/$PRGNAM
-            git pull
-        )
-    fi
-    cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM-$VERSION
-fi
-cd $PRGNAM-$VERSION
+#[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone http://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
+( cd $REPOSITORIES/$PRGNAM;
+  git pull
+)
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
+
+cd $PRGNAM
 
 # configuration
 CFLAGS=$SLCKFLAGS \
@@ -75,9 +68,9 @@ chmod +x $PKG/etc/profile.d/*
 cd $PKG
 chown -R root:root *
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
-cp -R $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+mkdir -p $PKG/usr/doc/$PRGNAM
+cd $TMP/$PRGNAM
+cp -R *.md COPYING $PKG/usr/doc/$PRGNAM
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -107,4 +100,4 @@ EOF
 # empaquetage
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
