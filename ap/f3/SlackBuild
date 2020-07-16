@@ -31,12 +31,12 @@ VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
 
-make
+make all extra
 
 mkdir -p $PKG$PREFIX/bin
-cp f3read f3write f3write.h2w log-f3wr $PKG$PREFIX/bin/
+cp f3read f3write f3write.h2w log-f3wr f3probe f3fix f3brew $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/*
-sed -i "s|^f3|$PREFIX/bin/f3|g" $PKG$PREFIX/bin/{log-f3wr,f3write.h2w}
+sed -i "s|^f3|$PREFIX/bin/f3|g" $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
