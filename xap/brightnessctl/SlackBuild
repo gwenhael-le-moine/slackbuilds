@@ -26,7 +26,7 @@ PREFIX=/usr
 VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -42,14 +42,14 @@ make -j3 PREFIX=$PREFIX
 # installation
 make install DESTDIR=$PKG PREFIX=$PREFIX MANDIR=$PKG$PREFIX/man
 
+chmod a+s $PKG/usr/bin/brightnessctl
+
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp LICENSE README.md $PKG/usr/doc/$PRGNAM/
 
 # correction
 cd $PKG
 chown -R root:root *
-
-find $PKG -name \.hg\* -exec rm -fr {} \;
 
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -61,6 +61,10 @@ find $PKG -name \.hg\* -exec rm -fr {} \;
 
 # embaumement
 mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+chmod a+s /usr/bin/brightnessctl
+EOF
+
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM ( A program to read and control device brightness)
 $PRGNAM:
