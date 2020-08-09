@@ -1,0 +1,85 @@
+#!/bin/sh
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $(pwd))
+BRANCH=
+VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+
+PREFIX=/usr
+
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/Hummer12007/brightnessctl.git $REPOSITORIES/$PRGNAM
+( cd $REPOSITORIES/$PRGNAM
+  git pull
+)
+
+VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
+
+cd $TMP/$PRGNAM
+
+# compilation
+make -j3 PREFIX=$PREFIX
+
+# installation
+make install DESTDIR=$PKG PREFIX=$PREFIX MANDIR=$PKG$PREFIX/man
+
+chmod a+s $PKG/usr/bin/brightnessctl
+
+mkdir -p $PKG/usr/doc/$PRGNAM
+cp LICENSE README.md $PKG/usr/doc/$PRGNAM/
+
+# correction
+cd $PKG
+chown -R root:root *
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+chmod a+s /usr/bin/brightnessctl
+EOF
+
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM ( A program to read and control device brightness)
+$PRGNAM:
+$PRGNAM: This program allows you read and control device brightness. Devices, by default,
+$PRGNAM: include backlight and LEDs (searched for in corresponding classes). If omitted,
+$PRGNAM: the first found device is selected.
+$PRGNAM:
+$PRGNAM: It can also preserve current brightness before applying the operation
+$PRGNAM: (allowing for usecases like disabling backlight on lid close).
+$PRGNAM:
+$PRGNAM: https://github.com/Hummer12007/brightnessctl
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
