@@ -4,7 +4,7 @@ set -e
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename $CWD)-$(hostname -s)
 BUILD=${BUILD:-1}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
