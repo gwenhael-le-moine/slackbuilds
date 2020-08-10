@@ -55,6 +55,8 @@ make oldconfig $*
 make $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
 
+VERSION=$(basename $(ls $PKG/lib/modules/ | head -n1))
+
 mkdir -p $PKG/boot/
 cp System.map $PKG/boot/System.map-gwh-$VERSION
 cp .config $PKG/boot/config-gwh-$VERSION
@@ -68,26 +70,26 @@ make clean
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 cp /boot/elilo-x86_64.efi /boot/efi/EFI/Slackware/elilo.efi
-
 cp /boot/vmlinuz-gwh-$VERSION /boot/efi/EFI/Slackware/vmlinuz-gwh
 cp /boot/intel-ucode.cpio /boot/efi/EFI/Slackware/
+
 eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -a '-P /boot/intel-ucode.cpio' -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
 cp /boot/initrd.gz /boot/efi/EFI/Slackware/initrd-gwh.gz
 EOF
 
 VERSION=$(echo $VERSION | tr - _)
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM-$VERSION: $PRGNAM-$VERSION (kernel)
-$PRGNAM-$VERSION:
-$PRGNAM-$VERSION: Linux is a clone of the operating system Unix, written from scratch by
-$PRGNAM-$VERSION: Linus Torvalds with assistance from a loosely-knit team of hackers
-$PRGNAM-$VERSION: across the Net. It aims towards POSIX and Single UNIX Specification
-$PRGNAM-$VERSION: compliance.
-$PRGNAM-$VERSION:
-$PRGNAM-$VERSION: It has all the features you would expect in a modern fully-fledged Unix
-$PRGNAM-$VERSION:
-$PRGNAM-$VERSION: http://www.kernel.org
-$PRGNAM-$VERSION:
+$PRGNAM: $PRGNAM (kernel)
+$PRGNAM:
+$PRGNAM: Linux is a clone of the operating system Unix, written from scratch by
+$PRGNAM: Linus Torvalds with assistance from a loosely-knit team of hackers
+$PRGNAM: across the Net. It aims towards POSIX and Single UNIX Specification
+$PRGNAM: compliance.
+$PRGNAM:
+$PRGNAM: It has all the features you would expect in a modern fully-fledged Unix
+$PRGNAM:
+$PRGNAM: http://www.kernel.org
+$PRGNAM:
 EOF
 
 cd $PKG
