@@ -29,8 +29,8 @@ VERSION=${VERSION:-$(ls /usr/doc/ | grep terminus-font | rev | cut -d- -f1 | rev
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
-TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/package-$PKGNAM
+TMP=${TMP:-/tmp}
+PKG=$TMP/$TAG/package-$PKGNAM
 
 rm -rf $PKG
 
@@ -63,8 +63,8 @@ $PKGNAM:
 $PKGNAM:
 $PKGNAM:
 $PKGNAM:
-$PKGNAM: Homepage: http://$PKGNAM.sourceforge.net
-$PKGNAM: https://github.com/archlinux/svntogit-community/tree/packages/terminus-font-otb/trunk
+$PKGNAM: Homepage: http://terminus-font.sourceforge.net
+$PKGNAM:
 $PKGNAM:
 $PKGNAM:
 EOF
@@ -72,12 +72,8 @@ EOF
 cat <<EOF > $PKG/install/doinst.sh
 #!/bin/sh
 # Update the X font indexes:
-if [ -x /usr/bin/mkfontdir -o -x /usr/X11R6/bin/mkfontdir ]; then
-  mkfontdir usr/share/fonts/misc 2> /dev/null
-fi
-if [ -x /usr/bin/fc-cache ]; then
-  /usr/bin/fc-cache -f 2> /dev/null
-fi
+[ -x /usr/bin/mkfontdir -o -x /usr/X11R6/bin/mkfontdir ] && mkfontdir /usr/share/fonts/misc 2> /dev/null
+[ -x /usr/bin/fc-cache ] && /usr/bin/fc-cache -f 2> /dev/null
 EOF
 
 cd $PKG
