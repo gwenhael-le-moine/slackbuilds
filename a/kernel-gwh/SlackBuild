@@ -6,7 +6,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)-$(hostname -s)
 BUILD=${BUILD:-1}
-BRANCH=${BRANCH:-mainline}        # stable ; mainline
+BRANCH=${BRANCH:-stable}        # stable ; mainline
 ARCH=$(uname -m)
 
 TAG=gwh
@@ -28,7 +28,7 @@ if [ $GIT == "YES" ]; then
     git pull
     VERSION="$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
 else
-    VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.]*: $BRANCH" | head -n1 | cut -d: -f1)}
+    VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
 
     SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
     [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.xz" -O $CWD/linux-$VERSION.tar.xz
