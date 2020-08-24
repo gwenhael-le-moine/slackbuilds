@@ -20,27 +20,18 @@ GIT=${GIT:-"NO"}
 
 rm -fr $PKG
 
-if [ $GIT == "YES" ]; then
-    REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
-    [ ! -e $REPOSITORY ] && git clone https://github.com/torvalds/linux.git $REPOSITORY
+VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
 
-    cd $REPOSITORY
-    git pull
-    VERSION="$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+if [ $BRANCH == "stable" ]; then
+    SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
 else
-    VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
-
-    if [ $BRANCH == "stable" ]; then
-	SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
-    else
-	SRC_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot"
-    fi
-    [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O $CWD/linux-$VERSION.tar.gz
-    mkdir -p $PKG/usr/src/
-    tar xf $CWD/linux-$VERSION.tar.gz -C $PKG/usr/src/
-
-    cd $PKG/usr/src/linux-$VERSION
+    SRC_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot"
 fi
+[ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O $CWD/linux-$VERSION.tar.gz
+mkdir -p $PKG/usr/src/
+tar xf $CWD/linux-$VERSION.tar.gz -C $PKG/usr/src/
+
+cd $PKG/usr/src/linux-$VERSION
 
 if [ -e $CWD/config-$VERSION ] ; then
     cp $CWD/config-$VERSION .config
@@ -54,25 +45,37 @@ fi
 
 make oldconfig $*
 
-# [ ! -e $CWD/config-$VERSION ] && cp .config $CWD/config-$VERSION
-
 make $NUMJOBS
+if [[ "$ARCH" == "aarch64" ]]; then
+    make dtbs
+    make dtbs_install INSTALL_DTBS_PATH=$PKG/boot/dtb
+fi
 make modules_install INSTALL_MOD_PATH=$PKG
 
 VERSION=$(basename $(ls $PKG/lib/modules/ | head -n1))
 
+mkdir -p $PKG/install
 mkdir -p $PKG/boot/
 cp System.map $PKG/boot/System.map-gwh-$VERSION
 cp .config $PKG/boot/config-gwh-$VERSION
-cp arch/${ARCH}/boot/bzImage $PKG/boot/vmlinuz-gwh-$VERSION
-( cd $PKG/boot/
-  ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
-)
+if [[ "$ARCH" == "aarch64" ]]; then
+    cp arch/arm64/boot/Image $PKG/boot/vmlinux-gwh-$VERSION
+    ( cd $PKG/boot/
+      ln -s vmlinux-gwh-$VERSION vmlinux-gwh
+    )
+    cat <<EOF > $PKG/install/doinst.sh
+[ -e /boot/Image ] && mv /boot/Image /boot/Image.old
+cp /boot/vmlinux-gwh-$VERSION /boot/Image
+eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r )
+cp /boot/initrd.gz /boot/initrd-gwh.gz
+EOF
+else
+    cp arch/${ARCH}/boot/bzImage $PKG/boot/vmlinuz-gwh-$VERSION
+    ( cd $PKG/boot/
+      ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
+    )
 
-make clean
-
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
+    cat <<EOF > $PKG/install/doinst.sh
 cp /boot/elilo-x86_64.efi /boot/efi/EFI/Slackware/elilo.efi
 cp /boot/vmlinuz-gwh-$VERSION /boot/efi/EFI/Slackware/vmlinuz-gwh
 cp /boot/intel-ucode.cpio /boot/efi/EFI/Slackware/
@@ -80,8 +83,10 @@ cp /boot/intel-ucode.cpio /boot/efi/EFI/Slackware/
 eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -a '-P /boot/intel-ucode.cpio' -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
 cp /boot/initrd.gz /boot/efi/EFI/Slackware/initrd-gwh.gz
 EOF
+fi
 
-VERSION=$(echo $VERSION | tr - _)
+make clean
+
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (kernel)
 $PRGNAM:
@@ -98,4 +103,4 @@ EOF
 
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-${VERSION}-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
