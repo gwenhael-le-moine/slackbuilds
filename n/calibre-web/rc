@@ -28,7 +28,7 @@ start() {
 
 stop() {
     echo -n "Shutting down $DAEMON..."
-    /usr/bin/kill $(cat $PIDFILE) && rm $PIDFILE
+    kill $(cat $PIDFILE) && rm $PIDFILE
     RETVAL=$?
     sleep 1
     status
