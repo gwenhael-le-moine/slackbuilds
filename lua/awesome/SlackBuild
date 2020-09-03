@@ -16,25 +16,12 @@ OUTPUT=/tmp
 
 REPOSITORIES=/home/installs/SlackBuilds/repositories
 
-PREFIX=/usr
-
 SLCKFLAGS=""
 
 REQUIRES="lua luarocks lgi"
-# for rock in luafilesystem penlight ldoc busted luacheck luacov; do luarocks install $rock; done
-
-function git_clone_or_pull() {
-    REPO_URL=$1
-    REPO_NAME=$2
-    [ ! -e $REPOSITORIES/$REPO_NAME ] && git clone $REPO_URL $REPOSITORIES/$REPO_NAME
-
-    ( cd $REPOSITORIES/$REPO_NAME
-      git pull
-    )
-}
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -42,24 +29,20 @@ SRC_PATH=$REPOSITORIES/$PRGNAM
 
 # mise en place
 cd $TMP
-if [ -e $CWD/$PRGNAM-$VERSION.tar.?z* ] ; then
-    tar xf $CWD/$PRGNAM-$VERSION.tar.?z*
-    SRC_PATH=.
-    cd $TMP/$PRGNAM-$VERSION
-else
-    git_clone_or_pull https://github.com/awesomeWM/$PRGNAM.git $PRGNAM
-    rm -fr $TMP/$PRGNAM-$VERSION
-    mkdir -p $TMP/$PRGNAM-$VERSION
-    cd $TMP/$PRGNAM-$VERSION
-    VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
-fi
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/awesomeWM/$PRGNAM.git $REPOSITORIES/$PRGNAM
+( cd $REPOSITORIES/$PRGNAM; git pull )
+
+rm -fr $TMP/$PRGNAM
+mkdir -p $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # configuration
 cmake \
-    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DCMAKE_INSTALL_PREFIX=/usr \
     -DSYSCONFDIR=/etc \
-    -DAWESOME_DOC_PATH=$PREFIX/doc/$PRGNAM \
-    -DAWESOME_MAN_PATH=$PREFIX/man \
+    -DAWESOME_DOC_PATH=/usr/doc/$PRGNAM \
+    -DAWESOME_MAN_PATH=/usr/man \
     $SRC_PATH
 
 # compilation
@@ -70,24 +53,6 @@ make install DESTDIR=$PKG
 mkdir -p $PKG/etc/X11/xinit/
 cp $CWD/xinitrc.$PRGNAM $PKG/etc/X11/xinit/
 chmod +x $PKG/etc/X11/xinit/xinitrc.$PRGNAM
-
-# ### obvious
-# git_clone_or_pull https://github.com/hoelzro/obvious.git obvious
-# cp -R $REPOSITORIES/obvious $PKG$PREFIX/share/awesome/lib/
-# ( cd $PKG$PREFIX/share/awesome/lib/obvious
-#   rm -fr .git
-#   make
-# )
-
-# ### vicious
-# git_clone_or_pull https://github.com/Mic92/vicious.git vicious
-# cp -R $REPOSITORIES/vicious $PKG$PREFIX/share/awesome/lib/
-# rm -fr $PKG$PREFIX/share/awesome/lib/vicious/.git
-
-# ### copycats
-# git_clone_or_pull https://github.com/lcpz/awesome-copycats.git copycats
-# cp -R $REPOSITORIES/copycats $PKG$PREFIX/share/awesome/lib/
-# rm -fr $PKG$PREFIX/share/awesome/lib/copycats/.git
 
 # correction
 cd $PKG
@@ -109,9 +74,9 @@ $PRGNAM: $PRGNAM (Window Manager "Framework")
 $PRGNAM:
 $PRGNAM: $PRGNAM is an extremely fast, small, and dynamic window manager for X.
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: # luarocks install luafilesystem penlight ldoc busted luacheck luacov
+$PRGNAM: # for rock in luafilesystem penlight ldoc busted luacheck luacov; do
+$PRGNAM:     luarocks install $rock;
+$PRGNAM: done
 $PRGNAM:
 $PRGNAM: https://awesomewm.org/
 $PRGNAM: see /usr/doc/$PRGNAM-$VERSION for more details
