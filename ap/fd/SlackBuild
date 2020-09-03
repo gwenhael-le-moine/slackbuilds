@@ -37,6 +37,9 @@ mkdir -p $PKG$PREFIX/bin
 cp target/release/$PRGNAM $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/*
 
+mkdir -p $PKG$PREFIX/man
+cp doc/${PRGNAM}.1 $PKG$PREFIX/man/${PRGNAM}.1
+
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp *.md LICENSE* $PKG$PREFIX/doc/$PRGNAM
