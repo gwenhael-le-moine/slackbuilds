@@ -23,20 +23,13 @@
 # Written by Dušan Stefanović (stefanovic.dusan@gmail.com)
 # Modified by Robby Workman <rworkman@slackbuilds.org>
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
+# Modified by Gwenhael Le Moine <gwenhael@le-moine.org>
 
 cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
 BUILD=${BUILD:-1}
 TAG=gwh
-# Determine version number the tarball is labeled with:
-#TARBALLVER=${TARBALLVER:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-# OK, now what's being used as the source directory version number...  account
-# for subversions a, b, c, and d in the $TARBALLVER:
-#SRCDIRVER=$(echo $TARBALLVER | tr -d a | tr -d b | tr -d c | tr -d d)
-# I guess this is the main "version"...  we don't use this variable anywhere below, but
-# defining it is traditional:
-#VERSION=$SRCDIRVER
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PKGNAM
 
