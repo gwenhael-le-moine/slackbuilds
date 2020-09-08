@@ -46,6 +46,9 @@ make -j3
 # installation
 make install DESTDIR=$PKG
 
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R test/ doc/ *.md LICENSE $PKG$PREFIX/doc/$PRGNAM
+
 # correction
 cd $PKG
 chown -R root:root *
