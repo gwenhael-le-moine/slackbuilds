@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# variables
+CWD=$(pwd)
+
+BUILD=${BUILD:-1}
+
+TAG=gwh
+TMP=${TMP:-/tmp/$TAG}
+OUTPUT=${OUTPUT:-/tmp}
+
+PRGNAM=${PRGNAM:-$(basename $CWD)}
+PKG=${PKG:-$TMP/pkg-$PRGNAM}
+
+ARCH=${ARCH:-noarch}
+
+PREFIX=${PREFIX:-/usr}
+
+REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+# nettoyage préalable
+rm -fr $PKG
+
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/winterheart/broadcom-bt-firmware.git $REPOSITORY
+( cd $REPOSITORY; git pull )
+VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+mkdir -p $PKG/lib/firmware/
+cp -R $REPOSITORY/brcm/ $PKG/lib/firmware/
+
+mkdir -p $PKG/usr/doc/$PRGNAM
+cp -R $REPOSITORY/{DEVICES.md,LICENSE.*,README.md} $PKG/usr/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (various Broadcom Bluetooth firmware)
+$PRGNAM:
+$PRGNAM: This package intentended to provide firmware of Broadcom WIDCOMM®
+$PRGNAM: Bluetooth devices (including BCM20702, BCM20703, BCM43142 chipsets
+$PRGNAM: and other) for Linux kernel.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/winterheart/broadcom-bt-firmware
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
