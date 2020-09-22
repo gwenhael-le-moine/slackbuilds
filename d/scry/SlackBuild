@@ -33,6 +33,8 @@ cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 
 cd $TMP/$PRGNAM-$VERSION
 
+sed -i 's|Errno|File::Error|g' src/scry/text_document.cr
+
 # compilation
 shards build --verbose --release
 
