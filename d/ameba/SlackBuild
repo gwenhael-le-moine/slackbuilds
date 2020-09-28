@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+#VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -26,24 +26,20 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/crystal-lang-tools/scry.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/crystal-ameba/ameba.git $REPOSITORY
 
 VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 
 cd $TMP/$PRGNAM-$VERSION
 
-sed -i 's|Errno|File::Error|g' src/scry/text_document.cr
-
 # compilation
 shards build --verbose --release
 
 # installation
 mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM}/
-cp bin/scry $PKG$PREFIX/bin/
-cp bin/ci $PKG$PREFIX/bin/scry-ci
-cp bin/format $PKG$PREFIX/bin/scry-format
-cp CHANGELOG.md LICENSE README.md $PKG$PREFIX/doc/$PRGNAM
+cp bin/ameba $PKG$PREFIX/bin/
+cp LICENSE README.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
@@ -61,15 +57,15 @@ find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs st
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
-$PRGNAM: $PRGNAM (Scry is a code analysis server for Crystal)
+$PRGNAM: $PRGNAM ( A static code analysis tool for Crystal )
 $PRGNAM:
-$PRGNAM: Scry is a code analysis server for Crystal. It is an implementation of a
-$PRGNAM: common language protocol. It is being built as a server for VSCode, but
-$PRGNAM: is compatible with any client that implements this protocol.
+$PRGNAM: Ameba is a static code analysis tool for the Crystal language. It enforces a
+$PRGNAM: consistent Crystal code style, also catches code smells and wrong code
+$PRGNAM: constructions.
 $PRGNAM:
-$PRGNAM: The server is implemented in Crystal.
 $PRGNAM:
-$PRGNAM: https://github.com/crystal-lang-tools/scry
+$PRGNAM:
+$PRGNAM: https://github.com/crystal-ameba/ameba
 $PRGNAM:
 EOF
 
