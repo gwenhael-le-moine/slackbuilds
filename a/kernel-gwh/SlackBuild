@@ -3,8 +3,8 @@
 set -e
 
 CWD=$(pwd)
-
-PRGNAM=$(basename $CWD)-$(hostname -s)
+THIS_HOST=$(hostname -s)
+PRGNAM=$(basename $CWD)-$THIS_HOST
 BUILD=${BUILD:-1}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
@@ -40,11 +40,11 @@ cd $PKG/usr/src/
 ln -s linux-$VERSION linux
 cd linux-$VERSION
 
-if [ -e $CWD/config-$(hostname -s)-$VERSION ] ; then
-    cp $CWD/config-$(hostname -s)-$VERSION .config
+if [ -e $CWD/config-$THIS_HOST-$VERSION ] ; then
+    cp $CWD/config-$THIS_HOST-$VERSION .config
 else
-    if [ -e $CWD/config-$(hostname -s) ] ; then
-        cp $CWD/config-$(hostname -s) .config
+    if [ -e $CWD/config-$THIS_HOST ] ; then
+        cp $CWD/config-$THIS_HOST .config
     else
         zcat /proc/config.gz > .config
     fi
