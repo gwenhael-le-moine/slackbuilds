@@ -6,7 +6,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)-$(hostname -s)
 BUILD=${BUILD:-1}
-BRANCH=${BRANCH:-stable}        # stable ; mainline
+BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
 
 TAG=gwh
@@ -22,24 +22,29 @@ rm -fr $PKG
 
 VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
 
-if [ $BRANCH == "stable" ]; then
-    SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
-else
-    SRC_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot"
-fi
-[ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O $CWD/linux-$VERSION.tar.gz
 mkdir -p $PKG/usr/src/
-tar xf $CWD/linux-$VERSION.tar.gz -C $PKG/usr/src/
+if [ -e /usr/src/linux-$VERSION ]; then
+    cp -a /usr/src/linux-$VERSION $PKG/usr/src/
+else
+    if [ $BRANCH == "stable" ]; then
+        SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
+    else
+        SRC_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot"
+    fi
+
+    [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O $CWD/linux-$VERSION.tar.gz
+    tar xf $CWD/linux-$VERSION.tar.gz -C $PKG/usr/src/
+fi
 
 cd $PKG/usr/src/
 ln -s linux-$VERSION linux
 cd linux-$VERSION
 
-if [ -e $CWD/config-$VERSION ] ; then
-    cp $CWD/config-$VERSION .config
+if [ -e $CWD/config-$(hostname -s)-$VERSION ] ; then
+    cp $CWD/config-$(hostname -s)-$VERSION .config
 else
-    if [ -e $CWD/config ]; then
-        cp $CWD/config .config
+    if [ -e $CWD/config-$(hostname -s) ] ; then
+        cp $CWD/config-$(hostname -s) .config
     else
         zcat /proc/config.gz > .config
     fi
@@ -48,11 +53,12 @@ fi
 make oldconfig $*
 
 make $NUMJOBS
+make modules $NUMJOBS
+make modules_install INSTALL_MOD_PATH=$PKG
 if [[ "$ARCH" == "aarch64" ]]; then
     make dtbs
     make dtbs_install INSTALL_DTBS_PATH=$PKG/boot/dtb
 fi
-make modules_install INSTALL_MOD_PATH=$PKG
 
 if [ -z "${HEADERS_ARCH}" ]; then
     case "$(uname -m)" in
@@ -75,7 +81,6 @@ fi
   # Remove unneeded dotfiles:
   find . -name ".??*" -exec rm -f {} \+
 )
-
 
 VERSION=$(basename $(ls $PKG/lib/modules/ | head -n1))
 
