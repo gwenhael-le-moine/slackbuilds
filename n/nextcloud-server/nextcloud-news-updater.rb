@@ -12,16 +12,22 @@ end
 
 occ( 'news:updater:before-update' )
 
-feeds = JSON.parse( occ( 'news:updater:all-feeds' ) )["feeds"]
+users = JSON.parse( occ( 'user:list --output=json' ) )
 
-slices_size = (feeds.length / NB_THREADS).floor
+users.keys.each do |userId|
+  feeds = JSON.parse( occ( "news:feed:list #{userId}" ) )
 
-ThreadsWait.all_waits( feeds.each_slice( slices_size ).to_a.map do |subfeeds|
-                         Thread.new do
-                           subfeeds.each do |feed|
-                             occ( "news:updater:update-feed #{feed['id']} #{feed['userId']}" )
+  next if feeds.empty?
+  
+  slices_size = (feeds.length / NB_THREADS).floor
+
+  ThreadsWait.all_waits( feeds.each_slice( slices_size ).to_a.map do |subfeeds|
+                           Thread.new do
+                             subfeeds.each do |feed|
+                               occ( "news:updater:update-feed #{userId} #{feed['id']}" )
+                             end
                            end
-                         end
-                       end )
+                         end )
+end
 
 occ( 'news:updater:after-update' )
