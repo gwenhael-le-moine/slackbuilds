@@ -108,9 +108,12 @@ else
     cat <<EOF > $PKG/install/doinst.sh
 cp /boot/elilo-x86_64.efi /boot/efi/EFI/Slackware/elilo.efi
 cp /boot/vmlinuz-gwh-$VERSION /boot/efi/EFI/Slackware/vmlinuz-gwh
-cp /boot/intel-ucode.cpio /boot/efi/EFI/Slackware/
-
-eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -a '-P /boot/intel-ucode.cpio' -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
+if [ -e /boot/intel-ucode.cpio ]; then
+    cp /boot/intel-ucode.cpio /boot/efi/EFI/Slackware/
+    eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -a '-P /boot/intel-ucode.cpio' -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
+else
+    eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
+fi
 cp /boot/initrd.gz /boot/efi/EFI/Slackware/initrd-gwh.gz
 EOF
 fi
