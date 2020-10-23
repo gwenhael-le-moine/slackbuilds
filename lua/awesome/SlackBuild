@@ -75,7 +75,7 @@ $PRGNAM:
 $PRGNAM: $PRGNAM is an extremely fast, small, and dynamic window manager for X.
 $PRGNAM:
 $PRGNAM: # for rock in luafilesystem penlight ldoc busted luacheck luacov; do
-$PRGNAM:     luarocks install $rock;
+$PRGNAM:     luarocks install \$rock;
 $PRGNAM: done
 $PRGNAM:
 $PRGNAM: https://awesomewm.org/
