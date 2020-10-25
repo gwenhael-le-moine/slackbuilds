@@ -64,6 +64,7 @@ if [ -z "${HEADERS_ARCH}" ]; then
     case "$(uname -m)" in
     i?86) HEADERS_ARCH=x86 ;;
     x86_64) HEADERS_ARCH=x86 ;;
+    aarch64) HEADERS_ARCH=arm64 ;;
     # Use uname -m for all other archs:
     *) HEADERS_ARCH=$(uname -m) ;;
   esac
