@@ -14,17 +14,16 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-NUMJOBS=${NUMJOBS:-" -j4 "}
+NUMJOBS=${NUMJOBS:-" -j$(nproc)"}
 
-GIT=${GIT:-"NO"}
-ANEW=${ANEW:-no}
+ANEW=${ANEW:-true}
 
 rm -fr $PKG
 
 VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
 
 mkdir -p $PKG/usr/src/
-if [ -e /usr/src/linux-$VERSION ] && [[ "$ANEW" == "no" ]]; then
+if [ -e /usr/src/linux-$VERSION ] && [[ "$ANEW" != "true" ]]; then
     cp -a /usr/src/linux-$VERSION $PKG/usr/src/
 else
     if [ $BRANCH == "stable" ]; then
