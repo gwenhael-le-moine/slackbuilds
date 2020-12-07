@@ -31,6 +31,8 @@ PKGNAM=emacs
 BUILD=${BUILD:-1}
 TAG=gwh
 
+BRANCH=${BRANCH:-master}
+
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PKGNAM
 
 # Automatically determine the architecture we're building on:
