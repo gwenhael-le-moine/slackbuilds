@@ -1,9 +1,10 @@
 #!/bin/sh
 
 set -e
+set -x
 
 CWD=$(pwd)
-THIS_HOST=$(hostname -s)
+THIS_HOST=${THIS_HOST:-$(hostname -s)}
 PRGNAM=$(basename $CWD)-$THIS_HOST
 BUILD=${BUILD:-1}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
