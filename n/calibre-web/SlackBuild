@@ -30,6 +30,7 @@ VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d 
 
 mkdir -p $PKG/opt
 cp -r $REPOSITORY $PKG/opt/
+rm -fr $PKG/opt/$PRGNAM/{.git*,.editorconfig,.eslintrc}
 chown -R ${RUNNING_USER}:${RUNNING_GROUP} $PKG/opt/$PRGNAM
 
 mkdir -p $PKG/etc/rc.d/
