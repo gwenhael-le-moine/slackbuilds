@@ -23,6 +23,7 @@ cd $PKG/usr/share/games
 # [ ! -e $CWD/flashback-x86_64.tar.gz ] & wget -c -O $CWD/flashback-x86_64.tar.gz https://lutris.net/files/games/flashback/flashback-x86_64.tar.gz
 # tar xvf $CWD/flashback-x86_64.tar.gz
 # mv flashback FlashBack
+# https://cors.archive.org/cors/msdos_Flashback_-_The_Quest_for_Identity_1993/Flashback_-_The_Quest_for_Identity_1993.zip
 tar xf $CWD/FlashBack.tar.bz2
 cd FlashBack
 chmod a+w /usr/share/games/FlashBack/DATA/*
