@@ -145,7 +145,7 @@ EOF
 cd $PKG/usr/games/
 cat <<EOF > $PRGNAM.sh
 #!/bin/sh
-dosbox -conf /usr/share/games/$PRGNAM/dosbox.config
+dosbox -conf /usr/share/games/$PRGNAM/dosbox.config \$*
 EOF
 chmod +x $PRGNAM.sh
 

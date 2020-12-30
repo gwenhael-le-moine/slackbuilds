@@ -145,7 +145,7 @@ EOF
 cd $PKG/usr/games/
 cat <<EOF > flashback.sh
 #!/bin/sh
-dosbox -conf /usr/share/games/FlashBack/dosbox.config
+dosbox -conf /usr/share/games/FlashBack/dosbox.config \$*
 EOF
 chmod +x flashback.sh
 
