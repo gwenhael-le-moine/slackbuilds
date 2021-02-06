@@ -1,59 +1,42 @@
 #!/bin/bash
 
-CALIBRE_LIBRARY_PATH="/home/gwh/BKP/tibou/Documents/eBooks/Livres/"
 PIDFILE=/tmp/calibre-server.pid
-USER=gwh
+RUNAS=gwh
 PORT=8081
-AUTH=""
 # uncomment and adapt to enable authtentication
-# AUTH=" --username=\"$USER\" --password=\"password\""
-OPTIONS=" --enable-local-writes"
-LOGFILE=/home/$USER/.calibre-server.log
+AUTH="" # " --username=\"$RUNAS\" --password=\"password\""
+OPTIONS=" --enable-local-write"
+LOGFILE=/home/$RUNAS/.calibre-server.log
+CALIBRE_LIBRARY_PATH="/home/$RUNAS/Documents/eBooks/Livres/"
 
 start() {
     echo "Starting Calibre server..."
-    su $USER -c "calibre-server --port=$PORT --pidfile=$PIDFILE --log=$LOGFILE --daemonize $AUTH $OPTIONS \"$CALIBRE_LIBRARY_PATH\"" &
-    if [ $? -ne 0 ]; then
-        echo "Could not start calibre-server."
+    if [ ! -d $CALIBRE_LIBRARY_PATH ]; then
+        echo "Library $CALIBRE_LIBRARY_PATH isn't accessible"
+        exit
     fi
+
+    su $RUNAS -c "calibre-server --port=$PORT --pidfile=$PIDFILE --log=$LOGFILE --daemonize $AUTH $OPTIONS \"$CALIBRE_LIBRARY_PATH\"" &
+
+    [ $? -ne 0 ] && echo "Could not start calibre-server."
 }
 
 stop() {
     echo "Stopping Calibre server..."
-    if [ -e $PIDFILE ]; then
-        read PID < $PIDFILE
-        ps aux | grep "$PID" | grep 'calibre-server' > /dev/null
-        RUNNING=$?
-        if [ $RUNNING -eq 0 ]; then
-            kill $PID
-            if [ $? -eq 0 ]; then
-                rm $PIDFILE
-            fi
-        else
-            echo "Could not find a calibre-server process with PID $PID."
-        fi
-    else
+    if [ ! -e $PIDFILE ]; then
         echo "Could not find pidfile: $PIDFILE"
+        exit
     fi
-}
 
-restart() {
-    stop
-    start
-}
-
-status() {
-    if [ -e $PIDFILE ]; then
-        read PID < $PIDFILE
-        echo "calibre-server is running with PID $PID."
+    read PID < $PIDFILE
+    ps aux | grep "$PID" | grep 'calibre-server' > /dev/null
+    RUNNING=$?
+    if [ $RUNNING -eq 0 ]; then
+        kill $PID
+        [ $? -eq 0 ] && rm $PIDFILE
     else
-        echo "calibre-server is not running."
+        echo "Could not find a calibre-server process with PID $PID."
     fi
-}
-
-unknown() {
-    echo "Unrecognized command: $1"
-    echo "Try one of the following: (start|stop|restart|status)"
 }
 
 case $1 in
@@ -64,12 +47,19 @@ case $1 in
         stop
         ;;
     restart )
-        restart
+        stop
+        start
         ;;
     status )
-        status
+        if [ -e $PIDFILE ]; then
+            read PID < $PIDFILE
+            echo "calibre-server is running with PID $PID."
+        else
+            echo "calibre-server is not running."
+        fi
         ;;
     * )
-        unknown
+        echo "Unrecognized command: $1"
+        echo "Try one of the following: (start|stop|restart|status)"
         ;;
 esac
