@@ -106,7 +106,9 @@ find . \
   -exec chmod 644 {} \+
 
 #autoreconf -vif
-$SRCDIR/autogen.sh
+(cd $SRCDIR
+ ./autogen.sh
+)
 
 EMACS_VERSION=$(grep "AC_INIT(GNU Emacs," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \ )
 

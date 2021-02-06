@@ -43,9 +43,11 @@ make -j$(nproc)
 
 # installation
 make install DESTDIR=$PKG
+mkdir -p $PKG$PREFIX/man/man1
+mv $PKG$PREFIX/man/lsyncd.1 $PKG$PREFIX/man/man1/
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R CPOYING ChangeLog INSTALL *.md  $PKG$PREFIX/doc/$PRGNAM
+cp -R COPYING ChangeLog INSTALL *.md examples $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
