@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # variables
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -18,7 +17,7 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -31,11 +30,18 @@ VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
 
-cargo build --release
+cargo build --release --features no-self-update
 
 mkdir -p $PKG$PREFIX/bin
-cp target/release/$PRGNAM $PKG$PREFIX/bin/
-chmod 755 $PKG$PREFIX/bin/*
+cp target/release/rustup-init $PKG$PREFIX/bin/rustup
+chmod 755 $PKG$PREFIX/bin/rustup
+
+mkdir -p $PKG/usr/share/bash-completion/completions
+$PKG/usr/bin/rustup completions bash > $PKG/usr/share/bash-completion/completions/rustup
+
+mkdir -p $PKG/usr/share/zsh/site-functions
+$PKG/usr/bin/rustup completions zsh > $PKG/usr/share/zsh/site-functions/_rustup
+chmod 0644 $PKG/usr/share/zsh/site-functions/_rustup $PKG/usr/share/bash-completion/completions/rustup
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
