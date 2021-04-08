@@ -34,7 +34,7 @@ cd $TMP/$PRGNAM
 cargo build --release
 
 mkdir -p $PKG$PREFIX/bin
-cp target/release/$PRGNAM $PKG$PREFIX/bin/
+find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
@@ -69,7 +69,7 @@ $PRGNAM: requires no additional setup. However, it does allow configuration of
 $PRGNAM: many aspects of the terminal.
 $PRGNAM:
 $PRGNAM: https://github.com/jwilm/alacritty
-$PRGNAM: 
+$PRGNAM:
 EOF
 
 # empaquetage

@@ -34,7 +34,7 @@ cd $TMP/$PRGNAM
 cargo build --release
 
 mkdir -p $PKG$PREFIX/bin
-cp target/release/rbspy $PKG$PREFIX/bin/
+find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
@@ -62,8 +62,8 @@ cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (Sampling profiler for Ruby)
 $PRGNAM:
 $PRGNAM: Have a running Ruby program that you want to profile without
-$PRGNAM: restarting it? Want to profile a Ruby command line program really 
-$PRGNAM: easily? You want rbspy! rbspy can profile any Ruby program just by 
+$PRGNAM: restarting it? Want to profile a Ruby command line program really
+$PRGNAM: easily? You want rbspy! rbspy can profile any Ruby program just by
 $PRGNAM: running 1 simple command.
 $PRGNAM:
 $PRGNAM:
