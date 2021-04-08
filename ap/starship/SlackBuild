@@ -26,7 +26,7 @@ mkdir -p $PKG
 cd $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/starship/starship.git $REPOSITORY
 ( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM

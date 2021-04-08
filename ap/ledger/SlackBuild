@@ -62,7 +62,7 @@ case $BRANCH in
         ;;
     *)
 esac
-[ $BRANCH != "RELEASE" ] && VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+[ $BRANCH != "RELEASE" ] && VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 ./acprep pull
 

@@ -21,7 +21,7 @@ PREFIX=/usr
 ( cd $REPOSITORIES/$PRGNAM
   git pull
 )
-VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # nettoyage préalable
 rm -fr $PKG

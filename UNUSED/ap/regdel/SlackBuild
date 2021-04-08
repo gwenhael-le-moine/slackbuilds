@@ -30,7 +30,7 @@ mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM}
 cd $TMP
 [ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/guillaumechereau/regdel.git $REPOSITORIES/$PRGNAM
 ( cd $REPOSITORIES/$PRGNAM && git pull )
-VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORIES/$PRGNAM/* $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/doc/$PRGNAM/$PRGNAM $PKG$PREFIX/bin/

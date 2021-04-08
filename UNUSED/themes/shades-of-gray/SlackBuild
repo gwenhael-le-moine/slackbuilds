@@ -26,7 +26,7 @@ rm -fr $PKG
 # Fetching sources
 [ ! -e $REPOSITORY ] && git clone https://github.com/WernerFP/Shades-of-gray-theme.git $REPOSITORY
 ( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Preparation
 mkdir -p $PKG$PREFIX/share/

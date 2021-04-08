@@ -44,7 +44,7 @@ REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 GIT_URL="https://github.com/pyca/bcrypt.git"
 [ ! -e $REPOSITORY ] && git clone "$GIT_URL" $REPOSITORY
 ( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM/

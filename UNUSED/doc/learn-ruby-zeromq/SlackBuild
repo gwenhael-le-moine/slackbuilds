@@ -23,7 +23,7 @@ rm -fr $PKG
 # get sources
 [ ! -e $REPOSITORY ] && git clone http://github.com/andrewvc/learn-ruby-zeromq.git $REPOSITORY
 ( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/doc/
 cp -R $REPOSITORY $PKG$PREFIX/doc/$PRGNAM

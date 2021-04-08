@@ -23,7 +23,7 @@ rm -fr $PKG
 # get sources
 [ ! -e $REPOSITORY/Book ] && git clone https://github.com/progit/progit.git $REPOSITORY/Book
 ( cd $REPOSITORY/Book && git pull )
-VERSION="$( cd $REPOSITORY/Book && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY/Book && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 [ ! -e $REPOSITORY/Examples ] && git clone https://github.com/progit/book-examples.git $REPOSITORY/Examples
 ( cd $REPOSITORY/Examples && git pull )

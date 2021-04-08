@@ -25,7 +25,7 @@ mkdir -p $PKG
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/jeffkaufman/icdiff $REPOSITORY
 ( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM

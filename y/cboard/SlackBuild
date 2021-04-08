@@ -26,7 +26,7 @@ mkdir -p $TMP
 
 [ ! -e $REPOSITORY ] && git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
 ( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Preparation
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION

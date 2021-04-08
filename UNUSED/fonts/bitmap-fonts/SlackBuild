@@ -24,7 +24,7 @@ rm -rf $OUTPUT/{configure,make,install,error,/sbin/makepkg}-$PRGNAM.log
 [ ! -e $REPOSITORY ] &&
     git clone https://github.com/Tecate/bitmap-fonts.git $REPOSITORY
 (cd $REPOSITORY && git pull)
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Move the fonts into place:
 mkdir -p $PKG$FONTDIR/misc $PKG/usr/doc/$PRGNAM

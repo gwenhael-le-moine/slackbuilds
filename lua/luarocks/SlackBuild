@@ -33,7 +33,7 @@ cd $TMP
 ( cd $REPOSITORIES/$PRGNAM;
   git pull
 )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
 

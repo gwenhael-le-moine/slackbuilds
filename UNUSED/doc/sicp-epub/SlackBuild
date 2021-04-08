@@ -27,7 +27,7 @@ mkdir -p $PKG$PREFIX/doc/
 # mise en place
 [ ! -e $REPOSITORY ] && git clone http://github.com/ieure/sicp.git $REPOSITORY
 (cd $REPOSITORY; git pull)
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cd $PKG$PREFIX/doc/
 cp -R $REPOSITORY $PRGNAM

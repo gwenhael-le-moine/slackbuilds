@@ -32,7 +32,7 @@ cd $PKG/$DOCROOT/apps/
   git pull
 )
 
-VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORIES/$PRGNAM $APPNAM
 
