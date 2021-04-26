@@ -37,6 +37,9 @@ mkdir -p $PKG$PREFIX/bin
 find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
 
+mkdir -p $PKG$PREFIX/share/$PRGNAM
+cp -R files/* $PKG$PREFIX/share/$PRGNAM
+
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -R doc/ example/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
