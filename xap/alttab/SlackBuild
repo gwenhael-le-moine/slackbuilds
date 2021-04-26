@@ -44,6 +44,7 @@ find . \
 ./configure \
     --prefix=$PREFIX \
     --mandir=$PREFIX/man \
+    --docdir=$PREFIX/doc/$PRGNAM \
     --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
     --sysconfdir=/etc
 
@@ -52,11 +53,6 @@ make
 
 # Installation
 make install DESTDIR=$PKG
-
-mkdir -p $PKG$PREFIX/share/$PRGNAM
-cd $PKG$PREFIX/share/$PRGNAM
-cp $TMP/$PRGNAM/ROMs/*rom*.bz2 .
-find . -name "*.bz2" -exec bunzip2 {} \;
 
 # Cleaning
 cd $PKG
