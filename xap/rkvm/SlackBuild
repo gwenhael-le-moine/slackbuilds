@@ -36,10 +36,101 @@ cargo build --release
 mkdir -p $PKG$PREFIX/bin
 find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
+(cd $PKG$PREFIX/bin/
+ for i in *; do
+     mv $i rkvm-$i;
+ done
+)
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -R example/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
+
+cat <<EOF > $PKG$PREFIX/doc/$PRGNAM/setup-keys.sh
+#!/bin/bash
+$PREFIX/bin/rkvm-certificate-gen /etc/rkvm/identity.p12.new /etc/rkvm/certificate.pem.new /etc/rkvm/key.pem.new -i \$(hostname -I | cut -d\\  -f1)
+EOF
+chmod +x $PKG$PREFIX/doc/$PRGNAM/setup-keys.sh
+
+mkdir -p $PKG/etc/rc.d
+cat <<EOF > $PKG/etc/rc.d/rc.rkvm-server
+#!/bin/bash
+
+start() {
+        echo "Starting rkvm server..."
+
+        /usr/bin/rkvm-server /etc/rkvm/server.toml &
+
+        [ $? -ne 0 ] && echo "Could not start rkvm-server."
+}
+
+stop() {
+       killall /usr/bin/rkvm-server
+}
+
+case \$1 in
+    start )
+        start
+        ;;
+    stop )
+        stop
+        ;;
+    restart )
+        stop
+        start
+        ;;
+    * )
+        echo "Unrecognized command: \$1"
+        echo "Try one of the following: (start|stop|restart)"
+        ;;
+esac
+EOF
+cat <<EOF > $PKG/etc/rc.d/rc.rkvm-client
+#!/bin/bash
+
+start() {
+        echo "Starting rkvm client..."
+
+        /usr/bin/rkvm-client /etc/rkvm/client.toml &
+
+        [ $? -ne 0 ] && echo "Could not start rkvm-client."
+}
+
+stop() {
+       killall /usr/bin/rkvm-client
+}
+
+case \$1 in
+    start )
+        start
+        ;;
+    stop )
+        stop
+        ;;
+    restart )
+        stop
+        start
+        ;;
+    * )
+        echo "Unrecognized command: \$1"
+        echo "Try one of the following: (start|stop|restart)"
+        ;;
+esac
+EOF
+
+mkdir -p $PKG/etc/rkvm
+cat <<EOF > $PKG/etc/rkvm/server.toml.new
+listen-address = "0.0.0.0:5258"
+# Switch to next client by pressing the right alt key.
+switch-keys = ["RightAlt"]
+identity-path = "/etc/rkvm/identity.p12"
+# Leave unset if no password is set.
+#identity-password = "123456789"
+EOF
+cat <<EOF > $PKG/etc/rkvm/client.toml.new
+server = "$(hostname -I | cut -d\  -f1):5258"
+certificate-path = "/etc/rkvm/certificate.pem"
+EOF
 
 # correction
 cd $PKG
@@ -65,10 +156,10 @@ $PRGNAM: rkvm is a tool for sharing keyboard and mouse across multiple Linux
 $PRGNAM: and Windows machines. It is based on a client/server architecture,
 $PRGNAM: where server is the machine controlling mouse and keyboard and relays
 $PRGNAM: events (mouse move, key presses, ...) to clients.
-$PRGNAM:
 $PRGNAM: Switching between different clients is done by a configurable keyboard
 $PRGNAM: shortcut.
 $PRGNAM:
+$PRGNAM: (use $PREFIX/doc/$PRGNAM/gen-keys.sh)
 $PRGNAM: https://github.com/htrefil/rkvm
 EOF
 
