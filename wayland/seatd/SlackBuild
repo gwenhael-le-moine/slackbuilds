@@ -30,8 +30,7 @@ VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
-meson build/
-meson configure --prefix /usr --mandir /usr/man/ build/
+meson setup --prefix /usr --mandir /usr/man/ build/
 ninja -C build/
 cd build/
 meson install --destdir=$PKG

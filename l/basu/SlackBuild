@@ -23,21 +23,22 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/swaywm/swayidle $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/emersion/basu $REPOSITORY
 ( cd $REPOSITORY && git pull )
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
-meson setup --prefix /usr --mandir /usr/man/ build/
+meson build/
+meson configure --prefix /usr --mandir /usr/man/ build/
 ninja -C build/
 cd build/
 meson install --destdir=$PKG
 cd ../
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+cp LICENSE* *.md $PKG$PREFIX/doc/$PRGNAM/
 
 # correction
 cd $PKG
@@ -56,17 +57,17 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Idle management daemon for Wayland)
+$PRGNAM: $PRGNAM (The sd-bus library, extracted from systemd.)
+$PRGNAM:
+$PRGNAM: Some projects rely on the sd-bus library for DBus support. However
+$PRGNAM: not all systems have systemd or elogind installed. This library
+$PRGNAM: provides just sd-bus (and the busctl utility).
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: https://github.com/swaywm/swayidle
+$PRGNAM: https://github.com/emersion/basu
 EOF
 
 # empaquetage

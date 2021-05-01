@@ -30,12 +30,48 @@ VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
-meson build/
-meson configure --prefix /usr --mandir /usr/man/ build/
+meson setup \
+      --prefix /usr \
+      --mandir /usr/man/ \
+      -Dsd-bus-provider=basu \
+      -Dtray=auto \
+      -Dlogind=enabled \
+      -Dlogind-provider=elogind \
+      build/
 ninja -C build/
 cd build/
 meson install --destdir=$PKG
 cd ../
+
+cat <<EOF > $PKG$PREFIX/bin/start_sway.sh
+#!/bin/sh
+
+export QT_QPA_PLATFORMTHEME=qt5ct
+export QT_QPA_PLATFORM=wayland-egl
+export QT_WAYLAND_FORCE_DPI=physical
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+
+export SAL_USE_VCLPLUGIN=gtk3
+
+export MOZ_ENABLE_WAYLAND=1
+export MOZ_DBUS_REMOTE=1
+
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+# export GDK_BACKEND=wayland
+export CLUTTER_BACKEND=gdk
+
+export SDL_VIDEODRIVER=wayland
+
+export XDG_CURRENT_DESKTOP=sway
+
+[ -e $HOME/.profile ] && . $HOME/.profile
+
+exec sway
+EOF
+chmod +x $PKG$PREFIX/bin/start_sway.sh
+
+sed -i 's|Exec=sway|Exec=/usr/bin/start_sway.sh|' $PKG$PREFIX/share/wayland-sessions/sway.desktop
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/

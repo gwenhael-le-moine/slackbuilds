@@ -23,14 +23,17 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/swaywm/swayidle $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/emersion/mako $REPOSITORY
 ( cd $REPOSITORY && git pull )
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
-meson setup --prefix /usr --mandir /usr/man/ build/
+meson setup \
+      --prefix /usr \
+      --mandir /usr/man/ \
+       build/
 ninja -C build/
 cd build/
 meson install --destdir=$PKG
@@ -56,7 +59,7 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Idle management daemon for Wayland)
+$PRGNAM: $PRGNAM (A lightweight Wayland notification daemon )
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
@@ -66,7 +69,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/swaywm/swayidle
+$PRGNAM: https://wayland.emersion.fr/mako
 EOF
 
 # empaquetage

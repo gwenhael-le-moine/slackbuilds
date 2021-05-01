@@ -125,15 +125,25 @@ $SRCDIR/configure \
   --without-gconf \
   --without-gsettings \
   --with-modules \
-  --with-x \
-  --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-  --without-toolkit-scroll-bars \
+  --with-dbus \
+  --with-gif \
+  --with-jpeg \
+  --with-png \
+  --with-rsvg \
+  --with-tiff \
+  --with-xft \
+  --with-xpm \
+  --with-gpm=no \
+  --with-pgtk \
   --enable-link-time-optimization \
   --with-compress-install \
   --without-gconf \
   --with-gameuser=":games" \
   --disable-libsystemd \
   --build=${ARCH}-slackware-linux || exit 1
+  # --with-x \
+  # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+  # --without-toolkit-scroll-bars \
 
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
