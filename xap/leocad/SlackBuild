@@ -41,14 +41,14 @@ cp -a docs/leocad.1 $PKG/usr/man/man1
 find $PKG/usr/man -type f -exec gzip -9 {} \;
 for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
-LIBRARY_URL=$(curl -s https://api.github.com/repos/leozide/leocad/releases | grep -o "http.*Library-Linux.*zip" | head -n1)
-LIBRARY_FILE=$(echo $LIBRARY_URL | grep -o "Library-Linux-[0-9]*.zip")
-LIBRARY_VERSION=$(echo $LIBRARY_FILE | grep -o "[0-9]*")
+LIBRARY_URL=$(curl -s https://api.github.com/repos/leozide/leocad/releases | grep -o "http.*Library-.*zip" | head -n1)
+LIBRARY_FILE=$(echo $LIBRARY_URL | grep -o "Library-[0-9.]*.zip")
+LIBRARY_VERSION=$(echo $LIBRARY_FILE | grep -o "[0-9.]*")
 [ ! -e $CWD/$LIBRARY_FILE ] && wget -c -O $CWD/$LIBRARY_FILE $LIBRARY_URL
 
 # Data from zip-file + set permissions
 mkdir -p $PKG/usr/share/leocad
-unzip $CWD/$LIBRARY_FILE -d $PKG/usr/share/leocad
+unzip $CWD/$LIBRARY_FILE -d $PKG/usr/share/leocad/
 chown -R root:root $PKG
 
 # correction
