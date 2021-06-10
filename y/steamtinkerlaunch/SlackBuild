@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# variables
+TAG=gwh
+TMP=/tmp/$TAG
+CWD=$(pwd)
+OUTPUT=/tmp
+
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+ARCH=$(uname -m)
+BUILD=1
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/frostworx/steamtinkerlaunch.git $REPOSITORY
+( cd $REPOSITORY && git pull )
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM/
+
+make PREFIX="$PKG/usr" install
+
+mv $PKG/usr/share/doc $PKG/usr/
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+if [ -x /usr/bin/update-desktop-database ]; then
+  /usr/bin/update-desktop-database -q usr/share/applications >/dev/null 2>&1
+fi
+
+if [ -x /usr/bin/update-mime-database ]; then
+  /usr/bin/update-mime-database usr/share/mime >/dev/null 2>&1
+fi
+
+if [ -e usr/share/icons/hicolor/icon-theme.cache ]; then
+  if [ -x /usr/bin/gtk-update-icon-cache ]; then
+    /usr/bin/gtk-update-icon-cache -f usr/share/icons/hicolor >/dev/null 2>&1
+  fi
+fi
+EOF
+
+cat <<EOF > $PKG/install/slack-desc
+      |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (wrapper tool for Steam client: custom options and 3rd party)
+$PRGNAM:
+$PRGNAM: a Linux wrapper tool for use with the Steam client
+$PRGNAM: Steam Tinker Launch (short stl) is a Linux wrapper tool for use with
+$PRGNAM: the Steam client which allows customizing and start tools and
+$PRGNAM: options for games quickly on the fly (see Features)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/frostworx/steamtinkerlaunch
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo ${VERSION}_${LIBRARY_VERSION} | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
