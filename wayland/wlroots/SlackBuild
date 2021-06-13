@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/bin/bash
+
+set -e
 
 # variables
-VERSION=master_$(date +"%Y.%m.%d_%H.%M")
+VERSION=${VERSION:-"git"}
 BUILD=1
 
 TAG=gwh
@@ -24,12 +26,14 @@ mkdir -p $PKG
 
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/swaywm/wlroots $REPOSITORY
-( cd $REPOSITORY && git pull )
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
+[ "x$VERSION" == "xgit" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
 meson setup --prefix /usr --mandir /usr/man/ build/
 ninja -C build/
 cd build/
@@ -42,7 +46,7 @@ cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
 # correction
 cd $PKG
 chown -R root:root *
-find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+# find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install
