@@ -1,0 +1,52 @@
+#!/bin/sh
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jgm/pandoc/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+ARCH=$(uname -m)
+BUILD=${BUILD:-1}
+TAG=${TAG:-gwh}
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+[ ! -e $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz https://github.com/jgm/pandoc/releases/download/$VERSION/pandoc-$VERSION-linux-amd64.tar.gz
+
+rm -fr $PKG
+mkdir -p $PKG
+
+cd $PKG
+tar xvf $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz
+
+mv pandoc-${VERSION} usr
+mv usr/share/man usr/
+rm -r usr/share
+
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+         |-----handy-ruler------------------------------------------------------|
+${PRGNAM}: ${PRGNAM} ( Universal markup converter )
+${PRGNAM}:
+${PRGNAM}: Pandoc is a Haskell library for converting from one markup format to
+${PRGNAM}: another, and a command-line tool that uses this library.
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}: https://pandoc.org
+EOF
+
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
