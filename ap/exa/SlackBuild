@@ -25,7 +25,8 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/ogham/exa.git $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/

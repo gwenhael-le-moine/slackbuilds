@@ -29,7 +29,8 @@ REPOSITORIES=/home/installs/SlackBuilds/repositories
 REPOSITORY=${REPOSITORIES}/$PRGNAM
 
 [ ! -e $REPOSITORY ] && git clone https://tt-rss.org/git/tt-rss.git $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $PKG$DOCROOT
@@ -39,7 +40,8 @@ cp -R $REPOSITORY $PKG$DOCROOT
 REPOSITORY=${REPOSITORIES}/clean-greader
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
@@ -50,7 +52,8 @@ rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git
 REPOSITORY=${REPOSITORIES}/tt-rss-feedly-theme
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/levito/tt-rss-feedly-theme $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/tt-rss-feedly-theme/.git
@@ -62,7 +65,8 @@ rm -fr $PKG$DOCROOT/themes.local/tt-rss-feedly-theme/.git
 REPOSITORY=${REPOSITORIES}/tt-rss_reeder_theme
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/tschinz/tt-rss_reeder_theme $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/tt-rss_reeder_theme/.git
@@ -74,7 +78,8 @@ rm -fr $PKG$DOCROOT/themes.local/tt-rss_reeder_theme/.git
 REPOSITORY=${REPOSITORIES}/clean-greader
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/naeramarth7/clean-greader $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $PKG$DOCROOT/themes.local/
 rm -fr $PKG$DOCROOT/themes.local/clean-greader/.git

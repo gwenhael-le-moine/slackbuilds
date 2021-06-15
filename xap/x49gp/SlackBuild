@@ -27,7 +27,8 @@ rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
 [ ! -e $REPOSITORY ] && git clone https://github.com/gwenhael-le-moine/x49gp.git $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 cp -R $REPOSITORY $TMP/$PRGNAM
 

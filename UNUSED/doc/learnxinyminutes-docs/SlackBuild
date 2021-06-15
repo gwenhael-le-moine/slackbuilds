@@ -22,7 +22,8 @@ rm -fr $PKG
 
 # get sources
 [ ! -e $REPOSITORY ] && git clone https://github.com/adambard/learnxinyminutes-docs $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG$PREFIX/doc/

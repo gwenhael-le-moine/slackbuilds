@@ -20,7 +20,8 @@ mkdir -p $TMP
 
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/espressif/esptool.git $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM

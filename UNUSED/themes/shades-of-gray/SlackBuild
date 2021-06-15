@@ -25,7 +25,8 @@ rm -fr $PKG
 
 # Fetching sources
 [ ! -e $REPOSITORY ] && git clone https://github.com/WernerFP/Shades-of-gray-theme.git $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # Preparation

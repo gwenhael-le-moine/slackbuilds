@@ -26,7 +26,8 @@ mkdir -p $PKG$PREFIX/doc/
 
 # mise en place
 [ ! -e $REPOSITORY ] && git clone http://github.com/twcamper/sicp-kindle $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $PKG$PREFIX/doc/$PRGNAM
