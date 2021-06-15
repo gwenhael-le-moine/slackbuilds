@@ -9,7 +9,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-VERSION=$(date +%Y.%m.%d_%H.%M)
+VERSION=${VERSION:-"trunk"}
 
 EXT=tar.gz
 
@@ -33,10 +33,10 @@ mkdir -p $PKG
 [ ! -e $REPOSITORY ] && git clone https://github.com/krakjoe/apcu.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $PRGNAM
 cd $PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # configuration
 phpize

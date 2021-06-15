@@ -7,7 +7,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 BRANCH=${BRANCH:="CURRENT"}
-VERSION=${VERSION:=${BRANCH}_$(date +%F | tr - .)}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}

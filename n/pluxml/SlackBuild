@@ -3,6 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-"trunk"}
 ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
@@ -28,13 +29,14 @@ REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 ( cd $REPOSITORY
   git pull )
 
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
-
 cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
+cd $PKG/$VHOSTROOT/htdocs
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
 rm -fr $PKG/$VHOSTROOT/htdocs/.git
 mv $PKG/$VHOSTROOT/htdocs/install.php $PKG/$VHOSTROOT/htdocs/install.php.disabled
 
-cd $PKG/$VHOSTROOT/htdocs
 chown -R root:root .
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 -o -perm 755 \) \

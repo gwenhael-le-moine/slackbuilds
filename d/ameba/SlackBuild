@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-#VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -28,10 +28,9 @@ mkdir -p $PKG
 cd $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/crystal-ameba/ameba.git $REPOSITORY
 
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # compilation
 shards build --verbose --release

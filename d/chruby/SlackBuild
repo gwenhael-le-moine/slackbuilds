@@ -11,7 +11,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
-VERSION=$(date +%Y.%m%d_%H.%M)
+VERSION=${VERSION:-"trunk"}
 
 ARCH='noarch'
 BUILD=1
@@ -26,14 +26,14 @@ mkdir -p $PKG
 [ ! -e $REPOSITORY ] && git clone https://github.com/postmodern/chruby $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # compilation
 make -j3 PREFIX=$PREFIX

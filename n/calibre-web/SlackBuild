@@ -3,6 +3,7 @@
 # variables
 RUNNING_USER=${RUNNING_USER:-gwh}
 RUNNING_GROUP=${RUNNING_GROUP:-users}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -27,7 +28,6 @@ mkdir -p $PKG
 [ ! -e $REPOSITORY ] && git clone https://github.com/janeczku/calibre-web.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $PKG/opt
 cp -r $REPOSITORY $PKG/opt/
@@ -39,6 +39,8 @@ cp -r $CWD/rc $PKG/etc/rc.d/rc.$PRGNAM
 sed -i "s|RUNNING_USER|$RUNNING_USER|" $PKG/etc/rc.d/rc.$PRGNAM
 
 cd $PKG/opt/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
 # change default password
 NEW_DEFAULT_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 sed -i "s|admin123|$NEW_DEFAULT_PASSWORD|g" cps/*

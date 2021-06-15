@@ -2,6 +2,7 @@
 set -x
 
 PRGNAM=$(basename $(pwd))
+VERSION=${VERSION:-"trunk"}
 
 BUILD=1
 
@@ -27,12 +28,13 @@ rm -fr $PRGNAM $PKG
 [ ! -e $REPOSITORY ] && git clone https://github.com/sagb/alttab.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 
 # Preparation
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
 chown -R root:root .
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -27,10 +27,10 @@ cd $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/Peltoche/lsd.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 cargo build --release
 

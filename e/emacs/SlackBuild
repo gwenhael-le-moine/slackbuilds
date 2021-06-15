@@ -32,6 +32,7 @@ BUILD=${BUILD:-1}
 TAG=gwh
 
 BRANCH=${BRANCH:-master}
+VERSION=${VERSION:-"trunk"}
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PKGNAM
 
@@ -88,12 +89,13 @@ rm -rf $PKGNAM
   git pull
   [ -e Makefile ] && make distclean
 )
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
 
 mkdir -p $TMP/$PKGNAM
 SRCDIR=$REPOSITORY
 
 cd $PKGNAM || exit 1
+[ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
 
 # tar xvf $CWD/$PKGNAM-$TARBALLVER.tar.xz || exit 1
 # cd $PKGNAM-$SRCDIRVER || exit 1

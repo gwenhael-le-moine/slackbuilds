@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $(pwd))
 BRANCH=
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -19,11 +19,8 @@ REPOSITORIES=/home/installs/SlackBuilds/repositories
 PREFIX=/usr
 
 [ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/Hummer12007/brightnessctl.git $REPOSITORIES/$PRGNAM
-( cd $REPOSITORIES/$PRGNAM
-  git pull
-)
-
-VERSION="git_$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cd $REPOSITORIES/$PRGNAM
+git pull --all
 
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
@@ -35,6 +32,7 @@ cd $TMP
 cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
 
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # compilation
 make -j3 PREFIX=$PREFIX

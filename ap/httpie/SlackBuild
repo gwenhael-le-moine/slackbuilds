@@ -9,7 +9,7 @@ OUTPUT=/tmp
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-VERSION=$(date +%Y.%m.%d_%H.%M)
+VERSION=${VERSION:-"trunk"}
 
 DOCS="LICENSE README.rst AUTHORS.rst"
 
@@ -31,10 +31,10 @@ GIT_URL="https://github.com/jkbr/httpie.git"
 [ ! -e $REPOSITORY ] && git clone "$GIT_URL" $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # installation
 python3 ./setup.py install --root=$PKG

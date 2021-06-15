@@ -3,7 +3,7 @@
 set -e
 
 # variables
-VERSION=${VERSION:-"git"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -28,11 +28,11 @@ mkdir -p $PKG
 [ ! -e $REPOSITORY ] && git clone https://github.com/Cloudef/bemenu.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 mkdir -p $TMP/
 cp -a $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 sed -i 's|-O2| -O2 -fPIC|' GNUmakefile
 make clients x11 wayland curses

@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
-VERSION=$(date +%F | tr - .)
+VERSION=${VERSION:-"trunk"}
 BUILD=1
 
 ARCH=noarch
@@ -22,11 +22,10 @@ mkdir -p $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/espressif/esptool.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
-
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 python setup.py install --root $PKG
 

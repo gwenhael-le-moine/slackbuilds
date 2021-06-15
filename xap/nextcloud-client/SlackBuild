@@ -4,8 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
-STABLE=${STABLE:-"NO"}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -27,21 +26,16 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-if [ "x$STABLE" == "xYES" ]; then
-    wget -c https://download.owncloud.com/desktop/stable/$PRGNAM-$VERSION.tar.xz -O $CWD/$PRGNAM-$VERSION.tar.xz
-    tar xf $CWD/$PRGNAM-$VERSION.tar.xz
-else
-    [ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/desktop.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/nextcloud/desktop.git $REPOSITORY
 
-    ( cd $REPOSITORY
-      git pull
-      git submodule update --init --recursive )
+cd $REPOSITORY
+git pull --all
 
-    VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
-    cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-fi
-
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 cd $TMP/$PRGNAM-$VERSION
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+git submodule update --init --recursive
 
 # configuration
 cmake \
