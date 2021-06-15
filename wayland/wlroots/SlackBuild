@@ -3,7 +3,7 @@
 set -e
 
 # variables
-VERSION=${VERSION:-"git"}
+VERSION=${VERSION:-"trunk"}
 BUILD=1
 
 TAG=gwh
@@ -32,7 +32,7 @@ git pull --all
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
-[ "x$VERSION" == "xgit" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 meson setup --prefix /usr --mandir /usr/man/ build/
 ninja -C build/
