@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -46,7 +46,7 @@ chmod 0770 $PKG/$DOCROOT/$PRGNAM/{config,apps}
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
 
 grep -q "/var/www/${VHOST}htdocs/owncloud/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}htdocs/owncloud/cron.php" >> /var/spool/cron/crontabs/apache

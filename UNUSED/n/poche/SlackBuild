@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -52,7 +52,7 @@ chmod 0750 $PKG/$DOCROOT/$PRGNAM
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/$PRGNAM/apps
 EOF
 

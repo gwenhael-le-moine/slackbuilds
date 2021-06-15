@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 VERSION=master_$(date +"%Y.%m.%d_%H.%M")
@@ -45,7 +45,7 @@ mkdir -p $PKG$PREFIX/bin/
 install -D dwl $PKG$PREFIX/bin/dwl
 
 cat <<EOF > $PKG$PREFIX/bin/start_dwl.sh
-#!/bin/sh
+#!/bin/bash
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_QPA_PLATFORM=wayland-egl

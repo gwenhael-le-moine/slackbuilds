@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 CWD=$(pwd)
@@ -58,7 +58,7 @@ mkdir -p $PKG$PREFIX/bin/
 cp x49gp $PKG$PREFIX/bin/x49gp-bin
 cp $CWD/bootstrap-config.sh $PKG$PREFIX/bin/x49gp-bootstrap-config
 cat <<EOF > $PKG$PREFIX/bin/x49gp
-#!/bin/sh
+#!/bin/bash
 
 if [ ! -e ~/.x49gp/config ]; then
    echo "Please run x49gp-bootstrap-config first"

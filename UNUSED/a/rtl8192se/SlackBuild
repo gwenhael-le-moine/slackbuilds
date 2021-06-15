@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 CWD=$(pwd)
@@ -60,7 +60,7 @@ find . -type f -exec chmod 644 {} \;
 # Packaging
 mkdir install
 cat <<EOF > install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 
 grep r8192_pci.ko /lib/modules/\$(uname -r)/modules.dep && rm -fr /lib/modules/\$(uname -r)/kernel/drivers/staging/rtl8192e/  || echo > /dev/null
 grep r8192se_pci.ko /lib/modules/\$(uname -r)/modules.dep && rm -fr /lib/modules/\$(uname -r)/kernel/ubuntu/rtl8192se/* || echo > /dev/null

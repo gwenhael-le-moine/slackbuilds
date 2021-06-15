@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Slackware build script for Google Chrome
 
@@ -79,7 +79,7 @@ gzip -9 $PKG/usr/man/man?/*.?
 
 mkdir -p $PKG/usr/bin
 cat <<EOF > $PKG/usr/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 cd /opt/chrome-linux/
 LD_LIBRARY_PATH=/opt/chrome-linux/:\$LD_LIBRARY_PATH ./chrome --proxy-server="socks://localhost:9050" \$*
 EOF

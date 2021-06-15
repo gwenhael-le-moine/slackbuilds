@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PRGNAM=fet
 VERSION=${VERSION:-5.37.2}

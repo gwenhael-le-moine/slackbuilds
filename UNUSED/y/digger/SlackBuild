@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PRGNAM=digger
 VERSION=${VERSION:-20020314}

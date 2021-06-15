@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 CWD=$(pwd)
@@ -62,7 +62,7 @@ rm lib/moveplan9.sh.slackinstall_$VERSION
 
 mkdir -p $PKG/etc/profile.d
 cat <<EOF > $PKG/etc/profile.d/$PRGNAM.sh
-#!/bin/sh
+#!/bin/bash
 PLAN9=/opt/plan9port
 PATH=\$PATH:\${PLAN9}
 MANPATH=\$MANPATH:\${PLAN9}/man

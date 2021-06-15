@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -101,7 +101,7 @@ EOF
 
 mkdir -p $PKG/install/
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 update-mime-database /usr/share/mime
 update-desktop-database
 EOF

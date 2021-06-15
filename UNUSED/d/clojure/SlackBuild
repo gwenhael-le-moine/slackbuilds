@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x -e
 
 CWD=$(pwd)
@@ -39,7 +39,7 @@ mkdir -p $PKG$PREFIX/libexec
 # installation
 mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
 cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 java -jar $PREFIX/libexec/$PRGNAM-$VERSION/clojure.jar \$@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM

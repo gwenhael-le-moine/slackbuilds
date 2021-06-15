@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -38,7 +38,7 @@ find $PKG/srv/www/htdocs -name \.svn\* -exec rm -fr {} \;
 
 mkdir -p $PKG/usr/bin
 cat <<EOF > $PKG/usr/bin/yiic
-#!/bin/sh
+#!/bin/bash
 
 cd /srv/www/htdocs/$PRGNAM/framework/
 exec yiic

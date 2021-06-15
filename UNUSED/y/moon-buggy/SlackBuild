@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 WITH_SOUND=${WITH_SOUND:=YES}
@@ -73,7 +73,7 @@ chmod +x $PKG$PREFIX/bin/*
 cd $PKG
 mkdir install
 cat <<EOF > install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 cd usr/info
 install-info $PRGNAM.info.gz dir
 EOF

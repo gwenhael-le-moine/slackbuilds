@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 TAG=${TAG:-gwh}
@@ -144,7 +144,7 @@ EOF
 
 cd $PKG/usr/games/
 cat <<EOF > $PRGNAM.sh
-#!/bin/sh
+#!/bin/bash
 dosbox -conf /usr/share/games/$PRGNAM/dosbox.config \$*
 EOF
 chmod +x $PRGNAM.sh

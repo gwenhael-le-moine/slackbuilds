@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PRGNAM=CentSchBook-Mono
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H:%M")}

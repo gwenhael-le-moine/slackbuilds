@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 CWD=$(pwd)
@@ -54,7 +54,7 @@ VERSION=$(ls target/droidAtScreen-*.jar | grep -o "[0-9.]*.jar" | sed 's|.jar||g
     mv target/droidAtScreen-$VERSION.jar $PKG$PREFIX/libexec/
     mv README.md $PKG$PREFIX/doc/$PRGNAM
 	cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 java -jar $PREFIX/libexec/droidAtScreen-$VERSION.jar
 EOF
 

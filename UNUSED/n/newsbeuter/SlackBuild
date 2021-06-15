@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Slackware build script for newsbeuter
 # Written by slakmagik <jsun@freeshell.org>

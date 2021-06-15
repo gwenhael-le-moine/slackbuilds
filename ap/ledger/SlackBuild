@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Slackware build script for ledger
 # Written by Lionel Young (redtricycle at gmail dot com)
 # updated and adapted to my own taste by Gwenhael Le Moine <gwenhael.le.moine-AT-gmail.com>

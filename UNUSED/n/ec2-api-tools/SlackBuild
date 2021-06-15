@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
@@ -45,7 +45,7 @@ mkdir -p $PKG$PREFIX/bin
     done
 )
 cat <<EOF > $PKG/etc/profile.d/$PRGNAM.sh
-#!/bin/sh
+#!/bin/bash
 
 # see http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/setting-up-your-tools.html
 # for documentation

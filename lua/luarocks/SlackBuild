@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 
@@ -53,7 +53,7 @@ make install DESTDIR=$PKG ROCKS_TREE=$PREFIX/lib64/luarocks #LUADIR=$PREFIX/lib6
 
 mkdir -p $PKG/etc/profile.d/
 cat <<EOF > $PKG/etc/profile.d/luarocks.sh
-#!/bin/sh
+#!/bin/bash
 
 export PATH=\$PATH:$PREFIX/lib64/luarocks/bin
 EOF

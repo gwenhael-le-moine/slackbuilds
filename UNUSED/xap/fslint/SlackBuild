@@ -1,4 +1,4 @@
- #!/bin/sh
+ #!/bin/bash
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
@@ -39,7 +39,7 @@ make
 # Install
 mkdir $PKG/usr/bin
 cat <<EOF > $PKG/usr/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 
 cd $PKG/usr/libexec/$PRGNAM
 ./fslint-gui

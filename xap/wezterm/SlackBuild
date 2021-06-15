@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}

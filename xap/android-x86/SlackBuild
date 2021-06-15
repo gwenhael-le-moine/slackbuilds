@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -38,7 +38,7 @@ chmod 755 $PKG$PREFIX/bin/${PRGNAM}.sh
 
 mkdir -p $PKG$PREFIX/share/${PRGNAM}
 cat <<EOF > $PKG$PREFIX/share/${PRGNAM}/create-data-img.sh
-#!/bin/sh
+#!/bin/bash
 
 SIZE=\${SIZE:-128G}
 
@@ -47,13 +47,13 @@ qemu-img create -f qcow2 \$HOME/.android-x86/data.img \$SIZE
 EOF
 
 cat <<EOF > $PKG$PREFIX/share/${PRGNAM}/create-data-dir.sh
-#!/bin/sh
+#!/bin/bash
 
 mkdir -p \$HOME/.android-x86/data
 EOF
 
 cat <<EOF > $PKG$PREFIX/share/${PRGNAM}/mount-data-img.sh
-#!/bin/sh
+#!/bin/bash
 
 sudo modprobe nbd max_part=63
 sudo qemu-nbd -c /dev/nbd0 \$HOME/.android-x86/data.img
@@ -62,7 +62,7 @@ sudo mount /dev/nbd0 /media/android-x86-data
 EOF
 
 cat <<EOF > $PKG$PREFIX/share/${PRGNAM}/umount-data-img.sh
-#!/bin/sh
+#!/bin/bash
 
 sudo umount /media/android-x86-data
 EOF

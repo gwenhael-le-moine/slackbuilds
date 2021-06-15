@@ -42,7 +42,7 @@ bmake install DESTDIR=$PKG PREFIX=/usr ETC_PREFIX=
 mv $PKG/usr/share/man/ $PKG/usr
 
 cat <<EOF > $PKG$PREFIX/bin/start_hikari.sh
-#!/bin/sh
+#!/bin/bash
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_QPA_PLATFORM=wayland-egl

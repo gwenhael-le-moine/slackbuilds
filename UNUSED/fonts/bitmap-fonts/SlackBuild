@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PRGNAM=$(basename $(pwd))
 ARCH=font
@@ -36,7 +36,7 @@ find $PKG$FONTDIR/misc/ -name \*.pcf -exec gzip {} \;
 # Post-install script:
 mkdir -p $PKG/install
 cat <<EOT > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 # Update the X font indexes:
 if [ -x /usr/bin/mkfontdir -o -x /usr/X11R6/bin/mkfontdir ]; then
   mkfontdir usr/share/fonts/misc 2> /dev/null

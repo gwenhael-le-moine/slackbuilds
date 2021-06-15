@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 VERSION=$(date +"%Y.%m.%d_%H.%M")
@@ -62,7 +62,7 @@ chown -R root:root *
 # embaumement
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 
 grep -q "/etc/rc.d/rc.$PRGNAM" /etc/rc.d/rc.local || cat <<FOE >> /etc/rc.d/rc.local
 

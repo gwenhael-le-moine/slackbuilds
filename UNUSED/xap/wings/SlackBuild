@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
@@ -33,7 +33,7 @@ ERL_LIBS=$PKG/opt/ make
 
 mkdir -p $PKG$PREFIX/bin
 cat<<EOF > $PKG$PREFIX/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 erl -pa /opt/$PRGNAM/ebin -run wings_start start_halt
 EOF
 chmod 0755 $PKG$PREFIX/bin/$PRGNAM

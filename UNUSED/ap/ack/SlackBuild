@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #NOTE: Needs File::Next (cpan -i File::Next)
 

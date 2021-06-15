@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 TAG=gwh
@@ -45,7 +45,7 @@ cp *.1 $PKG$PREFIX/man
 
 mkdir -p $PKG/etc/rc.d
 cat <<EOF > $PKG/etc/rc.d/rc.i8kmon.new
-#!/bin/sh
+#!/bin/bash
 # Start/stop/restart i8kmon.
 
 # Start i8kmon:

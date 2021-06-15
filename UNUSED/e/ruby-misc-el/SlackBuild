@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 VERSION=$(echo ruby-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1,2 -d - | rev)
 BUILD=${BUILD:-1gwh}

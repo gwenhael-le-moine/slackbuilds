@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
@@ -51,7 +51,7 @@ find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 mkdir -p $PKG/install
 
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 grep -q ion /etc/shells || echo /bin/ion >> /etc/shells;
 EOF
 

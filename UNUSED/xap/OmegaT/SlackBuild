@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 
 CWD=$(pwd)
@@ -27,7 +27,7 @@ unzip $CWD/OmegaT_$VERSION.zip
 
 mkdir -p $PKG/usr/bin
 cat <<EOF > $PKG/usr/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 cd /opt/$PRGNAM/
 ./$PRGNAM $*
 EOF

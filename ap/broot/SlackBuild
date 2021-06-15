@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
@@ -54,7 +54,7 @@ find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 mkdir -p $PKG/install
 
 cat <<EOF
-#!/bin/sh
+#!/bin/bash
 $PREFIX/bin/broot --print-shell-function bash > /etc/profile.d/broot.sh.new
 [ ! -e /etc/profile.d/broot.sh ] && mv /etc/profile.d/broot.sh.new /etc/profile.d/broot.sh
 EOF

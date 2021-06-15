@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 CWD=$(pwd)
@@ -35,7 +35,7 @@ git checkout v$VERSION
 mkdir -p $PKG/boot/
 cp $TMP/$PRGNAM/pinebook/filesystem/{idbloader,uboot,trust}.img $PKG/boot/
 cat <<EOF > $PKG/boot/install-boot-imgs.sh
-#!/bin/sh
+#!/bin/bash
 set -e
 
 grep -q "pinebook-pro" /proc/device-tree/compatible || exit 1

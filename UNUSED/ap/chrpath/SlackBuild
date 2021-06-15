@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #-- chrpath for Slackware --
 # Build script by Phantom X <megaphantomx@bol.com.br>
 # Suggested usage: $ chrpath.SlackBuild 2>&1 | tee build.log
