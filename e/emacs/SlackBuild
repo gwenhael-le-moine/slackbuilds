@@ -84,18 +84,17 @@ rm -rf $PKGNAM
 
 [ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
-( cd $REPOSITORY
-  git checkout $BRANCH
-  git pull
-  [ -e Makefile ] && make distclean
-)
+cd $REPOSITORY
+git checkout $BRANCH
+git pull --all
+[ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
+[ -e Makefile ] && make distclean
+ ./autogen.sh
+
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
 
 mkdir -p $TMP/$PKGNAM
-SRCDIR=$REPOSITORY
-
-cd $PKGNAM || exit 1
-[ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
+cd $TMP/$PKGNAM || exit 1
 
 # tar xvf $CWD/$PKGNAM-$TARBALLVER.tar.xz || exit 1
 # cd $PKGNAM-$SRCDIRVER || exit 1
@@ -107,11 +106,7 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \+
 
-#autoreconf -vif
-(cd $SRCDIR
- ./autogen.sh
-)
-
+SRCDIR=$REPOSITORY
 EMACS_VERSION=$(grep "AC_INIT(GNU Emacs," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \ )
 
 CFLAGS="$SLKCFLAGS" \
@@ -150,10 +145,8 @@ $SRCDIR/configure \
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-( cd $PKG/usr/bin
-  rm emacs
-  mv emacs-${EMACS_VERSION} emacs-${EMACS_VERSION}-with-x11
-)
+rm $PKG/usr/bin/emacs
+mv $PKG/usr/bin/emacs-${EMACS_VERSION} $PKG/usr/bin/emacs-${EMACS_VERSION}-with-x11
 
 # Also add a version of the binary that is not linked to X11:
 # cd $TMP
@@ -218,15 +211,14 @@ fi
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
+find $PKG/usr/man/ -type f -exec gzip -9 {} \+
 ( cd $PKG/usr/man
-  find . -type f -exec gzip -9 {} \+
   for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 )
 
-( cd $PKG/usr/info
-  rm -f dir
-  gzip -9 *
-)
+rm -f $PKG/usr/info/dir
+gzip -9 $PKG/usr/info/*
+
 
 mkdir -p $PKG/usr/doc/$PKGNAM-$EMACS_VERSION
 cp -a \
