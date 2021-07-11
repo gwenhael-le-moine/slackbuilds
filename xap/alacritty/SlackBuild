@@ -38,9 +38,29 @@ mkdir -p $PKG$PREFIX/bin
 find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
 
+mkdir -p $PKG$PREFIX/man/man1
+cp extra/alacritty.man $PKG$PREFIX/man/man1/alacritty.1
+gzip -9 $PKG$PREFIX/man/man1/alacritty.1
+
+mkdir -p $PKG$PREFIX/info
+cp extra/alacritty.info $PKG$PREFIX/info/
+gzip -9 $PKG$PREFIX/info/alacritty.info
+
+mkdir -p $PKG$PREFIX/share/applications
+cp extra/linux/Alacritty.desktop $PKG$PREFIX/share/applications/
+
+mkdir -p $PKG$PREFIX/share/appdata
+cp extra/linux/io.alacritty.Alacritty.appdata.xml $PKG$PREFIX/share/appdata/
+
+mkdir -p $PKG/usr/share/bash-completion/completions
+cp extra/completions/alacritty.bash $PKG/usr/share/bash-completion/completions/alacritty
+
+mkdir -p $PKG/usr/share/zsh/site-functions
+cp extra/completions/_alacritty $PKG/usr/share/zsh/site-functions/
+
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp *.md $PKG$PREFIX/doc/$PRGNAM
+cp -a docs/ extra/ *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
