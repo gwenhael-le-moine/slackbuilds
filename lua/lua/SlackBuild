@@ -109,6 +109,9 @@ cp -a liblua.so.$R $PKG/usr/lib${LIBDIRSUFFIX}
   ln -s liblua.so.$R liblua.so.$V
   ln -s liblua.so.$R liblua.so.${V%??}
   ln -s liblua.so.$R liblua.so
+  ln -s liblua.so.$R liblua$(echo $R | cut -d. -f1,2).so
+  ln -s liblua.so.$R liblua$(echo $R | cut -d. -f1).so
+  ln -s liblua.so.$R liblua$R.so
 )
 cd - >/dev/null
 
