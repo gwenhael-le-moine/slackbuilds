@@ -1,0 +1,55 @@
+#!/bin/bash
+set -x -e
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+ARCH=$(uname -m)
+VERSION=$(curl -s https://ziglang.org/download/index.json | jq 'keys' | grep -v master | grep -v \\\[ | grep -v \\\] | tr -d , | tr -d \" | tr -d \  | sort -V | tail -n1)
+BUILD=1
+
+TAG=gwh
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+PREFIX=/usr
+
+# cleaning
+rm -fr $PKG
+
+# unpacking
+[ ! -e $CWD/zig-linux-x86_64-${VERSION}.tar.gz ] && wget -c https://ziglang.org/download/0.8.0/zig-linux-x86_64-${VERSION}.tar.xz -O $CWD/zig-linux-x86_64-${VERSION}.tar.gz
+
+mkdir -p $TMP
+cd $TMP
+tar xvf $CWD/zig-linux-x86_64-${VERSION}.tar.gz
+cd zig-linux-x86_64-${VERSION}
+
+# installation
+mkdir -p $PKG$PREFIX/bin/
+install -D zig $PKG$PREFIX/bin/zig
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+install -D LICENSE $PKG$PREFIX/doc/zig/LICENSE
+cp -r lib $PKG$PREFIX
+cp -r doc/ $PKG$PREFIX/doc/zig/
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (robust, optimal, and clear programming language)
+$PRGNAM:
+$PRGNAM: Zig is a general-purpose programming language and toolchain for
+$PRGNAM: maintaining robust, optimal, and reusable software.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://ziglang.org/
+$PRGNAM:
+EOF
+
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
