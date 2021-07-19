@@ -36,6 +36,7 @@ cd $TMP/$PRGNAM/
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
+      -Dbuild-doc=true \
       build/
 ninja -C build/
 cd build/
@@ -80,7 +81,7 @@ Type=Application
 EOF
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -a docs/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+cp -a docs/ build/html/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
 
 # correction
 cd $PKG
