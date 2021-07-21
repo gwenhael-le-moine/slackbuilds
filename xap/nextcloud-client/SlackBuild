@@ -17,8 +17,6 @@ REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 PREFIX=/usr
 
-SLCKFLAGS=" -O "
-
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 
@@ -31,19 +29,22 @@ cd $TMP
 cd $REPOSITORY
 git pull --all
 
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 git submodule update --init --recursive
 
 # configuration
+mkdir build
+cd build/
+
 cmake \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DSYSCONFDIR=/etc \
     -DCMAKE_BUILD_TYPE=Release  \
     -DNO_SHIBBOLETH=1 \
-    .
+    ..
 
 # compilation
 make -j3
