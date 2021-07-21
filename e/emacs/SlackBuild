@@ -89,7 +89,9 @@ git checkout $BRANCH
 git pull --all
 [ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
 [ -e Makefile ] && make distclean
- ./autogen.sh
+./autogen.sh
+
+rm lisp/loaddefs.el             # https://lists.gnu.org/r/emacs-devel/2021-04/msg01430.html
 
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
 
