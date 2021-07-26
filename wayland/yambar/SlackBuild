@@ -23,72 +23,29 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/swaywm/sway $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://gitlab.com/dnkl/yambar.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
-# WLROOTS_REPOSITORY=/home/installs/SlackBuilds/repositories/wlroots
-# [ ! -e $WLROOTS_REPOSITORY ] && git clone https://github.com/swaywm/wlroots $WLROOTS_REPOSITORY
-# cd $WLROOTS_REPOSITORY
-# git pull --all
-
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
-
-# mkdir subprojects
-# cp -R $WLROOTS_REPOSITORY subprojects/
 
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
-      -Dsd-bus-provider=basu \
-      -Dtray=auto \
-      -Dlogind=enabled \
-      -Dlogind-provider=elogind \
-      build/
+      --buildtype=release \
+      -Dbackend-x11=disabled \
+      -Dbackend-wayland=enabled \
+       build/
 ninja -C build/
 cd build/
 meson install --destdir=$PKG
 cd ../
 
-# https://github.com/swaywm/sway/wiki/Running-Sway-without-systemd
-chmod +s $PKG$PREFIX/bin/sway
-
-cat <<EOF > $PKG$PREFIX/bin/start_sway.sh
-#!/bin/bash
-
-export QT_QPA_PLATFORMTHEME=qt5ct
-export QT_QPA_PLATFORM=wayland-egl
-export QT_WAYLAND_FORCE_DPI=physical
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-
-export SAL_USE_VCLPLUGIN=gtk3
-
-export MOZ_ENABLE_WAYLAND=1
-export MOZ_DBUS_REMOTE=1
-
-export _JAVA_AWT_WM_NONREPARENTING=1
-
-# export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=gdk
-
-export SDL_VIDEODRIVER=wayland
-
-#export XDG_CURRENT_DESKTOP=sway
-export XDG_CURRENT_DESKTOP=Unity # for tray ?
-
-[ -e $HOME/.profile ] && . $HOME/.profile
-
-exec sway
-EOF
-chmod +x $PKG$PREFIX/bin/start_sway.sh
-
-sed -i 's|Exec=sway|Exec=/usr/bin/start_sway.sh|' $PKG$PREFIX/share/wayland-sessions/sway.desktop
-
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+cp -a examples/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
 
 # correction
 cd $PKG
@@ -107,17 +64,17 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (i3-compatible Wayland compositor)
+$PRGNAM: $PRGNAM (Modular status panel for X11 and Wayland)
+$PRGNAM:
+$PRGNAM: yambar is a lightweight and configurable status panel (bar, for
+$PRGNAM: short) for X11 and Wayland, that goes to great lengths to be both
+$PRGNAM: CPU and battery efficient - polling is only done when absolutely
+$PRGNAM: necessary.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: https://github.com/swaywm/sway
+$PRGNAM: https://gitlab.com/dnkl/yambar
 EOF
 
 # empaquetage
