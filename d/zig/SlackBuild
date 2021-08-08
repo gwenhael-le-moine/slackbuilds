@@ -18,12 +18,12 @@ PREFIX=/usr
 rm -fr $PKG
 
 # unpacking
-[ ! -e $CWD/zig-linux-x86_64-${VERSION}.tar.gz ] && wget -c https://ziglang.org/download/0.8.0/zig-linux-x86_64-${VERSION}.tar.xz -O $CWD/zig-linux-x86_64-${VERSION}.tar.gz
+[ ! -e $CWD/zig-linux-${ARCH}-${VERSION}.tar.gz ] && wget -c https://ziglang.org/download/${VERSION}/zig-linux-${ARCH}-${VERSION}.tar.xz -O $CWD/zig-linux-${ARCH}-${VERSION}.tar.gz
 
 mkdir -p $TMP
 cd $TMP
-tar xvf $CWD/zig-linux-x86_64-${VERSION}.tar.gz
-cd zig-linux-x86_64-${VERSION}
+tar xvf $CWD/zig-linux-${ARCH}-${VERSION}.tar.gz
+cd zig-linux-${ARCH}-${VERSION}
 
 # installation
 mkdir -p $PKG$PREFIX/bin/
