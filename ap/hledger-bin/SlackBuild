@@ -24,6 +24,7 @@ rm -fr $PKG
 mkdir -p $PKG$PREFIX/bin
 cd $PKG$PREFIX/bin
 unzip $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+rm $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
 mv hledger-linux-static-${SRC_ARCH} hledger
 mv hledger-ui-linux-static-${SRC_ARCH} hledger-ui
 mv hledger-web-linux-static-${SRC_ARCH} hledger-web
@@ -31,7 +32,7 @@ chmod +x $PKG$PREFIX/bin/*
 
 mkdir -p  $PKG$PREFIX/doc/hledger/
 for d in $DOCS; do
-    cp $CWD/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
+    mv $CWD/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
 done
 
 cd $PKG
@@ -49,7 +50,7 @@ THIS FILE:
            # customary to leave one space after the ':'.
 
        |-----handy-ruler--------------------------------------------------------|
-$PRGNAM: $PRGNAM (A painless self-hosted Git service.)
+$PRGNAM: $PRGNAM (ledger-cli-like plaintext accounting tool in Haskell)
 $PRGNAM:
 $PRGNAM: easy-to-use command-line/curses/web plaintext accounting tool; a modern
 $PRGNAM: and largely compatible Haskell rewrite of Ledger
