@@ -43,12 +43,12 @@ cat <<EOF > $PKG/etc/rc.d/rc.hledger-web.new
 #
 
 DAEMON_USER=gwh
-DAEMON_OPTIONS=" --host=0.0.0.0 --port=7458 --base-url=https://my-host.tld --capabilities=view,add,manage "
+DAEMON_OPTIONS=" --server --host=0.0.0.0 --port=7458 --capabilities=view,add,manage --file=/path/to/file.ledger --base-url=https://my-host.tld "
 
 start() {
   if [ -x /usr/bin/hledger-web ]; then
     echo "Starting hledger-web daemon: /usr/bin/hledger-web "
-    sudo -u \$DAEMON_USER /usr/bin/hledger-web \$DAEMON_OPTIONS 2> /dev/null
+    sudo -u \$DAEMON_USER /usr/bin/hledger-web \$DAEMON_OPTIONS 2> /dev/null &
   fi
 }
 
