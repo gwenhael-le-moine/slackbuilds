@@ -3,7 +3,7 @@
 # Generic python SlackBuild
 
 # variables
-TAG=gwh
+TAG=${TAG:-pip_gwh}
 TMP=/tmp/$TAG
 CWD=$(pwd)
 OUTPUT=/tmp
@@ -15,8 +15,6 @@ VERSION=${VERSION:-"pip"}
 
 ARCH=$(uname -m)
 BUILD=1
-
-PREFIX=/usr
 
 # nettoyage préalable
 rm -fr $PKG
