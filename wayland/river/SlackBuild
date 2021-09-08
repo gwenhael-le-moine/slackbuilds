@@ -33,7 +33,7 @@ cd $TMP/$PRGNAM/
 
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
-zig build -Drelease-safe --prefix $PKG$PREFIX install
+zig build -Dxwayland -Drelease-safe --prefix $PKG$PREFIX install
 
 mv $PKG$PREFIX/share/man $PKG$PREFIX/
 
@@ -58,6 +58,12 @@ export CLUTTER_BACKEND=gdk
 export SDL_VIDEODRIVER=wayland
 
 export XDG_CURRENT_DESKTOP=river
+
+# export XKB_DEFAULT_MODEL
+export XKB_DEFAULT_LAYOUT "us(intl)"
+# export XKB_DEFAULT_VARIANT
+export XKB_DEFAULT_OPTIONS "compose:caps,ctrl:nocaps,eurosign:e"
+# export XKB_DEFAULT_RULES
 
 [ -e $HOME/.profile ] && . $HOME/.profile
 
