@@ -9,9 +9,9 @@ ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
-VHOST=${VHOST:-vhosts/$PRGNAM/}
+VHOST=${VHOST:-vhosts/$PRGNAM}
 VHOSTROOT=/var/www/${VHOST}
-DOCROOT=${DOCROOT:-/var/www/${VHOST}htdocs}
+DOCROOT=${DOCROOT:-/var/www/${VHOST}/htdocs}
 DATAROOT=${DATAROOT:-/home/nextcloud/data}
 
 PHPUSER=${PHPUSER:-apache}
@@ -99,11 +99,11 @@ config etc/logrotate.d/nextcloud.new
 
 chown -R $PHPUSER:$PHPGROUP $DOCROOT/apps
 
-grep -q "/var/www/${VHOST}htdocs/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}htdocs/cron.php" >> /var/spool/cron/crontabs/apache
-grep -q "/var/www/${VHOST}nextcloud-news-updater.rb" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}nextcloud-news-updater.rb" >> /var/spool/cron/crontabs/apache
+grep -q "/var/www/${VHOST}/htdocs/cron.php" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}/htdocs/cron.php" >> /var/spool/cron/crontabs/apache
+grep -q "/var/www/${VHOST}/nextcloud-news-updater.rb" /var/spool/cron/crontabs/apache || echo "*/15  *  *  *  * php -f /var/www/${VHOST}/nextcloud-news-updater.rb" >> /var/spool/cron/crontabs/apache
 
 echo "Upgrading database and applications"
-( cd /var/www/${VHOST}htdocs/
+( cd /var/www/${VHOST}/htdocs/
   sudo -u $PHPUSER php ./occ upgrade --quiet --no-interaction
 )
 echo "Post-installation process completed"
