@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Slackware build script for lua53
 
@@ -26,7 +26,7 @@
 
 CWD=${CWD:-$(pwd)}
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-5.4.0}
+VERSION=${VERSION:-5.3.6}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
@@ -109,6 +109,9 @@ cp -a liblua.so.$R $PKG/usr/lib${LIBDIRSUFFIX}
   ln -s liblua.so.$R liblua.so.$V
   ln -s liblua.so.$R liblua.so.${V%??}
   ln -s liblua.so.$R liblua.so
+  ln -s liblua.so.$R liblua$(echo $R | cut -d. -f1,2).so
+  ln -s liblua.so.$R liblua$(echo $R | cut -d. -f1).so
+  ln -s liblua.so.$R liblua$R.so
 )
 cd - >/dev/null
 

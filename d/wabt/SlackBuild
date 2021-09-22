@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -28,10 +28,9 @@ mkdir -p $PKG
 cd $TMP
 [ ! -e $REPOSITORY ] && git clone --recursive https://github.com/WebAssembly/wabt.git $REPOSITORY
 
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-
 cd $TMP/$PRGNAM-$VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # configuration
 mkdir build

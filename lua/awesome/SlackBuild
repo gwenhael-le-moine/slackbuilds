@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 CWD=$(pwd)
@@ -35,7 +35,7 @@ cd $TMP
 rm -fr $TMP/$PRGNAM
 mkdir -p $TMP/$PRGNAM
 cd $TMP/$PRGNAM
-VERSION="$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORIES/$PRGNAM && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 # configuration
 cmake \

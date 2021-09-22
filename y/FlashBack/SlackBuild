@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 TAG=${TAG:-gwh}
@@ -145,7 +145,7 @@ EOF
 
 cd $PKG/usr/games/
 cat <<EOF > flashback.sh
-#!/bin/sh
+#!/bin/bash
 dosbox -conf /usr/share/games/FlashBack/dosbox.config \$*
 EOF
 chmod +x flashback.sh

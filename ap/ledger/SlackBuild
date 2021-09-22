@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Slackware build script for ledger
 # Written by Lionel Young (redtricycle at gmail dot com)
 # updated and adapted to my own taste by Gwenhael Le Moine <gwenhael.le.moine-AT-gmail.com>
@@ -7,7 +7,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 BRANCH=${BRANCH:="CURRENT"}
-VERSION=${VERSION:=${BRANCH}_$(date +%F | tr - .)}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
@@ -62,7 +62,7 @@ case $BRANCH in
         ;;
     *)
 esac
-[ $BRANCH != "RELEASE" ] && VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+[ $BRANCH != "RELEASE" ] && VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 ./acprep pull
 

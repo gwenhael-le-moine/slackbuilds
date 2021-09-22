@@ -1,0 +1,116 @@
+#!/bin/bash
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/simonmichael/hledger/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-gwh}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+PREFIX=/usr
+
+echo $ARCH | grep -q 64 && SRC_ARCH=x64
+DOCS="CHANGES.md CONTRIBUTING.md CREDITS.md LICENSE README.md ROADMAP.md"
+wget -c https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-static-${SRC_ARCH}.zip -O $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+for d in $DOCS; do
+    wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} -O $CWD/${d}.${VERSION}
+done
+rm -fr $PKG
+
+mkdir -p $PKG$PREFIX/bin
+cd $PKG$PREFIX/bin
+unzip $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+rm $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+mv hledger-linux-static-${SRC_ARCH} hledger
+mv hledger-ui-linux-static-${SRC_ARCH} hledger-ui
+mv hledger-web-linux-static-${SRC_ARCH} hledger-web
+chmod +x $PKG$PREFIX/bin/*
+
+mkdir -p  $PKG$PREFIX/doc/hledger/
+for d in $DOCS; do
+    mv $CWD/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
+done
+
+mkdir -p $PKG/etc/rc.d/
+cat <<EOF > $PKG/etc/rc.d/rc.hledger-web.new
+#!/bin/sh
+#
+# Start/stop/restart hledger-web
+#
+
+DAEMON_USER=gwh
+DAEMON_OPTIONS=" --server --host=0.0.0.0 --port=7458 --capabilities=view,add,manage --file=/path/to/file.ledger --base-url=https://my-host.tld "
+
+start() {
+  if [ -x /usr/bin/hledger-web ]; then
+    echo "Starting hledger-web daemon: /usr/bin/hledger-web "
+    sudo -u \$DAEMON_USER /usr/bin/hledger-web \$DAEMON_OPTIONS 2> /dev/null &
+  fi
+}
+
+stop() {
+  killall hledger-web 2> /dev/null
+}
+
+restart() {
+  stop
+  sleep 1
+  start
+}
+
+case "\$1" in
+'start')
+  start
+  ;;
+'stop')
+  stop
+  ;;
+'restart')
+  restart
+  ;;
+*)
+  echo "usage \$0 start|stop|restart"
+esac
+EOF
+
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/doinst.sh
+#!/bin/bash
+[ ! -e /etc/rc.d/rc.hledger-web ] \&\& mv /etc/rc.d/rc.hledger-web.new /etc/rc.d/rc.hledger-web
+EOF
+
+cat <<EOF > $PKG/install/slack-desc
+           # HOW TO EDIT
+THIS FILE:
+           # The "handy ruler" below makes it easier to edit a package description.  Line
+           # up the first '|' above the ':' following the base package name, and the '|'
+           # on the right side marks the last column you can put a character in.  You must
+           # make exactly 11 lines for the formatting to be correct.  It's also
+           # customary to leave one space after the ':'.
+
+       |-----handy-ruler--------------------------------------------------------|
+$PRGNAM: $PRGNAM (ledger-cli-like plaintext accounting tool in Haskell)
+$PRGNAM:
+$PRGNAM: easy-to-use command-line/curses/web plaintext accounting tool; a modern
+$PRGNAM: and largely compatible Haskell rewrite of Ledger
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://hledger.org/
+$PRGNAM:
+EOF
+
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz

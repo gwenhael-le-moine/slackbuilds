@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 TAG=gwh
@@ -26,7 +26,8 @@ mkdir -p $PKG
 
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/derrod/legendary.git $REPOSITORY
-( cd $REPOSITORY && git pull )
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM

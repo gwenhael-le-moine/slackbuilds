@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 CWD=$(pwd)
@@ -6,6 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 
 BUILD=1
+VERSION=${VERSION:-"trunk"}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -25,12 +26,15 @@ rm -fr $PKG
 mkdir -p $TMP
 
 [ ! -e $REPOSITORY ] && git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
-( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cd $REPOSITORY
+git pull --all
 
 # Preparation
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 cd $TMP/$PRGNAM-$VERSION
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
 chown -R root:root .
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \

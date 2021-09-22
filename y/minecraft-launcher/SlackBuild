@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl -s https://minecraft.gamepedia.com/Launcher_version_history | grep Linux | head -n 1 | grep -o ">[0-9.]*</a>$" | sed 's|>\([0-9.]*\)</a>$|\1|')}
+VERSION=${VERSION:-$(curl "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=minecraft-launcher" | grep "pkgver=" | grep -o "[0-9]*")}
 
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
@@ -19,7 +19,7 @@ mkdir -p $PKG/opt/${PRGNAM}
 
 tar xvf $CWD/minecraft-launcher_${VERSION}.tar.gz -C $PKG/opt/
 
-# rm $CWD/minecraft-launcher_${VERSION}.tar.gz
+rm $CWD/minecraft-launcher_${VERSION}.tar.gz
 
 mkdir -p $PKG/usr/bin
 cd $PKG/usr/bin

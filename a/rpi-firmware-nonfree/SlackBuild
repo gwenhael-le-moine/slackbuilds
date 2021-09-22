@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 CWD=$(pwd)
 
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -25,7 +25,7 @@ rm -fr $PKG
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/RPi-Distro/firmware-nonfree.git $REPOSITORY
 ( cd $REPOSITORY; git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 mkdir -p $PKG/lib/firmware
 

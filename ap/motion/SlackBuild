@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Slackware build script for motion.
 #
@@ -25,7 +25,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=motion
-VERSION=$(date +%F | tr - .)
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
@@ -61,11 +61,12 @@ cd $TMP
 rm -rf $PRGNAM
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/Motion-Project/motion $REPOSITORY
-( cd $REPOSITORY && git pull )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+cd $REPOSITORY
+git pull --all
 
 cp -R $REPOSITORY $PRGNAM
 cd $PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 chown -R root:root .
 find -L . \
      \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 -o -perm 511 \) \

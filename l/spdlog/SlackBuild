@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-"trunk"}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://github.com/gabime/spdlog.git $REPOSITORY
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+# configuration
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    .
+
+# compilation
+make -j$(nproc)
+
+# installation
+make install DESTDIR=$PKG
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R INSTALL LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM ( Fast C++ logging library. )
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/gabime/spdlog
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz

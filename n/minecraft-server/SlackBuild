@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -28,7 +28,7 @@ rm -fr $PKG
 mkdir -p $PKG/opt/$PRGNAM
 mv $CWD/$PRGNAM.jar $PKG/opt/$PRGNAM/$PRGNAM.jar
 cat <<EOF > $PKG/opt/$PRGNAM/start.sh
-#!/bin/sh
+#!/bin/bash
 java -Xms1G -Xmx1G -jar /opt/$PRGNAM/$PRGNAM.jar nogui
 EOF
 chmod +x $PKG/opt/$PRGNAM/start.sh
@@ -81,7 +81,7 @@ chmod +x $PKG/etc/rc.d/rc.$PRGNAM
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 [ ! -e /opt/$PRGNAM/eula.txt ] && /etc/rc.d/rc.$PRGNAM start
 EOF
 

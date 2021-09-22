@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
+VERSION=${VERSION:-"trunk"}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -33,11 +34,11 @@ cd $TMP
 ( cd $REPOSITORIES/$PRGNAM;
   git pull
 )
-VERSION="$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
 cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
-
 cd $PRGNAM
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # configuration
 CFLAGS=$SLCKFLAGS \
@@ -53,7 +54,7 @@ make install DESTDIR=$PKG ROCKS_TREE=$PREFIX/lib64/luarocks #LUADIR=$PREFIX/lib6
 
 mkdir -p $PKG/etc/profile.d/
 cat <<EOF > $PKG/etc/profile.d/luarocks.sh
-#!/bin/sh
+#!/bin/bash
 
 export PATH=\$PATH:$PREFIX/lib64/luarocks/bin
 EOF

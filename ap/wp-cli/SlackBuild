@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(date +"%Y.%m.%d_%H.%M")}
+VERSION=${VERSION:-"trunk"}
 ARCH=noarch
 BUILD=1
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # variables
 CWD=$(pwd)
@@ -26,7 +26,7 @@ done
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/mrfixit2001/updates_repo.git $REPOSITORY
 ( cd $REPOSITORY; git pull )
-VERSION="$( cd $REPOSITORY/pinebook/ && cat version )"
+VERSION="git_$( cd $REPOSITORY/pinebook/ && cat version )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM/
@@ -35,7 +35,7 @@ git checkout v$VERSION
 mkdir -p $PKG/boot/
 cp $TMP/$PRGNAM/pinebook/filesystem/{idbloader,uboot,trust}.img $PKG/boot/
 cat <<EOF > $PKG/boot/install-boot-imgs.sh
-#!/bin/sh
+#!/bin/bash
 set -e
 
 grep -q "pinebook-pro" /proc/device-tree/compatible || exit 1

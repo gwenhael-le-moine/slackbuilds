@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x -e
 
 CWD=$(pwd)
@@ -28,7 +28,7 @@ mkdir -p $PKG$PREFIX/libexec/
 # installation
 mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
 cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
-#!/bin/sh
+#!/bin/bash
 cd $PREFIX/libexec/$PRGNAM
 ./$PRGNAM \$@
 EOF

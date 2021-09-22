@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CWD=$(pwd)
 
@@ -81,7 +81,7 @@ EOF
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
-#!/bin/sh
+#!/bin/bash
 config() {
   NEW="\$1"
   OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
