@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=swaywm/swaylock
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)} # or VERSION=trunk
+
 BUILD=1
 
 TAG=gwh
@@ -23,7 +25,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/swaywm/swaylock $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -68,7 +70,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/swaywm/swaylock
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage
