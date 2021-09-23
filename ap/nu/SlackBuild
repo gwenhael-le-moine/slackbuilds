@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=nushell/nushell
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -24,7 +25,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/nushell/nushell.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

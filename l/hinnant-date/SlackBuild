@@ -6,7 +6,8 @@ set -e
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=HowardHinnant/date
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -28,7 +29,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/HowardHinnant/date.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

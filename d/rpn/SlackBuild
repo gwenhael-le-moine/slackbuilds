@@ -4,7 +4,8 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=louisrubet/rpn
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -26,7 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/louisrubet/rpn.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 
 cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
 cd $TMP/$PRGNAM-$VERSION
@@ -72,7 +73,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/louisrubet/rpn
+$PRGNAM: https://github.com/${GITHUB_REPO}
 $PRGNAM:
 EOF
 

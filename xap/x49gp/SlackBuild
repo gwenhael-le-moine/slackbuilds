@@ -4,7 +4,8 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=gwenhael-le-moine/x49gp
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 
 BUILD=1
 
@@ -26,7 +27,7 @@ mkdir -p $TMP
 rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
-[ ! -e $REPOSITORY ] && git clone https://github.com/gwenhael-le-moine/x49gp.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -98,7 +99,7 @@ $PRGNAM: Post-installation setup:
 $PRGNAM: $ x49gp-bootstrap-config
 $PRGNAM:
 $PRGNAM: https://sourceforge.net/projects/x49gp/
-$PRGNAM: https://github.com/gwenhael-le-moine/x49gp
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la

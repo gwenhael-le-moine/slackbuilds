@@ -7,7 +7,8 @@ CWD=$(pwd)
 OUTPUT=/tmp
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=kovidgoyal/kitty
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 
 ARCH=$(uname -m)
 BUILD=1
@@ -24,7 +25,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/kovidgoyal/kitty.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

@@ -2,7 +2,8 @@
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=espressif/esptool
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 BUILD=1
 
 ARCH=noarch
@@ -19,7 +20,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $TMP
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/espressif/esptool.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -46,7 +47,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/espressif/esptool
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 cd $PKG

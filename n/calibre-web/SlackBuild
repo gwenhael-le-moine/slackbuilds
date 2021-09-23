@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # variables
+GITHUB_REPO=janeczku/calibre-web
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+
 RUNNING_USER=${RUNNING_USER:-gwh}
 RUNNING_GROUP=${RUNNING_GROUP:-users}
-VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -25,7 +27,7 @@ rm -fr $PKG
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/janeczku/calibre-web.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -74,7 +76,7 @@ $PRGNAM: default user: admin
 $PRGNAM: default password: $NEW_DEFAULT_PASSWORD
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/janeczku/calibre-web
+$PRGNAM: https://github.com/${GITHUB_REPO}
 $PRGNAM:
 EOF
 

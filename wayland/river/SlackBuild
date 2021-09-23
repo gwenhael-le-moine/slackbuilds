@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=ifreund/river
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+
 BUILD=1
 
 TAG=gwh
@@ -23,7 +25,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/ifreund/river --recursive $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} --recursive $REPOSITORY
 cd $REPOSITORY
 git pull --all
 git submodule update
@@ -110,7 +112,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/ifreund/river
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage

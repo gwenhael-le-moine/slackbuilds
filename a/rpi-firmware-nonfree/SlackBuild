@@ -3,7 +3,8 @@
 # variables
 CWD=$(pwd)
 
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=RPi-Distro/firmware-nonfree
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -23,7 +24,7 @@ REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
 rm -fr $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/RPi-Distro/firmware-nonfree.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 ( cd $REPOSITORY; git pull )
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
@@ -55,7 +56,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/RPi-Distro/firmware-nonfree
+$PRGNAM: https://github.com/${GITHUB_REPO}
 $PRGNAM:
 EOF
 

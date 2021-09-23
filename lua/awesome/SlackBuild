@@ -4,8 +4,9 @@
 CWD=$(pwd)
 
 PRGNAM=awesome
-BRANCH=master
-VERSION=${VERSION:-${BRANCH}}
+GITHUB_REPO=awesomeWM/awesome
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -29,7 +30,7 @@ SRC_PATH=$REPOSITORIES/$PRGNAM
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/awesomeWM/$PRGNAM.git $REPOSITORIES/$PRGNAM
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORIES/$PRGNAM
 ( cd $REPOSITORIES/$PRGNAM; git pull )
 
 rm -fr $TMP/$PRGNAM

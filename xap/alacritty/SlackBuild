@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=jwilm/alacritty
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -24,7 +25,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/jwilm/alacritty.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -89,7 +90,7 @@ $PRGNAM: to be blazingly fast. By making sane choices for defaults, Alacritty
 $PRGNAM: requires no additional setup. However, it does allow configuration of
 $PRGNAM: many aspects of the terminal.
 $PRGNAM:
-$PRGNAM: https://github.com/jwilm/alacritty
+$PRGNAM: https://github.com/${GITHUB_REPO}
 $PRGNAM:
 EOF
 

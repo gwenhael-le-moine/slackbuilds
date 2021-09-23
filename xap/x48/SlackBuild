@@ -4,7 +4,8 @@ set -x
 PRGNAM=x48
 
 BUILD=1
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=gwenhael-le-moine/x48
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -25,7 +26,7 @@ mkdir -p $TMP
 rm -fr $PRGNAM $PKG
 
 # Fetching sources
-[ ! -e $REPOSITORY ] && git clone https://github.com/gwenhael-le-moine/x48.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

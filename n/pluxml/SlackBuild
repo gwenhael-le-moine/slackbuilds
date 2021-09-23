@@ -2,8 +2,10 @@
 
 CWD=$(pwd)
 
+GITHUB_REPO=pluxml/PluXml
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"}
 ARCH="noarch"	# hardcode ARCH
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
@@ -25,7 +27,7 @@ rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
-[ ! -e $REPOSITORY ] && git clone https://github.com/pluxml/PluXml $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
 ( cd $REPOSITORY
   git pull )
 

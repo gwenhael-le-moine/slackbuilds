@@ -6,15 +6,15 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-BRANCH=${BRANCH:="CURRENT"}
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=ledger/ledger
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 TAG=${TAG:-gwh}
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/package-$PRGNAM
+PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 PYTHON=""                       # " --python "
@@ -35,7 +35,7 @@ mkdir -p $TMP $PKG/usr
 cd $TMP
 rm -rf $PRGNAM
 
-[ ! -e $REPOSITORY ] && git clone https://github.com/ledger/ledger.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 ( cd $REPOSITORY && git pull && git submodule update --init )
 cp -R $REPOSITORY $PRGNAM
 
@@ -47,22 +47,7 @@ find . \
      \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
      -exec chmod 644 {} \;
 
-case $BRANCH in
-    "RELEASE")
-        git checkout -b stable v$VERSION
-        ;;
-    "CURRENT")
-        git checkout -b master origin/master
-        ;;
-    "BETA")
-        git checkout -b $VERSION release/$VERSION
-        ;;
-    "ALPHA")
-        git checkout -b next origin/next
-        ;;
-    *)
-esac
-[ $BRANCH != "RELEASE" ] && VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 ./acprep pull
 
@@ -75,13 +60,13 @@ mv $PKG/usr/share/man $PKG/usr/
 rm -fr $PKG/usr/share/doc
 find $PKG/usr/man/ -type f -name \*.\? -exec gzip -9 {} \;
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/scripts
+mkdir -p $PKG/usr/doc/$PRGNAM/scripts
 cp -a \
    *.md contrib/ doc/ python/ \
-   $PKG/usr/doc/$PRGNAM-$VERSION
+   $PKG/usr/doc/$PRGNAM
 ( cd $PKG/usr/bin
   for i in report; do
-      ln -s ../doc/$PRGNAM-$VERSION/contrib/$i ledger-$i
+      ln -s ../doc/$PRGNAM/contrib/$i ledger-$i
   done
 )
 
@@ -108,6 +93,6 @@ ledger:
 ledger:
 EOF
 
-cd $TMP/package-$PRGNAM
+cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}

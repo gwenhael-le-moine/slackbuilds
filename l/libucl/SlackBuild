@@ -6,7 +6,8 @@ set -e
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"git"}
+GITHUB_REPO=vstakhov/libucl
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -28,14 +29,14 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/vstakhov/libucl.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 
 cd $TMP/$PRGNAM
-[ "x$VERSION" == "xgit" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # configuration
 # [ -e CMakeLists.txt ] && cmake \
@@ -82,7 +83,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/vstakhov/libucl
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage

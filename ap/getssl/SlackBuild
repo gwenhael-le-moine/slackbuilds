@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"trunk"}
+GITHUB_REPO=srvrco/getssl
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -23,7 +24,7 @@ rm -fr $PKG
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/srvrco/getssl.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
@@ -61,7 +62,7 @@ $PRGNAM: this script in standard bash ( on a desktop computer, or even
 $PRGNAM: virtualbox) and add the checks, and certificates to a remote server
 $PRGNAM: (providing you have an ssh key on the remote server with access).
 $PRGNAM:
-$PRGNAM: https://github.com/srvrco/getssl/
+$PRGNAM: https://github.com/${GITHUB_REPO}/
 $PRGNAM:
 EOF
 
