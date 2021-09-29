@@ -11,16 +11,20 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-TARVERSION=$(echo $VERSION | tr . -)
-[ ! -e $CWD/LDCad-$TARVERSION-Linux.tar.bz2 ] && wget -c -O $CWD/LDCad-$TARVERSION-Linux.tar.bz2 http://www.melkert.net/action/download/LDCad-$TARVERSION-Linux.tar.bz2
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 
-[ ! -e $CWD/complete.zip ] && wget -c -O $CWD/complete.zip http://www.ldraw.org/library/updates/complete.zip
+mkdir -p $REPOSITORY
+
+TARVERSION=$(echo $VERSION | tr . -)
+[ ! -e $REPOSITORY/LDCad-$TARVERSION-Linux.tar.bz2 ] && wget -c -O $REPOSITORY/LDCad-$TARVERSION-Linux.tar.bz2 http://www.melkert.net/action/download/LDCad-$TARVERSION-Linux.tar.bz2
+
+[ ! -e $REPOSITORY/complete.zip ] && wget -c -O $REPOSITORY/complete.zip http://www.ldraw.org/library/updates/complete.zip
 
 rm -fr $PKG $TMP/LDCad-$TARVERSION-Linux
 mkdir -p $PKG $TMP
 cd $TMP
 
-tar xvf $CWD/LDCad-$TARVERSION-Linux.tar.bz2
+tar xvf $REPOSITORY/LDCad-$TARVERSION-Linux.tar.bz2
 cd LDCad-$TARVERSION-Linux
 
 mkdir -p $PKG/usr/bin
@@ -43,7 +47,7 @@ mkdir -p $PKG/usr/share/LDCad
 mkdir -p $PKG/usr/share/LDCad/seeds
 cp -v seeds/*.sf $PKG/usr/share/LDCad/seeds
 cp -vr resources $PKG/usr/share/LDCad
-cp $CWD/complete.zip $PKG/usr/share/LDCad
+cp $REPOSITORY/complete.zip $PKG/usr/share/LDCad
 
 mkdir -p $PKG/usr/doc/LDCad
 cp -vr docs/* $PKG/usr/doc/LDCad

@@ -14,6 +14,10 @@ PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 mkdir -p $TMP
 cd $TMP
 
@@ -21,9 +25,9 @@ cd $TMP
 rm -fr $PRGNAM-${VERSION} $PKG
 
 # Fetching binaries
-[ ! -e $CWD/${PRGNAM}-${VERSION}.tar.xz ] && wget -c https://www.oilshell.org/download/${PRGNAM}-${VERSION}.tar.xz -O $CWD/${PRGNAM}-${VERSION}.tar.xz
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.xz ] && wget -c https://www.oilshell.org/download/${PRGNAM}-${VERSION}.tar.xz -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.xz
 
-tar xvf $CWD/${PRGNAM}-${VERSION}.tar.xz
+tar xvf $REPOSITORY/${PRGNAM}-${VERSION}.tar.xz
 cd ${PRGNAM}-${VERSION}
 
 # configuration

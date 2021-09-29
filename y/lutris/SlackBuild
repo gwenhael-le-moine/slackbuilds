@@ -45,6 +45,10 @@ OUTPUT=${OUTPUT:-/tmp}
 
 DOCS="AUTHORS LICENSE INSTALL.rst README.rst"
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 set -e
 
 rm -rf $PKG
@@ -52,9 +56,9 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM
 
-[ ! -e $CWD/$PRGNAM\_$VERSION.tar.xz ] && wget -c https://lutris.net/releases/lutris_$VERSION.tar.xz -O $CWD/$PRGNAM\_$VERSION.tar.xz
+[ ! -e $REPOSITORY/$PRGNAM\_$VERSION.tar.xz ] && wget -c https://lutris.net/releases/lutris_$VERSION.tar.xz -O $REPOSITORY/$PRGNAM\_$VERSION.tar.xz
 
-tar xvf $CWD/$PRGNAM\_$VERSION.tar.xz
+tar xvf $REPOSITORY/$PRGNAM\_$VERSION.tar.xz
 cd $PRGNAM
 chown -R root:root .
 find -L . \

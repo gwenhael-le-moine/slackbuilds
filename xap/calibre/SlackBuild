@@ -11,21 +11,25 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-[ ! -e $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz http://download.calibre-ebook.com/${VERSION}/${PRGNAM}-${VERSION}-${ARCH}.txz
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz http://download.calibre-ebook.com/${VERSION}/${PRGNAM}-${VERSION}-${ARCH}.txz
 
 rm -fr $PKG
 mkdir -p $PKG/opt/${PRGNAM}
 
-tar xvf $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz -C $PKG/opt/${PRGNAM}
+tar xvf $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz -C $PKG/opt/${PRGNAM}
 
-rm $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz
+rm $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz
 
 mkdir -p $PKG/usr/bin
 
 $PKG/opt/calibre/calibre_postinstall --root=$PKG/usr
 
 mkdir -p $PKG/etc/rc.d/
-cp $CWD/rc.calibre-server $PKG/etc/rc.d/rc.calibre-server.new
+cp $REPOSITORY/rc.calibre-server $PKG/etc/rc.d/rc.calibre-server.new
 
 cd $PKG/usr/bin
 find . -type l -exec sh -c 'rm "$1"; ln -s ../../opt/calibre/$(basename $1)' _ {} \;

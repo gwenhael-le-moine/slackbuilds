@@ -17,18 +17,22 @@ LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/r
 VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
 CLEAN_VERSION=$(echo $VERSION | tr '-' '_')
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 # cleaning
 rm -fr $PKG
 
 # download
-[ ! -e $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz
+[ ! -e $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
 
-[ ! -e $CWD/completion.zsh ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O $CWD/completion.zsh
+[ ! -e $REPOSITORY/completion.zsh ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O $REPOSITORY/completion.zsh
 
 # installation
 mkdir -p $PKG
 cd $PKG
-tar xvf $CWD/crystal-${VERSION}-linux-${ARCH}.tar.gz
+tar xvf $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
 mv crystal-$VERSION $PKG$PREFIX
 mkdir -p $PKG$PREFIX/doc/
 mv $PKG$PREFIX/share/doc $PKG$PREFIX/doc/$PRGNAM
@@ -36,7 +40,7 @@ mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/share/man $PKG$PREFIX/
 
 mkdir -p $PKG$PREFIX/share/zsh/site-functions/
-cp -R $CWD/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
+cp -R $REPOSITORY/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
 
 # sed -i "s|INSTALL_DIR=.*|INSTALL_DIR=$PREFIX/libexec/$PRGNAM|g" $PKG$PREFIX/bin/crystal
 

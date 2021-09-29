@@ -12,21 +12,25 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-[ ! -e $CWD/minecraft-launcher_${VERSION}.tar.gz ] && wget -c -O $CWD/minecraft-launcher_${VERSION}.tar.gz https://launcher.mojang.com/download/linux/x86_64/minecraft-launcher_${VERSION}.tar.gz
-[ ! -e $CWD/minecraft-launcher.svg ] && wget -c -O $CWD/minecraft-launcher.svg https://launcher.mojang.com/download/minecraft-launcher.svg
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+[ ! -e $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz ] && wget -c -O $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz https://launcher.mojang.com/download/linux/x86_64/minecraft-launcher_${VERSION}.tar.gz
+[ ! -e $REPOSITORY/minecraft-launcher.svg ] && wget -c -O $REPOSITORY/minecraft-launcher.svg https://launcher.mojang.com/download/minecraft-launcher.svg
 rm -fr $PKG
 mkdir -p $PKG/opt/${PRGNAM}
 
-tar xvf $CWD/minecraft-launcher_${VERSION}.tar.gz -C $PKG/opt/
+tar xvf $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz -C $PKG/opt/
 
-rm $CWD/minecraft-launcher_${VERSION}.tar.gz
+rm $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz
 
 mkdir -p $PKG/usr/bin
 cd $PKG/usr/bin
 ln -s ../../opt/minecraft-launcher/minecraft-launcher
 
 mkdir -p $PKG/usr/share/icons/hicolor/symbolic/apps/
-cp $CWD/minecraft-launcher.svg $PKG/usr/share/icons/hicolor/symbolic/apps/
+cp $REPOSITORY/minecraft-launcher.svg $PKG/usr/share/icons/hicolor/symbolic/apps/
 
 mkdir -p $PKG/usr/share/applications/
 cat <<EOF > $PKG/usr/share/applications/minecraft-launcher.desktop

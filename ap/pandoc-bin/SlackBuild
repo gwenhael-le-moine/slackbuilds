@@ -11,13 +11,17 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-[ ! -e $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz https://github.com/jgm/pandoc/releases/download/$VERSION/pandoc-$VERSION-linux-amd64.tar.gz
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz https://github.com/jgm/pandoc/releases/download/$VERSION/pandoc-$VERSION-linux-amd64.tar.gz
 
 rm -fr $PKG
 mkdir -p $PKG
 
 cd $PKG
-tar xvf $CWD/${PRGNAM}-${VERSION}-${ARCH}.txz
+tar xvf $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz
 
 mv pandoc-${VERSION} usr
 mv usr/share/man usr/

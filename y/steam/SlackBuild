@@ -46,6 +46,10 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 set -e
 
 rm -rf $PKG
@@ -53,14 +57,14 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf ${PRGNAM}-launcher
 
-[ -e $CWD/steam_latest-$BRANCH.tar.gz ] && rm $CWD/steam_latest-$BRANCH.tar.gz
-wget -c https://repo.steampowered.com/steam/archive/precise/steam_latest-$BRANCH.tar.gz -O $CWD/steam_latest-$BRANCH.tar.gz
-tar xvf $CWD/steam_latest-$BRANCH.tar.gz
+[ -e $REPOSITORY/steam_latest-$BRANCH.tar.gz ] && rm $REPOSITORY/steam_latest-$BRANCH.tar.gz
+wget -c https://repo.steampowered.com/steam/archive/precise/steam_latest-$BRANCH.tar.gz -O $REPOSITORY/steam_latest-$BRANCH.tar.gz
+tar xvf $REPOSITORY/steam_latest-$BRANCH.tar.gz
 cd ${PRGNAM}-launcher
 VERSION=$(cat client-versions.json | grep -o "[0-9.]*" | sed 'N;s/\n/_/')
 
 # Use Slackware-specific installation directories
-patch -p0 < $CWD/patch-slackdirs.diff
+patch -p0 < $REPOSITORY/patch-slackdirs.diff
 
 chown -R root:root .
 find -L . \
@@ -89,7 +93,7 @@ install -p -m 0644 subprojects/steam-devices/*.rules $PKG/lib/udev/rules.d/
 sed -i -e 's/^KERNEL=="uinput".*/& GROUP="plugdev"/' $PKG/lib/udev/rules.d/60-steam-input.rules
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp subprojects/steam-devices/LICENSE $CWD/SlackBuild $PKG/usr/doc/$PRGNAM/
+cp subprojects/steam-devices/LICENSE $REPOSITORY/SlackBuild $PKG/usr/doc/$PRGNAM/
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc

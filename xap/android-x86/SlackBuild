@@ -14,18 +14,22 @@ PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 mkdir -p $TMP
 
 # Cleaning
 rm -fr $PRGNAM $PKG
 
 # Fetching binaries
-[ ! -e $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c https://osdn.net/dl/android-x86/android-x86-${VERSION}.x86_64.rpm -O $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.${ARCH}.rpm ] && wget -c https://osdn.net/dl/android-x86/android-x86-${VERSION}.x86_64.rpm -O $REPOSITORY/${PRGNAM}-${VERSION}.${ARCH}.rpm
 
 # Installation
 mkdir -p $PKG$PREFIX/share/
 cd $PKG$PREFIX/share/
-rpm2targz $CWD/${PRGNAM}-${VERSION}.${ARCH}.rpm
+rpm2targz $REPOSITORY/${PRGNAM}-${VERSION}.${ARCH}.rpm
 tar xvf ${PRGNAM}-${VERSION}.${ARCH}.tar.gz
 rm ${PRGNAM}-${VERSION}.${ARCH}.tar.gz
 
@@ -33,7 +37,7 @@ rm -fr usr
 mv android-${VERSION} ${PRGNAM}
 
 mkdir -p $PKG$PREFIX/bin/
-cp $CWD/${PRGNAM}.sh $PKG$PREFIX/bin/
+cp $REPOSITORY/${PRGNAM}.sh $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/${PRGNAM}.sh
 
 mkdir -p $PKG$PREFIX/share/${PRGNAM}

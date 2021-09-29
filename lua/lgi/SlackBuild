@@ -23,16 +23,13 @@ rm -rf $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 cd $TMP
 
-if [ -e $CWD/$PRGNAM-$VERSION.tar.xz ] ; then
-    tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
-else
-    [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
-    cd $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+cd $REPOSITORY
 git pull --all
-    VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
+VERSION="git_$( cd $REPOSITORY && git log -1 --format=%h_%ad --date=format:%Y.%m.%d )"
 
-    cp -R $REPOSITORY $PRGNAM
-fi
+cp -R $REPOSITORY $PRGNAM
+
 cd $PRGNAM
 
 LUA_VERSION=$(lua -v 2>&1 | grep -o "5\..")

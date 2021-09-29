@@ -43,6 +43,10 @@ TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 if [ "$ARCH" = "i586" ]; then
     SLKCFLAGS="-O2 -march=i586 -mtune=i686"
     LIBDIRSUFFIX=""
@@ -67,9 +71,9 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf lua-$VERSION
 
-[ ! -e $CWD/lua-$VERSION.tar.gz ] && wget -c https://www.lua.org/ftp/lua-$VERSION.tar.gz -O  $CWD/lua-$VERSION.tar.gz
+[ ! -e $REPOSITORY/lua-$VERSION.tar.gz ] && wget -c https://www.lua.org/ftp/lua-$VERSION.tar.gz -O  $REPOSITORY/lua-$VERSION.tar.gz
 
-tar xvf $CWD/lua-$VERSION.tar.gz
+tar xvf $REPOSITORY/lua-$VERSION.tar.gz
 cd lua-$VERSION
 chown -R root:root .
 find -L . \
@@ -124,7 +128,7 @@ sed \
   -e '/^INSTALL_LIB= /s,lib,&'"${LIBDIRSUFFIX}"',' \
   -e '/^INSTALL_CMOD= /s,lib,&'"${LIBDIRSUFFIX}"',' \
   -e '/^libdir=/s,/lib,&'"${LIBDIRSUFFIX}"',' \
-  $CWD/lua.pc.in > lua.pc
+  $REPOSITORY/lua.pc.in > lua.pc
 
 ln -s lua.pc lua-$V.pc
 ln -s lua.pc lua${V%.?}${V#?.}.pc
@@ -138,7 +142,7 @@ for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; r
 
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a README doc/* $PKG/usr/doc/$PRGNAM
-cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM/SlackBuild
+cat $REPOSITORY/SlackBuild > $PKG/usr/doc/$PRGNAM/SlackBuild
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc

@@ -13,18 +13,22 @@ PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 echo $ARCH | grep -q 64 && SRC_ARCH=x64
 DOCS="CHANGES.md CONTRIBUTING.md CREDITS.md LICENSE README.md ROADMAP.md"
-wget -c https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-static-${SRC_ARCH}.zip -O $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+wget -c https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-static-${SRC_ARCH}.zip -O $REPOSITORY/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
 for d in $DOCS; do
-    wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} -O $CWD/${d}.${VERSION}
+    wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} -O $REPOSITORY/${d}.${VERSION}
 done
 rm -fr $PKG
 
 mkdir -p $PKG$PREFIX/bin
 cd $PKG$PREFIX/bin
-unzip $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
-rm $CWD/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+unzip $REPOSITORY/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
+rm $REPOSITORY/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
 mv hledger-linux-static-${SRC_ARCH} hledger
 mv hledger-ui-linux-static-${SRC_ARCH} hledger-ui
 mv hledger-web-linux-static-${SRC_ARCH} hledger-web
@@ -32,7 +36,7 @@ chmod +x $PKG$PREFIX/bin/*
 
 mkdir -p  $PKG$PREFIX/doc/hledger/
 for d in $DOCS; do
-    mv $CWD/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
+    mv $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
 done
 
 mkdir -p $PKG/etc/rc.d/

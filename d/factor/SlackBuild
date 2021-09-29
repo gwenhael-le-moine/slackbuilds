@@ -14,15 +14,19 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 # cleaning
 rm -fr $PKG
 
 # unpacking
-[ ! -e $CWD/${PRGNAM}-${VERSION}.tar.gz ] && wget -c http://downloads.factorcode.org/releases/$VERSION/factor-linux-x86-64-$VERSION.tar.gz -O $CWD/${PRGNAM}-${VERSION}.tar.gz
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz ] && wget -c http://downloads.factorcode.org/releases/$VERSION/factor-linux-x86-64-$VERSION.tar.gz -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz
 
 mkdir -p $PKG$PREFIX/libexec/
 ( cd $PKG$PREFIX/libexec/
-    tar xf $CWD/${PRGNAM}-${VERSION}.tar.gz
+    tar xf $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz
 )
 
 # installation

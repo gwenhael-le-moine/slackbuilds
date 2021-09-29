@@ -14,15 +14,19 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
 # cleaning
 rm -fr $PKG
 
 # unpacking
-[ ! -e $CWD/zig-linux-${ARCH}-${VERSION}.tar.gz ] && wget -c https://ziglang.org/download/${VERSION}/zig-linux-${ARCH}-${VERSION}.tar.xz -O $CWD/zig-linux-${ARCH}-${VERSION}.tar.gz
+[ ! -e $REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz ] && wget -c https://ziglang.org/download/${VERSION}/zig-linux-${ARCH}-${VERSION}.tar.xz -O $REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz
 
 mkdir -p $TMP
 cd $TMP
-tar xvf $CWD/zig-linux-${ARCH}-${VERSION}.tar.gz
+tar xvf $REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz
 cd zig-linux-${ARCH}-${VERSION}
 
 # installation
