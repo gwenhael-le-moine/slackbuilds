@@ -22,8 +22,6 @@ mkdir -p $PKG/opt/${PRGNAM}
 
 tar xvf $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz -C $PKG/opt/${PRGNAM}
 
-rm $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz
-
 mkdir -p $PKG/usr/bin
 
 $PKG/opt/calibre/calibre_postinstall --root=$PKG/usr
