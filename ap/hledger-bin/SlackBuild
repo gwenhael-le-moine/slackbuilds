@@ -28,7 +28,6 @@ rm -fr $PKG
 mkdir -p $PKG$PREFIX/bin
 cd $PKG$PREFIX/bin
 unzip $REPOSITORY/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
-rm $REPOSITORY/hledger-linux-static-${SRC_ARCH}-${VERSION}.zip
 mv hledger-linux-static-${SRC_ARCH} hledger
 mv hledger-ui-linux-static-${SRC_ARCH} hledger-ui
 mv hledger-web-linux-static-${SRC_ARCH} hledger-web
@@ -36,7 +35,7 @@ chmod +x $PKG$PREFIX/bin/*
 
 mkdir -p  $PKG$PREFIX/doc/hledger/
 for d in $DOCS; do
-    mv $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
+    cp $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
 done
 
 mkdir -p $PKG/etc/rc.d/
