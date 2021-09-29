@@ -26,6 +26,8 @@ rm -fr $PKG
 mkdir -p $PKG/usr/{bin,doc/knock}/
 
 cp $REPOSITORY/knock-${VERSION}-${ARCH}-linux $PKG/usr/bin/knock
+chmod +x $PKG/usr/bin/knock
+
 for i in $DOCS; do
     cp $REPOSITORY/${i}-${VERSION} $PKG/usr/doc/knock/$i
 done
