@@ -1,0 +1,59 @@
+#!/bin/bash
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/BentonEdmondson/knock/tags | jq -r '.[0].name')}
+ARCH=$(uname -m)
+BUILD=${BUILD:-1}
+TAG=${TAG:-gwh}
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+[ ! -e $REPOSITORY/knock-${VERSION}-${ARCH}-linux ] && wget -c -O $REPOSITORY/knock-${VERSION}-${ARCH}-linux https://github.com/BentonEdmondson/knock/releases/download/${VERSION}/knock-${VERSION}-${ARCH}-linux
+
+DOCS="LICENSE README.md demo.png"
+for i in $DOCS; do
+    [ ! -e $REPOSITORY/${i}-${VERSION} ] && wget -c -O $REPOSITORY/${i}-${VERSION} https://raw.githubusercontent.com/BentonEdmondson/knock/${VERSION}/$i
+done
+
+rm -fr $PKG
+mkdir -p $PKG/usr/{bin,doc/knock}/
+
+cp $REPOSITORY/knock-${VERSION}-${ARCH}-linux $PKG/usr/bin/knock
+for i in $DOCS; do
+    cp $REPOSITORY/${i}-${VERSION} $PKG/usr/doc/knock/$i
+done
+
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+         |-----handy-ruler------------------------------------------------------|
+${PRGNAM}: ${PRGNAM} (Convert ACSM files to DRM-free EPUB files with one command)
+${PRGNAM}:
+${PRGNAM}: This software does not utilize Adobe Digital Editions nor Wine. It is
+${PRGNAM}: completely free and open-source software written natively for Linux.
+${PRGNAM}:
+${PRGNAM}: usage:
+${PRGNAM}:   $ knock file.acsm
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}: https://github.com/BentonEdmondson/knock
+EOF
+
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
