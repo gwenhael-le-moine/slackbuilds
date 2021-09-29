@@ -21,12 +21,16 @@ PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
-wget -c $(curl https://www.minecraft.net/en-us/download/server | grep -o "https.*server\.jar") -O $CWD/$PRGNAM.jar
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+[ ! -e  $REPOSITORY/${PRGNAM}-${VERSION}.jar ] && wget -c $(curl https://www.minecraft.net/en-us/download/server | grep -o "https.*server\.jar") -O $REPOSITORY/${PRGNAM}-${VERSION}.jar
 
 rm -fr $PKG
 
 mkdir -p $PKG/opt/$PRGNAM
-mv $CWD/$PRGNAM.jar $PKG/opt/$PRGNAM/$PRGNAM.jar
+cp $REPOSITORY/${PRGNAM}-${VERSION}.jar $PKG/opt/$PRGNAM/$PRGNAM.jar
 cat <<EOF > $PKG/opt/$PRGNAM/start.sh
 #!/bin/bash
 java -Xms1G -Xmx1G -jar /opt/$PRGNAM/$PRGNAM.jar nogui
@@ -89,14 +93,14 @@ cat <<EOF > $PKG/install/slack-desc
        |-----handy-ruler--------------------------------------------------------|
 $PRGNAM: $PRGNAM (Proprietary Minecraft Server)
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: https://www.minecraft.net/en-us/download/server/
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM:
 EOF
 
