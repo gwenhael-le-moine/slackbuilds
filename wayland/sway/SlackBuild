@@ -74,7 +74,7 @@ export XDG_CURRENT_DESKTOP=Unity # for tray ?
 
 [ -e $HOME/.profile ] && . $HOME/.profile
 
-exec sway
+exec dbus-run-session sway
 EOF
 chmod +x $PKG$PREFIX/bin/start_sway.sh
 
