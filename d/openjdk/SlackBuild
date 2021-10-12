@@ -1,0 +1,77 @@
+#!/bin/bash
+set -x -e
+
+VERSION=${VERSION:-17}
+FLAVOR=${FLAVOR:-"server-release"}
+
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+ARCH=$(uname -m)
+BUILD=1
+TAG=gwh
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+PREFIX=/usr
+
+LATEST_RELEASE_URL="https://builds.shipilev.net/openjdk-jdk${VERSION}/openjdk-jdk${VERSION}-linux-${ARCH}-${FLAVOR}.tar.xz"
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+# cleaning
+rm -fr $PKG
+
+# download
+[ ! -e $REPOSITORY/openjdk-jdk${VERSION}-linux-${ARCH}-${FLAVOR}.tar.xz ] && wget -c $LATEST_RELEASE_URL -O $REPOSITORY/openjdk-jdk${VERSION}-linux-${ARCH}-${FLAVOR}.tar.xz
+
+# installation
+mkdir -p $PKG/opt/
+cd $PKG/opt/
+tar xvf $REPOSITORY/openjdk-jdk${VERSION}-linux-${ARCH}-${FLAVOR}.tar.xz
+cd jdk
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R legal/ *.log  $PKG$PREFIX/doc/$PRGNAM
+
+find $PKG/opt/jdk/man -type f -name "*.?" -exec gzip -9f {} \;
+
+mkdir -p $PKG/etc/profile.d/
+
+cat <<EOF > $PKG/etc/profile.d/${PRGNAM}.sh
+#!/bin/sh
+export JAVA_HOME=/opt/jdk
+export MANPATH="\${MANPATH}:\${JAVA_HOME}/man"
+export PATH="\${PATH}:\${JAVA_HOME}/bin:\${JAVA_HOME}/jre/bin"
+EOF
+
+cat <<EOF > $PKG/etc/profile.d/${PRGNAM}.csh
+#!/bin/csh
+setenv JAVA_HOME /opt/jdk
+setenv MANPATH \${MANPATH}:\${JAVA_HOME}/man
+setenv PATH \${PATH}:\${JAVA_HOME}/bin:\${JAVA_HOME}/jre/bin
+EOF
+
+chmod +x $PKG/etc/profile.d/${PRGNAM}.*sh
+
+PKG_VERSION="$(echo "${VERSION}_${FLAVOR}" | tr '-' '_')_$(cat $PKG/opt/jdk/release | grep VERSION_DATE | cut -d\= -f2 | tr -d \" | tr - _)"
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (Java Development Kit)
+$PRGNAM:
+$PRGNAM: Mister Shipilëv's Peculiar (JVM) Builds
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: 
+$PRGNAM: https://builds.shipilev.net/
+$PRGNAM: https://sexyjdk.com
+EOF
+
+#rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$PKG_VERSION-$ARCH-$BUILD$TAG.txz
