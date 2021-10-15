@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-BUILD=5
+BUILD=6
 
 TAG=gwh
 OUTPUT=/tmp
@@ -35,14 +35,11 @@ cd $PKG
 tar xvf $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
 mv crystal-$VERSION $PKG$PREFIX
 mkdir -p $PKG$PREFIX/doc/
-mv $PKG$PREFIX/share/doc $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
 mv $PKG$PREFIX/share/man $PKG$PREFIX/
 
 mkdir -p $PKG$PREFIX/share/zsh/site-functions/
 cp -R $REPOSITORY/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
-
-# sed -i "s|INSTALL_DIR=.*|INSTALL_DIR=$PREFIX/libexec/$PRGNAM|g" $PKG$PREFIX/bin/crystal
 
 # packaging
 cd $PKG
