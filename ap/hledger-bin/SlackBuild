@@ -87,7 +87,7 @@ find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs st
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 #!/bin/bash
-[ ! -e /etc/rc.d/rc.hledger-web ] \&\& mv /etc/rc.d/rc.hledger-web.new /etc/rc.d/rc.hledger-web
+[ ! -e /etc/rc.d/rc.hledger-web ] && mv /etc/rc.d/rc.hledger-web.new /etc/rc.d/rc.hledger-web
 EOF
 
 cat <<EOF > $PKG/install/slack-desc
