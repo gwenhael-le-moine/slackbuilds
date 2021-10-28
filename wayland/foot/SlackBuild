@@ -1,7 +1,7 @@
 #!/bin/bash
 # variables
 VERSION=${VERSION:-"trunk"}
-BUILD=1
+BUILD=2
 
 TAG=gwh
 OUTPUT=/tmp
@@ -42,6 +42,9 @@ cd ../
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+
+mkdir -p $PKG$PREFIX/share/$PRGNAM
+cp -R themes $PKG$PREFIX/share/$PRGNAM
 
 # correction
 cd $PKG

@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
-BUILD=1
+BUILD=2
 
 TAG=gwh
 OUTPUT=/tmp
@@ -32,6 +32,8 @@ cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+git am $CWD/6249-tray-menu.patch
 
 meson setup \
       --prefix /usr \
