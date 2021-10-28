@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-"trunk"} # or VERSION=trunk
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-*
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://git.savannah.gnu.org/git/gforth.git $REPOSITORY
+
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+# configuration
+./BUILD-FROM-SCRATCH --prefix=${PREFIX} \
+                     --mandir=${PREFIX}/man \
+                     --infodir=${PREFIX}/info \
+                     --libdir=${PREFIX}/lib$(uname -m | grep -o 64)
+
+# compilation
+make -j3
+
+# installation
+make install DESTDIR=$PKG
+
+rm $PKG$PREFIX/info/dir
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R test/ doc/ *.md LICENSE $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (implementation of the Forth 2012 language.)
+$PRGNAM:
+$PRGNAM: A free, fast, featureful and portable implementation of the Forth 2012
+$PRGNAM: language.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://gforth.org
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
