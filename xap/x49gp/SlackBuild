@@ -7,7 +7,7 @@ PRGNAM=$(basename $CWD)
 GITHUB_REPO=gwenhael-le-moine/x49gp
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 
-BUILD=1
+BUILD=2
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -44,33 +44,31 @@ find . \
      -exec chmod 644 {} \;
 
 # Building
-make
-make sdcard
+make INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
+make sdcard INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 
 # Installing
+mkdir -p $PKG
+make install DESTDIR=$PKG INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
+
 mkdir -p $PKG$PREFIX/share/$PRGNAM
-cp 4950_215.bin config.tmpl hp50g.png $PKG$PREFIX/share/$PRGNAM
+[ ! -e $CWD/hp4950v215.zip ] && wget -c -O $CWD/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
+unzip -d $PKG$PREFIX/share/$PRGNAM/ $CWD/hp4950v215.zip
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp README* config.tmpl flash-50g s3c2410-sram sdcard sram $PKG$PREFIX/doc/$PRGNAM
+mkdir -p $PKG$PREFIX/share/$PRGNAM/newrpl/
+wget -c -O $PKG$PREFIX/share/$PRGNAM/newrpl/newrplfw.bin https://hpgcc3.org/downloads/newrplfw.bin
+echo "newrplfw.bin" > $PKG$PREFIX/share/$PRGNAM/newrpl/update.scp
 
-mv $PKG$PREFIX/doc/$PRGNAM/config.tmpl $PKG$PREFIX/doc/$PRGNAM/config
-sed -i "s|image=hp50g.png|image=$PREFIX/share/$PRGNAM/hp50g.png|" $PKG$PREFIX/doc/$PRGNAM/config
+mkdir -p $PKG$PREFIX/doc/$PRGNAM/
+cp README* sdcard $PKG$PREFIX/doc/$PRGNAM/
 
-mkdir -p $PKG$PREFIX/bin/
-cp x49gp $PKG$PREFIX/bin/x49gp-bin
-cp $CWD/bootstrap-config.sh $PKG$PREFIX/bin/x49gp-bootstrap-config
-cat <<EOF > $PKG$PREFIX/bin/x49gp
-#!/bin/bash
+mkdir -p $PKG$PREFIX/doc/$PRGNAM/HP_50g_Advanced_User-s_Reference_Manual_Edition_2
+[ ! -e $CWD/hp50gaur.zip ] && wget -c -O $CWD/hp50gaur.zip https://www.hpcalc.org/hp49/docs/misc/hp50gaur.zip
+unzip -d $PKG$PREFIX/doc/$PRGNAM/HP_50g_Advanced_User-s_Reference_Manual_Edition_2/ $CWD/hp50gaur.zip
 
-if [ ! -e ~/.x49gp/config ]; then
-   echo "Please run x49gp-bootstrap-config first"
-   exit
-fi
-
-x49gp-bin ~/.x49gp/config
-EOF
-chmod +x $PKG$PREFIX/bin/x49gp $PKG$PREFIX/bin/x49gp-bootstrap-config
+mkdir -p $PKG$PREFIX/doc/$PRGNAM/HP_50g_User-s_Guide
+[ ! -e $CWD/hp50gug.zip ] && wget -c -O $CWD/hp50gug.zip https://www.hpcalc.org/hp49/docs/misc/hp50gug.zip
+unzip -d $PKG$PREFIX/doc/$PRGNAM/HP_50g_User-s_Guide/ $CWD/hp50gug.zip
 
 # Cleaning
 cd $PKG
@@ -88,6 +86,13 @@ find . \
 
 # Packaging
 mkdir install
+cat <<EOF > install/doinst.sh
+#!/bin/bash
+
+cat /usr/doc/x49gp/README.md | grep "First launch setup" --before-context=2 --after-context=28
+
+echo "Prepared folders are installed in $PREFIX/share/$PRGNAM/hp4950v215"
+EOF
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (HP49/50 emulator)
 $PRGNAM:
