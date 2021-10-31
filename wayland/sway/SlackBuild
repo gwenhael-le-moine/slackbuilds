@@ -40,8 +40,6 @@ meson setup \
       --mandir /usr/man/ \
       -Dsd-bus-provider=basu \
       -Dtray=auto \
-      -Dlogind=enabled \
-      -Dlogind-provider=elogind \
       build/
 ninja -C build/
 cd build/
