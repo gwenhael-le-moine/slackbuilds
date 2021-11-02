@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# variables
+
+TAG=gwh
+TMP=/tmp/$TAG
+OUTPUT=/tmp
+CWD=$(pwd)
+PRGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PRGNAM
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+GITHUB_REPO=Fred78290/nct6687d
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+KERNEL_VERSION=$(uname -r)
+
+ARCH=$(uname -m)
+BUILD=1
+
+PREFIX=/usr
+
+SLCKFLAGS="-fPIC -O2"
+
+mkdir -p $PKG
+
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+cd $REPOSITORY
+git pull --all
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+# compilation
+make
+
+# installation
+mkdir -p $PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/
+cp nct6687.ko $PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/
+
+mkdir -p $PKG/usr/doc/$PRGNAM/
+cp -R images/ LICENSE *.md $PKG/usr/doc/$PRGNAM/
+
+# correction
+cd $PKG
+chown -R root:root *
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Linux kernel module for Nuvoton NCT6687-R)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM:
+EOF
+
+# empaquetage
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')_${KERNEL_VERSION}-$ARCH-$BUILD$TAG.txz
