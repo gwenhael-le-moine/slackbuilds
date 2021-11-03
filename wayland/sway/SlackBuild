@@ -33,7 +33,9 @@ cd $TMP/$PRGNAM/
 
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
-git am $CWD/6249-tray-menu.patch
+for p in $CWD/patches/*.patch; do
+    git am $p
+done
 
 meson setup \
       --prefix /usr \
