@@ -6,8 +6,9 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 GITHUB_REPO=gwenhael-le-moine/x49gp
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+NEWRPL_VERSION=1487
 
-BUILD=2
+BUILD=4
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -17,7 +18,8 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORY=$REPOSITORIES/$PRGNAM
 
 PREFIX=/usr
 
@@ -55,9 +57,9 @@ mkdir -p $PKG$PREFIX/share/$PRGNAM
 [ ! -e $CWD/hp4950v215.zip ] && wget -c -O $CWD/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
 unzip -d $PKG$PREFIX/share/$PRGNAM/ $CWD/hp4950v215.zip
 
-mkdir -p $PKG$PREFIX/share/$PRGNAM/newrpl/
-wget -c -O $PKG$PREFIX/share/$PRGNAM/newrpl/newrplfw.bin https://hpgcc3.org/downloads/newrplfw.bin
-echo "newrplfw.bin" > $PKG$PREFIX/share/$PRGNAM/newrpl/update.scp
+mkdir -p $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/
+wget -c -O $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/newrpl.bin https://phoenixnap.dl.sourceforge.net/project/newrpl/TARGET%2050g-ROM/newRPL-${NEWRPL_VERSION}-firmware-50g.bin
+echo "newrpl.bin" > $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/update.scp
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM/
 cp README* sdcard $PKG$PREFIX/doc/$PRGNAM/
@@ -69,6 +71,13 @@ unzip -d $PKG$PREFIX/doc/$PRGNAM/HP_50g_Advanced_User-s_Reference_Manual_Edition
 mkdir -p $PKG$PREFIX/doc/$PRGNAM/HP_50g_User-s_Guide
 [ ! -e $CWD/hp50gug.zip ] && wget -c -O $CWD/hp50gug.zip https://www.hpcalc.org/hp49/docs/misc/hp50gug.zip
 unzip -d $PKG$PREFIX/doc/$PRGNAM/HP_50g_User-s_Guide/ $CWD/hp50gug.zip
+
+[ ! -e $REPOSITORIES/newRPL-hp50g-usersguide ] && git clone https://github.com/smartin-calc/newRPL-hp50g-usersguide.git $REPOSITORIES/newRPL-hp50g-usersguide
+cd $REPOSITORIES/newRPL-hp50g-usersguide
+git pull --all
+
+cp -R $REPOSITORIES/newRPL-hp50g-usersguide $PKG$PREFIX/doc/$PRGNAM/
+rm -fr $PKG$PREFIX/doc/$PRGNAM/newRPL-hp50g-usersguide/.git
 
 # Cleaning
 cd $PKG
