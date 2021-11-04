@@ -109,8 +109,8 @@ $PRGNAM: Emulator of the newer Hewlett Packard Handheld Calculator Models with A
 $PRGNAM: (HP49g+ HP50).
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Post-installation setup:
-$PRGNAM: $ x49gp-bootstrap-config
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: https://sourceforge.net/projects/x49gp/
 $PRGNAM: https://github.com/${GITHUB_REPO}
