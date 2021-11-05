@@ -61,10 +61,16 @@ cd build-ui/
 qmake ../newrpl-ui.pro
 make -j$NPROC
 
+cd $TMP/$PRGNAM/
+mkdir build-ui-prime
+cd build-ui-prime/
+qmake ../newrpl-ui-prime.pro
+make -j$NPROC
 
 cd $TMP/$PRGNAM/
 mkdir -p $PKG$PREFIX/bin/
 cp build-ui/newrpl-ui build-comp/newrpl-comp $PKG$PREFIX/bin/
+cp build-ui-prime/newrpl-ui $PKG$PREFIX/bin/newrpl-ui-prime
 cp build-elf2rom/elf2rom $PKG$PREFIX/bin/newrpl-elf2rom
 cp build-bmp2font/bmp2font $PKG$PREFIX/bin/newrpl-bmp2font
 
