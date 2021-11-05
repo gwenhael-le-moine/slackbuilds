@@ -18,6 +18,8 @@ ARCH=$(uname -m)
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 PREFIX=/usr
 
+NPROC=$(nproc)
+
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 
@@ -36,28 +38,29 @@ cd $TMP/$PRGNAM/
 mkdir build-elf2rom
 cd build-elf2rom/
 qmake ../tools/elf2rom//elf2rom.pro
-make
+make -j$NPROC
 cp elf2rom ../tools-bin/
 
 cd $TMP/$PRGNAM/
 mkdir build-bmp2font
 cd build-bmp2font/
 qmake ../tools/fonts/bmp2font//bmp2font.pro
-make
+make -j$NPROC
 cp bmp2font ../tools-bin/
 
 cd $TMP/$PRGNAM/
 mkdir build-comp
 cd build-comp/
 qmake ../newrpl-comp.pro
-make
+make -j$NPROC
 cp newrpl-comp ../tools-bin/
 
 cd $TMP/$PRGNAM/
 mkdir build-ui
 cd build-ui/
 qmake ../newrpl-ui.pro
-make
+make -j$NPROC
+
 
 cd $TMP/$PRGNAM/
 mkdir -p $PKG$PREFIX/bin/
