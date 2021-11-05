@@ -33,31 +33,37 @@ cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
-cd tools/elf2rom/
-qmake elf2rom.pro
+mkdir build-elf2rom
+cd build-elf2rom/
+qmake ../tools/elf2rom//elf2rom.pro
 make
-cp elf2rom ../../tools-bin/
+cp elf2rom ../tools-bin/
 
 cd $TMP/$PRGNAM/
-cd tools/fonts/bmp2font/
-qmake bmp2font.pro
+mkdir build-bmp2font
+cd build-bmp2font/
+qmake ../tools/fonts/bmp2font//bmp2font.pro
 make
-cp bmp2font ../../../tools-bin/
+cp bmp2font ../tools-bin/
 
 cd $TMP/$PRGNAM/
-qmake newrpl-comp.pro
+mkdir build-comp
+cd build-comp/
+qmake ../newrpl-comp.pro
 make
-cp newrpl-comp tools-bin/
+cp newrpl-comp ../tools-bin/
 
-# This `make clean` is important
-make clean
-qmake newrpl-ui.pro
+cd $TMP/$PRGNAM/
+mkdir build-ui
+cd build-ui/
+qmake ../newrpl-ui.pro
 make
 
 mkdir -p $PKG$PREFIX/bin/
-cp newrpl-ui newrpl-comp $PKG$PREFIX/bin/
-cp tools-bin/elf2rom $PKG$PREFIX/bin/newrpl-elf2rom
-cp tools-bin/bmp2font $PKG$PREFIX/bin/newrpl-bmp2font
+cd $TMP/$PRGNAM/
+cp build-ui/newrpl-ui build-comp/newrpl-comp $PKG$PREFIX/bin/
+cp build-elf2rom/elf2rom $PKG$PREFIX/bin/newrpl-elf2rom
+cp build-bmp2font/bmp2font $PKG$PREFIX/bin/newrpl-bmp2font
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp LICENSE* $PKG$PREFIX/doc/$PRGNAM/
