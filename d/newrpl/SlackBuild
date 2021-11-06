@@ -3,7 +3,7 @@
 # variables
 VERSION=${VERSION:-"trunk"}
 
-BUILD=1
+BUILD=2
 
 TAG=gwh
 OUTPUT=/tmp
@@ -35,18 +35,22 @@ cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
-mkdir build-elf2rom
-cd build-elf2rom/
-qmake ../tools/elf2rom//elf2rom.pro
-make -j$NPROC
-cp elf2rom ../tools-bin/
+# https://www.hpmuseum.org/forum/thread-17667-post-154012.html#pid154012
+# elf2rom is only needed to build actual calculator firmware
+# bmp2font is only needed to edit or create fonts
 
-cd $TMP/$PRGNAM/
-mkdir build-bmp2font
-cd build-bmp2font/
-qmake ../tools/fonts/bmp2font//bmp2font.pro
-make -j$NPROC
-cp bmp2font ../tools-bin/
+# mkdir build-elf2rom
+# cd build-elf2rom/
+# qmake ../tools/elf2rom//elf2rom.pro
+# make -j$NPROC
+# cp elf2rom ../tools-bin/
+
+# cd $TMP/$PRGNAM/
+# mkdir build-bmp2font
+# cd build-bmp2font/
+# qmake ../tools/fonts/bmp2font//bmp2font.pro
+# make -j$NPROC
+# cp bmp2font ../tools-bin/
 
 cd $TMP/$PRGNAM/
 mkdir build-comp
@@ -71,8 +75,8 @@ cd $TMP/$PRGNAM/
 mkdir -p $PKG$PREFIX/bin/
 cp build-ui/newrpl-ui build-comp/newrpl-comp $PKG$PREFIX/bin/
 cp build-ui-prime/newrpl-ui $PKG$PREFIX/bin/newrpl-ui-prime
-cp build-elf2rom/elf2rom $PKG$PREFIX/bin/newrpl-elf2rom
-cp build-bmp2font/bmp2font $PKG$PREFIX/bin/newrpl-bmp2font
+# cp build-elf2rom/elf2rom $PKG$PREFIX/bin/newrpl-elf2rom
+# cp build-bmp2font/bmp2font $PKG$PREFIX/bin/newrpl-bmp2font
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp LICENSE* $PKG$PREFIX/doc/$PRGNAM/
