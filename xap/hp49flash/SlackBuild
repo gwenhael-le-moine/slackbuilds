@@ -1,0 +1,60 @@
+#!/bin/bash
+set -x -e
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+ARCH=$(uname -m)
+BUILD=1
+VERSION=${VERSION:-0.2.3}
+
+TAG=gwh
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+PREFIX=/usr
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+# cleaning
+rm -fr $PKG $TMP
+
+# download
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz ] && wget -c https://www.hpcalc.org/hp49/pc/rom/hp49fl02.tgz -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz
+
+# installation
+mkdir -p $PKG $TMP
+cd $TMP
+tar xvf $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz
+cd ${PRGNAM}-${VERSION}
+
+make
+
+mkdir -p $PKG$PREFIX/bin
+cp upgrade $PKG$PREFIX/bin/$PRGNAM
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp Changes FileFormat GPL Protocol README ToDo $PKG$PREFIX/doc/$PRGNAM
+chmod 644 $PKG$PREFIX/doc/$PRGNAM/*
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (program to update the HP 49G's ROM under Linux.)
+$PRGNAM:
+$PRGNAM: GPL source code for a program to update the HP 49G's ROM under Linux.
+$PRGNAM: Works with either a GTK graphical interface or a command line interface.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://www.hpcalc.org/details/3242
+$PRGNAM:
+EOF
+
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-${VERSION}-$ARCH-$BUILD$TAG.txz
