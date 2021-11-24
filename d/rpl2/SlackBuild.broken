@@ -1,0 +1,93 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+VERSION=${VERSION:-4.1.32}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/rpl-$VERSION
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+mkdir -p $REPOSITORY
+[ ! -e $REPOSITORY/$PRGNAM-$VERSION.tar.bz2 ] && wget -c -O $REPOSITORY/$PRGNAM-$VERSION.tar.bz2 http://www.rpl2.net/download/rpl-${VERSION}.tar.bz2
+
+cd $TMP/
+tar xvf $REPOSITORY/$PRGNAM-$VERSION.tar.bz2
+cd rpl-$VERSION
+
+# configuration
+./autogen.sh
+
+./configure \
+    --prefix=$PREFIX \
+    --mandir=$PREFIX/man \
+    --libdir=$PREFIX/lib$(uname -m | grep -o 64) \
+    --disable-embedded-gnuplot \
+    --disable-dependency-tracking
+    # --enable-rplcas \
+    # --enable-native \
+    # --enable-experimental \
+    # --with-x \
+
+# compilation
+make -j$(nproc)
+
+# installation
+make install DESTDIR=$PKG
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R AUTHORS COPYING ChangeLog HEADER INSTALL LIMITATIONS Licence_CeCILL_V2-en.txt Licence_CeCILL_V2-fr.txt NEWS README doc/ examples/ $PKG$PREFIX/doc/$PRGNAM
+
+[ ! -e $REPOSITORY/reference_rpl_french.ps.bz2 ] && wget -c -O $REPOSITORY/reference_rpl_french.ps.bz2 http://www.rpl2.net/download/reference_rpl_french.ps.bz2
+
+bzcat $REPOSITORY/reference_rpl_french.ps.bz2 > $PKG$PREFIX/doc/$PRGNAM/reference_rpl_french.ps
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (a programming language designed for scientific computations)
+$PRGNAM:
+$PRGNAM: Your goal: improve the portability and facilitate the writing of your numerical
+$PRGNAM: algorithms or symbolic computations on parallel calulators.
+$PRGNAM: A simple solution: use RPL/2 language and extensions
+$PRGNAM:    An functional Turing-equivalent language
+$PRGNAM:    A compiled language
+$PRGNAM:    A type-inference language
+$PRGNAM:    An extensible language
+$PRGNAM: https://github.com/${GITHUB_REPO}
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
