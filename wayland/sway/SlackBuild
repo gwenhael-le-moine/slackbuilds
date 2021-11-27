@@ -37,6 +37,9 @@ for p in $CWD/patches/*.patch; do
     git am $p
 done
 
+# Slackware ships meson 0.59.4 and won't move to 0.60.x for the time being
+sed -i 's|0.60|0.59|' meson.build
+
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
