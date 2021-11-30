@@ -4,7 +4,7 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=gwenhael-le-moine/x49gp
+GITHUB_REPO=claudiobsd/x49gp
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 NEWRPL_VERSION=1487
 
@@ -46,6 +46,13 @@ find . \
      -exec chmod 644 {} \;
 
 # Building
+./pull-roms.sh
+
+# temporary fix
+[ ! -e ./firmware/boot-49g+.bin ] && [ -e $CWD/boot-49g+.bin ] && cp $CWD/boot-49g+.bin firmware/
+[ ! -e ./firmware/boot-50g.bin ] && [ -e $CWD/boot-50g.bin ] && cp $CWD/boot-50g.bin firmware/
+sed -i 's|= boot-|= firmware/boot-|g' Makefile
+
 make INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 make sdcard INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 
@@ -57,9 +64,13 @@ mkdir -p $PKG$PREFIX/share/$PRGNAM
 [ ! -e $CWD/hp4950v215.zip ] && wget -c -O $CWD/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
 unzip -d $PKG$PREFIX/share/$PRGNAM/ $CWD/hp4950v215.zip
 
-mkdir -p $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/
-wget -c -O $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/newrpl.bin https://phoenixnap.dl.sourceforge.net/project/newrpl/TARGET%2050g-ROM/newRPL-${NEWRPL_VERSION}-firmware-50g.bin
-echo "newrpl.bin" > $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/update.scp
+# mkdir -p $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/
+# wget -c -O $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/newrpl.bin https://phoenixnap.dl.sourceforge.net/project/newrpl/TARGET%2050g-ROM/newRPL-${NEWRPL_VERSION}-firmware-50g.bin
+# echo "newrpl.bin" > $PKG$PREFIX/share/$PRGNAM/newrpl-${NEWRPL_VERSION}/update.scp
+
+mkdir -p $PKG$PREFIX/share/$PRGNAM/newrpl/
+wget -c -O $PKG$PREFIX/share/$PRGNAM/newrpl/newrplfw.bin https://www.hpgcc3.org/downloads/newrplfw.bin
+echo "newrplfw.bin" > $PKG$PREFIX/share/$PRGNAM/newrpl/update.scp
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM/
 cp README* sdcard $PKG$PREFIX/doc/$PRGNAM/

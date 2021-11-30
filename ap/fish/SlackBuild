@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+GITHUB_REPO=fish-shell/fish-shell
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM-*
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+
+cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+# configuration
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DCMAKE_INSTALL_MANDIR=$PREFIX/man \
+    -DCMAKE_INSTALL_DOCDIR=$PREFIX/doc/$PRGNAM \
+    .
+
+# compilation
+make -j$(nproc)
+
+# installation
+make install DESTDIR=$PKG
+mkdir -p $PKG$PREFIX/man/man1
+mv $PKG$PREFIX/man/lsyncd.1 $PKG$PREFIX/man/man1/
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R COPYING ChangeLog INSTALL *.md examples $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (The user-friendly command line shell)
+$PRGNAM:
+$PRGNAM: fish is a smart and user-friendly command line shell for macOS, Linux,
+$PRGNAM: and the rest of the family. fish includes features like syntax highlighting,
+$PRGNAM: autosuggest-as-you-type, and fancy tab completions that just work,
+$PRGNAM: with no configuration required.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://fishshell.com/
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
