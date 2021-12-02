@@ -18,9 +18,11 @@ CHANNEL=${CHANNEL:=stable}
 wget -c --no-check-certificate https://dl.google.com/linux/direct/google-chrome-${CHANNEL}_current_$DEBARCH.deb
 cp $BUILD_DIR/google-chrome.SlackBuild .
 
-RELEASE=$CHANNEL ./google-chrome.SlackBuild
+RELEASE=$CHANNEL BUILD=1gwh ./google-chrome.SlackBuild
 
 upgradepkg --install-new --reinstall /tmp/google-chrome-*-$ARCH-*.txz
+
+sed -i "s|Exec=/usr/bin/google-chrome\([a-z-]*\)|Exec=/usr/bin/google-chrome\1 --enable-features=UseOzonePlatform --ozone-platform=wayland|g" /usr/share/applications/google-chrome.desktop
 
 rm google-chrome.SlackBuild google-chrome-${CHANNEL}_current_$DEBARCH.deb
 
