@@ -8,7 +8,7 @@ GITHUB_REPO=gwenhael-le-moine/x49gp #claudiobsd/x49gp
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 NEWRPL_VERSION=1487
 
-BUILD=5
+BUILD=6
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -60,22 +60,16 @@ cat <<EOF > $PKG$PREFIX/doc/$PRGNAM/post-install.sh
 
 mkdir -p $PREFIX/share/$PRGNAM
 [ ! -e $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip ] && wget -c -O $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip https://www.hpcalc.org/hp49/pc/rom/hp-arm-models-bootloader.zip
-unzip -d $PREFIX/share/$PRGNAM/ $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip
+unzip -d $PREFIX/share/$PRGNAM/firmware/ $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip
+rm $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip
 
 [ ! -e $PREFIX/doc/$PRGNAM/hp4950v215.zip ] && wget -c -O $PREFIX/doc/$PRGNAM/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
 unzip -d $PREFIX/share/$PRGNAM/ $PREFIX/doc/$PRGNAM/hp4950v215.zip
+rm $PREFIX/doc/$PRGNAM/hp4950v215.zip
 
 mkdir -p $PREFIX/share/$PRGNAM/newrpl/
 wget -c -O $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin https://www.hpgcc3.org/downloads/newrplfw.bin
 echo "newrplfw.bin" > $PREFIX/share/$PRGNAM/newrpl/update.scp
-
-mkdir -p $PREFIX/doc/$PRGNAM/HP_50g_Advanced_User-s_Reference_Manual_Edition_2
-[ ! -e $PREFIX/doc/$PRGNAM/hp50gaur.zip ] && wget -c -O $PREFIX/doc/$PRGNAM/hp50gaur.zip https:/www.hpcalc.org/hp49/docs/misc/hp50gaur.zip
-unzip -d $PREFIX/doc/$PRGNAM/HP_50g_Advanced_User-s_Reference_Manual_Edition_2/ $PREFIX/doc/$PRGNAM/hp50gaur.zip
-
-mkdir -p $PREFIX/doc/$PRGNAM/HP_50g_User-s_Guide
-[ ! -e $PREFIX/doc/$PRGNAM/hp50gug.zip ] && wget -c -O $PREFIX/doc/$PRGNAM/hp50gug.zip https:/www.hpcalc.org/hp49/docs/misc/hp50gug.zip
-unzip -d $PREFIX/doc/$PRGNAM/HP_50g_User-s_Guide/ $PREFIX/doc/$PRGNAM/hp50gug.zip
 EOF
 
 # Cleaning
