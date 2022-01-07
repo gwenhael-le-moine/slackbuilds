@@ -5,41 +5,71 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-BUILD=6
+GITHUB_REPO=crystal-lang/crystal
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 
+BUILD=1
 TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
-LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
-VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
-CLEAN_VERSION=$(echo $VERSION | tr '-' '_')
-
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
-
-mkdir -p $REPOSITORY
-
 # cleaning
-rm -fr $PKG
+rm -fr $PKG $TMP/$PRGNAM/
 
-# download
-[ ! -e $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
+# mise en place
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+cd $REPOSITORY
+git pull --all
 
-[ ! -e $REPOSITORY/completion.zsh ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O $REPOSITORY/completion.zsh
+cp -R $REPOSITORY $TMP/
+cd $TMP/$PRGNAM/
+
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+make -j$(nproc) interpreter=1 release=1
 
 # installation
-mkdir -p $PKG
-cd $PKG
-tar xvf $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
-mv crystal-$VERSION $PKG$PREFIX
-mkdir -p $PKG$PREFIX/doc/
-mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
-mv $PKG$PREFIX/share/man $PKG$PREFIX/
+make install PREFIX=$PREFIX MANDIR=$PKG$PREFIX/man LIBDIR=$PKG$PREFIX/lib$(uname -m | grep -o 64) DESTDIR=$PKG
 
-mkdir -p $PKG$PREFIX/share/zsh/site-functions/
-cp -R $REPOSITORY/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+ ########
+# shards #
+ ########
+SHARDS_PRGNAM=shards
+SHARDS_GITHUB_REPO=crystal-lang/shards
+SHARDS_VERSION=${SHARDS_VERSION:-$(curl -s https://api.github.com/repos/${SHARDS_GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+SHARDS_REPOSITORY=${SHARDS_REPOSITORY:-/home/installs/SlackBuilds/repositories/$SHARDS_PRGNAM}
+SHARDS_PKG=$TMP/pkg-$SHARDS_PRGNAM
+
+# cleaning
+rm -fr $SHARDS_PKG $TMP/$SHARDS_PRGNAM/
+
+# mise en place
+[ ! -e $SHARDS_REPOSITORY ] && git clone https://github.com/${SHARDS_GITHUB_REPO} $SHARDS_REPOSITORY
+cd $SHARDS_REPOSITORY
+git pull --all
+
+cp -R $SHARDS_REPOSITORY $TMP/
+cd $TMP/$SHARDS_PRGNAM/
+
+[ "x$SHARDS_VERSION" == "xtrunk" ] && SHARDS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $SHARDS_VERSION
+
+make -j$(nproc) release=1
+
+# installation
+make install PREFIX=$PREFIX MANDIR=$SHARDS_PKG$PREFIX/man LIBDIR=$SHARDS_PKG$PREFIX/lib$(uname -m | grep -o 64) DESTDIR=$SHARDS_PKG
+
+[ -d $SHARDS_PKG/usr/man ] && find $SHARDS_PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+ ################
+# merge both PKG #
+ ################
+
+cp -R $SHARDS_PKG/* $PKG
 
 # packaging
 cd $PKG
@@ -59,4 +89,4 @@ $PRGNAM: http://crystal-lang.org/
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$CLEAN_VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-${VERSION}_${SHARDS_VERSION}-$ARCH-$BUILD$TAG.txz

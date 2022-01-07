@@ -1,0 +1,62 @@
+#!/bin/bash
+set -x -e
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+ARCH=$(uname -m)
+BUILD=6
+
+TAG=gwh
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+PREFIX=/usr
+
+LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
+VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
+CLEAN_VERSION=$(echo $VERSION | tr '-' '_')
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+# cleaning
+rm -fr $PKG
+
+# download
+[ ! -e $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
+
+[ ! -e $REPOSITORY/completion.zsh ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O $REPOSITORY/completion.zsh
+
+# installation
+mkdir -p $PKG
+cd $PKG
+tar xvf $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
+mv crystal-$VERSION $PKG$PREFIX
+mkdir -p $PKG$PREFIX/doc/
+mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
+mv $PKG$PREFIX/share/man $PKG$PREFIX/
+
+mkdir -p $PKG$PREFIX/share/zsh/site-functions/
+cp -R $REPOSITORY/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
+
+# packaging
+cd $PKG
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (The Crystal Programming Language)
+$PRGNAM:
+$PRGNAM: Crystal is a programming language with the following goals:
+$PRGNAM: .Have the same syntax as Ruby, or at least as similar as possible.
+$PRGNAM: .Statically type-checked but without having to specify the type of variables or
+$PRGNAM:    method arguments.
+$PRGNAM: .Be able to call C code by writing bindings to it in Crystal.
+$PRGNAM: .Have compile-time evaluation and generation of code, to avoid boilerplate code.
+$PRGNAM: .Compile to efficient native code.
+$PRGNAM:
+$PRGNAM: http://crystal-lang.org/
+EOF
+
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$CLEAN_VERSION-$ARCH-$BUILD$TAG.txz
