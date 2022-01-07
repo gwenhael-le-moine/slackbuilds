@@ -5,7 +5,8 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-VERSION=$(curl -s https://api.github.com/repos/factor/factor/releases/latest | grep tag_name | grep -o "[0-9.]*")
+GITHUB_REPO=factor/factor
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 BUILD=1
 
 TAG=gwh
@@ -16,20 +17,26 @@ PREFIX=/usr
 
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 
-mkdir -p $REPOSITORY
+mkdir -p $TMP
 
 # cleaning
 rm -fr $PKG
 
-# unpacking
-[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz ] && wget -c http://downloads.factorcode.org/releases/$VERSION/factor-linux-x86-64-$VERSION.tar.gz -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 
-mkdir -p $PKG$PREFIX/libexec/
-( cd $PKG$PREFIX/libexec/
-    tar xf $REPOSITORY/${PRGNAM}-${VERSION}.tar.gz
-)
+[ -e $TMP/$PRGNAM ] && rm -fr $TMP/$PRGNAM
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+./build.sh update
 
 # installation
+mkdir -p $PKG$PREFIX/libexec/$PRGNAM
+cp -a * $PKG$PREFIX/libexec/$PRGNAM
+
 mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
 cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
 #!/bin/bash
