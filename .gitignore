@@ -34,7 +34,7 @@ a/linux/patches/
 xap/st/patches/st-scrollback*
 xap/st/patches/st-vertcenter*
 *.rpm
-/d/crystal/completion.zsh
+/d/crystal-bin/completion.zsh
 *.pk3
 *.pk4
 /xap/android-x86/android-8.1-r1/
