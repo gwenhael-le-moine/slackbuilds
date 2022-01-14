@@ -18,6 +18,7 @@ PREFIX=/usr
 
 # cleaning
 rm -fr $PKG $TMP/$PRGNAM/
+mkdir -p $TMP/
 
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
