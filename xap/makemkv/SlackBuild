@@ -3,6 +3,9 @@ set -x
 
 PRGNAM=$(basename $(pwd))
 
+# Fetching sources
+VERSION=${VERSION:-1.16.5}
+
 BUILD=1
 
 ARCH=$(uname -m)
@@ -24,9 +27,6 @@ mkdir -p $TMP
 
 # Cleaning
 rm -fr $TMP/$PRGNAM $PKG
-
-# Fetching sources
-VERSION=${VERSION:-1.15.4}
 
 [ ! -e $REPOSITORY/makemkv-bin-$VERSION.tar.gz ] && wget -c https://www.makemkv.com/download/makemkv-bin-$VERSION.tar.gz -O $REPOSITORY/makemkv-bin-$VERSION.tar.gz
 [ ! -e $REPOSITORY/makemkv-oss-$VERSION.tar.gz ] && wget -c https://www.makemkv.com/download/makemkv-oss-$VERSION.tar.gz -O $REPOSITORY/makemkv-oss-$VERSION.tar.gz
