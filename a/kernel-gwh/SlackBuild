@@ -56,10 +56,10 @@ make oldconfig $*
 make $NUMJOBS
 make modules $NUMJOBS
 make modules_install INSTALL_MOD_PATH=$PKG
-if [[ "$ARCH" == "aarch64" ]]; then
-    make dtbs
-    make dtbs_install INSTALL_DTBS_PATH=$PKG/boot/dtb
-fi
+# if [[ "$ARCH" == "aarch64" ]]; then
+#     make dtbs
+#     make dtbs_install INSTALL_DTBS_PATH=$PKG/boot/dtb
+# fi
 
 if [ -z "${HEADERS_ARCH}" ]; then
     case "$(uname -m)" in
@@ -90,22 +90,22 @@ mkdir -p $PKG/install
 mkdir -p $PKG/boot/
 cp System.map $PKG/boot/System.map-gwh-$VERSION
 cp .config $PKG/boot/config-gwh-$VERSION
-if [[ "$ARCH" == "aarch64" ]]; then
-    cp arch/arm64/boot/Image $PKG/boot/vmlinux-gwh-$VERSION
-    ( cd $PKG/boot/
-      ln -s vmlinux-gwh-$VERSION vmlinux-gwh
-    )
-    cat <<EOF > $PKG/install/doinst.sh
-[ -e /boot/Image ] && mv /boot/Image /boot/Image.old
-cp /boot/vmlinux-gwh-$VERSION /boot/Image
-eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r )
-cp /boot/initrd.gz /boot/initrd-gwh.gz
-EOF
-else
+# if [[ "$ARCH" == "aarch64" ]]; then
+#     cp arch/arm64/boot/Image $PKG/boot/vmlinux-gwh-$VERSION
+#     ( cd $PKG/boot/
+#       ln -s vmlinux-gwh-$VERSION vmlinux-gwh
+#     )
+#     cat <<EOF > $PKG/install/doinst.sh
+# [ -e /boot/Image ] && mv /boot/Image /boot/Image.old
+# cp /boot/vmlinux-gwh-$VERSION /boot/Image
+# eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r )
+# cp /boot/initrd.gz /boot/initrd-gwh.gz
+# EOF
+# else
     cp arch/${ARCH}/boot/bzImage $PKG/boot/vmlinuz-gwh-$VERSION
-    ( cd $PKG/boot/
-      ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
-    )
+    # ( cd $PKG/boot/
+    #   ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
+    # )
 
     cat <<EOF > $PKG/install/doinst.sh
 cp /boot/elilo-x86_64.efi /boot/efi/EFI/Slackware/elilo.efi
@@ -118,7 +118,7 @@ else
 fi
 cp /boot/initrd.gz /boot/efi/EFI/Slackware/initrd-gwh.gz
 EOF
-fi
+# fi
 
 make clean
 
