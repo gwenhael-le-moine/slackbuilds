@@ -37,7 +37,7 @@ rm -fr usr
 mv android-${VERSION} ${PRGNAM}
 
 mkdir -p $PKG$PREFIX/bin/
-cp $REPOSITORY/${PRGNAM}.sh $PKG$PREFIX/bin/
+cp $CWD/${PRGNAM}.sh $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/${PRGNAM}.sh
 
 mkdir -p $PKG$PREFIX/share/${PRGNAM}
