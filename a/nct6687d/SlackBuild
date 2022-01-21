@@ -12,7 +12,7 @@ PKG=$TMP/pkg-$PRGNAM
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
 GITHUB_REPO=Fred78290/nct6687d
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-"latest"}
 KERNEL_VERSION=$(uname -r)
 
 ARCH=$(uname -m)
@@ -34,8 +34,18 @@ rm -fr $PKG $TMP/$PRGNAM
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
-
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+case $VERSION in
+    trunk)
+        VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        ;;
+    latest)
+        VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+        git checkout $VERSION
+        ;;
+    *)
+        git checkout $VERSION
+        ;;
+esac
 
 # compilation
 make
