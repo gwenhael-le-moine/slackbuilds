@@ -30,7 +30,7 @@ PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${PRGNAM}/${PRGNAM}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/dbeaver/dbeaver/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
@@ -46,7 +46,7 @@ set -e
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 
-SRCNAM=${PRGNAM}-ce
+SRCNAM=dbeaver-ce
 SRCVER=$VERSION-linux.gtk.$SRCARCH
 DESTDIR=$PKG/opt/
 
@@ -55,7 +55,7 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 mkdir -p $REPOSITORY
 
 # mise en place
-[ ! -e $REPOSITORY/${SRCNAM}-${VERSION}-linux.gtk.${SRCARCH}.tar.gz ] && wget -c -O $REPOSITORY/${SRCNAM}-${VERSION}-linux.gtk.${SRCARCH}.tar.gz https://github.com/${PRGNAM}/${PRGNAM}/releases/download/${VERSION}/${SRCNAM}-${VERSION}-linux.gtk.${SRCARCH}.tar.gz
+[ ! -e $REPOSITORY/${SRCNAM}-${VERSION}-linux.gtk.${SRCARCH}.tar.gz ] && wget -c -O $REPOSITORY/${SRCNAM}-${VERSION}-linux.gtk.${SRCARCH}.tar.gz https://github.com/dbeaver/dbeaver/releases/download/${VERSION}/${SRCNAM}-${VERSION}-linux.gtk.${SRCARCH}.tar.gz
 
 mkdir -p $DESTDIR
 cd $DESTDIR
@@ -66,23 +66,23 @@ find -L . \
   -o -perm 511 \) -exec chmod 755 {} \; -o \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
-chmod ga+x $DESTDIR/$PRGNAM/$PRGNAM
+chmod ga+x $DESTDIR/dbeaver/dbeaver
 
 mkdir -p $PKG/usr/bin
-cat << EOF > $PKG/usr/bin/$PRGNAM
+cat << EOF > $PKG/usr/bin/dbeaver
 #!/bin/bash
 cd \$HOME
-/opt/$PRGNAM/$PRGNAM \$@
+/opt/dbeaver/dbeaver \$@
 EOF
-chmod 0755 $PKG/usr/bin/$PRGNAM
+chmod 0755 $PKG/usr/bin/dbeaver
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+mkdir -p $PKG/usr/doc/dbeaver
 cp -a \
-  $DESTDIR/$PRGNAM/readme.txt $DESTDIR/$PRGNAM/licenses/* \
-  $PKG/usr/doc/$PRGNAM-$VERSION
+  $DESTDIR/dbeaver/readme.txt $DESTDIR/dbeaver/licenses/* \
+  $PKG/usr/doc/dbeaver
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
