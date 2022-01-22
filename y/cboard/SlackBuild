@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 
 BUILD=1
-VERSION=${VERSION:-"trunk"}
+VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")

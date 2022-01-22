@@ -1,6 +1,6 @@
 #!/bin/bash
 # variables
-VERSION=${VERSION:-"trunk"}
+VERSION=${VERSION:-latest}
 BUILD=2
 
 TAG=gwh

@@ -9,7 +9,7 @@ OUTPUT=/tmp
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-VERSION=${VERSION:-"trunk"}
+VERSION=${VERSION:-latest}
 
 DOCS="LICENSE README.rst AUTHORS.rst"
 

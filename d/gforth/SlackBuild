@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-"trunk"} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
