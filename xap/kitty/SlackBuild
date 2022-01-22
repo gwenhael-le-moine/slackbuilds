@@ -17,7 +17,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 PREFIX=/usr
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM

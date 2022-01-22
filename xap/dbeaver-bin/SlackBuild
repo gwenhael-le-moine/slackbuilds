@@ -50,7 +50,7 @@ SRCNAM=dbeaver-ce
 SRCVER=$VERSION-linux.gtk.$SRCARCH
 DESTDIR=$PKG/opt/
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 mkdir -p $REPOSITORY
 

@@ -7,7 +7,7 @@ TAG=gwh
 TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)
-REPOSITORIES=/home/installs/SlackBuilds/repositories
+REPOSITORIES=/home/installs/SlackBuilds/_repositories
 REPOSITORY=$REPOSITORIES/$PRGNAM
 
 PRGNAM=$(basename $CWD)

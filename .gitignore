@@ -1,5 +1,5 @@
 Alien/
-repositories/
+_repositories/
 *.tar.?z*
 *.deb
 *.zip

@@ -15,7 +15,7 @@ OUTPUT=${OUTPUT:-/tmp}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable

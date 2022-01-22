@@ -16,7 +16,7 @@ PREFIX=/usr
 
 LATEST_RELEASE_URL="https://builds.shipilev.net/openjdk-jdk${VERSION}/openjdk-jdk${VERSION}-linux-${ARCH}-${FLAVOR}.tar.xz"
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 mkdir -p $REPOSITORY
 

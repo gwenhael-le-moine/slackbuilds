@@ -32,7 +32,7 @@ VERSION=${VERSION:-latest}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in

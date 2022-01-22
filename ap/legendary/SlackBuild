@@ -18,7 +18,7 @@ PREFIX=/usr
 
 SLCKFLAGS="-fPIC -O2"
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 

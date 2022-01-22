@@ -17,7 +17,7 @@ LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/r
 VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
 CLEAN_VERSION=$(echo $VERSION | tr '-' '_')
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 mkdir -p $REPOSITORY
 

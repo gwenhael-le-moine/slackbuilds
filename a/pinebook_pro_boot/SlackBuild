@@ -16,7 +16,7 @@ ARCH=${ARCH:-noarch}
 
 PREFIX=${PREFIX:-/usr}
 
-REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:=/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 # nettoyage préalable
 for d in $PKG $TMP/$PRGNAM; do

@@ -12,7 +12,7 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-3}
 TAG=${TAG:-gwh}
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

@@ -9,7 +9,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 GITHUB_REPO=postmodern/chruby
 VERSION=${VERSION:-latest}

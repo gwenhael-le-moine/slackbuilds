@@ -34,7 +34,7 @@ TAG=gwh
 BRANCH=${BRANCH:-master}
 VERSION=${VERSION:-"trunk"}
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PKGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then

@@ -19,7 +19,7 @@ DOCS="CHANGELOG INSTALL LICENSE NOTICE README.md TECHNOTES.txt TODO"
 ARCH=$(uname -m)
 BUILD=1
 
-REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 PREFIX=/usr
 
