@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 GITHUB_REPO=pavouk/lgi
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 
 # default settings
 PRGNAM=$(basename $CWD)

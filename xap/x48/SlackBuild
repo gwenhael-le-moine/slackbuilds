@@ -5,7 +5,7 @@ PRGNAM=x48
 
 BUILD=1
 GITHUB_REPO=gwenhael-le-moine/x48
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -35,6 +35,8 @@ cp -R $REPOSITORY $TMP/$PRGNAM
 # Preparation
 cd $TMP/$PRGNAM
 
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 chown -R root:root .

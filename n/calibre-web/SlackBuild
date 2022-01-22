@@ -2,7 +2,7 @@
 
 # variables
 GITHUB_REPO=janeczku/calibre-web
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 
 RUNNING_USER=${RUNNING_USER:-gwh}
 RUNNING_GROUP=${RUNNING_GROUP:-users}
@@ -41,6 +41,8 @@ cp -r $CWD/rc $PKG/etc/rc.d/rc.$PRGNAM
 sed -i "s|RUNNING_USER|$RUNNING_USER|" $PKG/etc/rc.d/rc.$PRGNAM
 
 cd $PKG/opt/$PRGNAM
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # change default password

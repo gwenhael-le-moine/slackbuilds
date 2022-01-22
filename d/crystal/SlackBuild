@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 GITHUB_REPO=crystal-lang/crystal
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/repositories/$PRGNAM}
 
 BUILD=1
@@ -28,6 +28,8 @@ git pull --all
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 make -j$(nproc) interpreter=1 release=1
@@ -57,6 +59,8 @@ git pull --all
 cp -R $SHARDS_REPOSITORY $TMP/
 cd $TMP/$SHARDS_PRGNAM/
 
+[ "x$SHARDS_VERSION" == "xlatest" ] && SHARDS_VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$SHARDS_VERSION" == "x" ] && SHARDS_VERSION=trunk
 [ "x$SHARDS_VERSION" == "xtrunk" ] && SHARDS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $SHARDS_VERSION
 
 make -j$(nproc) release=1

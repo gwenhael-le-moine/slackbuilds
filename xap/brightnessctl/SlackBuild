@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $(pwd))
 GITHUB_REPO=Hummer12007/brightnessctl
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -32,6 +32,8 @@ cd $TMP
 cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
 
 cd $TMP/$PRGNAM
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 # compilation

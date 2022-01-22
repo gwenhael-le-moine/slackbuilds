@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"trunk"}
+VERSION=${VERSION:-"latest"}
 BUILD=1
 
 TAG=gwh
@@ -30,6 +30,8 @@ git pull --all
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 meson setup --prefix /usr --mandir /usr/man/ build/
@@ -73,4 +75,4 @@ EOF
 
 # empaquetage
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz

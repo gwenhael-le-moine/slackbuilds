@@ -12,7 +12,7 @@ PKG=$TMP/pkg-$PRGNAM
 ARCH=$(uname -m)
 BUILD=1
 GITHUB_REPO=leozide/leocad
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+VERSION=${VERSION:-latest}
 
 REPOSITORY=/home/installs/SlackBuilds/repositories/$PRGNAM
 
@@ -28,6 +28,8 @@ git pull --all
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM/
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
 qmake-qt5 DISABLE_UPDATE_CHECK=1 DOCS_DIR=/usr/doc/$PRGNAM MAN_DIR=/usr/man/man1 leocad.pro
