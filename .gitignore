@@ -43,3 +43,4 @@ xap/st/patches/st-vertcenter*
 /ap/hledger-bin/LICENSE.*
 /ap/hledger-bin/*.md.*
 /xap/x49gp/newrplfw.bin
+/d/crystal/completion.zsh

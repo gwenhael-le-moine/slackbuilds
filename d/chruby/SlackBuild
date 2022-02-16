@@ -42,8 +42,9 @@ cd $TMP/$PRGNAM
 make -j3 PREFIX=$PREFIX
 
 # installation
-make install PREFIX=$PREFIX DOC_DIR=$PREFIX/doc/$PRGNAM DESTDIR=$PKG
-mv $PKG$PREFIX/share/man $PKG$PREFIX/man
+mkdir -p $PKG
+PREFIX=$PREFIX DOC_DIR=$PREFIX/doc/$PRGNAM DESTDIR=$PKG make install PREFIX=$PREFIX DOC_DIR=$PREFIX/doc/$PRGNAM DESTDIR=$PKG
+[ -d $PKG$PREFIX/share/man ] && mv $PKG$PREFIX/share/man $PKG$PREFIX/man
 
 # correction
 cd $PKG
