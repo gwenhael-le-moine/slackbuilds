@@ -3,24 +3,29 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Kron4ek/Conty/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+GITHUB_REPO=Kron4ek/Conty
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
+
+EDITION=${EDITION:-"_lite_dwarfs"} # "", "_lite", "_dwarfs", "_lite_dwarfs"
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 PREFIX=/usr
 
-GITEA_WORK_DIR=/var/lib/gitea
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
-wget -c https://github.com/Kron4ek/Conty/releases/download/${VERSION}/conty.sh -O $CWD/conty.sh
+mkdir -p $REPOSITORY
+
+[ ! -e $REPOSITORY/conty${EDITION}-${VERSION}.sh ] && wget -c https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/conty${EDITION}.sh -O $REPOSITORY/conty${EDITION}-${VERSION}.sh
 
 rm -fr $PKG
 
-mkdir -p  $PKG$PREFIX/bin
-mv $CWD/conty.sh $PKG$PREFIX/bin/${PRGNAM}
+mkdir -p $PKG$PREFIX/bin
+cp $REPOSITORY/conty${EDITION}-${VERSION}.sh $PKG$PREFIX/bin/${PRGNAM}
 chmod +x $PKG$PREFIX/bin/${PRGNAM}
 
 ( cd $PKG
@@ -48,11 +53,11 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/Kron4ek/Conty
+$PRGNAM: https://github.com/${GITHUB_REPO}
 $PRGNAM:
 EOF
 
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION${EDITION}-$ARCH-$BUILD$TAG.txz
