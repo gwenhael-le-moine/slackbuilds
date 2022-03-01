@@ -1,7 +1,9 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # variables
 CWD=$(pwd)
+
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/nextcloud/desktop/releases/latest | jq -r .tag_name)}
 
 PRGNAM=$(basename $CWD)
 ARCH="AppImage"
@@ -15,22 +17,19 @@ OUTPUT=/tmp
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr $PKG
 
 mkdir -p $PKG/opt/$PRGNAM
 
 # mise en place
 cd $PKG/opt/$PRGNAM
 
-wget -c https://download.nextcloud.com/desktop/daily/Linux/latest.AppImage -O ${PRGNAM}.AppImage
-chmod +x ${PRGNAM}.AppImage
-VERSION=$( ./${PRGNAM}.AppImage --help | grep version | sed 's/Nextcloud version //' | sed 's/ (build /_/' | tr -d \))
+wget -c https://github.com/nextcloud/desktop/releases/download/${VERSION}/Nextcloud-$(echo ${VERSION} | sed 's|^v||')-x86_64.AppImage -O ${PRGNAM}-${VERSION}.AppImage
+chmod +x ${PRGNAM}-${VERSION}.AppImage
 
 mkdir -p $PKG$PREFIX/bin/
-( cd $PKG$PREFIX/bin/
-  # ln -s ../../opt/$PRGNAM/${PRGNAM}.AppImage $PRGNAM
-  ln -s ../../opt/$PRGNAM/${PRGNAM}.AppImage nextcloud
-)
+cd $PKG$PREFIX/bin/
+ln -s ../../opt/$PRGNAM/${PRGNAM}-${VERSION}.AppImage nextcloud
 
 # correction
 cd $PKG
