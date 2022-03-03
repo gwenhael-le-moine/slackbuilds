@@ -49,7 +49,7 @@ make install DESTDIR=$PKG
 rm $PKG$PREFIX/info/dir
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R test/ doc/ *.md LICENSE $PKG$PREFIX/doc/$PRGNAM
+cp -R AUTHORS Agenda BUGS BUILD-FROM-SCRATCH COPYING* ChangeLog* INSTALL* NEWS* README* ToDo* test/ doc/ *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG

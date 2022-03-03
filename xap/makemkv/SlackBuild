@@ -4,7 +4,7 @@ set -x
 PRGNAM=$(basename $(pwd))
 
 # Fetching sources
-VERSION=${VERSION:-1.16.5}
+VERSION=${VERSION:-1.16.7}
 
 BUILD=1
 

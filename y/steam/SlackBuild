@@ -64,7 +64,7 @@ cd ${PRGNAM}-launcher
 VERSION=$(cat client-versions.json | grep -o "[0-9.]*" | sed 'N;s/\n/_/')
 
 # Use Slackware-specific installation directories
-patch -p0 < $REPOSITORY/patch-slackdirs.diff
+patch -p0 < $CWD/patch-slackdirs.diff
 
 chown -R root:root .
 find -L . \
@@ -93,7 +93,7 @@ install -p -m 0644 subprojects/steam-devices/*.rules $PKG/lib/udev/rules.d/
 sed -i -e 's/^KERNEL=="uinput".*/& GROUP="plugdev"/' $PKG/lib/udev/rules.d/60-steam-input.rules
 
 mkdir -p $PKG/usr/doc/$PRGNAM
-cp subprojects/steam-devices/LICENSE $REPOSITORY/SlackBuild $PKG/usr/doc/$PRGNAM/
+cp subprojects/steam-devices/LICENSE $PKG/usr/doc/$PRGNAM/
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
