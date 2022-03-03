@@ -50,13 +50,13 @@ cp -R doc/ example/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
 
 mkdir -p $PKG$PREFIX/man
 cp man/i3status-rs.1 $PKG$PREFIX/man
-find $PKG$PREFIX/man -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -exec gzip -9 {} \;
 
 # correction
 cd $PKG
 chown -R root:root *
 
-find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install

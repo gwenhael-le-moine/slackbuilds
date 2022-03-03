@@ -56,7 +56,7 @@ $PKG$PREFIX/bin/himalaya completion bash > $PKG/usr/share/bash-completion/comple
 cd $PKG
 chown -R root:root *
 
-find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install
