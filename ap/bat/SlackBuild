@@ -43,7 +43,7 @@ chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENCE* .md $PKG$PREFIX/doc/$PRGNAM
+cp LICENSE* *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG

@@ -50,7 +50,7 @@ chmod 0644 $PKG/usr/share/zsh/site-functions/_rustup $PKG/usr/share/bash-complet
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENCE* *.md $PKG$PREFIX/doc/$PRGNAM
+cp LICENSE* *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
