@@ -21,7 +21,7 @@ SLCKFLAGS=""
 
 REQUIRES="lua luarocks lgi"
 
-# nettoyage préalable
+# nettoyage prealable
 rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG

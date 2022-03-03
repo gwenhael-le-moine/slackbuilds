@@ -41,7 +41,7 @@ DESTDIR=$PKG ./install
 
 # Cleaning
 
-find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 cd $PKG
 chown -R root:root .

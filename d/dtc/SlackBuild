@@ -18,7 +18,7 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-$VERSION
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -44,7 +44,7 @@ cp -R Documentation/ GPL README* $PKG$PREFIX/doc/$PRGNAM
 cd $PKG
 chown -R root:root *
 
-find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install

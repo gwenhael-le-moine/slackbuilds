@@ -21,7 +21,7 @@ PREFIX=/usr
 SLCKFLAGS=" -O "
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-*
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -29,8 +29,8 @@ mkdir -p $PKG
 cd $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION

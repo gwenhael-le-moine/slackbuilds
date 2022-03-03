@@ -90,7 +90,7 @@ cp -a docs/ example/ contrib/ AUTHORS LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
 # correction
 cd $PKG
 chown -R root:root *
-find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install

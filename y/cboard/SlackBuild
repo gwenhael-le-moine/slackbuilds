@@ -21,8 +21,7 @@ REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 PREFIX=/usr
 
 # Cleaning
-rm -fr $TMP/$PRGNAM-$VERSION
-rm -fr $PKG
+rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $TMP
 
 [ ! -e $REPOSITORY ] && git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
@@ -30,8 +29,8 @@ cd $REPOSITORY
 git pull --all
 
 # Preparation
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk
@@ -62,7 +61,7 @@ cp COPYING NEWS doc/config.example INSTALL README KnownBugs THANKS TODO $PKG$PRE
 find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
 
 chown -R root:root $PKG
 find $PKG -type f -exec chmod 644 {} \;

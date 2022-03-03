@@ -54,7 +54,7 @@ cp AUTHORS COPYING INSTALL* MANIFEST* NEWS README* THANKS TODO $PKG$PREFIX/doc/$
 cd $PKG
 chown -R root:root *
 
-find $PKG$PREFIX/man -type f -exec gzip -9 {} \;
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -exec gzip -9 {} \;
 find $PKG$PREFIX/info -type f -name dir -delete
 find $PKG$PREFIX/info -type f -exec gzip -9 {} \;
 
