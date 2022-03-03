@@ -21,8 +21,7 @@ REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 PREFIX=/usr
 
 # Cleaning
-rm -fr $TMP/$PRGNAM-$VERSION
-rm -fr $PKG
+rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $TMP
 
 [ ! -e $REPOSITORY ] && git clone "http://repo.or.cz/r/cboard.git" $REPOSITORY
@@ -30,8 +29,8 @@ cd $REPOSITORY
 git pull --all
 
 # Preparation
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk

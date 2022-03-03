@@ -20,7 +20,7 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 mkdir -p $TMP
 
 # cleaning
-rm -fr $PKG
+rm -fr $PKG $TMP/$PRGNAM
 
 # mise en place
 cd $TMP
@@ -39,14 +39,14 @@ cd $TMP/$PRGNAM
 mkdir -p $PKG$PREFIX/libexec/$PRGNAM
 cp -a * $PKG$PREFIX/libexec/$PRGNAM
 
-mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM-$VERSION}
+mkdir -p $PKG$PREFIX/{bin,doc/$PRGNAM}
 cat <<EOF > $PKG$PREFIX/bin/$PRGNAM
 #!/bin/bash
 cd $PREFIX/libexec/$PRGNAM
 ./$PRGNAM \$@
 EOF
 chmod +x $PKG$PREFIX/bin/$PRGNAM
-( cd $PKG$PREFIX/doc/$PRGNAM-$VERSION
+( cd $PKG$PREFIX/doc/$PRGNAM
     ln -s ../libexec/$PRGNAM/readme.html
     ln -s ../libexec/$PRGNAM/license.txt
 )
@@ -62,7 +62,7 @@ $PRGNAM: full-featured library. Factor runs on all common platforms and Factor
 $PRGNAM: applications are portable between them. Factor can deploy stand-alone
 $PRGNAM: applications on all platforms.
 $PRGNAM:
-$PRGNAM: see $PREFIX/doc/$PRGNAM-$VERSION
+$PRGNAM: see $PREFIX/doc/$PRGNAM
 $PRGNAM:
 $PRGNAM: http://factorcode.org/
 $PRGNAM:

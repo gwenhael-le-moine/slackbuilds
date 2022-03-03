@@ -14,7 +14,7 @@ OUTPUT=${OUTPUT:-/tmp}
 
 set -e # Exit on most errors
 
-rm -fr $TMP/$PRGNAM-$VERSION $PKG
+rm -fr $TMP/$PRGNAM $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 
@@ -28,12 +28,11 @@ make prefix=$PKG/usr mandir=$PKG/usr/man
 
 # Racket also has a 'scribble' binary in /usr/bin
 # Scribble's scribble is in /usr/games but Racket's steal its place in $PATH
-( cd $PKG/usr/games/
-    ln -s scribble scribble-scrabble
-)
-( cd $PKG/usr/man/man6/
-    ln -s scribble.6.gz scribble-scrabble.6.gz
-)
+cd $PKG/usr/games/
+ln -s scribble scribble-scrabble
+
+cd $PKG/usr/man/man6/
+ln -s scribble.6.gz scribble-scrabble.6.gz
 
 chmod -R o-w $PKG
 chown -R root:root $PKG/*

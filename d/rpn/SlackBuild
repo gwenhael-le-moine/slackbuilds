@@ -21,7 +21,7 @@ PREFIX=/usr
 SLCKFLAGS=" -O "
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM-*
+rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
 
@@ -31,8 +31,8 @@ cd $TMP
 cd $REPOSITORY
 git pull --all
 
-cp -R $REPOSITORY $TMP/$PRGNAM-$VERSION
-cd $TMP/$PRGNAM-$VERSION
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xdevelop" ] && git checkout develop && VERSION=trunk
