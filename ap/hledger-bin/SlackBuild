@@ -18,10 +18,14 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 mkdir -p $REPOSITORY
 
 echo $ARCH | grep -q 64 && SRC_ARCH=x64
-DOCS="CHANGES.md CONTRIBUTING.md CREDITS.md LICENSE README.md ROADMAP.md"
-wget -c https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-${SRC_ARCH}.zip -O $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip
+DOCS="CHANGES.md CONTRIBUTING.md CREDITS.md LICENSE README.md"
+[ ! -e $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip ] && \
+    wget -c https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-${SRC_ARCH}.zip \
+	 -O $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip
 for d in $DOCS; do
-    wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} -O $REPOSITORY/${d}.${VERSION}
+    [ ! -e $REPOSITORY/${d}.${VERSION} ] && \
+	wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} \
+	     -O $REPOSITORY/${d}.${VERSION}
 done
 rm -fr $PKG
 
@@ -35,7 +39,8 @@ chmod +x $PKG$PREFIX/bin/*
 
 mkdir -p  $PKG$PREFIX/doc/hledger/
 for d in $DOCS; do
-    cp $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
+    [ -e $REPOSITORY/${d}.${VERSION} ] && \
+	cp $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
 done
 
 mkdir -p $PKG/etc/rc.d/
@@ -80,9 +85,9 @@ case "\$1" in
 esac
 EOF
 
-cd $PKG
-find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
-find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# cd $PKG
+# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh

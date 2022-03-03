@@ -17,7 +17,7 @@ mkdir -p $REPOSITORY
 
 [ ! -e $REPOSITORY/knock-${VERSION}-${ARCH}-linux ] && wget -c -O $REPOSITORY/knock-${VERSION}-${ARCH}-linux https://github.com/BentonEdmondson/knock/releases/download/${VERSION}/knock-${VERSION}-${ARCH}-linux
 
-DOCS="LICENSE README.md demo.png"
+DOCS="license readme.md demo.png"
 for i in $DOCS; do
     [ ! -e $REPOSITORY/${i}-${VERSION} ] && wget -c -O $REPOSITORY/${i}-${VERSION} https://raw.githubusercontent.com/BentonEdmondson/knock/${VERSION}/$i
 done
