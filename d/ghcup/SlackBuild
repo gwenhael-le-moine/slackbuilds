@@ -20,9 +20,10 @@ mkdir -p $REPOSITORY
 [ ! -e $REPOSITORY/${PRGNAM}-${VERSION} ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION} https://downloads.haskell.org/~ghcup/$VERSION/${ARCH}-linux-ghcup-$VERSION
 
 rm -fr $PKG
-mkdir -p $PKG/bin
+mkdir -p $PKG/usr/bin
 
-cp $REPOSITORY/${PRGNAM}-${VERSION} $PKG/bin/$PRGNAM
+cp $REPOSITORY/${PRGNAM}-${VERSION} $PKG/usr/bin/$PRGNAM
+chmod 0755 $PKG/usr/bin/$PRGNAM
 
 mkdir -p $PKG/install
 
