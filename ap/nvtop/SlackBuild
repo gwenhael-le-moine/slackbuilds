@@ -1,0 +1,85 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+GITHUB_REPO=Syllo/nvtop
+VERSION=${VERSION:-latest}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+# configuration
+cmake -DNVIDIA_SUPPORT=ON \
+      -DAMDGPU_SUPPORT=ON \
+      -DCMAKE_INSTALL_PREFIX=$PREFIX \
+      -DCMAKE_INSTALL_MANDIR=$PREFIX/man \
+      -DCMAKE_INSTALL_DOCDIR=$PREFIX/doc/$PRGNAM \
+      .
+
+# compilation
+make -j$(nproc)
+
+# installation
+make install DESTDIR=$PKG PREFIX=$PREFIX
+mv $PKG$PREFIX/share/man/ $PKG$PREFIX/
+rm -r $PKG$PREFIX/share/
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R COPYING LICENSE README.* $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (AMD and NVIDIA GPUs htop like monitoring tool)
+$PRGNAM:
+$PRGNAM: Nvtop stands for Neat Videocard TOP, a (h)top like task monitor for AMD and NVIDIA GPUs.
+$PRGNAM: It can handle multiple GPUs and print information about them in a htop familiar way.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/Syllo/nvtop
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
