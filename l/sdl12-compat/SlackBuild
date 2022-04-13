@@ -39,10 +39,15 @@ else
 fi
 
 # configuration
+mkdir -p build
+cd build || exit
+
 cmake \
+    -DSDL12TESTS=0 \
+    -DSDL12DEVEL=1 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
-    .
+    ..
 
 # compilation
 make "-j$(nproc)"
@@ -51,7 +56,7 @@ make "-j$(nproc)"
 make install DESTDIR="$PKG"
 
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp -R INSTALL LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+cp -R ../*.txt ../*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
 cd "$PKG" || exit
