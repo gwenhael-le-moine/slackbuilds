@@ -25,6 +25,11 @@ EXTRA=""
 [ "x$VERSION" == "xpip" ] || EXTRA="==$VERSION"
 pip install --ignore-installed --root $PKG --no-deps $PRGNAM$EXTRA
 
+if [ -d $PKG/usr/share/man ]; then
+    mv $PKG/usr/share/man $PKG/usr/
+    find $PKG/usr/man -type f -not -name \*.gz -exec gzip -9 {} \;
+fi
+
 METADATA_FILE=$(find $PKG -name METADATA)
 
 [ ! -e $METADATA_FILE ] && exit 1
