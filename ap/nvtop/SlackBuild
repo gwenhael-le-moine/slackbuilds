@@ -77,7 +77,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/Syllo/nvtop
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage
