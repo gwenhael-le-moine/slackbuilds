@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=3
+BUILD=4
 
 TAG=gwh
 OUTPUT=/tmp
@@ -54,8 +54,17 @@ done
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
-      -Dsd-bus-provider=basu \
-      -Dtray=auto \
+      -Dsd-bus-provider=libelogind \
+      -Dstrip=true \
+      -Ddefault-wallpaper=true \
+      -Dswaybar=true \
+      -Dxwayland=enabled \
+      -Dtray=enabled \
+      -Dgdk-pixbuf=enabled \
+      -Dswaynag=true \
+      -Dbash-completions=true \
+      -Dzsh-completions=true \
+      -Dfish-completions=true \
       build/
 
 ninja -C build/
