@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=2
+BUILD=3
 
 TAG=gwh
 OUTPUT=/tmp
@@ -49,7 +49,7 @@ for p in $CWD/patches/*.patch; do
 done
 
 # Slackware ships meson 0.59.4 and won't move to 0.60.x for the time being
-sed -i 's|0.60|0.59|' meson.build
+# sed -i 's|0.60|0.59|' meson.build # -current now has 0.62.x
 
 meson setup \
       --prefix /usr \
@@ -57,6 +57,7 @@ meson setup \
       -Dsd-bus-provider=basu \
       -Dtray=auto \
       build/
+
 ninja -C build/
 cd build/
 meson install --destdir=$PKG
@@ -87,6 +88,9 @@ export SDL_VIDEODRIVER=wayland
 
 #export XDG_CURRENT_DESKTOP=sway
 export XDG_CURRENT_DESKTOP=Unity # for tray ?
+
+# Décommenter s'il n'y a pas de curseur souris visible
+# export WLR_NO_HARDWARE_CURSORS=1
 
 [ -e $HOME/.profile ] && . $HOME/.profile
 
