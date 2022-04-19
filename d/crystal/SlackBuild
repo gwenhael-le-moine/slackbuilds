@@ -70,6 +70,7 @@ if [ "$SHARDS_VERSION" == "trunk" ]; then
 else
     git checkout "$SHARDS_VERSION"
 fi
+
 make -j"$(nproc)" release=1
 
 # installation
