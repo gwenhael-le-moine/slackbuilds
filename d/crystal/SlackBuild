@@ -3,7 +3,7 @@ set -x -e
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 ARCH=$(uname -m)
 GITHUB_REPO=crystal-lang/crystal
 VERSION=${VERSION:-latest}
@@ -17,27 +17,31 @@ PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
 # cleaning
-rm -fr $PKG $TMP/$PRGNAM/
+rm -fr "$PKG" "${TMP:?}/$PRGNAM/"
 mkdir -p $TMP/
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+cd "$REPOSITORY" || exit
 git pull --all
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM/
+cp -R "$REPOSITORY" $TMP/
+cd "$TMP/$PRGNAM/" || exit
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+if [ "$VERSION" == "trunk" ]; then
+    VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+else
+    git checkout "$VERSION"
+fi
 
-make -j$(nproc) interpreter=1 release=1
+make -j"$(nproc)" interpreter=1 release=1
 
 # installation
-make install PREFIX=$PREFIX MANDIR=$PKG$PREFIX/man LIBDIR=$PKG$PREFIX/lib$(uname -m | grep -o 64) DESTDIR=$PKG
+make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR="$PKG"
 
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d "$PKG/usr/man" ] && find "$PKG/usr/man" -type f -name "*.?" -exec gzip -9f {} \;
 
  ########
 # shards #
@@ -49,24 +53,27 @@ SHARDS_REPOSITORY=${SHARDS_REPOSITORY:-/home/installs/SlackBuilds/_repositories/
 SHARDS_PKG=$TMP/pkg-$SHARDS_PRGNAM
 
 # cleaning
-rm -fr $SHARDS_PKG $TMP/$SHARDS_PRGNAM/
+rm -fr "$SHARDS_PKG" "${TMP:?}/$SHARDS_PRGNAM/"
 
 # mise en place
-[ ! -e $SHARDS_REPOSITORY ] && git clone https://github.com/${SHARDS_GITHUB_REPO} $SHARDS_REPOSITORY
-cd $SHARDS_REPOSITORY
+[ ! -e "$SHARDS_REPOSITORY" ] && git clone https://github.com/${SHARDS_GITHUB_REPO} "$SHARDS_REPOSITORY"
+cd "$SHARDS_REPOSITORY" || exit
 git pull --all
 
-cp -R $SHARDS_REPOSITORY $TMP/
+cp -R "$SHARDS_REPOSITORY" "$TMP/"
 cd $TMP/$SHARDS_PRGNAM/
 
-[ "x$SHARDS_VERSION" == "xlatest" ] && SHARDS_VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
-[ "x$SHARDS_VERSION" == "x" ] && SHARDS_VERSION=trunk
-[ "x$SHARDS_VERSION" == "xtrunk" ] && SHARDS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $SHARDS_VERSION
-
-make -j$(nproc) release=1
+[ "$SHARDS_VERSION" == "latest" ] && SHARDS_VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "$SHARDS_VERSION" == "" ] && SHARDS_VERSION=trunk
+if [ "$SHARDS_VERSION" == "trunk" ]; then
+    SHARDS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+else
+    git checkout "$SHARDS_VERSION"
+fi
+make -j"$(nproc)" release=1
 
 # installation
-make install PREFIX=$PREFIX MANDIR=$SHARDS_PKG$PREFIX/man LIBDIR=$SHARDS_PKG$PREFIX/lib$(uname -m | grep -o 64) DESTDIR=$SHARDS_PKG
+make install PREFIX=$PREFIX MANDIR=$SHARDS_PKG$PREFIX/man LIBDIR="$SHARDS_PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR=$SHARDS_PKG
 
 [ -d $SHARDS_PKG/usr/man ] && find $SHARDS_PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
@@ -74,10 +81,10 @@ make install PREFIX=$PREFIX MANDIR=$SHARDS_PKG$PREFIX/man LIBDIR=$SHARDS_PKG$PRE
 # merge both PKG #
  ################
 
-cp -R $SHARDS_PKG/* $PKG
+cp -R $SHARDS_PKG/* "$PKG"
 
 # packaging
-cd $PKG
+cd "$PKG" || exit
 mkdir install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (The Crystal Programming Language)
@@ -93,5 +100,5 @@ $PRGNAM:
 $PRGNAM: http://crystal-lang.org/
 EOF
 
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-${VERSION}_${SHARDS_VERSION}-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-${VERSION}_${SHARDS_VERSION}-$ARCH-$BUILD$TAG.txz"
