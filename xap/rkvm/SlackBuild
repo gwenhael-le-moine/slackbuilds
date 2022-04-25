@@ -69,7 +69,7 @@ start() {
 }
 
 stop() {
-       killall /usr/bin/rkvm-server
+       killall rkvm-server
 }
 
 case \$1 in
@@ -81,6 +81,7 @@ case \$1 in
         ;;
     restart )
         stop
+        sleep 1
         start
         ;;
     * )
@@ -101,7 +102,7 @@ start() {
 }
 
 stop() {
-       killall /usr/bin/rkvm-client
+       killall rkvm-client
 }
 
 case \$1 in
@@ -113,6 +114,7 @@ case \$1 in
         ;;
     restart )
         stop
+        sleep 1
         start
         ;;
     * )
