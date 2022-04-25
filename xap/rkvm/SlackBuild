@@ -65,7 +65,7 @@ start() {
 
         /usr/bin/rkvm-server /etc/rkvm/server.toml &
 
-        [ $? -ne 0 ] && echo "Could not start rkvm-server."
+        [ \$? -ne 0 ] && echo "Could not start rkvm-server."
 }
 
 stop() {
@@ -97,7 +97,7 @@ start() {
 
         /usr/bin/rkvm-client /etc/rkvm/client.toml &
 
-        [ $? -ne 0 ] && echo "Could not start rkvm-client."
+        [ \$? -ne 0 ] && echo "Could not start rkvm-client."
 }
 
 stop() {
