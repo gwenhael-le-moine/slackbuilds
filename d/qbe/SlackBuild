@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+
+VERSION=${VERSION:-latest}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+
+SLCKFLAGS=" -O "
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone git://c9x.me/qbe.git $REPOSITORY
+cd $REPOSITORY
+git pull --all
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
+[ "x$VERSION" == "xdevelop" ] && git checkout develop && VERSION=trunk
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+
+# compilation
+make -j3
+
+# installation
+make install DESTDIR=$PKG PREFIX=$PREFIX
+
+mkdir -p $PKG$PREFIX/doc/$PRGNAM
+cp -R doc/ LICENSE README $PKG$PREFIX/doc/$PRGNAM
+
+# correction
+cd $PKG
+chown -R root:root *
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# # Strip binaries
+# cd $PKG
+# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Compiler Backend)
+$PRGNAM:
+$PRGNAM: QBE aims to be a pure C embeddable backend that provides 70% of the performance
+$PRGNAM: of advanced compilers in 10% of the code. Its small size serves both its
+$PRGNAM: aspirations of correctness and our ability to understand, fix, and improve it.
+$PRGNAM: It also serves its users by providing trivial integration and great flexibility.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://c9x.me/compile/
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
