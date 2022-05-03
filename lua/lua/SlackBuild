@@ -128,7 +128,7 @@ sed \
   -e '/^INSTALL_LIB= /s,lib,&'"${LIBDIRSUFFIX}"',' \
   -e '/^INSTALL_CMOD= /s,lib,&'"${LIBDIRSUFFIX}"',' \
   -e '/^libdir=/s,/lib,&'"${LIBDIRSUFFIX}"',' \
-  $REPOSITORY/lua.pc.in > lua.pc
+  $CWD/lua.pc.in > lua.pc
 
 ln -s lua.pc lua-$V.pc
 ln -s lua.pc lua${V%.?}${V#?.}.pc
@@ -142,7 +142,7 @@ for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; r
 
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp -a README doc/* $PKG/usr/doc/$PRGNAM
-cat $REPOSITORY/SlackBuild > $PKG/usr/doc/$PRGNAM/SlackBuild
+cat $CWD/SlackBuild > $PKG/usr/doc/$PRGNAM/SlackBuild
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
