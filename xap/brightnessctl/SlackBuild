@@ -36,6 +36,9 @@ cd $TMP/$PRGNAM
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
+./configure \
+    --prefix=/usr
+
 # compilation
 make -j3 PREFIX=$PREFIX
 
