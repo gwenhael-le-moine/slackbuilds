@@ -19,6 +19,20 @@ ARCH=$(uname -m)
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 PREFIX=/usr
 
+if [ "$ARCH" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+else
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX="$(uname -m | grep -o 64)"
+fi
+
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 
@@ -30,24 +44,51 @@ cd $REPOSITORY
 git pull --all
 
 cp -R $REPOSITORY $TMP/
+
 cd $TMP/$PRGNAM/
+case $VERSION in
+    trunk)
+        VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        ;;
+    latest)
+        VERSION=$(git describe --tags --abbrev=0)
+        git checkout $VERSION
+        ;;
+    *)
+        git checkout $VERSION
+        ;;
+esac
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+mkdir build
+cd build
+  CFLAGS="$SLKCFLAGS" \
+  CXXFLAGS="$SLKCFLAGS" \
+  meson .. \
+    --buildtype=release \
+    --infodir=/usr/info \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --localstatedir=/var \
+    --mandir=/usr/man \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    -Dstrip=true \
+    -Dlibcxx=false \
+    -Dlibnl=enabled \
+    -Dlibudev=auto \
+    -Dlibevdev=auto \
+    -Dpulseaudio=auto \
+    -Dsystemd=disabled \
+    -Ddbusmenu-gtk=auto \
+    -Dmpd=auto \
+    -Dgtk-layer-shell=auto \
+    -Drfkill=auto \
+    -Dsndio=disabled \
+    -Dtests=disabled \
+    -Dexperimental=true \
 
-meson setup \
-      --prefix /usr \
-      --mandir /usr/man/ \
-      -Dbuildtype=plain \
-      -Dauto-features=enabled \
-      -Dwrap-mode=nodownload \
-      -Dsndio=disabled \
-       build/
-ninja -C build/
-cd build/
-meson install --destdir=$PKG
-cd ../
+  "${NINJA:=ninja}"
+  DESTDIR=$PKG $NINJA install
+cd ..
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
