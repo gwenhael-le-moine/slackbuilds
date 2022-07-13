@@ -95,10 +95,6 @@ export MOZ_DBUS_REMOTE=1
 export GDK_BACKEND=wayland
 export CLUTTER_BACKEND=wayland
 
-#export XDG_CURRENT_DESKTOP=sway
-export XDG_CURRENT_DESKTOP=Unity # for waybar's tray
-export XDG_SESSION_TYPE=wayland
-
 export NO_AT_BRIDGE=1
 export \$(gnome-keyring-daemon --start --components=ssh)
 
@@ -109,13 +105,14 @@ export ECORE_EVAS_ENGINE=wayland_egl
 export ELM_ENGINE=wayland_egl
 
 # SDL [https://www.reddit.com/r/swaywm/comments/s8kiz6/common_swaywayland_fixes_for_steam_games/]
-export SDL_DYNAMIC_API=/usr/lib64/libSDL2.so
+export SDL_DYNAMIC_API=/usr/lib\$(uname -m | grep -o 64)/libSDL2.so
 export SDL_VIDEODRIVER=wayland
 
 #[ -e \$HOME/.profile ] && . \$HOME/.profile
 
-unset DISPLAY
-
+#export XDG_CURRENT_DESKTOP=sway
+export XDG_CURRENT_DESKTOP=Unity # for waybar's tray
+export XDG_SESSION_TYPE=wayland
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
 mkdir -p \$XDG_RUNTIME_DIR
 chmod 0700 \$XDG_RUNTIME_DIR
@@ -124,6 +121,8 @@ export LIBSEAT_BACKEND=logind
 
 # Décommenter s'il n'y a pas de curseur souris visible
 #export WLR_NO_HARDWARE_CURSORS=1
+
+unset DISPLAY                   # avoid wlr error
 
 export SWAYSOCK=/run/user/\$(id -u)/sway-ipc.\$(id -u).\$(pgrep -x sway).sock
 exec dbus-run-session sway
