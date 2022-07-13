@@ -72,9 +72,6 @@ cd build/
 meson install --destdir=$PKG
 cd ../
 
-# https://github.com/swaywm/sway/wiki/Running-Sway-without-systemd
-chmod +s $PKG$PREFIX/bin/sway
-
 cat <<EOF > $PKG$PREFIX/bin/start_sway.sh
 #!/bin/bash
 set -e
