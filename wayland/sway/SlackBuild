@@ -83,6 +83,10 @@ export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_QPA_PLATFORM=wayland-egl
 export QT_WAYLAND_FORCE_DPI=physical
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+#export QT_FONT_DPI=161
+export QT_SCALE_FACTOR=2
 
 export SAL_USE_VCLPLUGIN=gtk3
 
@@ -91,26 +95,40 @@ export MOZ_DBUS_REMOTE=1
 
 export _JAVA_AWT_WM_NONREPARENTING=1
 
-# export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=gdk
-
-export SDL_VIDEODRIVER=wayland
+export GDK_BACKEND=wayland
+export CLUTTER_BACKEND=wayland
 
 #export XDG_CURRENT_DESKTOP=sway
-export XDG_CURRENT_DESKTOP=Unity # for tray ?
+export XDG_CURRENT_DESKTOP=Unity # for waybar's tray
+export XDG_SESSION_TYPE=wayland
 
-# Décommenter s'il n'y a pas de curseur souris visible
-# export WLR_NO_HARDWARE_CURSORS=1
+export NO_AT_BRIDGE=1
+export \$(gnome-keyring-daemon --start --components=ssh)
 
-[ -e $HOME/.profile ] && . $HOME/.profile
+# java fix
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+export ECORE_EVAS_ENGINE=wayland_egl
+export ELM_ENGINE=wayland_egl
+
+# SDL [https://www.reddit.com/r/swaywm/comments/s8kiz6/common_swaywayland_fixes_for_steam_games/]
+export SDL_DYNAMIC_API=/usr/lib64/libSDL2.so
+export SDL_VIDEODRIVER=wayland
+
+#[ -e \$HOME/.profile ] && . \$HOME/.profile
 
 unset DISPLAY
 
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
 mkdir -p \$XDG_RUNTIME_DIR
+chmod 0700 \$XDG_RUNTIME_DIR
 
 export LIBSEAT_BACKEND=logind
 
+# Décommenter s'il n'y a pas de curseur souris visible
+#export WLR_NO_HARDWARE_CURSORS=1
+
+export SWAYSOCK=/run/user/\$(id -u)/sway-ipc.\$(id -u).\$(pgrep -x sway).sock
 exec dbus-run-session sway
 EOF
 chmod +x $PKG$PREFIX/bin/start_sway.sh
