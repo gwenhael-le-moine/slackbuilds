@@ -3,10 +3,10 @@
 # variables
 GITHUB_REPO=janeczku/calibre-web
 VERSION=${VERSION:-latest}
+BUILD=${BUILD:-2}
 
 RUNNING_USER=${RUNNING_USER:-gwh}
 RUNNING_GROUP=${RUNNING_GROUP:-users}
-BUILD=${BUILD:-1}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -33,6 +33,21 @@ git pull --all
 
 mkdir -p $PKG/opt
 cp -r $REPOSITORY $PKG/opt/
+cd $PKG/opt/$PRGNAM
+
+case $VERSION in
+    trunk)
+        VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        ;;
+    latest)
+        VERSION=$(git describe --tags --abbrev=0)
+        git checkout $VERSION
+        ;;
+    *)
+        git checkout $VERSION
+        ;;
+esac
+
 rm -fr $PKG/opt/$PRGNAM/{.git*,.editorconfig,.eslintrc}
 chown -R ${RUNNING_USER}:${RUNNING_GROUP} $PKG/opt/$PRGNAM
 
@@ -40,15 +55,10 @@ mkdir -p $PKG/etc/rc.d/
 cp -r $CWD/rc $PKG/etc/rc.d/rc.$PRGNAM
 sed -i "s|RUNNING_USER|$RUNNING_USER|" $PKG/etc/rc.d/rc.$PRGNAM
 
-cd $PKG/opt/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
-
 # change default password
 NEW_DEFAULT_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 sed -i "s|admin123|$NEW_DEFAULT_PASSWORD|g" cps/*
-pip3 install --target vendor -r requirements.txt
+pip3 install --target vendor -r requirements.txt -r optional-requirements.txt
 
 # correction
 cd $PKG
