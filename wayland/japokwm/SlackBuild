@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # variables
-GITHUB_REPO=swaywm/sway
+GITHUB_REPO=werererer/japokwm
 VERSION=${VERSION:-"latest"}
-BUILD=4
+BUILD=2
 
 TAG=gwh
 OUTPUT=/tmp
@@ -36,7 +36,7 @@ case $VERSION in
         VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
         ;;
     latest)
-        VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+        VERSION=$(git describe --tags --abbrev=0)
         git checkout $VERSION
         ;;
     *)
@@ -44,24 +44,10 @@ case $VERSION in
         ;;
 esac
 
-for p in $CWD/patches/*.patch; do
-    git am $p
-done
-
-# Slackware ships meson 0.59.4 and won't move to 0.60.x for the time being
-# sed -i 's|0.60|0.59|' meson.build # -current now has 0.62.x
-
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
-      -Dsd-bus-provider=libelogind \
-      -Dstrip=true \
-      -Ddefault-wallpaper=true \
-      -Dswaybar=true \
-      -Dxwayland=enabled \
-      -Dtray=enabled \
-      -Dgdk-pixbuf=enabled \
-      -Dswaynag=true \
+      -Dxwayland=true \
       -Dbash-completions=true \
       -Dzsh-completions=true \
       -Dfish-completions=true \
@@ -72,32 +58,30 @@ cd build/
 meson install --destdir=$PKG
 cd ../
 
-# https://github.com/swaywm/sway/wiki/Running-Sway-without-systemd
-chmod +s $PKG$PREFIX/bin/sway
-
-cat <<EOF > $PKG$PREFIX/bin/start_sway.sh
+cat <<EOF > $PKG$PREFIX/bin/start_japokwm.sh
 #!/bin/bash
+
 set -e
 
-export QT_QPA_PLATFORMTHEME=qt5ct
-export QT_QPA_PLATFORM=wayland-egl
-export QT_WAYLAND_FORCE_DPI=physical
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+# export QT_QPA_PLATFORMTHEME=qt5ct
+# export QT_QPA_PLATFORM=wayland-egl
+# export QT_WAYLAND_FORCE_DPI=physical
+# export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 
-export SAL_USE_VCLPLUGIN=gtk3
+# export SAL_USE_VCLPLUGIN=gtk3
 
-export MOZ_ENABLE_WAYLAND=1
-export MOZ_DBUS_REMOTE=1
+# export MOZ_ENABLE_WAYLAND=1
+# export MOZ_DBUS_REMOTE=1
 
-export _JAVA_AWT_WM_NONREPARENTING=1
+# export _JAVA_AWT_WM_NONREPARENTING=1
 
-# export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=gdk
+# # export GDK_BACKEND=wayland
+# export CLUTTER_BACKEND=gdk
 
-export SDL_VIDEODRIVER=wayland
+# export SDL_VIDEODRIVER=wayland
 
-#export XDG_CURRENT_DESKTOP=sway
-export XDG_CURRENT_DESKTOP=Unity # for tray ?
+#export XDG_CURRENT_DESKTOP=japokwm
+export XDG_CURRENT_DESKTOP=Unity # for waybar's tray?
 
 # Décommenter s'il n'y a pas de curseur souris visible
 # export WLR_NO_HARDWARE_CURSORS=1
@@ -111,14 +95,14 @@ mkdir -p \$XDG_RUNTIME_DIR
 
 export LIBSEAT_BACKEND=logind
 
-exec dbus-run-session sway
+exec dbus-run-session japokwm
 EOF
-chmod +x $PKG$PREFIX/bin/start_sway.sh
+chmod +x $PKG$PREFIX/bin/start_japokwm.sh
 
-sed -i 's|Exec=sway|Exec=/usr/bin/start_sway.sh|' $PKG$PREFIX/share/wayland-sessions/sway.desktop
+sed -i 's|Exec=japokwm|Exec=/usr/bin/start_japokwm.sh|' $PKG$PREFIX/share/wayland-sessions/japokwm.desktop
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+cp -R config LICENSE ./*.md $PKG$PREFIX/doc/$PRGNAM/
 
 # correction
 cd $PKG
@@ -137,7 +121,7 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (i3-compatible Wayland compositor)
+$PRGNAM: $PRGNAM (A tiling wayland compositor based around creating layouts)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
