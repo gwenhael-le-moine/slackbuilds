@@ -112,7 +112,7 @@ find . \
   -exec chmod 644 {} \+
 
 SRCDIR=$REPOSITORY
-EMACS_VERSION=$(grep "AC_INIT(GNU Emacs," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \ )
+EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
