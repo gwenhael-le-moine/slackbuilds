@@ -48,8 +48,8 @@ cp -R files/* $PKG$PREFIX/share/$PRGNAM
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -R doc/ examples/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
 
-mkdir -p $PKG$PREFIX/man
-cp man/i3status-rs.1 $PKG$PREFIX/man
+mkdir -p $PKG$PREFIX/man/man1
+cp man/i3status-rs.1 $PKG$PREFIX/man/man1
 [ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -exec gzip -9 {} \;
 
 # correction
