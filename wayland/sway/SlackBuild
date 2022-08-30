@@ -73,6 +73,12 @@ cat <<EOF > "$PKG$PREFIX/bin/start_sway.sh"
 #!/bin/bash
 set -e
 
+LOGFILE=/tmp/wsession-errors
+true > \$LOGFILE
+exec \&> \$LOGFILE
+set -x
+echo "sway Starting: \$( date )"
+
 # avoid wlr error
 unset DISPLAY
 
