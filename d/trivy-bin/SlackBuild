@@ -1,0 +1,68 @@
+#!/bin/bash
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+GITHUB_REPO=aquasecurity/trivy
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/tags | jq -r '.[0].name' | tr -d v)}
+ARCH=$(uname -m)
+BUILD=${BUILD:-1}
+TAG=${TAG:-gwh}
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
+
+mkdir -p $REPOSITORY
+
+GO_ARCH="64bit"
+case $(uname -m) in
+    "x86_64")
+        GO_ARCH="64bit"
+        ;;
+    "aarch64")
+        GO_ARCH="ARM64"
+        ;;
+    "arm*")
+        GO_ARCH="ARM"
+        ;;
+esac
+
+[ ! -e $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz ] && wget -c -O $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz
+
+rm -fr $PKG
+mkdir -p $PKG/usr/{bin,doc/$PRGNAM}/
+
+cd $PKG/usr/bin/
+tar xvf $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz
+mv README.md LICENSE contrib/ $PKG/usr/doc/$PRGNAM/
+chmod +x $PKG/usr/bin/hugo
+
+mkdir -p $PKG/install
+
+cat <<EOF > $PKG/install/slack-desc
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+         |-----handy-ruler------------------------------------------------------|
+${PRGNAM}: ${PRGNAM} (Scanner for vulnerabilities)
+${PRGNAM}:
+${PRGNAM}: Scanner for vulnerabilities in container images, file systems, and
+${PRGNAM}: Git repositories, as well as for configuration issues and hard-coded
+${PRGNAM}: secrets.
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}:
+${PRGNAM}: https://aquasecurity.github.io/trivy/
+EOF
+
+cd $PKG
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg -l y -c n ${OUTPUT}/${PRGNAM}-$(echo ${VERSION} | tr - _)-${ARCH}-${BUILD}${TAG}.txz
