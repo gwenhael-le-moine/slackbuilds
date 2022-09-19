@@ -19,37 +19,34 @@ REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr "$PKG" "$TMP/$PRGNAM"
 
-mkdir -p $PKG
+mkdir -p "$PKG"
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/
+cp -R "$REPOSITORY" $TMP/
 
-cd $TMP/$PRGNAM/
+cd "$TMP/$PRGNAM/" || exit 1
 case $VERSION in
     trunk)
         VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
         ;;
     latest)
         VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
-        git checkout $VERSION
+        git checkout "$VERSION"
         ;;
     *)
-        git checkout $VERSION
+        git checkout "$VERSION"
         ;;
 esac
 
-for p in $CWD/patches/*.patch; do
-    git am $p
+for p in "$CWD"/patches/*.patch; do
+    git am "$p"
 done
-
-# Slackware ships meson 0.59.4 and won't move to 0.60.x for the time being
-# sed -i 's|0.60|0.59|' meson.build # -current now has 0.62.x
 
 meson setup \
       --prefix /usr \
@@ -68,78 +65,50 @@ meson setup \
       build/
 
 ninja -C build/
-cd build/
-meson install --destdir=$PKG
+cd build/ || exit 1
+meson install --destdir="$PKG"
 cd ../
 
-cat <<EOF > $PKG$PREFIX/bin/start_sway.sh
+cat <<EOF > "$PKG$PREFIX/bin/start_sway.sh"
 #!/bin/bash
 set -e
 
-export QT_QPA_PLATFORMTHEME=qt5ct
-export QT_QPA_PLATFORM=wayland-egl
-export QT_WAYLAND_FORCE_DPI=physical
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-export QT_AUTO_SCREEN_SCALE_FACTOR=0
-#export QT_FONT_DPI=161
-export QT_SCALE_FACTOR=2
+LOGFILE=/tmp/wsession-errors
+true > \$LOGFILE
+exec \&> \$LOGFILE
+set -x
+echo "sway Starting: \$( date )"
 
-export SAL_USE_VCLPLUGIN=gtk3
+# avoid wlr error
+unset DISPLAY
 
-export MOZ_ENABLE_WAYLAND=1
-export MOZ_DBUS_REMOTE=1
+# Uncomment if mouse pointer is invisible
+#export WLR_NO_HARDWARE_CURSORS=1
 
-export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=wayland
-
-export NO_AT_BRIDGE=1
-export \$(gnome-keyring-daemon --start --components=ssh)
-
-# java fix
-export _JAVA_AWT_WM_NONREPARENTING=1
-
-export ECORE_EVAS_ENGINE=wayland_egl
-export ELM_ENGINE=wayland_egl
-
-# SDL [https://www.reddit.com/r/swaywm/comments/s8kiz6/common_swaywayland_fixes_for_steam_games/]
-export SDL_DYNAMIC_API=/usr/lib\$(uname -m | grep -o 64)/libSDL2.so
-export SDL_VIDEODRIVER=wayland
-
-#[ -e \$HOME/.profile ] && . \$HOME/.profile
-
-#export XDG_CURRENT_DESKTOP=sway
-export XDG_CURRENT_DESKTOP=Unity # for waybar's tray
-export XDG_SESSION_TYPE=wayland
+export SWAYSOCK=/run/user/\$(id -u)/sway-ipc.\$(id -u).\$(pgrep -x sway).sock
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
+
 mkdir -p \$XDG_RUNTIME_DIR
 chmod 0700 \$XDG_RUNTIME_DIR
 
-export LIBSEAT_BACKEND=logind
-
-# Décommenter s'il n'y a pas de curseur souris visible
-#export WLR_NO_HARDWARE_CURSORS=1
-
-unset DISPLAY                   # avoid wlr error
-
-export SWAYSOCK=/run/user/\$(id -u)/sway-ipc.\$(id -u).\$(pgrep -x sway).sock
 exec dbus-run-session sway
 EOF
-chmod +x $PKG$PREFIX/bin/start_sway.sh
+chmod +x "$PKG$PREFIX/bin/start_sway.sh"
 
-sed -i 's|Exec=sway|Exec=/usr/bin/start_sway.sh|' $PKG$PREFIX/share/wayland-sessions/sway.desktop
+sed -i 's|Exec=sway|Exec=/usr/bin/start_sway.sh|' "$PKG$PREFIX/share/wayland-sessions/sway.desktop"
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM/"
 
 # correction
-cd $PKG
-chown -R root:root *
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+cd "$PKG" || exit 1
+chown -R root:root ./*
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -name "*.?" -type f -exec gzip -9 {} \;
 
 # embaumement
-mkdir -p $PKG/install
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -162,5 +131,5 @@ $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
