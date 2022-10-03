@@ -78,10 +78,11 @@ cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 case $VERSION in
     trunk)
+        git checkout wlroots-next
         VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
         ;;
     latest)
-        VERSION=$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -n1)
+        VERSION=$(git describe --tags --abbrev=0)
         git checkout $VERSION
         ;;
     *)
@@ -92,12 +93,12 @@ esac
 # fix to correct man pages directory path
 sed -i 's/share/man/g' config.mk
 
-# compile with XWayland support
-XWAYLAND=${XWAYLAND:-yes}
-[ "$XWAYLAND" = "yes" ] && patch -p1 <$CWD/sbo-patches/use-XWayland.patch
+# # compile with XWayland support
+# XWAYLAND=${XWAYLAND:-yes}
+# [ "$XWAYLAND" = "yes" ] && patch -p1 <$CWD/sbo-patches/use-XWayland.patch
 
 # autostart patch for stuff like swaybg
-patch -p1 < $CWD/sbo-patches/autostart.patch
+#patch -p1 < $CWD/sbo-patches/autostart.patch
 
 mkdir -p $PKG/usr/share/wayland-sessions
 
@@ -122,12 +123,14 @@ find -L . \
 ### that will change the default terminal from 'alacritty'
 ### to 'foot'.
 
-find $CWD/patches/ -name \*.patch -exec patch --verbose -p1 -i {} \;
+#find $CWD/patches/ -name \*.patch -exec patch --verbose -p1 -i {} \;
 
 make \
   OPTS="$SLKCFLAGS" \
   PREFIX=/usr \
   MANPREFIX=/usr/man \
+  XWAYLAND=-DXWAYLAND \
+  XLIBS=xcb xcb-icccm
 
 make PREFIX=$PKG/usr install
 
