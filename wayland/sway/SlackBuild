@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=4
+BUILD=5
 
 TAG=gwh
 OUTPUT=/tmp
@@ -71,13 +71,15 @@ cd ../
 
 cat <<EOF > "$PKG$PREFIX/bin/start_sway.sh"
 #!/bin/bash
-set -e
 
-# LOGFILE=/tmp/wsession-errors
-# true > \$LOGFILE
-# exec &> \$LOGFILE
-# set -x
-# echo "sway Starting: \$( date )"
+#set -e
+
+LOGFILE=\~/.wsession-errors
+true > \$LOGFILE
+exec &> \$LOGFILE
+
+set -x
+echo "sway Starting: \$( date )"
 
 # Uncomment if mouse pointer is invisible
 #export WLR_NO_HARDWARE_CURSORS=1
