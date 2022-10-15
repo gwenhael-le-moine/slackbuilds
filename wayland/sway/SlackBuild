@@ -100,7 +100,9 @@ chmod 0700 \$XDG_RUNTIME_DIR
 # avoid wlr error
 unset DISPLAY
 
-exec dbus-run-session sway
+exec dbus-run-session /usr/bin/sway
+#dbus-launch --sh-syntax --exit-with-session /usr/bin/sway
+#exec /usr/bin/sway
 EOF
 chmod +x "$PKG$PREFIX/bin/start_sway.sh"
 
