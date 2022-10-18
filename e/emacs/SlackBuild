@@ -135,7 +135,7 @@ $SRCDIR/configure \
   --with-tiff \
   --with-xft \
   --with-xpm \
-  --with-gpm=no \
+  --with-gpm=yes \
   --with-pgtk \
   --enable-link-time-optimization \
   --with-compress-install \
