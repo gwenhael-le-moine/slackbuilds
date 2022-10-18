@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=5
+BUILD=6
 
 TAG=gwh
 OUTPUT=/tmp
@@ -74,7 +74,7 @@ cat <<EOF > "$PKG$PREFIX/bin/start_sway.sh"
 
 #set -e
 
-LOGFILE=\~/.wsession-errors
+LOGFILE=~/.wsession-errors
 true > \$LOGFILE
 exec &> \$LOGFILE
 
@@ -89,7 +89,7 @@ unset QT_QPA_PLATFORM
 export QT_QPA_PLATFORMTHEME=qt5ct
 export MOZ_ENABLE_WAYLAND=1
 export XDG_CURRENT_DESKTOP=sway
-export XDG_PICTURES_DIR=\$HOME/.wallpapers
+export XDG_PICTURES_DIR=~/.wallpapers
 
 export SWAYSOCK=/run/user/\$(id -u)/sway-ipc.\$(id -u).\$(pgrep -x sway).sock
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
@@ -100,7 +100,9 @@ chmod 0700 \$XDG_RUNTIME_DIR
 # avoid wlr error
 unset DISPLAY
 
-exec dbus-run-session sway
+exec dbus-run-session /usr/bin/sway
+#dbus-launch --sh-syntax --exit-with-session /usr/bin/sway
+#exec /usr/bin/sway
 EOF
 chmod +x "$PKG$PREFIX/bin/start_sway.sh"
 
