@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 GITHUB_REPO=mozilla-mobile/mozilla-vpn-client
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/tags | jq -r '.[0].name' | tr -d v)}
 ARCH=$(uname -m)
@@ -17,25 +17,25 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 UBUNTU_VERSION=jammy1
 DEBARCH=amd64
 
-mkdir -p $REPOSITORY
+mkdir -p "$REPOSITORY"
 
-[ ! -e $REPOSITORY/$PRGNAM-${VERSION}-${ARCH}.deb ] && wget -c -O $REPOSITORY/$PRGNAM-${VERSION}-${ARCH}.deb \
-                                                            https://launchpad.net/~mozillacorp/+archive/ubuntu/mozillavpn/+files/mozillavpn_${VERSION}-${UBUNTU_VERSION}_${DEBARCH}.deb
+[ ! -e "$REPOSITORY"/"$PRGNAM-${VERSION}-${ARCH}.deb" ] && wget -c -O "$REPOSITORY"/"$PRGNAM-${VERSION}-${ARCH}.deb" \
+                                                            "https://launchpad.net/~mozillacorp/+archive/ubuntu/mozillavpn/+files/mozillavpn_${VERSION}-${UBUNTU_VERSION}_${DEBARCH}.deb"
 
-rm -fr $PKG
-mkdir -p $PKG/
+rm -fr "$PKG"
+mkdir -p "$PKG"/
 
-cd $PKG/
-ar x $REPOSITORY/$PRGNAM-${VERSION}-${ARCH}.deb
+cd "$PKG"/ || exit 1
+ar x "$REPOSITORY"/"$PRGNAM-${VERSION}-${ARCH}.deb"
 rm debian-binary control.tar.zst
 
 tar xvf data.tar.zst && rm data.tar.zst
 
 mv usr/lib{,64}/
 
-mkdir -p $PKG/install
+mkdir -p "$PKG"/install
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -57,7 +57,7 @@ ${PRGNAM}: https://vpn.mozilla.org/
 ${PRGNAM}: DEPENDS: qt6, md4c
 EOF
 
-cd $PKG
-chown -R root:root *
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
+cd "$PKG" || exit 1
+chown -R root:root ./*
+rm -f "$PKG"/{,usr/}lib"$(uname -m | grep -o 64)"/*.la
+/sbin/makepkg -l y -c n "${OUTPUT}"/"${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz"
