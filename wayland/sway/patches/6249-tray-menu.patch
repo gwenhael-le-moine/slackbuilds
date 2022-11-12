@@ -1,4 +1,4 @@
-From cc6eafe8946dea44c6c8dcee88118451c0065012 Mon Sep 17 00:00:00 2001
+From c1773310a3baf392477ca2e8e41cdcb602c743f9 Mon Sep 17 00:00:00 2001
 From: Felix Weilbach <felix.weilbach@t-online.de>
 Date: Sun, 30 May 2021 20:45:01 +0200
 Subject: [PATCH] Tray: Implement dbusmenu
@@ -8,19 +8,33 @@ Co-authored-by: Nathan Schulte <nmschulte@gmail.com>
 
 Signed-off-by: Felix Weilbach <felix.weilbach@t-online.de>
 ---
+ include/swaybar/bar.h           |    1 +
  include/swaybar/input.h         |    5 +-
- include/swaybar/tray/dbusmenu.h |   26 +
+ include/swaybar/tray/dbusmenu.h |   27 +
  include/swaybar/tray/item.h     |    2 +
  include/swaybar/tray/tray.h     |    3 +
- swaybar/input.c                 |   52 +-
+ swaybar/bar.c                   |    4 +
+ swaybar/input.c                 |   51 +-
  swaybar/meson.build             |    3 +-
  swaybar/render.c                |    8 +-
- swaybar/tray/dbusmenu.c         | 1381 +++++++++++++++++++++++++++++++
+ swaybar/tray/dbusmenu.c         | 1365 +++++++++++++++++++++++++++++++
  swaybar/tray/item.c             |   18 +-
- 9 files changed, 1482 insertions(+), 16 deletions(-)
+ 11 files changed, 1471 insertions(+), 16 deletions(-)
  create mode 100644 include/swaybar/tray/dbusmenu.h
  create mode 100644 swaybar/tray/dbusmenu.c
 
+diff --git a/include/swaybar/bar.h b/include/swaybar/bar.h
+index 3ad0bdf3ce..3c0b49265e 100644
+--- a/include/swaybar/bar.h
++++ b/include/swaybar/bar.h
+@@ -31,6 +31,7 @@ struct swaybar {
+ 	struct zwlr_layer_shell_v1 *layer_shell;
+ 	struct zxdg_output_manager_v1 *xdg_output_manager;
+ 	struct wl_shm *shm;
++	struct xdg_wm_base *wm_base;
+ 
+ 	struct swaybar_config *config;
+ 	struct status_line *status;
 diff --git a/include/swaybar/input.h b/include/swaybar/input.h
 index e8735d883a..222872f822 100644
 --- a/include/swaybar/input.h
@@ -46,30 +60,31 @@ index e8735d883a..222872f822 100644
  };
 diff --git a/include/swaybar/tray/dbusmenu.h b/include/swaybar/tray/dbusmenu.h
 new file mode 100644
-index 0000000000..fe92d2dbaf
+index 0000000000..dc90f6e571
 --- /dev/null
 +++ b/include/swaybar/tray/dbusmenu.h
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +#ifndef _SWAYBAR_TRAY_DBUSMENU_H
 +#define _SWAYBAR_TRAY_DBUSMENU_H
 +
 +#include "swaybar/bar.h"
 +#include "swaybar/tray/item.h"
 +
-+struct swaybar_dbusmenu *swaybar_dbusmenu_create(struct swaybar_sni *sni,
-+	struct swaybar_output *output, struct swaybar_seat *seat, uint32_t serial, int x, int y);
++void swaybar_dbusmenu_open(struct swaybar_sni *sni,
++		struct swaybar_output *output, struct swaybar_seat *seat, uint32_t serial,
++		int x, int y);
 +
 +bool dbusmenu_pointer_button(void *data, struct wl_pointer *wl_pointer,
-+	uint32_t serial, uint32_t time_, uint32_t button, uint32_t state);
++		uint32_t serial, uint32_t time_, uint32_t button, uint32_t state);
 +
 +bool dbusmenu_pointer_motion(struct swaybar_seat *seat, struct wl_pointer *wl_pointer,
-+	uint32_t time_, wl_fixed_t surface_x, wl_fixed_t surface_y);
++		uint32_t time_, wl_fixed_t surface_x, wl_fixed_t surface_y);
 +
 +bool dbusmenu_pointer_enter(void *data, struct wl_pointer *wl_pointer, uint32_t serial,
-+	struct wl_surface *surface, wl_fixed_t surface_x, wl_fixed_t surface_y);
++		struct wl_surface *surface, wl_fixed_t surface_x, wl_fixed_t surface_y);
 +
 +bool dbusmenu_pointer_leave(void *data, struct wl_pointer *wl_pointer, uint32_t serial,
-+	struct wl_surface *surface);
++		struct wl_surface *surface);
 +
 +bool dbusmenu_pointer_frame(struct swaybar_seat *data, struct wl_pointer *wl_pointer);
 +
@@ -110,8 +125,37 @@ index d2e80a6d47..853f17cdc1 100644
  };
  
  struct swaybar_tray *create_tray(struct swaybar *bar);
+diff --git a/swaybar/bar.c b/swaybar/bar.c
+index 5e4ebd97c9..177b870b48 100644
+--- a/swaybar/bar.c
++++ b/swaybar/bar.c
+@@ -29,6 +29,7 @@
+ #include "pool-buffer.h"
+ #include "wlr-layer-shell-unstable-v1-client-protocol.h"
+ #include "xdg-output-unstable-v1-client-protocol.h"
++#include "xdg-shell-client-protocol.h"
+ 
+ void free_workspaces(struct wl_list *list) {
+ 	struct swaybar_workspace *ws, *tmp;
+@@ -362,6 +363,8 @@ static void handle_global(void *data, struct wl_registry *registry,
+ 	} else if (strcmp(interface, zxdg_output_manager_v1_interface.name) == 0) {
+ 		bar->xdg_output_manager = wl_registry_bind(registry, name,
+ 			&zxdg_output_manager_v1_interface, 2);
++	} else if (strcmp(interface, xdg_wm_base_interface.name) == 0) {
++		bar->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface, 1);
+ 	}
+ }
+ 
+@@ -534,6 +537,7 @@ void bar_teardown(struct swaybar *bar) {
+ #if HAVE_TRAY
+ 	destroy_tray(bar->tray);
+ #endif
++	xdg_wm_base_destroy(bar->wm_base);
+ 	free_outputs(&bar->outputs);
+ 	free_outputs(&bar->unused_outputs);
+ 	free_seats(&bar->seats);
 diff --git a/swaybar/input.c b/swaybar/input.c
-index c8c8f0d4f1..456ecd1fbb 100644
+index c8c8f0d4f1..46295052a5 100644
 --- a/swaybar/input.c
 +++ b/swaybar/input.c
 @@ -10,6 +10,10 @@
@@ -125,7 +169,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  void free_hotspots(struct wl_list *list) {
  	struct swaybar_hotspot *hotspot, *tmp;
  	wl_list_for_each_safe(hotspot, tmp, list, link) {
-@@ -112,19 +116,38 @@ static void wl_pointer_enter(void *data, struct wl_pointer *wl_pointer,
+@@ -112,10 +116,23 @@ static void wl_pointer_enter(void *data, struct wl_pointer *wl_pointer,
  		}
  	}
  	update_cursor(seat);
@@ -149,14 +193,11 @@ index c8c8f0d4f1..456ecd1fbb 100644
  	struct swaybar_seat *seat = data;
  	seat->pointer.current = NULL;
  }
- 
- static void wl_pointer_motion(void *data, struct wl_pointer *wl_pointer,
- 		uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) {
-+#if HAVE_TRAY
+@@ -125,6 +142,11 @@ static void wl_pointer_motion(void *data, struct wl_pointer *wl_pointer,
  	struct swaybar_seat *seat = data;
  	seat->pointer.x = wl_fixed_to_double(surface_x);
  	seat->pointer.y = wl_fixed_to_double(surface_y);
-+
++#if HAVE_TRAY
 +	if (dbusmenu_pointer_motion(data, wl_pointer, time, surface_x, surface_y)) {
 +		return;
 +	}
@@ -164,7 +205,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  }
  
  static bool check_bindings(struct swaybar *bar, uint32_t button,
-@@ -141,13 +164,14 @@ static bool check_bindings(struct swaybar *bar, uint32_t button,
+@@ -141,13 +163,14 @@ static bool check_bindings(struct swaybar *bar, uint32_t button,
  }
  
  static bool process_hotspots(struct swaybar_output *output,
@@ -181,7 +222,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  					button, hotspot->data)) {
  				return true;
  			}
-@@ -160,6 +184,12 @@ static bool process_hotspots(struct swaybar_output *output,
+@@ -160,6 +183,12 @@ static bool process_hotspots(struct swaybar_output *output,
  static void wl_pointer_button(void *data, struct wl_pointer *wl_pointer,
  		uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
  	struct swaybar_seat *seat = data;
@@ -194,7 +235,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  	struct swaybar_pointer *pointer = &seat->pointer;
  	struct swaybar_output *output = pointer->current;
  	if (!sway_assert(output, "button with no active output")) {
-@@ -173,7 +203,7 @@ static void wl_pointer_button(void *data, struct wl_pointer *wl_pointer,
+@@ -173,7 +202,7 @@ static void wl_pointer_button(void *data, struct wl_pointer *wl_pointer,
  	if (state != WL_POINTER_BUTTON_STATE_PRESSED) {
  		return;
  	}
@@ -203,7 +244,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  }
  
  static void workspace_next(struct swaybar *bar, struct swaybar_output *output,
-@@ -230,7 +260,7 @@ static void process_discrete_scroll(struct swaybar_seat *seat,
+@@ -230,7 +259,7 @@ static void process_discrete_scroll(struct swaybar_seat *seat,
  		return;
  	}
  
@@ -212,7 +253,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  		return;
  	}
  
-@@ -280,6 +310,12 @@ static void wl_pointer_axis(void *data, struct wl_pointer *wl_pointer,
+@@ -280,6 +309,12 @@ static void wl_pointer_axis(void *data, struct wl_pointer *wl_pointer,
  		return;
  	}
  
@@ -225,7 +266,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  	// If there's a while since the last scroll event,
  	// set 'value' to zero as if to reset the "virtual scroll wheel"
  	if (seat->axis[axis].discrete_steps == 0 &&
-@@ -296,6 +332,12 @@ static void wl_pointer_frame(void *data, struct wl_pointer *wl_pointer) {
+@@ -296,6 +331,12 @@ static void wl_pointer_frame(void *data, struct wl_pointer *wl_pointer) {
  	struct swaybar_pointer *pointer = &seat->pointer;
  	struct swaybar_output *output = pointer->current;
  
@@ -238,7 +279,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  	if (output == NULL) {
  		return;
  	}
-@@ -403,7 +445,7 @@ static void wl_touch_up(void *data, struct wl_touch *wl_touch,
+@@ -403,7 +444,7 @@ static void wl_touch_up(void *data, struct wl_touch *wl_touch,
  	}
  	if (time - slot->time < 500) {
  		// Tap, treat it like a pointer click
@@ -248,7 +289,7 @@ index c8c8f0d4f1..456ecd1fbb 100644
  	slot->output = NULL;
  }
 diff --git a/swaybar/meson.build b/swaybar/meson.build
-index 9feb3cd2d0..86abe93235 100644
+index 9feb3cd2d0..6dbe9a1019 100644
 --- a/swaybar/meson.build
 +++ b/swaybar/meson.build
 @@ -3,7 +3,8 @@ tray_files = have_tray ? [
@@ -257,7 +298,7 @@ index 9feb3cd2d0..86abe93235 100644
  	'tray/tray.c',
 -	'tray/watcher.c'
 +	'tray/watcher.c',
-+    'tray/dbusmenu.c'
++	'tray/dbusmenu.c'
  ] : []
  
  swaybar_deps = [
@@ -289,10 +330,10 @@ index a878805eeb..891928d10e 100644
  	}
 diff --git a/swaybar/tray/dbusmenu.c b/swaybar/tray/dbusmenu.c
 new file mode 100644
-index 0000000000..be0ed010a9
+index 0000000000..b8b969d0ed
 --- /dev/null
 +++ b/swaybar/tray/dbusmenu.c
-@@ -0,0 +1,1381 @@
+@@ -0,0 +1,1365 @@
 +#define _POSIX_C_SOURCE 200809L
 +#include <linux/input-event-codes.h>
 +#include <pool-buffer.h>
@@ -379,7 +420,6 @@ index 0000000000..be0ed010a9
 +
 +struct swaybar_dbusmenu {
 +	struct swaybar_sni *sni;
-+	struct xdg_wm_base *wm_base;
 +	struct swaybar_output *output;
 +	struct swaybar_seat *seat;
 +	int serial;
@@ -401,7 +441,7 @@ index 0000000000..be0ed010a9
 +};
 +
 +static int handle_items_properties_updated(sd_bus_message *msg, void *data,
-+                                           sd_bus_error *error) {
++		sd_bus_error *error) {
 +	struct swaybar_sni *sni = data;
 +	sway_log(SWAY_DEBUG, "%s%s item properties updated", sni->service, sni->menu);
 +
@@ -413,7 +453,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static int handle_layout_updated(sd_bus_message *msg, void *data,
-+                                 sd_bus_error *error) {
++		sd_bus_error *error) {
 +	struct swaybar_sni *sni = data;
 +	sway_log(SWAY_DEBUG, "%s%s layout updated", sni->service, sni->menu);
 +
@@ -426,7 +466,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static int handle_item_activation_requested(sd_bus_message *msg, void *data,
-+                                            sd_bus_error *error) {
++		sd_bus_error *error) {
 +	return 0; // TODO: Implement handling of hotkeys for opening the menu
 +}
 +
@@ -455,8 +495,8 @@ index 0000000000..be0ed010a9
 +  // intentionally left blank
 +}
 +
-+static void
-+destroy_dbusmenu_surface(struct swaybar_dbusmenu_surface *dbusmenu_surface) {
++static void destroy_dbusmenu_surface(
++		struct swaybar_dbusmenu_surface *dbusmenu_surface) {
 +	if (!dbusmenu_surface) {
 +		return;
 +	}
@@ -466,6 +506,7 @@ index 0000000000..be0ed010a9
 +		dbusmenu_surface->xdg_popup = NULL;
 +	}
 +	if (dbusmenu_surface->surface) {
++		xdg_surface_destroy(dbusmenu_surface->xdg_surface);
 +		wl_surface_destroy(dbusmenu_surface->surface);
 +		dbusmenu_surface->surface = NULL;
 +	}
@@ -507,14 +548,14 @@ index 0000000000..be0ed010a9
 +	close_menu(menu);
 +}
 +
-+static void free_items(struct swaybar_dbusmenu_menu *menu) {
++static void swaybar_dbusmenu_menu_destroy(struct swaybar_dbusmenu_menu *menu) {
 +	if (!menu) {
 +		return;
 +	}
 +
 +	if (menu->child_menus) {
 +		for (int i = 0; i < menu->child_menus->length; ++i) {
-+			free_items(menu->child_menus->items[i]);
++			swaybar_dbusmenu_menu_destroy(menu->child_menus->items[i]);
 +		}
 +	}
 +	list_free(menu->child_menus);
@@ -522,12 +563,9 @@ index 0000000000..be0ed010a9
 +	if (menu->items) {
 +		for (int i = 0; i < menu->items->length; ++i) {
 +			struct swaybar_dbusmenu_menu_item *item = menu->items->items[i];
-+			if (item->label) {
-+				free(item->label);
-+			}
-+			if (item->icon_name) {
-+				free(item->icon_name);
-+			}
++			free(item->label);
++			free(item->icon_name);
++			free(item->icon_data);
 +			free(item);
 +		}
 +	}
@@ -544,8 +582,7 @@ index 0000000000..be0ed010a9
 +	menu->sni->tray->menu_pointer_focus = NULL;
 +
 +	close_menus(menu->menu);
-+	free_items(menu->menu);
-+	xdg_wm_base_destroy(menu->wm_base);
++	swaybar_dbusmenu_menu_destroy(menu->menu);
 +	free(menu);
 +}
 +
@@ -583,8 +620,8 @@ index 0000000000..be0ed010a9
 +}
 +
 +static void draw_menu_items(cairo_t *cairo, struct swaybar_dbusmenu_menu *menu,
-+                            int *surface_x, int *surface_y, int *surface_width,
-+                            int *surface_height, bool open) {
++		int *surface_x, int *surface_y, int *surface_width, int *surface_height,
++		bool open) {
 +	struct swaybar_sni *sni = menu->dbusmenu->sni;
 +	struct swaybar_tray *tray = sni->tray;
 +	struct swaybar_output *output = menu->dbusmenu->output;
@@ -774,7 +811,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +struct swaybar_dbusmenu_menu *find_menu_id(struct swaybar_dbusmenu_menu *menu,
-+                                           int id) {
++		int id) {
 +	if (!menu) {
 +		return NULL;
 +	}
@@ -798,7 +835,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static void swaybar_dbusmenu_draw_menu(struct swaybar_dbusmenu_menu *menu,
-+                                       int id, bool open) {
++		int id, bool open) {
 +	if (menu->dbusmenu->drawing) {
 +		return;
 +	}
@@ -823,7 +860,6 @@ index 0000000000..be0ed010a9
 +		menu->surface = swaybar_dbusmenu_surface_create();
 +		if (!menu->surface) {
 +			sway_log(SWAY_ERROR, "Could not create surface for menu %d", menu->item_id);
-+			menu->dbusmenu->drawing = false;
 +			return;
 +		}
 +	}
@@ -872,6 +908,8 @@ index 0000000000..be0ed010a9
 +	if (dbusmenu_surface->width != surface_width ||
 +			dbusmenu_surface->height != surface_height) {
 +		if (dbusmenu_surface->surface) {
++			xdg_surface_destroy(dbusmenu_surface->xdg_surface);
++			dbusmenu_surface->xdg_surface = NULL;
 +			wl_surface_destroy(dbusmenu_surface->surface);
 +			dbusmenu_surface->surface = NULL;
 +			sway_log(SWAY_DEBUG, "Destroy xdg popup");
@@ -882,9 +920,9 @@ index 0000000000..be0ed010a9
 +		// configure & position popup surface
 +		struct wl_surface *surface = wl_compositor_create_surface(bar->compositor);
 +		struct xdg_surface *xdg_surface =
-+			xdg_wm_base_get_xdg_surface(menu->dbusmenu->wm_base, surface);
++			xdg_wm_base_get_xdg_surface(menu->dbusmenu->bar->wm_base, surface);
 +		struct xdg_positioner *positioner =
-+			xdg_wm_base_create_positioner(menu->dbusmenu->wm_base);
++			xdg_wm_base_create_positioner(menu->dbusmenu->bar->wm_base);
 +
 +		struct swaybar_dbusmenu_menu_item *item =
 +			find_item(!menu->parent_menu ? menu : menu->parent_menu, menu->item_id);
@@ -921,6 +959,7 @@ index 0000000000..be0ed010a9
 +			xdg_popup = xdg_surface_get_popup(
 +					xdg_surface, menu->parent_menu->surface->xdg_surface, positioner);
 +		}
++		xdg_positioner_destroy(positioner);
 +
 +		xdg_popup_grab(xdg_popup, menu->dbusmenu->seat->wl_seat,
 +					   menu->dbusmenu->serial);
@@ -929,7 +968,6 @@ index 0000000000..be0ed010a9
 +		wl_surface_commit(surface);
 +
 +		wl_display_roundtrip(bar->display);
-+		xdg_positioner_destroy(positioner);
 +
 +		dbusmenu_surface->xdg_popup = xdg_popup;
 +		dbusmenu_surface->xdg_surface = xdg_surface;
@@ -957,7 +995,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static cairo_status_t read_png_stream(void *closure, unsigned char *data,
-+                                      unsigned int length) {
++		unsigned int length) {
 +	struct png_stream *png_stream = closure;
 +	if (length > png_stream->left) {
 +		return CAIRO_STATUS_READ_ERROR;
@@ -969,16 +1007,11 @@ index 0000000000..be0ed010a9
 +}
 +
 +static cairo_surface_t *read_png(const void *data, size_t data_size) {
-+	struct png_stream *png_stream = malloc(sizeof(struct png_stream));
-+	if (png_stream == NULL) {
-+		sway_log(SWAY_ERROR, "Allocation for PNG stream failed");
-+		return NULL;
-+	}
-+	png_stream->data = data;
-+	png_stream->left = data_size;
++	struct png_stream png_stream = {0};
++	png_stream.data = data;
++	png_stream.left = data_size;
 +	cairo_surface_t *surface =
-+		cairo_image_surface_create_from_png_stream(read_png_stream, png_stream);
-+	free(png_stream);
++		cairo_image_surface_create_from_png_stream(read_png_stream, &png_stream);
 +
 +	if (cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS) {
 +		return surface;
@@ -989,7 +1022,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static int about_to_show_callback(sd_bus_message *msg, void *data,
-+								  sd_bus_error *error) {
++		sd_bus_error *error) {
 +	struct swaybar_sni_slot *slot = data;
 +	struct swaybar_sni *sni = slot->sni;
 +	int menu_id = slot->menu_id;
@@ -1044,7 +1077,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static int update_item_properties(struct swaybar_dbusmenu_menu_item *item,
-+								  sd_bus_message *msg) {
++		sd_bus_message *msg) {
 +	sd_bus_message_enter_container(msg, 'a', "{sv}");
 +	while (!sd_bus_message_at_end(msg, 0)) {
 +		sd_bus_message_enter_container(msg, 'e', "sv");
@@ -1126,7 +1159,7 @@ index 0000000000..be0ed010a9
 +			}
 +			log_value = children_display;
 +		} else {
-+			// Ignored: shortcut, disposition, disposition
++			// Ignored: shortcut, disposition
 +			sd_bus_message_skip(msg, "v");
 +			log_value = "<ignored>";
 +		}
@@ -1138,7 +1171,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static int get_layout_callback(sd_bus_message *msg, void *data, 
-+							   sd_bus_error *error) {
++		sd_bus_error *error) {
 +	struct swaybar_sni_slot *slot = data;
 +	struct swaybar_sni *sni = slot->sni;
 +	int menu_id = slot->menu_id;
@@ -1174,17 +1207,18 @@ index 0000000000..be0ed010a9
 +
 +	if (dbusmenu->menu) {
 +		close_menus(dbusmenu->menu);
-+		free_items(dbusmenu->menu);
++		swaybar_dbusmenu_menu_destroy(dbusmenu->menu);
 +		dbusmenu->menu = NULL;
 +	}
 +
 +	struct swaybar_dbusmenu_menu_item *parent_item = NULL;
-+	dbusmenu->menu = calloc(1, sizeof(struct swaybar_dbusmenu_menu));
-+	if (!dbusmenu->menu) {
++	struct swaybar_dbusmenu_menu *menu = calloc(1,
++			sizeof(struct swaybar_dbusmenu_menu));
++	if (!menu) {
 +		sway_log(SWAY_ERROR, "Could not allocate menu");
 +		return -ENOMEM;
 +	}
-+	struct swaybar_dbusmenu_menu *menu = dbusmenu->menu;
++	dbusmenu->menu = menu;
 +	menu->dbusmenu = dbusmenu;
 +	int ret = 0;
 +	while (!sd_bus_message_at_end(msg, 1)) {
@@ -1257,8 +1291,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static void swaybar_dbusmenu_subscribe_signal(struct swaybar_dbusmenu *menu,
-+											  const char *signal_name,
-+											  sd_bus_message_handler_t callback) {
++		const char *signal_name, sd_bus_message_handler_t callback) {
 +	int ret = sd_bus_match_signal_async( menu->sni->tray->bus, NULL, 
 +			menu->sni->service, menu->sni->menu, menu_interface, signal_name, callback,
 +			NULL, menu->sni);
@@ -1310,7 +1343,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static int get_icon_theme_path_callback(sd_bus_message *msg, void *data,
-+                                        sd_bus_error *error) {
++		sd_bus_error *error) {
 +	struct swaybar_sni_slot *slot = data;
 +	struct swaybar_sni *sni = slot->sni;
 +	wl_list_remove(&slot->link);
@@ -1334,7 +1367,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static void swaybar_dbusmenu_setup(struct swaybar_dbusmenu *menu) {
-+	struct swaybar_sni_slot *slot = calloc(1, sizeof(struct swaybar_sni_slot));
++		struct swaybar_sni_slot *slot = calloc(1, sizeof(struct swaybar_sni_slot));
 +	slot->sni = menu->sni;
 +	int ret = sd_bus_call_method_async( menu->sni->tray->bus, &slot->slot, 
 +			menu->sni->service, menu->sni->path, "org.freedesktop.DBus.Properties",
@@ -1352,83 +1385,64 @@ index 0000000000..be0ed010a9
 +	swaybar_dbusmenu_get_layout_root(menu);
 +}
 +
-+static void handle_global(void *data, struct wl_registry *registry,
-+                          uint32_t name, const char *interface,
-+                          uint32_t version) {
-+	struct swaybar_dbusmenu *menu = data;
-+	if (strcmp(interface, xdg_wm_base_interface.name) == 0) {
-+		menu->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface, 1);
-+	}
-+}
-+
-+static void handle_global_remove(void *data, struct wl_registry *registry,
-+                                 uint32_t name) {
-+  // intentionally left blank
-+}
-+
-+static const struct wl_registry_listener registry_listener = {
-+    .global = handle_global,
-+	.global_remove = handle_global_remove,
-+};
-+
-+struct swaybar_dbusmenu *swaybar_dbusmenu_create(struct swaybar_sni *sni,
-+                                                 struct swaybar_output *output,
-+                                                 struct swaybar_seat *seat,
-+                                                 uint32_t serial, int x,
-+                                                 int y) {
-+	struct swaybar_dbusmenu *dbusmenu = calloc(1, sizeof(struct swaybar_dbusmenu));
-+
++void swaybar_dbusmenu_open(struct swaybar_sni *sni,
++		struct swaybar_output *output, struct swaybar_seat *seat, uint32_t serial, 
++		int x, int y) {
++	struct swaybar_dbusmenu *dbusmenu = sni->tray->menu;
 +	if (!dbusmenu) {
-+		sway_log(SWAY_DEBUG, "Could not allocate dbusmenu");
-+		return NULL;
++		dbusmenu = calloc(1, sizeof(struct swaybar_dbusmenu));
++		if (!dbusmenu) {
++			sway_log(SWAY_DEBUG, "Could not allocate dbusmenu");
++			return;
++		}
++		sni->tray->menu = dbusmenu;
 +	}
-+
-+	sni->tray->menu = dbusmenu;
 +
 +	dbusmenu->sni = sni;
 +	dbusmenu->output = output;
 +	dbusmenu->seat = seat;
 +	dbusmenu->serial = serial;
-+	dbusmenu->x = seat->pointer.x;
-+	dbusmenu->y = seat->pointer.y;
++	dbusmenu->x = x;
++	dbusmenu->y = y;
 +	dbusmenu->bar = output->bar;
-+	struct wl_registry *registry = wl_display_get_registry(sni->tray->bar->display);
-+	wl_registry_add_listener(registry, &registry_listener, dbusmenu);
-+	wl_display_roundtrip(sni->tray->bar->display);
 +
 +	swaybar_dbusmenu_setup(dbusmenu);
-+
-+	return dbusmenu;
 +}
 +
 +static void close_child_menus(struct swaybar_dbusmenu_menu *menu) {
 +	if (!menu || !menu->child_menus) {
 +		return;
 +	}
-+
-+	for (int i = 0; i < menu->child_menus->length; ++i) {
-+		close_menus(menu->child_menus->items[i]);
++    for (int i = 0; i < menu->child_menus->length; ++i) {
++        close_menus(menu->child_menus->items[i]);
++	// for (int i = 0; i < menu->items->length; ++i) {
++	// 	struct swaybar_dbusmenu_menu_item *item = menu->items->items[i];
++	// 	if (item->id != 0 && item->submenu) {
++	// 		close_menus(item->submenu);
++	// 	}
 +	}
 +}
 +
 +static void close_child_menus_except(struct swaybar_dbusmenu_menu *menu,
-+                                     int id) {
++		int id) {
 +	if (!menu || !menu->child_menus) {
 +		return;
 +	}
-+
-+	for (int i = 0; i < menu->child_menus->length; ++i) {
-+		struct swaybar_dbusmenu_menu *child_menu = menu->child_menus->items[i];
-+		if (child_menu->item_id == id) {
-+			continue;
++    for (int i = 0; i < menu->child_menus->length; ++i) {
++        struct swaybar_dbusmenu_menu *child_menu = menu->child_menus->items[i];
++        if (child_menu->item_id == id) {
++            continue;
++	// for (int i = 0; i < menu->items->length; ++i) {
++	// 	struct swaybar_dbusmenu_menu_item *item = menu->items->items[i];
++	// 	if (item->id != 0 && item->id != id && item->submenu) {
++	// 		close_menus(item->submenu);
 +		}
 +		close_menus(child_menu);
 +	}
 +}
 +
 +static void open_close_child_menu(struct swaybar_dbusmenu_menu *menu,
-+                                  struct swaybar_dbusmenu_menu_item *item,
-+                                  int x, int y) {
++		struct swaybar_dbusmenu_menu_item *item, int x, int y) {
 +	bool in_hotspot = is_in_hotspot(&item->hotspot, x, y);
 +
 +	if (item->submenu && in_hotspot) {
@@ -1445,8 +1459,7 @@ index 0000000000..be0ed010a9
 +
 +static bool
 +pointer_motion_process_item(struct swaybar_dbusmenu_menu *focused_menu,
-+                            struct swaybar_dbusmenu_menu_item *item,
-+                            struct swaybar_seat *seat) {
++		struct swaybar_dbusmenu_menu_item *item, struct swaybar_seat *seat) {
 +	int scale = focused_menu->dbusmenu->output->scale;
 +	double x = seat->pointer.x * scale;
 +	double y = seat->pointer.y * scale;
@@ -1478,9 +1491,9 @@ index 0000000000..be0ed010a9
 +	return redraw;
 +}
 +
-+bool dbusmenu_pointer_motion(struct swaybar_seat *seat,
-+                             struct wl_pointer *wl_pointer, uint32_t time_,
-+                             wl_fixed_t surface_x, wl_fixed_t surface_y) {
++bool dbusmenu_pointer_motion(struct swaybar_seat *seat, 
++		struct wl_pointer *wl_pointer, uint32_t time_, wl_fixed_t surface_x,
++		wl_fixed_t surface_y) {
 +	struct swaybar_tray *tray = seat->bar->tray;
 +	struct swaybar_dbusmenu_menu *focused_menu = tray->menu_pointer_focus;
 +	if (!(tray && tray->menu && focused_menu)) {
@@ -1502,42 +1515,57 @@ index 0000000000..be0ed010a9
 +
 +static struct swaybar_dbusmenu_menu *
 +dbusmenu_menu_find_menu_surface(struct swaybar_dbusmenu_menu *menu,
-+                                struct wl_surface *surface) {
++		struct wl_surface *surface) {
 +	if (menu->surface && menu->surface->surface == surface) {
 +		return menu;
 +	}
-+
 +	if (!menu->child_menus) {
 +		return NULL;
 +	}
-+
-+	for (int i = 0; i < menu->child_menus->length; ++i) {
-+		struct swaybar_dbusmenu_menu *child_menu = menu->child_menus->items[i];
-+		if (child_menu->surface && child_menu->surface->surface == surface) {
-+			return child_menu;
++    for (int i = 0; i < menu->child_menus->length; ++i) {
++        struct swaybar_dbusmenu_menu *child_menu = menu->child_menus->items[i];
++        if (child_menu->surface && child_menu->surface->surface == surface) {
++            return child_menu;
++	// for (int i = 0; i < menu->items->length; ++i) {
++	// 	struct swaybar_dbusmenu_menu_item *item = menu->items->items[i];
++	// 	if (!item->submenu) {
++	// 		continue;
++	// 	}
++	// 	if (item->submenu->surface && item->submenu->surface->surface == surface) {
++	// 		return item->submenu;
 +		}
 +
-+		struct swaybar_dbusmenu_menu *child_child_menu =
-+		dbusmenu_menu_find_menu_surface(child_menu, surface);
-+		if (child_child_menu != NULL) {
-+			return child_child_menu;
++        struct swaybar_dbusmenu_menu *child_child_menu =
++        dbusmenu_menu_find_menu_surface(child_menu, surface);
++        if (child_child_menu != NULL) {
++            return child_child_menu;
++		// if (item->id != 0) {
++		// 	struct swaybar_dbusmenu_menu *child_child_menu =
++		// 		dbusmenu_menu_find_menu_surface(item->submenu, surface);
++		// 	if (!child_child_menu) {
++		// 		return child_child_menu;
++		// 	} 
 +		}
 +	}
 +
 +	return NULL;
 +}
 +
-+static void close_menus_id(struct swaybar_dbusmenu_menu *menu, int item_id) {
-+	for (int j = 0; j < menu->child_menus->length; ++j) {
-+		struct swaybar_dbusmenu_menu *child_menu = menu->child_menus->items[j];
-+		if (child_menu->item_id == item_id) {
-+			close_menus(child_menu);
++static void close_menus_by_id(struct swaybar_dbusmenu_menu *menu, int item_id) {
++    for (int j = 0; j < menu->child_menus->length; ++j) {
++        struct swaybar_dbusmenu_menu *child_menu = menu->child_menus->items[j];
++        if (child_menu->item_id == item_id) {
++            close_menus(child_menu);
++	// for (int i = 0; i < menu->items->length; ++i) {
++	// 	struct swaybar_dbusmenu_menu_item *item = menu->items->items[i];
++	// 	if (item->id != item_id && item->submenu) {
++	// 		close_menus(item->submenu);
 +		}
 +	}
 +}
 +
-+static void close_child_menus_outside_pointer(struct swaybar_dbusmenu_menu *menu,
-+											  struct swaybar_seat *seat) {
++static void close_unfocused_child_menus(struct swaybar_dbusmenu_menu *menu,
++		struct swaybar_seat *seat) {
 +	for (int i = 0; i < menu->items->length; ++i) {
 +		struct swaybar_dbusmenu_menu_item *item = menu->items->items[i];
 +
@@ -1545,13 +1573,13 @@ index 0000000000..be0ed010a9
 +		int x = seat->pointer.x * scale;
 +		int y = seat->pointer.y * scale;
 +		if (item->submenu && !is_in_hotspot(&item->hotspot, x, y)) {
-+		  close_menus_id(menu, item->id);
++		  close_menus_by_id(menu, item->id);
 +		}
 +	}
 +}
 +
 +bool dbusmenu_pointer_frame(struct swaybar_seat *data, 
-+							struct wl_pointer *wl_pointer) {
++		struct wl_pointer *wl_pointer) {
 +	struct swaybar_tray *tray = data->bar->tray;
 +	if (!(tray && tray->menu && tray->menu_pointer_focus)) {
 +		return false;
@@ -1560,7 +1588,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +bool dbusmenu_pointer_axis(struct swaybar_seat *data,
-+                           struct wl_pointer *wl_pointer) {
++		struct wl_pointer *wl_pointer) {
 +	struct swaybar_tray *tray = data->bar->tray;
 +	if (!(tray && tray->menu && tray->menu_pointer_focus)) {
 +		return false;
@@ -1569,8 +1597,8 @@ index 0000000000..be0ed010a9
 +}
 +
 +bool dbusmenu_pointer_enter(void *data, struct wl_pointer *wl_pointer,
-+                            uint32_t serial, struct wl_surface *surface,
-+                            wl_fixed_t surface_x, wl_fixed_t surface_y) {
++		uint32_t serial, struct wl_surface *surface, wl_fixed_t surface_x,
++		wl_fixed_t surface_y) {
 +	struct swaybar_seat *seat = data;
 +	struct swaybar_tray *tray = seat->bar->tray;
 +	if (!(tray && tray->menu)) {
@@ -1581,7 +1609,7 @@ index 0000000000..be0ed010a9
 +	dbusmenu_menu_find_menu_surface(tray->menu->menu, surface);
 +
 +	if (new_focused_menu && new_focused_menu->child_menus) {
-+		close_child_menus_outside_pointer(new_focused_menu, seat);
++		close_unfocused_child_menus(new_focused_menu, seat);
 +	}
 +
 +	tray->menu_pointer_focus = new_focused_menu;
@@ -1590,7 +1618,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +bool dbusmenu_pointer_leave(void *data, struct wl_pointer *wl_pointer,
-+                            uint32_t serial, struct wl_surface *surface) {
++		uint32_t serial, struct wl_surface *surface) {
 +	struct swaybar_seat *seat = data;
 +	struct swaybar_tray *tray = seat->bar->tray;
 +	if (!(tray && tray->menu)) {
@@ -1603,8 +1631,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static bool dbusmenu_pointer_button_left_process_item(struct swaybar_dbusmenu *dbusmenu,
-+													  struct swaybar_dbusmenu_menu_item *item,
-+													  struct swaybar_seat *seat) {
++		struct swaybar_dbusmenu_menu_item *item, struct swaybar_seat *seat) {
 +	struct swaybar_sni *sni = dbusmenu->sni;
 +	struct swaybar_tray *tray = sni->tray;
 +	int scale = dbusmenu->output->scale;
@@ -1632,7 +1659,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +static bool dbusmenu_pointer_button_left(struct swaybar_dbusmenu *dbusmenu,
-+                                         struct swaybar_seat *seat) {
++		struct swaybar_seat *seat) {
 +	struct swaybar_dbusmenu_menu *focused_menu 
 +		= dbusmenu->sni->tray->menu_pointer_focus;
 +
@@ -1651,9 +1678,7 @@ index 0000000000..be0ed010a9
 +}
 +
 +bool dbusmenu_pointer_button(void *data, struct wl_pointer *wl_pointer,
-+                             uint32_t serial, uint32_t time_, uint32_t button,
-+                             uint32_t state) {
-+
++		uint32_t serial, uint32_t time_, uint32_t button, uint32_t state) {
 +	struct swaybar_seat *seat = data;
 +	struct swaybar_tray *tray = seat->bar->tray;
 +	if (!(tray && tray->menu)) {
@@ -1675,7 +1700,7 @@ index 0000000000..be0ed010a9
 +	return false;
 +}
 diff --git a/swaybar/tray/item.c b/swaybar/tray/item.c
-index 0cb5ee9dfe..178401267f 100644
+index 0cb5ee9dfe..45bc7df29b 100644
 --- a/swaybar/tray/item.c
 +++ b/swaybar/tray/item.c
 @@ -8,6 +8,7 @@
@@ -1703,9 +1728,9 @@ index 0cb5ee9dfe..178401267f 100644
  	}
  
 -	if (strncmp(method, "Scroll", strlen("Scroll")) == 0) {
-+	if (sni->menu && strcmp(method, "ContextMenu") == 0) {
-+		if (!sni->tray->menu) {
-+			swaybar_dbusmenu_create(sni, output, seat, serial, x, y);
++	if (strcmp(method, "ContextMenu") == 0) {
++		if (sni->menu && !sni->tray->menu) {
++			swaybar_dbusmenu_open(sni, output, seat, serial, x, y);
 +		}
 +	} else if (strncmp(method, "Scroll", strlen("Scroll")) == 0) {
  		char dir = method[strlen("Scroll")];
