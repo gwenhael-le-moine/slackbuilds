@@ -7,7 +7,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(curl -s "https://gitlab.haskell.org/haskell/ghcup-hs/-/tags?format=atom" | grep "title>v" | head -n1 | grep -o "[0-9rc.-]*")}
 ARCH=$(uname -m)
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
@@ -22,8 +22,8 @@ mkdir -p $REPOSITORY
 rm -fr $PKG
 mkdir -p $PKG/usr/bin
 
-cp $REPOSITORY/${PRGNAM}-${VERSION} $PKG/usr/bin/$PRGNAM
-chmod 0755 $PKG/usr/bin/$PRGNAM
+cp $REPOSITORY/${PRGNAM}-${VERSION} $PKG/usr/bin/ghcup
+chmod 0755 $PKG/usr/bin/ghcup
 
 mkdir -p $PKG/install
 
