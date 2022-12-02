@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=6
+BUILD=7
 
 TAG=gwh
 OUTPUT=/tmp
@@ -26,6 +26,7 @@ mkdir -p "$PKG"
 # mise en place
 [ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
+git reset --hard HEAD
 git pull --all
 
 cp -R "$REPOSITORY" $TMP/
@@ -48,9 +49,36 @@ esac
 wget -c https://patch-diff.githubusercontent.com/raw/swaywm/sway/pull/6249.patch -O "$CWD"/patches/6249-tray-menu.patch
 
 for p in "$CWD"/patches/*.patch; do
-    git am "$p"
+    git am --show-current-patch=diff "$p"
 done
 
+# Embed wlroots
+WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
+WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+
+[ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
+cd "$WLROOTS_REPOSITORY" || exit 1
+git reset --hard HEAD
+git pull --all
+
+mkdir -p "$TMP/$PRGNAM"/subprojects/
+cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
+cd "$TMP/$PRGNAM"/subprojects/wlroots || exit 1
+case $WLROOTS_VERSION in
+    trunk)
+        WLROOTS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        ;;
+    latest)
+        WLROOTS_VERSION=$(git describe --tags --abbrev=0)
+        git checkout $WLROOTS_VERSION
+        ;;
+    *)
+        git checkout "$WLROOTS_VERSION"
+        ;;
+esac
+cd "$TMP/$PRGNAM/" || exit 1
+
+# Back to compiling sway…
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
@@ -146,4 +174,4 @@ EOF
 
 # empaquetage
 rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$(echo "${VERSION}+${WLROOTS_VERSION}" | tr - _)-$ARCH-$BUILD$TAG.txz"
