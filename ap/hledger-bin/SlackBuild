@@ -5,7 +5,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/simonmichael/hledger/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -21,26 +21,27 @@ echo $ARCH | grep -q 64 && SRC_ARCH=x64
 DOCS="CHANGES.md CONTRIBUTING.md CREDITS.md LICENSE README.md"
 [ ! -e $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip ] && \
     wget -c https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-${SRC_ARCH}.zip \
-	 -O $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip
+         -O $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip
 for d in $DOCS; do
     [ ! -e $REPOSITORY/${d}.${VERSION} ] && \
-	wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} \
-	     -O $REPOSITORY/${d}.${VERSION}
+        wget -c https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d} \
+             -O $REPOSITORY/${d}.${VERSION}
 done
 rm -fr $PKG
 
 mkdir -p $PKG$PREFIX/bin
 cd $PKG$PREFIX/bin
 unzip $REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip
-mv hledger-linux-${SRC_ARCH} hledger
-mv hledger-ui-linux-${SRC_ARCH} hledger-ui
-mv hledger-web-linux-${SRC_ARCH} hledger-web
+tar xvf hledger-linux-x64.tar && rm hledger-linux-x64.tar
+# mv hledger-linux-${SRC_ARCH} hledger
+# mv hledger-ui-linux-${SRC_ARCH} hledger-ui
+# mv hledger-web-linux-${SRC_ARCH} hledger-web
 chmod +x $PKG$PREFIX/bin/*
 
 mkdir -p  $PKG$PREFIX/doc/hledger/
 for d in $DOCS; do
     [ -e $REPOSITORY/${d}.${VERSION} ] && \
-	cp $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
+        cp $REPOSITORY/${d}.${VERSION} $PKG$PREFIX/doc/hledger/${d}
 done
 
 mkdir -p $PKG/etc/rc.d/
