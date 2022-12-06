@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=7
+BUILD=8
 
 TAG=gwh
 OUTPUT=/tmp
