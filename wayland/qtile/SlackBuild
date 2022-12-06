@@ -41,36 +41,33 @@ python3 ./setup.py install --root=$PKG
 
 cat <<EOF > $PKG$PREFIX/bin/start_qtile.sh
 #!/bin/bash
-set -e
+
+#set -e
+
+LOGFILE=~/.wsession-errors
+true > \$LOGFILE
+exec &> \$LOGFILE
+
+set -x
+echo "sway Starting: \$( date )"
+
+# Uncomment if mouse pointer is invisible
+#export WLR_NO_HARDWARE_CURSORS=1
+
+unset QT_QPA_PLATFORM
 
 export QT_QPA_PLATFORMTHEME=qt5ct
-export QT_QPA_PLATFORM=wayland-egl
-export QT_WAYLAND_FORCE_DPI=physical
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-
-export SAL_USE_VCLPLUGIN=gtk3
-
 export MOZ_ENABLE_WAYLAND=1
-export MOZ_DBUS_REMOTE=1
-
-export _JAVA_AWT_WM_NONREPARENTING=1
-
-# export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=gdk
-
-export SDL_VIDEODRIVER=wayland
-
-#export XDG_CURRENT_DESKTOP=qtile
-export XDG_CURRENT_DESKTOP=Unity # for tray ?
-
-[ -e $HOME/.profile ] && . $HOME/.profile
-
-unset DISPLAY
+export XDG_CURRENT_DESKTOP=sway
+export XDG_PICTURES_DIR=~/.wallpapers
 
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
-mkdir -p \$XDG_RUNTIME_DIR
 
-export LIBSEAT_BACKEND=logind
+mkdir -p \$XDG_RUNTIME_DIR
+chmod 0700 \$XDG_RUNTIME_DIR
+
+# avoid wlr error
+unset DISPLAY
 
 exec dbus-run-session qtile start -b wayland
 EOF
