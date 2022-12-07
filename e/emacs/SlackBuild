@@ -115,39 +115,40 @@ SRCDIR=$REPOSITORY
 EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-$SRCDIR/configure \
-  --prefix=/usr \
-  --sysconfdir=/etc \
-  --localstatedir=/var \
-  --program-prefix="" \
-  --program-suffix="" \
-  --mandir=/usr/man \
-  --infodir=/usr/info \
-  --without-gconf \
-  --without-gsettings \
-  --with-modules \
-  --with-dbus \
-  --with-gif \
-  --with-jpeg \
-  --with-png \
-  --with-rsvg \
-  --with-tiff \
-  --with-xft \
-  --with-xpm \
-  --with-gpm=yes \
-  --with-pgtk \
-  --with-tree-sitter \
-  --with-native-compilation=aot \
-  --enable-link-time-optimization \
-  --with-compress-install \
-  --without-gconf \
-  --with-gameuser=":games" \
-  --build=${ARCH}-slackware-linux || exit 1
-  # --disable-libsystemd \
-  # --with-x \
-  # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-  # --without-toolkit-scroll-bars \
+      CXXFLAGS="$SLKCFLAGS" \
+      $SRCDIR/configure \
+      --prefix=/usr \
+      --libdir=/usr/lib$(uname -m | grep -o 64 ) \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --program-prefix="" \
+      --program-suffix="" \
+      --mandir=/usr/man \
+      --infodir=/usr/info \
+      --without-gconf \
+      --without-gsettings \
+      --with-modules \
+      --with-dbus \
+      --with-gif \
+      --with-jpeg \
+      --with-png \
+      --with-rsvg \
+      --with-tiff \
+      --with-xft \
+      --with-xpm \
+      --with-gpm=yes \
+      --with-pgtk \
+      --with-tree-sitter \
+      --with-native-compilation=aot \
+      --enable-link-time-optimization \
+      --with-compress-install \
+      --without-gconf \
+      --with-gameuser=":games" \
+      --build=${ARCH}-slackware-linux || exit 1
+# --disable-libsystemd \
+    # --with-x \
+    # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+    # --without-toolkit-scroll-bars \
 
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
@@ -178,6 +179,20 @@ if [ -r $PKG/usr/man/man1/ctags.1 ]; then
 elif [ -r $PKG/usr/man/man1/ctags.1.gz ]; then
   mv $PKG/usr/man/man1/ctags.1.gz $PKG/usr/man/man1/ctags-emacs.1.gz
 fi
+
+
+
+# gwh: 2022-12-06
+# tree-sitter grammars
+git clone https://github.com/casouri/tree-sitter-module
+cd tree-sitter-module
+sed -i 's|cc -c -I. parser.c|cc -fPIC -c -I. parser.c|' build.sh
+bash ./batch.sh
+cp dist/*.so "$PKG/usr/lib$(uname -m | grep -o 64)/"
+cd ..
+# /tree-sitter grammars
+
+
 
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
