@@ -6,7 +6,7 @@ set -x
 CWD=$(pwd)
 THIS_HOST=${THIS_HOST:-$(hostname -s)}
 PRGNAM=$(basename $CWD)-$THIS_HOST
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-5}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
 
@@ -82,45 +82,33 @@ fi
 
 VERSION=$(basename $(ls $PKG/lib/modules/ | head -n1))
 
-mkdir -p $PKG/install
 mkdir -p $PKG/boot/
 cp System.map $PKG/boot/System.map-gwh-$VERSION
 cp .config $PKG/boot/config-gwh-$VERSION
 cp arch/${ARCH}/boot/bzImage $PKG/boot/vmlinuz-gwh-$VERSION
-( cd $PKG/boot/
-  ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
-)
 
-# cat <<EOF > $PKG/install/doinst.sh
-# cp /boot/elilo-x86_64.efi /boot/efi/EFI/Slackware/elilo.efi
-# cp /boot/vmlinuz-gwh-$VERSION /boot/efi/EFI/Slackware/vmlinuz-gwh
-# if [ -e /boot/intel-ucode.cpio ]; then
-#     cp /boot/intel-ucode.cpio /boot/efi/EFI/Slackware/
-#     eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -a '-P /boot/intel-ucode.cpio' -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
-# else
-#     eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r -m crc32-pclmul:crc32c-intel:crc32_generic\$(lspci | grep -iq radeon && echo ':amdgpu:radeon'))
-# fi
-# cp /boot/initrd.gz /boot/efi/EFI/Slackware/initrd-gwh.gz
-# EOF
+make clean
 
+cd $PKG/boot/
+ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
+ln -s config-gwh-$VERSION config-gwh
+ln -s System.map-gwh-$VERSION System.map-gwh
+
+mkdir -p $PKG/install
 cat <<EOF > $PKG/install/doinst.sh
 echo -n "updating grub... "
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub
 echo OK
 
-[ -e /boot/initrd.gz ] && mv /boot/initrd.gz /boot/initrd.gz.orig
+echo -n "building initrd… "
+eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|")
+echo "OK"
 
-echo -n "building initrd... "
-eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r)
-echo OK
-
-mv /boot/initrd.gz /boot/initrd-gwh-${VERSION}.gz
+[ -L /boot/initrd-gwh.gz ] && rm /boot/initrd-gwh.gz
 ln -s /boot/initrd-gwh-${VERSION}.gz /boot/initrd-gwh.gz
 
-[ -e /boot/initrd.gz.orig ] && mv /boot/initrd.gz.orig /boot/initrd.gz
+grub-mkconfig -o /boot/grub/grub.cfg
 EOF
-
-make clean
 
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM (kernel)
