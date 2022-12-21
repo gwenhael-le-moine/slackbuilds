@@ -5,7 +5,7 @@ set -x
 
 CWD=$(pwd)
 THIS_HOST=${THIS_HOST:-$(hostname -s)}
-PRGNAM=$(basename $CWD)-$THIS_HOST
+PRGNAM=$(basename "$CWD")-$THIS_HOST
 BUILD=${BUILD:-5}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
@@ -15,47 +15,47 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-NUMJOBS=${NUMJOBS:-" -j$(nproc)"}
+NUMJOBS=${NUMJOBS:-$(nproc)}
 
 ANEW=${ANEW:-true}
 
-rm -fr $PKG
+rm -fr "$PKG"
 
 VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
 
-mkdir -p $PKG/usr/src/
-if [ -e /usr/src/linux-$VERSION ] && [[ "$ANEW" != "true" ]]; then
-    cp -a /usr/src/linux-$VERSION $PKG/usr/src/
+mkdir -p "$PKG/usr/src/"
+if [ -e "/usr/src/linux-$VERSION" ] && [[ "$ANEW" != "true" ]]; then
+    cp -a "/usr/src/linux-$VERSION" "$PKG/usr/src/"
 else
-    if [ $BRANCH == "stable" ]; then
-        SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo $VERSION | cut -d. -f1).x"
+    if [ "$BRANCH" == "stable" ]; then
+        SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo "$VERSION" | cut -d. -f1).x"
     else
         SRC_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot"
     fi
 
-    [ ! -e $CWD/linux-$VERSION.tar.?z* ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O $CWD/linux-$VERSION.tar.gz
-    tar xf $CWD/linux-$VERSION.tar.gz -C $PKG/usr/src/
+    [ ! -e "$CWD"/linux-"$VERSION".tar.gz ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O "$CWD/linux-$VERSION.tar.gz"
+    tar xf "$CWD/linux-$VERSION.tar.gz" -C "$PKG/usr/src/"
 fi
 
-cd $PKG/usr/src/
-ln -s linux-$VERSION linux
-cd linux-$VERSION
+cd "$PKG/usr/src/" || exit 1
+ln -s "linux-$VERSION" linux
+cd "linux-$VERSION"
 
-if [ -e $CWD/config-$THIS_HOST-$VERSION ] ; then
-    cp $CWD/config-$THIS_HOST-$VERSION .config
+if [ -e "$CWD/config-$THIS_HOST-$VERSION" ] ; then
+    cp "$CWD/config-$THIS_HOST-$VERSION" .config
 else
-    if [ -e $CWD/config-$THIS_HOST ] ; then
-        cp $CWD/config-$THIS_HOST .config
+    if [ -e "$CWD/config-$THIS_HOST" ] ; then
+        cp "$CWD/config-$THIS_HOST" .config
     else
         zcat /proc/config.gz > .config
     fi
 fi
 
-make oldconfig $*
+make oldconfig "$@"
 
-make $NUMJOBS
-make modules $NUMJOBS
-make modules_install INSTALL_MOD_PATH=$PKG
+make -j"$NUMJOBS"
+make modules -j"$NUMJOBS"
+make modules_install INSTALL_MOD_PATH="$PKG"
 
 if [ -z "${HEADERS_ARCH}" ]; then
     case "$(uname -m)" in
@@ -68,34 +68,34 @@ if [ -z "${HEADERS_ARCH}" ]; then
 fi
 # Generate the kernel headers and clean them up:
 ( echo "Generating headers from the Linux kernel source tree in ${KERNEL_SOURCE}:"
-  make headers_install ARCH=${HEADERS_ARCH} INSTALL_HDR_PATH=$PKG/usr
-  cd $PKG/usr/include
+  make headers_install ARCH="${HEADERS_ARCH}" INSTALL_HDR_PATH="$PKG/usr"
+  cd "$PKG/usr/include" || exit 1
   # You won't want these files. The ones in libdrm work better.
   rm -rf drm
   # This next part seems pretty much cosmetic, but since we've been doing this
   # for a long time (and others also do), we'll stick with it:
-  mv asm asm-${HEADERS_ARCH}
-  ln -sf asm-${HEADERS_ARCH} asm
+  mv asm "asm-${HEADERS_ARCH}"
+  ln -sf "asm-${HEADERS_ARCH}" asm
   # Remove unneeded dotfiles:
   find . -name ".??*" -exec rm -f {} \+
 )
 
-VERSION=$(basename $(ls $PKG/lib/modules/ | head -n1))
+VERSION=$(basename "$(find "$PKG/lib/modules/" -type d -maxdepth 1 -mindepth 1 | head -n1)")
 
-mkdir -p $PKG/boot/
-cp System.map $PKG/boot/System.map-gwh-$VERSION
-cp .config $PKG/boot/config-gwh-$VERSION
-cp arch/${ARCH}/boot/bzImage $PKG/boot/vmlinuz-gwh-$VERSION
+mkdir -p "$PKG/boot/"
+cp System.map "$PKG/boot/System.map-gwh-$VERSION"
+cp .config "$PKG/boot/config-gwh-$VERSION"
+cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
 
 make clean
 
-cd $PKG/boot/
-ln -s vmlinuz-gwh-$VERSION vmlinuz-gwh
-ln -s config-gwh-$VERSION config-gwh
-ln -s System.map-gwh-$VERSION System.map-gwh
+cd "$PKG/boot/" || exit 1
+ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
+ln -s "config-gwh-$VERSION" config-gwh
+ln -s "System.map-gwh-$VERSION" System.map-gwh
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/doinst.sh"
 echo -n "updating grub... "
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub
 echo OK
@@ -110,7 +110,7 @@ ln -s /boot/initrd-gwh-${VERSION}.gz /boot/initrd-gwh.gz
 grub-mkconfig -o /boot/grub/grub.cfg
 EOF
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 $PRGNAM: $PRGNAM (kernel)
 $PRGNAM:
 $PRGNAM: Linux is a clone of the operating system Unix, written from scratch by
@@ -124,6 +124,6 @@ $PRGNAM: http://www.kernel.org
 $PRGNAM:
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
