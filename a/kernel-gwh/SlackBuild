@@ -6,7 +6,7 @@ set -x
 CWD=$(pwd)
 THIS_HOST=${THIS_HOST:-$(hostname -s)}
 PRGNAM=$(basename "$CWD")-$THIS_HOST
-BUILD=${BUILD:-5}
+BUILD=${BUILD:-6}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
 
@@ -83,16 +83,22 @@ fi
 VERSION=$(basename "$(find "$PKG/lib/modules/" -type d -maxdepth 1 -mindepth 1 | head -n1)")
 
 mkdir -p "$PKG/boot/"
-cp System.map "$PKG/boot/System.map-gwh-$VERSION"
-cp .config "$PKG/boot/config-gwh-$VERSION"
-cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
+# cp System.map "$PKG/boot/System.map-gwh-$VERSION"
+# cp .config "$PKG/boot/config-gwh-$VERSION"
+# cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
+cp System.map "$PKG/boot/System.map-gwh"
+cp .config "$PKG/boot/config-gwh"
+cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh"
 
 make clean
 
 cd "$PKG/boot/" || exit 1
-ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
-ln -s "config-gwh-$VERSION" config-gwh
-ln -s "System.map-gwh-$VERSION" System.map-gwh
+# ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
+# ln -s "config-gwh-$VERSION" config-gwh
+# ln -s "System.map-gwh-$VERSION" System.map-gwh
+ln -s vmlinuz-gwh "vmlinuz-gwh-$VERSION"
+ln -s config-gwh "config-gwh-$VERSION"
+ln -s System.map-gwh "System.map-gwh-$VERSION"
 
 mkdir -p "$PKG/install"
 cat <<EOF > "$PKG/install/doinst.sh"
