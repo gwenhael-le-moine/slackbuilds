@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=8
+BUILD=9
 
 TAG=gwh
 OUTPUT=/tmp
@@ -121,6 +121,14 @@ echo "sway Starting: \$( date )"
 #export WLR_NO_HARDWARE_CURSORS=1
 
 unset QT_QPA_PLATFORM
+
+export WLR_RENDERER=vulkan
+export CLUTTER_BACKEND=wayland
+export SDL_VIDEODRIVER=wayland
+export XDG_SESSION_DESKTOP=sway
+export XDG_SESSION_TYPE=wayland
+export QT_PLATFORMTHEME=qt5ct
+export QT_PLATFORM_PLUGIN=qt5ct
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export MOZ_ENABLE_WAYLAND=1
