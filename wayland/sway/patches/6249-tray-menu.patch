@@ -1,4 +1,4 @@
-From ce789fe3f752e94d7f73f39106bfac5339b6bf7e Mon Sep 17 00:00:00 2001
+From 2f304ef0532a45d00b2ec2c7fc63adef0aec7607 Mon Sep 17 00:00:00 2001
 From: Felix Weilbach <felix.weilbach@t-online.de>
 Date: Sun, 30 May 2021 20:45:01 +0200
 Subject: [PATCH] Tray: Implement dbusmenu
@@ -92,10 +92,10 @@ index 0000000000..dc90f6e571
 +
 +#endif
 diff --git a/include/swaybar/tray/item.h b/include/swaybar/tray/item.h
-index c02a558237..0e25cae318 100644
+index 73937a0cc2..9a4a00ff66 100644
 --- a/include/swaybar/tray/item.h
 +++ b/include/swaybar/tray/item.h
-@@ -17,6 +17,7 @@ struct swaybar_pixmap {
+@@ -18,6 +18,7 @@ struct swaybar_pixmap {
  struct swaybar_sni_slot {
  	struct wl_list link; // swaybar_sni::slots
  	struct swaybar_sni *sni;
@@ -103,7 +103,7 @@ index c02a558237..0e25cae318 100644
  	const char *prop;
  	const char *type;
  	void *dest;
-@@ -47,6 +48,7 @@ struct swaybar_sni {
+@@ -48,6 +49,7 @@ struct swaybar_sni {
  	char *icon_theme_path; // non-standard KDE property
  
  	struct wl_list slots; // swaybar_sni_slot::link
@@ -302,7 +302,7 @@ index e5f1811eb0..fef1ee778f 100644
  
  swaybar_deps = [
 diff --git a/swaybar/render.c b/swaybar/render.c
-index 95f6e5be4d..da3e3bd0fd 100644
+index ccf3656378..2385a2f46d 100644
 --- a/swaybar/render.c
 +++ b/swaybar/render.c
 @@ -160,6 +160,7 @@ static void render_sharp_line(cairo_t *cairo, uint32_t color,
@@ -323,7 +323,7 @@ index 95f6e5be4d..da3e3bd0fd 100644
  		return HOTSPOT_PROCESS;
 diff --git a/swaybar/tray/dbusmenu.c b/swaybar/tray/dbusmenu.c
 new file mode 100644
-index 0000000000..ed74e04029
+index 0000000000..8821cacaec
 --- /dev/null
 +++ b/swaybar/tray/dbusmenu.c
 @@ -0,0 +1,1367 @@
@@ -1428,8 +1428,8 @@ index 0000000000..ed74e04029
 +	dbusmenu->output = output;
 +	dbusmenu->seat = seat;
 +	dbusmenu->serial = serial;
-+	dbusmenu->x = x;
-+	dbusmenu->y = y;
++	dbusmenu->x = seat->pointer.x;
++	dbusmenu->y = seat->pointer.y;
 +	dbusmenu->bar = output->bar;
 +
 +	swaybar_dbusmenu_setup(dbusmenu);

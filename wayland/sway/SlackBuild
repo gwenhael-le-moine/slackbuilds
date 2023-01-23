@@ -3,7 +3,8 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=9
+WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
+BUILD=10
 
 TAG=gwh
 OUTPUT=/tmp
@@ -16,6 +17,8 @@ PKG=$TMP/pkg-$PRGNAM
 ARCH=$(uname -m)
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+
 PREFIX=/usr
 
 # nettoyage préalable
@@ -47,15 +50,13 @@ esac
 
 [ -e "$CWD"/patches/6249-tray-menu.patch ] && mv "$CWD"/patches/6249-tray-menu.patch{,.previous}
 wget -c https://patch-diff.githubusercontent.com/raw/swaywm/sway/pull/6249.patch -O "$CWD"/patches/6249-tray-menu.patch
+patch -p1 < "$CWD"/patches/6249-tray-menu.patch
 
-for p in "$CWD"/patches/*.patch; do
-    git am --show-current-patch=diff "$p"
-done
+# for p in "$CWD"/patches/*.patch; do
+#     git am --show-current-patch=diff "$p"
+# done
 
 # Embed wlroots
-WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
-WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
-
 [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
 cd "$WLROOTS_REPOSITORY" || exit 1
 git reset --hard HEAD
