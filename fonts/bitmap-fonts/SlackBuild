@@ -60,15 +60,15 @@ cat <<EOF > "$PKG/install/slack-desc"
 # customary to leave one space after the ':'.
 
              |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (a clean fixed width font)
-$PRGNAM:
-$PRGNAM: OTB format addition to the official terminus-font package.
+$PRGNAM: $PRGNAM (bitmap fonts collection)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Homepage: http://$PRGNAM.sourceforge.net
-$PRGNAM: https://github.com/archlinux/svntogit-community/tree/packages/terminus-font-otb/trunk
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/Tecate/bitmap-fonts
 $PRGNAM:
 $PRGNAM:
 EOF
