@@ -4,6 +4,7 @@
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
 WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
+LIBLIFTOFF_VERSION=${LIBLIFTOFF_VERSION:-$VERSION}
 BUILD=10
 
 TAG=gwh
@@ -18,6 +19,7 @@ ARCH=$(uname -m)
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+LIBLIFTOFF_REPOSITORY=/home/installs/SlackBuilds/_repositories/libliftoff
 
 PREFIX=/usr
 
@@ -77,9 +79,32 @@ case $WLROOTS_VERSION in
         git checkout "$WLROOTS_VERSION"
         ;;
 esac
-cd "$TMP/$PRGNAM/" || exit 1
+
+# Embed libliftoff
+[ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
+cd "$LIBLIFTOFF_REPOSITORY" || exit 1
+git reset --hard HEAD
+git pull --all
+
+mkdir -p "$TMP/$PRGNAM"/subprojects/
+cp -a "$LIBLIFTOFF_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libliftoff
+cd "$TMP/$PRGNAM"/subprojects/libliftoff || exit 1
+case $LIBLIFTOFF_VERSION in
+    trunk)
+        LIBLIFTOFF_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        ;;
+    latest)
+        LIBLIFTOFF_VERSION=$(git describe --tags --abbrev=0)
+        git checkout "$LIBLIFTOFF_VERSION"
+        ;;
+    *)
+        git checkout "$LIBLIFTOFF_VERSION"
+        ;;
+esac
 
 # Back to compiling sway…
+cd "$TMP/$PRGNAM/" || exit 1
+
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
@@ -188,4 +213,4 @@ EOF
 
 # empaquetage
 rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg -l y -c n "$OUTPUT/${PRGNAM}+wlroots-$(echo "${VERSION}+${WLROOTS_VERSION}" | tr - _)-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg -l y -c n "$OUTPUT/${PRGNAM}+wlroots+libliftoff-$(echo "${VERSION}+${WLROOTS_VERSION}+${LIBLIFTOFF_VERSION}" | tr - _)-$ARCH-$BUILD$TAG.txz"
