@@ -53,11 +53,14 @@ find . \
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
 
-# ./acprep pull
-
-./acprep --prefix=/usr $PYTHON opt config -- -DUSE_DOXYGEN=ON -DBoost_NO_BOOST_CMAKE=ON -DUSE_PYTHON=ON
-./acprep --prefix=/usr $PYTHON opt make || exit 1
-./acprep --prefix=/usr $PYTHON opt -- make install DESTDIR=$PKG || exit 1
+cmake . \
+      -DUSE_DOXYGEN=ON \
+      -DBoost_NO_BOOST_CMAKE=ON \
+      -DUSE_PYTHON=ON \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_INSTALL_MANDIR=/usr/man
+make || exit 1
+make install DESTDIR=$PKG || exit 1
 
 [ -e $PKG/usr/share/man ] && mv $PKG/usr/share/man $PKG/usr/
 [ -e $PKG/usr/share/doc ] && rm -fr $PKG/usr/share/doc
