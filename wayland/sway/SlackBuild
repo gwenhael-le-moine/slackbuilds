@@ -3,9 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
-LIBLIFTOFF_VERSION=${LIBLIFTOFF_VERSION:-$VERSION}
-BUILD=10
+BUILD=11
 
 TAG=gwh
 OUTPUT=/tmp
@@ -18,8 +16,6 @@ PKG=$TMP/pkg-$PRGNAM
 ARCH=$(uname -m)
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
-WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
-LIBLIFTOFF_REPOSITORY=/home/installs/SlackBuilds/_repositories/libliftoff
 
 PREFIX=/usr
 
@@ -54,53 +50,95 @@ esac
 wget -c https://patch-diff.githubusercontent.com/raw/swaywm/sway/pull/6249.patch -O "$CWD"/patches/6249-tray-menu.patch
 patch -p1 < "$CWD"/patches/6249-tray-menu.patch
 
-# for p in "$CWD"/patches/*.patch; do
-#     git am --show-current-patch=diff "$p"
-# done
+PKGNAM=${PRGNAM}
+PKGVERSION=$(echo "${VERSION}" | tr - _)
 
 # Embed wlroots
-[ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
-cd "$WLROOTS_REPOSITORY" || exit 1
-git reset --hard HEAD
-git pull --all
+EMBED_WLROOTS=${EMBED_WLROOTS:-"yes"}
+if [ "$EMBED_WLROOTS" = "yes" ]; then
+    WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
+    WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+    [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
+    cd "$WLROOTS_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
 
-mkdir -p "$TMP/$PRGNAM"/subprojects/
-cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
-cd "$TMP/$PRGNAM"/subprojects/wlroots || exit 1
-case $WLROOTS_VERSION in
-    trunk)
-        WLROOTS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-        ;;
-    latest)
-        WLROOTS_VERSION=$(git describe --tags --abbrev=0)
-        git checkout "$WLROOTS_VERSION"
-        ;;
-    *)
-        git checkout "$WLROOTS_VERSION"
-        ;;
-esac
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
+    cd "$TMP/$PRGNAM"/subprojects/wlroots || exit 1
+    case $WLROOTS_VERSION in
+        trunk)
+            WLROOTS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            ;;
+        latest)
+            WLROOTS_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$WLROOTS_VERSION"
+            ;;
+        *)
+            git checkout "$WLROOTS_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+wlroots"
+    PKGVERSION="${PKGVERSION}+${WLROOTS_VERSION}"
+fi
 
 # Embed libliftoff
-[ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
-cd "$LIBLIFTOFF_REPOSITORY" || exit 1
-git reset --hard HEAD
-git pull --all
+EMBED_LIBLIFTOFF=${EMBED_LIBLIFTOFF:-"yes"}
+if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
+    LIBLIFTOFF_VERSION=${LIBLIFTOFF_VERSION:-$VERSION}
+    LIBLIFTOFF_REPOSITORY=/home/installs/SlackBuilds/_repositories/libliftoff
+    [ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
+    cd "$LIBLIFTOFF_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
 
-mkdir -p "$TMP/$PRGNAM"/subprojects/
-cp -a "$LIBLIFTOFF_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libliftoff
-cd "$TMP/$PRGNAM"/subprojects/libliftoff || exit 1
-case $LIBLIFTOFF_VERSION in
-    trunk)
-        LIBLIFTOFF_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-        ;;
-    latest)
-        LIBLIFTOFF_VERSION=$(git describe --tags --abbrev=0)
-        git checkout "$LIBLIFTOFF_VERSION"
-        ;;
-    *)
-        git checkout "$LIBLIFTOFF_VERSION"
-        ;;
-esac
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$LIBLIFTOFF_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libliftoff
+    cd "$TMP/$PRGNAM"/subprojects/libliftoff || exit 1
+    case $LIBLIFTOFF_VERSION in
+        trunk)
+            LIBLIFTOFF_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            ;;
+        latest)
+            LIBLIFTOFF_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$LIBLIFTOFF_VERSION"
+            ;;
+        *)
+            git checkout "$LIBLIFTOFF_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+libliftoff"
+    PKGVERSION="${PKGVERSION}+${LIBLIFTOFF_VERSION}"
+fi
+
+# Embed libdisplay-info
+EMBED_LIBDISPLAYINFO=${EMBED_LIBDISPLAYINFO:-"yes"}
+if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
+    LIBDISPLAYINFO_VERSION=${LIBDISPLAYINFO_VERSION:-$VERSION}
+    LIBDISPLAYINFO_REPOSITORY=/home/installs/SlackBuilds/_repositories/libdisplay-info
+    [ ! -e "$LIBDISPLAYINFO_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libdisplay-info.git "$LIBDISPLAYINFO_REPOSITORY"
+    cd "$LIBDISPLAYINFO_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$LIBDISPLAYINFO_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libdisplay-info
+    cd "$TMP/$PRGNAM"/subprojects/libdisplay-info || exit 1
+    case $LIBDISPLAYINFO_VERSION in
+        trunk)
+            LIBDISPLAYINFO_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            ;;
+        latest)
+            LIBDISPLAYINFO_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$LIBDISPLAYINFO_VERSION"
+            ;;
+        *)
+            git checkout "$LIBDISPLAYINFO_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+libdisplay_info"
+    PKGVERSION="${PKGVERSION}+${LIBDISPLAYINFO_VERSION}"
+fi
 
 # Back to compiling sway…
 cd "$TMP/$PRGNAM/" || exit 1
@@ -213,4 +251,4 @@ EOF
 
 # empaquetage
 rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg -l y -c n "$OUTPUT/${PRGNAM}+wlroots+libliftoff-$(echo "${VERSION}+${WLROOTS_VERSION}+${LIBLIFTOFF_VERSION}" | tr - _)-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg -l y -c n "$OUTPUT/${PKGNAM}-$(echo "$PKGVERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
