@@ -35,23 +35,28 @@ cp -R "$REPOSITORY" $TMP/
 cd "$TMP/$PRGNAM/" || exit 1
 case $VERSION in
     trunk)
-        VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        PKGVERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
         ;;
     latest)
-        VERSION=$(git describe --tags --abbrev=0)
-        git checkout "$VERSION"
+        PKGVERSION=$(git describe --tags --abbrev=0)
+        git checkout "$PKGVERSION"
         ;;
     *)
-        git checkout "$VERSION"
+        git checkout "$PKGVERSION"
         ;;
 esac
-
-[ -e "$CWD"/patches/6249-tray-menu.patch ] && mv "$CWD"/patches/6249-tray-menu.patch{,.previous}
-wget -c https://patch-diff.githubusercontent.com/raw/swaywm/sway/pull/6249.patch -O "$CWD"/patches/6249-tray-menu.patch
-patch -p1 < "$CWD"/patches/6249-tray-menu.patch
-
 PKGNAM=${PRGNAM}
-PKGVERSION=$(echo "${VERSION}" | tr - _)
+
+
+# Tray-menu patch
+PATCH_6249=${PATCH_6249:-"yes"}
+if [ "$PATCH_6249" = "yes" ]; then
+    [ -e "$CWD"/patches/6249-tray-menu.patch ] && mv "$CWD"/patches/6249-tray-menu.patch{,.previous}
+    wget -c https://patch-diff.githubusercontent.com/raw/swaywm/sway/pull/6249.patch -O "$CWD"/patches/6249-tray-menu.patch
+    patch -p1 < "$CWD"/patches/6249-tray-menu.patch
+    PKGVERSION="${PKGVERSION}_+6249"
+fi
+
 
 # Embed wlroots
 EMBED_WLROOTS=${EMBED_WLROOTS:-"yes"}
@@ -82,6 +87,7 @@ if [ "$EMBED_WLROOTS" = "yes" ]; then
     PKGVERSION="${PKGVERSION}+${WLROOTS_VERSION}"
 fi
 
+
 # Embed libliftoff
 EMBED_LIBLIFTOFF=${EMBED_LIBLIFTOFF:-"yes"}
 if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
@@ -111,6 +117,7 @@ if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
     PKGVERSION="${PKGVERSION}+${LIBLIFTOFF_VERSION}"
 fi
 
+
 # Embed libdisplay-info
 EMBED_LIBDISPLAYINFO=${EMBED_LIBDISPLAYINFO:-"yes"}
 if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
@@ -139,6 +146,7 @@ if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
     PKGNAM="${PKGNAM}+libdisplay_info"
     PKGVERSION="${PKGVERSION}+${LIBDISPLAYINFO_VERSION}"
 fi
+
 
 # Back to compiling sway…
 cd "$TMP/$PRGNAM/" || exit 1
