@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $(dirname $0) || exit 1
+
 PKGs=$(ls /var/adm/packages/ | sed 's|^\(.*\)-.*-.*-.*$|\1|')
 
 for cat in a ap d l lua n wayland xap y; do
