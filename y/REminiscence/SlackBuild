@@ -3,14 +3,14 @@
 # --- INIT ---
 # Set initial variables:
 CWD=`pwd`
-if [ "$TMP" = "" ]; then
-  TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
-fi
 
-PRGNAM=REminiscence
-VERSION=0.3.7
+PRGNAM=$(basename $CWD)
+TAG=${TAG:-gwh}
+OUTPUT=/tmp
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PRGNAM
+
+VERSION=${VERSION:-$(curl -s http://cyxdown.free.fr/reminiscence/CHANGES.txt | grep release | head -n1 | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -28,23 +28,18 @@ elif [ "$ARCH" = "x86_64" ]; then
   SLKCFLAGS="-O2"
 fi
 
-PKG=$TMP/pkg-$PRGNAM
-
 # --- PACKAGE BUILDING ---
-
-echo "++"
-echo "|| $PRGNAM-$VERSION"
-echo "++"
+[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2 ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2 http://cyxdown.free.fr/reminiscence/REminiscence-${VERSION}.tar.bz2
+[ ! -e $REPOSITORY/CHANGES-${VERSION}.txt ] && wget -c -O $REPOSITORY/CHANGES-${VERSION}.txt http://cyxdown.free.fr/reminiscence/CHANGES.txt
+[ ! -e $REPOSITORY/flashback-x86_64.tar.gz ] & wget -c -O $REPOSITORY/flashback-x86_64.tar.gz https://lutris.net/files/games/flashback/flashback-x86_64.tar.gz
+[ ! -e $REPOSITORY/stb_vorbis.c ] & wget -c -O $REPOSITORY/stb_vorbis.c https://raw.githubusercontent.com/nothings/stb/master/stb_vorbis.c
 
 rm -rf $PKG $TMP/${PRGNAM}-${VERSION}
-
-cd $TMP
-
-# --- TARBALL EXTRACTION,PATCH,MODIFY ---
-[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2 ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2 http://cyxdown.free.fr/reminiscence/REminiscence-${VERSION}.tar.bz2
-[ ! -e $REPOSITORY/flashback-x86_64.tar.gz ] & wget -c -O $REPOSITORY/flashback-x86_64.tar.gz https://lutris.net/files/games/flashback/flashback-x86_64.tar.gz
+mkdir -p $TMP
 
 echo "Extracting the program tarball for $PRGNAM..."
+[ -e $TMP/${PRGNAM}-${VERSION} ] && rm -r $TMP/${PRGNAM}-${VERSION}
+cd $TMP
 tar xf $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2
 
 cd ${PRGNAM}-${VERSION}
@@ -52,15 +47,13 @@ cd ${PRGNAM}-${VERSION}
 chown -R root.root *
 find . -perm 777 -exec chmod 755 {} \;
 
-zcat $REPOSITORY/nices_path.patch.gz | patch -p1
-#zcat $REPOSITORY/bad_crc.diff.gz | patch -p1
+zcat $CWD/nices_path.patch.gz | patch -p1
+cp $REPOSITORY/stb_vorbis.c .
 
 # --- BUILDING ---
 
-echo Building ...
-
 CFLAGS="$SLKCFLAGS" \
-make
+      make
 
 #
 # Install all the needed stuff to the package dir
@@ -77,12 +70,12 @@ tar xf $REPOSITORY/flashback-x86_64.tar.gz # jeu lui-même
 mv flashback $PRGNAM
 
 mkdir -p $PKG/usr/share/pixmaps
-cp $REPOSITORY/flashback.png $PKG/usr/share/pixmaps
+cp $CWD/flashback.png $PKG/usr/share/pixmaps
 
 # --- DOCUMENTATION ---
 cd $TMP/${PRGNAM}-${VERSION}
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a README.txt $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a $REPOSITORY/CHANGES-${VERSION}.txt README.txt $PKG/usr/doc/$PRGNAM-$VERSION
 chmod -R a-w $PKG/usr/doc/$PRGNAM-$VERSION/*
 
 # Compress the man page(s)
@@ -131,11 +124,3 @@ EOF
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
 /sbin/makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}$TAG.txz
-
-# --- CLEANUP ---
-
-# Clean up the extra stuff:
-if [ "$1" = "--cleanup" ]; then
-  rm -rf $TMP/tmp-$PRGNAM
-  rm -rf $PKG
-fi
