@@ -36,7 +36,7 @@ cd "$TMP/$PRGNAM/" || exit 1
 case $VERSION in
     trunk)
         # PKGVERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-        PKGVERSION="r$(git rev-list --count HEAD)"
+        PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
         PKGVERSION=$(git describe --tags --abbrev=0)
@@ -80,7 +80,7 @@ if [ "$EMBED_WLROOTS" = "yes" ]; then
     case $WLROOTS_VERSION in
         trunk)
             # WLROOTS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-            WLROOTS_VERSION="r$(git rev-list --count HEAD)"
+            WLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
             WLROOTS_VERSION=$(git describe --tags --abbrev=0)
@@ -110,7 +110,7 @@ if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
     case $LIBLIFTOFF_VERSION in
         trunk)
             # LIBLIFTOFF_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-            LIBLIFTOFF_VERSION="r$(git rev-list --count HEAD)"
+            LIBLIFTOFF_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
             LIBLIFTOFF_VERSION=$(git describe --tags --abbrev=0)
@@ -140,7 +140,7 @@ if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
     case $LIBDISPLAYINFO_VERSION in
         trunk)
             # LIBDISPLAYINFO_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-            LIBDISPLAYINFO_VERSION="r$(git rev-list --count HEAD)"
+            LIBDISPLAYINFO_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
             LIBDISPLAYINFO_VERSION=$(git describe --tags --abbrev=0)

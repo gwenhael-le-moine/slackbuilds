@@ -29,7 +29,7 @@ git pull --all
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
-VERSION="$(git rev-list --count HEAD)"
+VERSION="$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
 # installation
 ./tools/local_install.sh $PKG$PREFIX/bin

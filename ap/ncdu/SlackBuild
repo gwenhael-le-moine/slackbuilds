@@ -36,7 +36,7 @@ git checkout zig-0.10
 
 [ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_$(git rev-list --count HEAD)" || git checkout "$VERSION"
+[ "$VERSION" == "trunk" ] && VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
 
 #zig build -Drelease-safe --prefix "$PKG$PREFIX" install
 make

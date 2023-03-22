@@ -30,7 +30,7 @@ hg pull
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 
-# [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)" || git checkout $VERSION
+# [ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 [ "x$VERSION" == "xtrunk" ] && VERSION="hg_$(date +%F | tr - .)"
 
 meson setup --prefix /usr --mandir /usr/man/ build/

@@ -34,7 +34,7 @@ cd $TMP/$PRGNAM
 
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)" || git checkout $VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 chown -R root:root .
 find . \
