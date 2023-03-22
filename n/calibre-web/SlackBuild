@@ -37,7 +37,7 @@ cd $PKG/opt/$PRGNAM
 
 case $VERSION in
     trunk)
-        VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        VERSION="git_$(git rev-list --count HEAD)"
         ;;
     latest)
         VERSION=$(git describe --tags --abbrev=0)

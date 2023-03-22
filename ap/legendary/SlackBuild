@@ -31,7 +31,7 @@ git pull --all
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
-VERSION="$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+VERSION="$(git rev-list --count HEAD)"
 
 # installation
 python3 ./setup.py install --root=$PKG

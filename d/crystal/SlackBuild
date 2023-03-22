@@ -31,7 +31,7 @@ cd "$TMP/$PRGNAM/" || exit
 [ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "$VERSION" == "" ] && VERSION=trunk
 if [ "$VERSION" == "trunk" ]; then
-    VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+    VERSION="git_$(git rev-list --count HEAD)"
 else
     git checkout "$VERSION"
 fi
@@ -66,7 +66,7 @@ cd $TMP/$SHARDS_PRGNAM/
 [ "$SHARDS_VERSION" == "latest" ] && SHARDS_VERSION=$(git describe --tags --abbrev=0)
 [ "$SHARDS_VERSION" == "" ] && SHARDS_VERSION=trunk
 if [ "$SHARDS_VERSION" == "trunk" ]; then
-    SHARDS_VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+    SHARDS_VERSION="git_$(git rev-list --count HEAD)"
 else
     git checkout "$SHARDS_VERSION"
 fi

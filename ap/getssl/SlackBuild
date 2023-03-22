@@ -29,7 +29,7 @@ cd $REPOSITORY
 git pull --all
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)" || git checkout $VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)" || git checkout $VERSION
 
 mkdir -p $PKG$PREFIX/bin
 cp $REPOSITORY/getssl $PKG$PREFIX/bin/

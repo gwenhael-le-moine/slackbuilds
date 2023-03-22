@@ -74,9 +74,9 @@ cp $CWD/flashback.png $PKG/usr/share/pixmaps
 
 # --- DOCUMENTATION ---
 cd $TMP/${PRGNAM}-${VERSION}
-mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a $REPOSITORY/CHANGES-${VERSION}.txt README.txt $PKG/usr/doc/$PRGNAM-$VERSION
-chmod -R a-w $PKG/usr/doc/$PRGNAM-$VERSION/*
+mkdir -p $PKG/usr/doc/$PRGNAM
+cp -a $REPOSITORY/CHANGES-${VERSION}.txt README.txt $PKG/usr/doc/$PRGNAM
+chmod -R a-w $PKG/usr/doc/$PRGNAM/*
 
 # Compress the man page(s)
 [ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
@@ -110,11 +110,11 @@ ${PRGNAM}:
 ${PRGNAM}: ${PRGNAM} is a re-implementation of the engine used in the game
 ${PRGNAM}: Flashback made by Delphine Software and released in 1992.
 ${PRGNAM}:
-${PRGNAM}: You will need the original files.
+${PRGNAM}: 
 ${PRGNAM}:
 ${PRGNAM}: Original files included.
 ${PRGNAM}:
-${PRGNAM}: see /usr/doc/${PRGNAM}-${VERSION} for more.
+${PRGNAM}: see /usr/doc/${PRGNAM} for more.
 ${PRGNAM}: http://cyxdown.free.fr/reminiscence/
 EOF
 
