@@ -28,7 +28,7 @@ rm -fr $PKG
 ( cd $REPOSITORY; git pull )
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 mkdir -p $PKG/usr/bin
 cp $REPOSITORY/simpleimage/platform-scripts/* $PKG/usr/bin/

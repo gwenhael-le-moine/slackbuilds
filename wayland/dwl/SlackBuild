@@ -79,7 +79,7 @@ cd $TMP/$PRGNAM/
 case $VERSION in
     trunk)
         git checkout wlroots-next
-        VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
         VERSION=$(git describe --tags --abbrev=0)

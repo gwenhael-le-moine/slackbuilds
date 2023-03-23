@@ -96,7 +96,7 @@ git clean -dfX                  # https://github.com/commercial-emacs/commercial
 
 rm lisp/loaddefs.el             # https://lists.gnu.org/r/emacs-devel/2021-04/msg01430.html
 
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
 #mkdir -p $TMP/$PKGNAM
 cp -R $REPOSITORY $TMP/$PKGNAM

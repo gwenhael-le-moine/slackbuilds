@@ -26,7 +26,7 @@ cd $TMP
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
-VERSION="git_$( cd $REPOSITORY && git rev-list --count HEAD )"
+VERSION="git_r$( cd $REPOSITORY && git rev-list --count HEAD )"
 
 cp -R $REPOSITORY $PRGNAM
 

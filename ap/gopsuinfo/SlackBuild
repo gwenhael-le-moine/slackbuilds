@@ -34,7 +34,7 @@ cd "$TMP/$PRGNAM/" || exit
 [ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "$VERSION" == "" ] && VERSION=trunk
 if [ "$VERSION" == "trunk" ]; then
-    VERSION="git_$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+    VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 else
     git checkout "$VERSION"
 fi

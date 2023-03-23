@@ -36,7 +36,7 @@ cd $TMP
 rm -fr $TMP/$PRGNAM
 mkdir -p $TMP/$PRGNAM
 cd $TMP/$PRGNAM
-VERSION="git_$( cd $REPOSITORIES/$PRGNAM && git rev-list --count HEAD )"
+VERSION="git_r$( cd $REPOSITORIES/$PRGNAM && git rev-list --count HEAD )"
 
 # configuration
 cmake \
