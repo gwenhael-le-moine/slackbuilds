@@ -23,7 +23,7 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $PRGNAM $PKG
+rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
@@ -47,6 +47,7 @@ find . \
      -exec chmod 644 {} \;
 
 # Configuration
+autoupdate
 ./autogen.sh
 ./configure \
     --prefix=$PREFIX \
