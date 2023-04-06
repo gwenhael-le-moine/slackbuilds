@@ -1,0 +1,56 @@
+#!/bin/bash -e
+
+# variables
+CWD=$(pwd)
+GITHUB_REPO=edrlab/thorium-reader
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)}
+
+PRGNAM=$(basename $CWD)
+ARCH="AppImage"
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr $PKG
+
+mkdir -p $PKG/opt/$PRGNAM
+
+# mise en place
+cd $PKG/opt/$PRGNAM
+
+wget -c https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/Thorium-${VERSION#v}.AppImage -O ${PRGNAM}-${VERSION}.AppImage
+chmod +x ${PRGNAM}-${VERSION}.AppImage
+
+mkdir -p $PKG$PREFIX/bin/
+cd $PKG$PREFIX/bin/
+ln -s /opt/$PRGNAM/${PRGNAM}-${VERSION}.AppImage ${PRGNAM}
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (ebook reader (LCP DRM))
+$PRGNAM:
+$PRGNAM:  A cross platform desktop reading app, based on the Readium Desktop toolkit
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://www.edrlab.org/software/thorium-reader/
+$PRGNAM: https://github.com/$(GITHUB_REPO)
+$PRGNAM:
+EOF
+
+# empaquetage
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
