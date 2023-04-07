@@ -152,6 +152,7 @@ CFLAGS="$SLKCFLAGS" \
     # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
     # --without-toolkit-scroll-bars \
 
+make bootstrap $NUMJOBS || exit 1
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
