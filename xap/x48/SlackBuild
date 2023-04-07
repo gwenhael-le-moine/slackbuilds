@@ -3,7 +3,7 @@ set -x
 
 PRGNAM=x48
 
-BUILD=1
+BUILD=2
 GITHUB_REPO=gwenhael-le-moine/x48
 VERSION=${VERSION:-latest}
 
@@ -65,6 +65,18 @@ mkdir -p $PKG$PREFIX/share/$PRGNAM
 cd $PKG$PREFIX/share/$PRGNAM
 cp $TMP/$PRGNAM/ROMs/*rom*.bz2 .
 find . -name "*.bz2" -exec bunzip2 {} \;
+
+mkdir -p $PKG$PREFIX/share/applications/
+cat <<EOF > $PKG$PREFIX/share/applications/$PRGNAM.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=$PREFIX/bin/x48
+Name=x48
+#Icon=/path/to/icon
+EOF
 
 # # Cleaning
 # cd $PKG
