@@ -18,6 +18,7 @@ OUTPUT=/tmp
 NUMJOBS=${NUMJOBS:-$(nproc)}
 
 ANEW=${ANEW:-true}
+CONFIG=${CONFIG:-""}
 
 rm -fr "$PKG"
 
@@ -41,15 +42,13 @@ cd "$PKG/usr/src/" || exit 1
 ln -s "linux-$VERSION" linux
 cd "linux-$VERSION"
 
-if [ -e "$CWD/config-$THIS_HOST-$VERSION" ] ; then
-    cp "$CWD/config-$THIS_HOST-$VERSION" .config
-else
-    if [ -e "$CWD/config-$THIS_HOST" ] ; then
-        cp "$CWD/config-$THIS_HOST" .config
-    else
-        zcat /proc/config.gz > .config
-    fi
+if [ -n "$CONFIG" ] && [ -e "$CONFIG" ]; then
+    cat "$CONFIG" > .config
 fi
+if [ ! -f .config ]; then
+    zcat /proc/config.gz > .config
+fi
+read
 
 make oldconfig "$@"
 
