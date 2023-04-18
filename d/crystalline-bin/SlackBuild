@@ -15,7 +15,7 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 mkdir -p $REPOSITORY
 
-[ ! -e $REPOSITORY/crystalline_x86_64-unknown-linux-gnu-${VERSION}.gz ] && wget -c -O $REPOSITORY/crystalline_x86_64-unknown-linux-gnu-${VERSION}.gz https://github.com/elbywan/crystalline/releases/download/${VERSION}/crystalline_x86_64-unknown-linux-gnu.gz
+[ ! -e $REPOSITORY/crystalline_x86_64-unknown-linux-musl-${VERSION}.gz ] && wget -c -O $REPOSITORY/crystalline_x86_64-unknown-linux-musl-${VERSION}.gz https://github.com/elbywan/crystalline/releases/download/${VERSION}/crystalline_x86_64-unknown-linux-musl.gz
 
 DOCS="LICENSE README.md"
 for i in $DOCS; do
@@ -25,9 +25,9 @@ done
 rm -fr $PKG
 mkdir -p $PKG/usr/{bin,doc/crystalline}/
 
-cp $REPOSITORY/crystalline_x86_64-unknown-linux-gnu-${VERSION}.gz $PKG/usr/bin/
-gunzip $PKG/usr/bin/crystalline_x86_64-unknown-linux-gnu-${VERSION}.gz
-mv $PKG/usr/bin/crystalline_x86_64-unknown-linux-gnu-${VERSION} $PKG/usr/bin/crystalline
+cp $REPOSITORY/crystalline_x86_64-unknown-linux-musl-${VERSION}.gz $PKG/usr/bin/
+gunzip $PKG/usr/bin/crystalline_x86_64-unknown-linux-musl-${VERSION}.gz
+mv $PKG/usr/bin/crystalline_x86_64-unknown-linux-musl-${VERSION} $PKG/usr/bin/crystalline
 chmod +x $PKG/usr/bin/crystalline
 
 for i in $DOCS; do
