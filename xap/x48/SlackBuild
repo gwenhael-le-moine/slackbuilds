@@ -5,7 +5,7 @@ PRGNAM=x48
 
 BUILD=2
 GITHUB_REPO=gwenhael-le-moine/x48
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-trunk}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -46,37 +46,11 @@ find . \
      \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
      -exec chmod 644 {} \;
 
-# Configuration
-autoupdate
-./autogen.sh
-./configure \
-    --prefix=$PREFIX \
-    --mandir=$PREFIX/man \
-    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
-    --sysconfdir=/etc
-
 # Building
-make
+make all PREFIX=/usr
 
 # Installation
-make install DESTDIR=$PKG
-
-mkdir -p $PKG$PREFIX/share/$PRGNAM
-cd $PKG$PREFIX/share/$PRGNAM
-cp $TMP/$PRGNAM/ROMs/*rom*.bz2 .
-find . -name "*.bz2" -exec bunzip2 {} \;
-
-mkdir -p $PKG$PREFIX/share/applications/
-cat <<EOF > $PKG$PREFIX/share/applications/$PRGNAM.desktop
-[Desktop Entry]
-Encoding=UTF-8
-Version=1.0
-Type=Application
-Terminal=false
-Exec=$PREFIX/bin/x48
-Name=x48
-#Icon=/path/to/icon
-EOF
+make install DESTDIR=$PKG PREFIX=/usr
 
 # # Cleaning
 # cd $PKG
@@ -107,7 +81,7 @@ $PRGNAM: $ mkdir ~/.hp48 && cp $PREFIX/share/$PRGNAM/gxrom-r ~/.hp48/rom.dump
 $PRGNAM: $ cd ~/.hp48 && x48 -initialize
 $PRGNAM:
 $PRGNAM: http://x48.berlios.de/
-$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
