@@ -8,7 +8,7 @@ GITHUB_REPO=gwenhael-le-moine/x49gp #claudiobsd/x49gp
 VERSION=${VERSION:-latest}
 NEWRPL_VERSION=1487
 
-BUILD=6
+BUILD=8
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -57,6 +57,18 @@ make install DESTDIR=$PKG INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 mkdir -p $PKG$PREFIX/doc/$PRGNAM/
 cp README* sdcard $PKG$PREFIX/doc/$PRGNAM/
 
+mkdir -p $PKG$PREFIX/share/applications/
+cat <<EOF > $PKG$PREFIX/share/applications/$PRGNAM.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=$PREFIX/bin/x49gp
+Name=x49gp
+Icon=/usr/share/x49gp/hp50g.png
+EOF
+
 cat <<EOF > $PKG$PREFIX/doc/$PRGNAM/post-install.sh
 #!/bin/bash
 
@@ -70,7 +82,8 @@ unzip -d $PREFIX/share/$PRGNAM/ $PREFIX/doc/$PRGNAM/hp4950v215.zip
 rm $PREFIX/doc/$PRGNAM/hp4950v215.zip
 
 mkdir -p $PREFIX/share/$PRGNAM/newrpl/
-wget -c -O $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin https://www.hpgcc3.org/downloads/newrplfw.bin
+wget -c -O $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin.new https://www.hpgcc3.org/downloads/newrplfw.bin
+mv $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin.new $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin
 echo "newrplfw.bin" > $PREFIX/share/$PRGNAM/newrpl/update.scp
 EOF
 

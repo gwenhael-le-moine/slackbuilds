@@ -1,0 +1,55 @@
+#!/bin/bash -e
+
+# variables
+CWD=$(pwd)
+VERSION=${VERSION:-1.2.2}
+ITEMNB=${ITEMNB:-37359}
+COMMITNB=${COMMITNB:-b0a8486}
+
+PRGNAM=$(basename $CWD)
+ARCH="AppImage"
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr $PKG
+
+mkdir -p $PKG/opt/$PRGNAM
+
+# mise en place
+cd $PKG/opt/$PRGNAM
+
+wget -c https://inkscape.org/gallery/item/${ITEMNB}/Inkscape-${COMMITNB}-x86_64.AppImage -O ${PRGNAM}-${VERSION}.AppImage
+chmod +x ${PRGNAM}-${VERSION}.AppImage
+
+mkdir -p $PKG$PREFIX/bin/
+cd $PKG$PREFIX/bin/
+ln -s /opt/$PRGNAM/${PRGNAM}-${VERSION}.AppImage ${PRGNAM}
+
+# correction
+cd $PKG
+chown -R root:root *
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (A powerful, free design tool)
+$PRGNAM:
+$PRGNAM: Whether you are an illustrator, designer, web designer
+$PRGNAM: or just someone who needs to create some vector imagery,
+$PRGNAM: Inkscape is for you!
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://www.inkscape.org
+$PRGNAM: 
+$PRGNAM:
+EOF
+
+# empaquetage
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz

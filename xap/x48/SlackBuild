@@ -3,9 +3,9 @@ set -x
 
 PRGNAM=x48
 
-BUILD=1
+BUILD=2
 GITHUB_REPO=gwenhael-le-moine/x48
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-trunk}
 
 ARCH=$(uname -m)
 LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
@@ -23,7 +23,7 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $PRGNAM $PKG
+rm -fr $TMP/$PRGNAM $PKG
 
 # Fetching sources
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
@@ -46,24 +46,11 @@ find . \
      \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
      -exec chmod 644 {} \;
 
-# Configuration
-./autogen.sh
-./configure \
-    --prefix=$PREFIX \
-    --mandir=$PREFIX/man \
-    --libdir=$PREFIX/lib$(echo "$ARCH" | grep -o "64") \
-    --sysconfdir=/etc
-
 # Building
-make
+make all PREFIX=/usr
 
 # Installation
-make install DESTDIR=$PKG
-
-mkdir -p $PKG$PREFIX/share/$PRGNAM
-cd $PKG$PREFIX/share/$PRGNAM
-cp $TMP/$PRGNAM/ROMs/*rom*.bz2 .
-find . -name "*.bz2" -exec bunzip2 {} \;
+make install DESTDIR=$PKG PREFIX=/usr
 
 # # Cleaning
 # cd $PKG
@@ -90,11 +77,11 @@ $PRGNAM: The x48 is an emulator of the Saturn Processor and the I/O of an
 $PRGNAM: HP48 calculator. There is a debugger for the Saturn Processor.
 $PRGNAM:
 $PRGNAM: initialization:
-$PRGNAM: $ mkdir ~/.hp48 && cp $PREFIX/share/$PRGNAM/gxrom-r ~/.hp48/rom.dump
-$PRGNAM: $ cd ~/.hp48 && x48 -initialize
+$PRGNAM: $ $PREFIX/share/$PRGNAM/setup-x48-home.sh
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: http://x48.berlios.de/
-$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
