@@ -141,8 +141,9 @@ CFLAGS="$SLKCFLAGS" \
       --with-gpm=yes \
       --with-pgtk \
       --with-tree-sitter \
-      --with-native-compilation=aot \
+      --with-native-compilation \
       --enable-link-time-optimization \
+      --with-json --with-xwidgets --with-xinput \
       --with-compress-install \
       --without-gconf \
       --with-gameuser=":games" \
@@ -189,7 +190,7 @@ fi
 git clone https://github.com/casouri/tree-sitter-module
 cd tree-sitter-module
 sed -i 's|cc -c -I. parser.c|cc -fPIC -c -I. parser.c|' build.sh
-bash ./batch.sh
+JOBS=$NUMJOBS bash ./batch.sh
 cp dist/*.so "$PKG/usr/lib$(uname -m | grep -o 64)/"
 cd ..
 # /tree-sitter grammars
