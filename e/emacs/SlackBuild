@@ -191,7 +191,7 @@ fi
 git clone https://github.com/casouri/tree-sitter-module
 cd tree-sitter-module
 sed -i 's|cc -c -I. parser.c|cc -fPIC -c -I. parser.c|' build.sh
-JOBS=$NUMJOBS bash ./batch.sh
+bash ./batch.sh
 cp dist/*.so "$PKG/usr/lib$(uname -m | grep -o 64)/"
 cd ..
 # /tree-sitter grammars
