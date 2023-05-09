@@ -2,7 +2,7 @@
 
 # variables
 GITHUB_REPO=hyprwm/Hyprland
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-"latest"}
 
 BUILD=1
 
@@ -11,7 +11,7 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
@@ -20,40 +20,159 @@ REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-mkdir -p $PKG
+mkdir -p "$PKG"
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM/
+cp -R "$REPOSITORY" $TMP/
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+cd "$TMP/$PRGNAM/" || exit 1
+case $VERSION in
+    trunk)
+        PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        PKGVERSION=$(git describe --tags --abbrev=0)
+        git checkout "$PKGVERSION"
+        ;;
+    *)
+        git checkout "$PKGVERSION"
+        ;;
+esac
+PKGNAM=${PRGNAM}
 
-meson setup --prefix /usr --mandir /usr/man/ build/
+
+
+######################
+# EMBED DEPENDENCIES #
+######################
+# # wlroots
+# EMBED_WLROOTS=${EMBED_WLROOTS:-"yes"}
+# if [ "$EMBED_WLROOTS" = "yes" ]; then
+#     WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
+#     WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+#     [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
+#     cd "$WLROOTS_REPOSITORY" || exit 1
+#     git reset --hard HEAD
+#     git pull --all
+
+#     mkdir -p "$TMP/$PRGNAM"/subprojects/
+#     [ ! -d "$TMP/$PRGNAM"/subprojects/wlroots ] && cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
+#     cd "$TMP/$PRGNAM"/subprojects/wlroots || exit 1
+#     case $WLROOTS_VERSION in
+#         trunk)
+#             # WLROOTS_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+#             WLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+#             ;;
+#         latest)
+#             WLROOTS_VERSION=$(git describe --tags --abbrev=0)
+#             git checkout "$WLROOTS_VERSION"
+#             ;;
+#         *)
+#             git checkout "$WLROOTS_VERSION"
+#             ;;
+#     esac
+#     PKGNAM="${PKGNAM}+wlroots"
+#     PKGVERSION="${PKGVERSION}+${WLROOTS_VERSION}"
+# fi
+
+# libliftoff
+EMBED_LIBLIFTOFF=${EMBED_LIBLIFTOFF:-"yes"}
+if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
+    LIBLIFTOFF_VERSION=${LIBLIFTOFF_VERSION:-$VERSION}
+    LIBLIFTOFF_REPOSITORY=/home/installs/SlackBuilds/_repositories/libliftoff
+    [ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
+    cd "$LIBLIFTOFF_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$LIBLIFTOFF_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libliftoff
+    cd "$TMP/$PRGNAM"/subprojects/libliftoff || exit 1
+    case $LIBLIFTOFF_VERSION in
+        trunk)
+            # LIBLIFTOFF_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            LIBLIFTOFF_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            LIBLIFTOFF_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$LIBLIFTOFF_VERSION"
+            ;;
+        *)
+            git checkout "$LIBLIFTOFF_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+libliftoff"
+    PKGVERSION="${PKGVERSION}+${LIBLIFTOFF_VERSION}"
+fi
+
+# libdisplay-info
+EMBED_LIBDISPLAYINFO=${EMBED_LIBDISPLAYINFO:-"yes"}
+if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
+    LIBDISPLAYINFO_VERSION=${LIBDISPLAYINFO_VERSION:-$VERSION}
+    LIBDISPLAYINFO_REPOSITORY=/home/installs/SlackBuilds/_repositories/libdisplay-info
+    [ ! -e "$LIBDISPLAYINFO_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libdisplay-info.git "$LIBDISPLAYINFO_REPOSITORY"
+    cd "$LIBDISPLAYINFO_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$LIBDISPLAYINFO_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libdisplay-info
+    cd "$TMP/$PRGNAM"/subprojects/libdisplay-info || exit 1
+    case $LIBDISPLAYINFO_VERSION in
+        trunk)
+            # LIBDISPLAYINFO_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            LIBDISPLAYINFO_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            LIBDISPLAYINFO_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$LIBDISPLAYINFO_VERSION"
+            ;;
+        *)
+            git checkout "$LIBDISPLAYINFO_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+libdisplay_info"
+    PKGVERSION="${PKGVERSION}+${LIBDISPLAYINFO_VERSION}"
+fi
+
+
+# Back to compiling sway…
+cd "$TMP/$PRGNAM/" || exit 1
+
+meson setup \
+      --prefix /usr \
+      --mandir /usr/man/ \
+      -Dxwayland=enabled \
+      build/
+
 ninja -C build/
-cd build/
-meson install --destdir=$PKG
+cd build/ || exit 1
+meson install --destdir="$PKG"
 cd ../
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -r ./docs/ ./LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM/"
 
 # correction
-cd $PKG
-chown -R root:root *
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+cd "$PKG" || exit 1
+chown -R root:root ./*
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -name "*.?" -type f -exec gzip -9 {} \;
+
+# Don't package wlroots includes or .so link as we don't want to interfere with SBo's wlroots
+find "$PKG$PREFIX/lib$(uname -m | grep -o 64)/" -type l -exec rm {} \;
+rm -r "$PKG$PREFIX/lib$(uname -m | grep -o 64)/pkgconfig/"
+rm -r "$PKG$PREFIX/include/"
 
 # embaumement
-mkdir -p $PKG/install
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -76,5 +195,5 @@ $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg -l y -c n "$OUTPUT/${PKGNAM}-$(echo "$PKGVERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
