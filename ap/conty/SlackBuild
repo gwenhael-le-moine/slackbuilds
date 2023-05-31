@@ -2,14 +2,12 @@
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 GITHUB_REPO=Kron4ek/Conty
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+VERSION=${VERSION:-"latest"}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-4}
+BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
-
-EDITION=${EDITION:-"_lite_dwarfs"} # "", "_lite", "_dwarfs", "_lite_dwarfs"
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
@@ -18,24 +16,49 @@ PREFIX=/usr
 
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
-mkdir -p $REPOSITORY
+# nettoyage préalable
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-[ ! -e $REPOSITORY/conty${EDITION}-${VERSION}.sh ] && wget -c https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/conty${EDITION}.sh -O $REPOSITORY/conty${EDITION}-${VERSION}.sh
+mkdir -p "$PKG"
 
-rm -fr $PKG
+# mise en place
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git reset --hard HEAD
+git pull --all
 
-mkdir -p $PKG$PREFIX/bin
-cp $REPOSITORY/conty${EDITION}-${VERSION}.sh $PKG$PREFIX/bin/${PRGNAM}
+cp -R "$REPOSITORY" "$TMP/"
 
-cd $PKG$PREFIX/bin/
+cd "$TMP/$PRGNAM/" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION=$(git describe --tags --abbrev=0)
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
+
+./create-arch-bootstrap.sh
+
+./create-conty.sh
+
+mkdir -p "$PKG$PREFIX/bin"
+cp conty.sh "$PKG$PREFIX/bin/${PRGNAM}"
+
+cd "$PKG$PREFIX/bin/" || exit 1
 cat <<EOF > steam
 #!/bin/bash
 
 $PREFIX/bin/conty steam "\$@"
 EOF
 
-mkdir -p $PKG$PREFIX/share/applications/
-cat <<EOF > $PKG$PREFIX/share/applications/steam.desktop
+mkdir -p "$PKG$PREFIX/share/applications/"
+cat <<EOF > "$PKG$PREFIX/share/applications/steam.desktop"
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
@@ -46,8 +69,8 @@ Name=Steam
 EOF
 
 for prg in wine winetricks lutris playonlinux4; do
-    ln -s ${PRGNAM} $prg
-cat <<EOF > $PKG$PREFIX/share/applications/$prg.desktop
+    ln -s "${PRGNAM}" $prg
+cat <<EOF > "$PKG$PREFIX/share/applications/$prg.desktop"
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
@@ -58,15 +81,15 @@ Name=$prg
 EOF
 done
 
-chmod +x $PKG$PREFIX/bin/*
+chmod +x "$PKG$PREFIX/bin/*"
 
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
+# ( cd "$PKG" || exit 1
+#   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+#   find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# )
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
            # HOW TO EDIT
 THIS FILE:
            # The "handy ruler" below makes it easier to edit a package description.  Line
@@ -89,7 +112,7 @@ $PRGNAM: https://github.com/${GITHUB_REPO}
 $PRGNAM:
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+cd "$PKG" || exit 1
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
 
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION${EDITION}-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$VERSION${EDITION}-$ARCH-$BUILD$TAG.txz"
