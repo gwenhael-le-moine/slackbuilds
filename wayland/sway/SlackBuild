@@ -18,6 +18,7 @@ ARCH=$(uname -m)
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 PREFIX=/usr
+MESONFLAGS=""
 
 # nettoyage préalable
 rm -fr "$PKG" "${TMP:?}/$PRGNAM"
@@ -43,6 +44,8 @@ case $VERSION in
         git checkout "$PKGVERSION"
         ;;
     *)
+        PKGVERSION=$VERSION
+        MESONFLAGS="-Dc_args=\"-Wno-error=switch\""
         git checkout "$PKGVERSION"
         ;;
 esac
@@ -172,6 +175,7 @@ meson setup \
       -Dbash-completions=true \
       -Dzsh-completions=true \
       -Dfish-completions=true \
+      "$MESONFLAGS" \
       build/
 
 ninja -C build/
