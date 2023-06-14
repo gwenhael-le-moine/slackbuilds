@@ -56,6 +56,9 @@ cat <<EOF > steam
 
 $PREFIX/bin/conty steam "\$@"
 EOF
+chmod +x steam
+
+chmod +x "$PKG$PREFIX"/bin/*
 
 mkdir -p "$PKG$PREFIX/share/applications/"
 cat <<EOF > "$PKG$PREFIX/share/applications/steam.desktop"
@@ -80,8 +83,6 @@ Exec=$PREFIX/bin/$prg
 Name=$prg
 EOF
 done
-
-chmod +x "$PKG$PREFIX/bin/*"
 
 # ( cd "$PKG" || exit 1
 #   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
