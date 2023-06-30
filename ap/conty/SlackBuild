@@ -6,7 +6,7 @@ PRGNAM=$(basename "$CWD")
 GITHUB_REPO=Kron4ek/Conty
 VERSION=${VERSION:-"latest"}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -42,6 +42,11 @@ case $VERSION in
         git checkout "$VERSION"
         ;;
 esac
+
+# don't embed
+for i in firefox qbittorrent ; do
+    sed -i "s|$i||" ./create-arch-bootstrap.sh
+done
 
 ./create-arch-bootstrap.sh
 
