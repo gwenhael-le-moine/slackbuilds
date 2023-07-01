@@ -7,7 +7,7 @@ PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 GITHUB_REPO=racket/racket
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^v||')}
-BUILD=1
+BUILD=3
 TAG=gwh
 
 OUTPUT=/tmp
@@ -30,7 +30,9 @@ chmod +x $REPOSITORY/racket-${VERSION}-${ARCH}-linux-cs.sh
 $REPOSITORY/racket-${VERSION}-${ARCH}-linux-cs.sh --unix-style --create-dir --dest $PKG$PREFIX
 
 # post-install
-[ -e $PKG$PREFIX/bin/racket-uninstall ] && rm $PKG$PREFIX/bin/racket-uninstall
+rm $PKG$PREFIX/bin/racket-uninstall
+mv $PKG$PREFIX/lib/racket/compiled$PKG$PREFIX $PKG$PREFIX/lib/racket/compiled/
+rm -r $PKG$PREFIX/lib/racket/compiled/tmp/
 
 mv $PKG$PREFIX/share/man $PKG$PREFIX
 [ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
