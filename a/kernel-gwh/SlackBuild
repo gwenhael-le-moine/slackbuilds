@@ -31,16 +31,17 @@ else
     if [ "$BRANCH" == "stable" ]; then
         SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo "$VERSION" | cut -d. -f1).x"
     else
-        SRC_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot"
+        SRC_URL="https://git.kernel.org/torvalds/t"
     fi
 
-    [ ! -e "$CWD"/linux-"$VERSION".tar.xz ] && wget -c "$SRC_URL/linux-$VERSION.tar.xz" -O "$CWD/linux-$VERSION.tar.xz"
-    tar xf "$CWD/linux-$VERSION.tar.xz" -C "$PKG/usr/src/"
+    [ ! -e "$CWD"/linux-"$VERSION".tar.gz ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O "$CWD/linux-$VERSION.tar.gz"
+    tar xf "$CWD/linux-$VERSION.tar.gz" -C "$PKG/usr/src/"
 fi
 
 cd "$PKG/usr/src/" || exit 1
-ln -s "linux-$VERSION" linux
-cd "linux-$VERSION"
+mv "linux-$VERSION" "linux-${VERSION}-gwh"
+#ln -s "linux-$VERSION" linux
+cd "linux-${VERSION}-gwh"
 
 if [ -n "$CONFIG" ] && [ -e "$CONFIG" ]; then
     cat "$CONFIG" > .config
