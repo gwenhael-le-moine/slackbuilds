@@ -44,3 +44,5 @@ xap/st/patches/st-vertcenter*
 /ap/hledger-bin/*.md.*
 /xap/x49gp/newrplfw.bin
 /d/crystal/completion.zsh
+/wayland/sway/patches/*.previous
+/d/crystal-lang-bin/completion.zsh
