@@ -147,5 +147,5 @@ esac
 
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $TMP/$PKGNAM-$VERSION-$ARCH-$BUILD.txz
+/sbin/makepkg --linkadd y --chown n --prepend $TMP/$PKGNAM-$VERSION-$ARCH-$BUILD.txz
 

@@ -77,4 +77,4 @@ $PRGNAM:
 EOF
 
 cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION${EDITION}-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION${EDITION}-$ARCH-$BUILD$TAG.txz

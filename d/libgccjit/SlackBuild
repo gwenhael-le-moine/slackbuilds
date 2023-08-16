@@ -184,4 +184,4 @@ libgccjit: bindings for languages available from 3rd parties
 libgccjit:
 EOF
 
-makepkg -l y -c n $OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+makepkg --linkadd y --chown n --prepend $OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
