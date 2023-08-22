@@ -28,11 +28,11 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=gwh
 
 BRANCH=${BRANCH:-master}
-VERSION=${VERSION:-"trunk"}
+VERSION=${VERSION:-"latest"}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
@@ -85,9 +85,9 @@ rm -rf $PKGNAM
 [ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
 cd $REPOSITORY
-git checkout $BRANCH
+git reset --hard HEAD
 git pull --all
-[ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
+#[ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
 
 git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
 
@@ -96,14 +96,25 @@ git clean -dfX                  # https://github.com/commercial-emacs/commercial
 
 rm lisp/loaddefs.el             # https://lists.gnu.org/r/emacs-devel/2021-04/msg01430.html
 
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+#[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
 #mkdir -p $TMP/$PKGNAM
 cp -R $REPOSITORY $TMP/$PKGNAM
 cd $TMP/$PKGNAM || exit 1
 
-# tar xvf $CWD/$PKGNAM-$TARBALLVER.tar.xz || exit 1
-# cd $PKGNAM-$SRCDIRVER || exit 1
+case $VERSION in
+    trunk)
+        VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION=$(git describe --tags --abbrev=0)
+        git checkout "$VERSION"
+        ;;
+    *)
+        VERSION=$VERSION
+        git checkout "emacs-$VERSION"
+        ;;
+esac
 
 chown -R root:root .
 find . \
@@ -141,17 +152,20 @@ CFLAGS="$SLKCFLAGS" \
       --with-gpm=yes \
       --with-pgtk \
       --with-tree-sitter \
-      --with-native-compilation \
       --enable-link-time-optimization \
-      --with-json --with-xwidgets --with-xinput \
+      --with-native-compilation=aot \
+      --with-json \
+      --with-xwidgets \
+      --with-xinput \
       --with-compress-install \
       --without-gconf \
       --with-gameuser=":games" \
       --build=${ARCH}-slackware-linux || exit 1
-# --disable-libsystemd \
+    # --disable-libsystemd \
     # --with-x \
     # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
     # --without-toolkit-scroll-bars \
+
 
 make bootstrap $NUMJOBS || exit 1
 make $NUMJOBS || make || exit 1
@@ -233,4 +247,4 @@ if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
 fi
 
 cd $PKG
-/sbin/makepkg -l y -c n $TMP/$PKGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $TMP/$PKGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz

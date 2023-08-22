@@ -32,8 +32,6 @@ git submodule update
 cp -R "$REPOSITORY" $TMP/
 cd "$TMP/$PRGNAM/" || exit 1
 
-git checkout zig-0.10
-
 [ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "$VERSION" == "" ] && VERSION=trunk
 [ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
@@ -77,4 +75,4 @@ EOF
 
 # empaquetage
 rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"

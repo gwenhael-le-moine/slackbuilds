@@ -74,4 +74,4 @@ $PRGNAM: https://sexyjdk.com
 EOF
 
 #rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$PKG_VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$PKG_VERSION-$ARCH-$BUILD$TAG.txz

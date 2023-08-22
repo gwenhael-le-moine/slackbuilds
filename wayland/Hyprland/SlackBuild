@@ -51,35 +51,7 @@ PKGNAM=${PRGNAM}
 ######################
 # EMBED DEPENDENCIES #
 ######################
-# # wlroots
-# EMBED_WLROOTS=${EMBED_WLROOTS:-"yes"}
-# if [ "$EMBED_WLROOTS" = "yes" ]; then
-#     WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
-#     WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
-#     [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
-#     cd "$WLROOTS_REPOSITORY" || exit 1
-#     git reset --hard HEAD
-#     git pull --all
-
-#     mkdir -p "$TMP/$PRGNAM"/subprojects/
-#     [ ! -d "$TMP/$PRGNAM"/subprojects/wlroots ] && cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
-#     cd "$TMP/$PRGNAM"/subprojects/wlroots || exit 1
-#     case $WLROOTS_VERSION in
-#         trunk)
-#             # WLROOTS_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-#             WLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
-#             ;;
-#         latest)
-#             WLROOTS_VERSION=$(git describe --tags --abbrev=0)
-#             git checkout "$WLROOTS_VERSION"
-#             ;;
-#         *)
-#             git checkout "$WLROOTS_VERSION"
-#             ;;
-#     esac
-#     PKGNAM="${PKGNAM}+wlroots"
-#     PKGVERSION="${PKGVERSION}+${WLROOTS_VERSION}"
-# fi
+git submodule update --init --recursive
 
 # libliftoff
 EMBED_LIBLIFTOFF=${EMBED_LIBLIFTOFF:-"yes"}
@@ -142,7 +114,7 @@ if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
 fi
 
 
-# Back to compiling sway…
+# Back to compiling
 cd "$TMP/$PRGNAM/" || exit 1
 
 meson setup \
@@ -195,5 +167,5 @@ $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 # empaquetage
-rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg -l y -c n "$OUTPUT/${PKGNAM}-$(echo "$PKGVERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
+rm -f "$PKG"/{,usr/}lib"$(uname -m | grep -o 64)"/*.la
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT"/"$PKGNAM"-"$(echo $PKGVERSION | tr - _)"-"$ARCH"-"$BUILD$TAG".txz
