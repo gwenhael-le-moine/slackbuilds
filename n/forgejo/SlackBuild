@@ -26,7 +26,7 @@ if [ "$(id -g gitea 2> /dev/null)" != "817" ] || [ "$(id -u gitea 2> /dev/null)"
 fi
 
 # nettoyage préalable
-rm -r "$PKG" "{$TMP:?}/$PRGNAM"
+rm -r "$PKG"
 mkdir -p "$PKG"
 
 # mise en place
@@ -35,7 +35,9 @@ cd "$REPOSITORY" || exit 1
 git pull --all
 
 mkdir -p "$TMP"
-cp -r "$REPOSITORY" "$TMP/"
+cd "$TMP" || exit 1
+[ -e "$PRGNAM" ] && rm -r "$PRGNAM"
+cp -r "$REPOSITORY" .
 
 cd "$TMP/$PRGNAM" || exit 1
 case $VERSION in
