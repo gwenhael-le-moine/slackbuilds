@@ -4,9 +4,8 @@ set -e
 set -x
 
 CWD=$(pwd)
-THIS_HOST=${THIS_HOST:-$(hostname -s)}
-PRGNAM=$(basename "$CWD")-$THIS_HOST
-BUILD=${BUILD:-6}
+PRGNAM=$(basename "$CWD")
+BUILD=${BUILD:-7}
 BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
 
@@ -20,9 +19,13 @@ NUMJOBS=${NUMJOBS:-$(nproc)}
 ANEW=${ANEW:-true}
 CONFIG=${CONFIG:-""}
 
-rm -fr "$PKG"
+REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
+
+mkdir -p "$REPOSITORY"
+
+rm -fr "$PKG"
 
 mkdir -p "$PKG/usr/src/"
 if [ -e "/usr/src/linux-$VERSION" ] && [[ "$ANEW" != "true" ]]; then
@@ -34,13 +37,12 @@ else
         SRC_URL="https://git.kernel.org/torvalds/t"
     fi
 
-    [ ! -e "$CWD"/linux-"$VERSION".tar.gz ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O "$CWD/linux-$VERSION.tar.gz"
-    tar xf "$CWD/linux-$VERSION.tar.gz" -C "$PKG/usr/src/"
+    [ ! -e "$REPOSITORY"/linux-"$VERSION".tar.gz ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O "$REPOSITORY/linux-$VERSION.tar.gz"
+    tar xf "$REPOSITORY/linux-$VERSION.tar.gz" -C "$PKG/usr/src/"
 fi
 
 cd "$PKG/usr/src/" || exit 1
 mv "linux-$VERSION" "linux-${VERSION}-gwh"
-#ln -s "linux-$VERSION" linux
 cd "linux-${VERSION}-gwh"
 
 if [ -n "$CONFIG" ] && [ -e "$CONFIG" ]; then
@@ -49,7 +51,8 @@ fi
 if [ ! -f .config ]; then
     zcat /proc/config.gz > .config
 fi
-read
+
+# read
 
 make oldconfig "$@"
 
@@ -66,6 +69,7 @@ if [ -z "${HEADERS_ARCH}" ]; then
     *) HEADERS_ARCH=$(uname -m) ;;
   esac
 fi
+
 # Generate the kernel headers and clean them up:
 ( echo "Generating headers from the Linux kernel source tree in ${KERNEL_SOURCE}:"
   make headers_install ARCH="${HEADERS_ARCH}" INSTALL_HDR_PATH="$PKG/usr"
@@ -83,22 +87,22 @@ fi
 VERSION=$(basename "$(find "$PKG/lib/modules/" -type d -maxdepth 1 -mindepth 1 | head -n1)")
 
 mkdir -p "$PKG/boot/"
-# cp System.map "$PKG/boot/System.map-gwh-$VERSION"
-# cp .config "$PKG/boot/config-gwh-$VERSION"
-# cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
-cp System.map "$PKG/boot/System.map-gwh"
-cp .config "$PKG/boot/config-gwh"
-cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh"
+cp System.map "$PKG/boot/System.map-gwh-$VERSION"
+cp .config "$PKG/boot/config-gwh-$VERSION"
+cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
+# cp System.map "$PKG/boot/System.map-gwh"
+# cp .config "$PKG/boot/config-gwh"
+# cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh"
 
 make clean
 
 cd "$PKG/boot/" || exit 1
-# ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
-# ln -s "config-gwh-$VERSION" config-gwh
-# ln -s "System.map-gwh-$VERSION" System.map-gwh
-ln -s vmlinuz-gwh "vmlinuz-gwh-$VERSION"
-ln -s config-gwh "config-gwh-$VERSION"
-ln -s System.map-gwh "System.map-gwh-$VERSION"
+ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
+ln -s "config-gwh-$VERSION" config-gwh
+ln -s "System.map-gwh-$VERSION" System.map-gwh
+# ln -s vmlinuz-gwh "vmlinuz-gwh-$VERSION"
+# ln -s config-gwh "config-gwh-$VERSION"
+# ln -s System.map-gwh "System.map-gwh-$VERSION"
 
 mkdir -p "$PKG/install"
 cat <<EOF > "$PKG/install/doinst.sh"
