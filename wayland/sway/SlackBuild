@@ -3,7 +3,7 @@
 # variables
 GITHUB_REPO=swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=11
+BUILD=12
 
 TAG=gwh
 OUTPUT=/tmp
@@ -224,6 +224,8 @@ chmod 0700 \$XDG_RUNTIME_DIR
 
 # avoid wlr error
 unset DISPLAY
+
+killall daemon
 
 exec dbus-run-session /usr/bin/sway
 #dbus-launch --sh-syntax --exit-with-session /usr/bin/sway
