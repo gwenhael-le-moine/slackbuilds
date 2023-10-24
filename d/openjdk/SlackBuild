@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x -e
 
-VERSION=${VERSION:-18}
-FLAVOR=${FLAVOR:-"server-release-gcc10-glibc2.31"}
+VERSION=${VERSION:-21}
+FLAVOR=${FLAVOR:-"server-release-gcc12-glibc2.36"}
 
 CWD=$(pwd)
 PRGNAM=$(basename $CWD)

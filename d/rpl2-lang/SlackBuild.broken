@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-4.1.32}
+VERSION=${VERSION:-4.1.34}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
@@ -27,7 +27,9 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 mkdir -p $REPOSITORY
-[ ! -e $REPOSITORY/$PRGNAM-$VERSION.tar.bz2 ] && wget -c -O $REPOSITORY/$PRGNAM-$VERSION.tar.bz2 http://www.rpl2.net/download/rpl-${VERSION}.tar.bz2
+[ ! -e $REPOSITORY/$PRGNAM-$VERSION.tar.bz2 ] && wget -c -O $REPOSITORY/$PRGNAM-$VERSION.tar.bz2 http://www.rpl2.fr/download/rpl-${VERSION}.tar.bz2
+
+[ ! -e $REPOSITORY/reference_rpl_french.ps.bz2 ] && wget -c -O $REPOSITORY/reference_rpl_french.ps.bz2 http://www.rpl2.fr/download/reference_rpl_french.ps.bz2
 
 cd $TMP/
 tar xvf $REPOSITORY/$PRGNAM-$VERSION.tar.bz2
@@ -56,8 +58,6 @@ make install DESTDIR=$PKG
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -R AUTHORS COPYING ChangeLog HEADER INSTALL LIMITATIONS Licence_CeCILL_V2-en.txt Licence_CeCILL_V2-fr.txt NEWS README doc/ examples/ $PKG$PREFIX/doc/$PRGNAM
 
-[ ! -e $REPOSITORY/reference_rpl_french.ps.bz2 ] && wget -c -O $REPOSITORY/reference_rpl_french.ps.bz2 http://www.rpl2.net/download/reference_rpl_french.ps.bz2
-
 bzcat $REPOSITORY/reference_rpl_french.ps.bz2 > $PKG$PREFIX/doc/$PRGNAM/reference_rpl_french.ps
 
 # correction
@@ -85,7 +85,8 @@ $PRGNAM:    An functional Turing-equivalent language
 $PRGNAM:    A compiled language
 $PRGNAM:    A type-inference language
 $PRGNAM:    An extensible language
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM:
+$PRGNAM: http://www.rpl2.fr
 EOF
 
 # empaquetage

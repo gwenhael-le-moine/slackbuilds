@@ -37,7 +37,8 @@ cd $TMP/$PRGNAM/
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 # installation
-python3 ./setup.py install --root=$PKG
+python3 -m build --wheel
+python3 -m installer --destdir $PKG --prefix /usr dist/*.whl
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp CHANGELOG LICENSE ./*.md $PKG$PREFIX/doc/$PRGNAM/

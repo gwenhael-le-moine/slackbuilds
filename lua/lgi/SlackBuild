@@ -21,13 +21,13 @@ DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 
 rm -rf $PKG $TMP/$PRGNAM
 mkdir -p $PKG
-cd $TMP
 
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 VERSION="git_r$( cd $REPOSITORY && git rev-list --count HEAD )"
 
+cd $TMP
 cp -R $REPOSITORY $PRGNAM
 
 cd $PRGNAM
