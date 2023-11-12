@@ -28,10 +28,9 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-4}
 TAG=gwh
 
-BRANCH=${BRANCH:-master}
 VERSION=${VERSION:-"latest"}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
@@ -87,7 +86,6 @@ rm -rf $PKGNAM
 cd $REPOSITORY
 git reset --hard HEAD
 git pull --all
-#[ "x$VERSION" == "xtrunk" ] || git checkout $VERSION
 
 git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
 
@@ -96,9 +94,6 @@ git clean -dfX                  # https://github.com/commercial-emacs/commercial
 
 rm lisp/loaddefs.el             # https://lists.gnu.org/r/emacs-devel/2021-04/msg01430.html
 
-#[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
-
-#mkdir -p $TMP/$PKGNAM
 cp -R $REPOSITORY $TMP/$PKGNAM
 cd $TMP/$PKGNAM || exit 1
 
@@ -123,10 +118,11 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \+
 
-#SRCDIR=$REPOSITORY
 SRCDIR=.
 EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
 
+      # --disable-libsystemd \
+      # --with-pgtk \
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
       $SRCDIR/configure \
@@ -150,7 +146,9 @@ CFLAGS="$SLKCFLAGS" \
       --with-xft \
       --with-xpm \
       --with-gpm=yes \
-      --with-pgtk \
+      --with-x \
+      --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+      --without-toolkit-scroll-bars \
       --with-tree-sitter \
       --enable-link-time-optimization \
       --with-native-compilation=aot \
@@ -161,26 +159,13 @@ CFLAGS="$SLKCFLAGS" \
       --without-gconf \
       --with-gameuser=":games" \
       --build=${ARCH}-slackware-linux || exit 1
-    # --disable-libsystemd \
-    # --with-x \
-    # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-    # --without-toolkit-scroll-bars \
 
 
 make bootstrap $NUMJOBS || exit 1
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-rm $PKG/usr/bin/emacs
-mv $PKG/usr/bin/emacs-${EMACS_VERSION} $PKG/usr/bin/emacs-${EMACS_VERSION}-with-x11
-
-# Create unversioned symlinks for both versions of emacs:
-( cd $PKG/usr/bin
-  ln -sf emacs-${EMACS_VERSION}-with-x11 emacs-with-x11
-  # ln -sf emacs-${EMACS_VERSION}-no-x11 emacs-no-x11
-  # Create a plain "emacs" symlink pointing to emacs-with-x11:
-  ln -sf emacs-with-x11 emacs
-)
+mv $PKG/usr/bin/emacs-${EMACS_VERSION} $PKG/usr/bin/emacs
 
 # Seems like this nonsense is finally obsolete:
 if [ -d $PKG/var/games/emacs ]; then
@@ -208,7 +193,6 @@ sed -i 's|cc -c -I. parser.c|cc -fPIC -c -I. parser.c|' build.sh
 bash ./batch.sh
 cp dist/*.so "$PKG/usr/lib$(uname -m | grep -o 64)/"
 cd ..
-# /tree-sitter grammars
 
 
 

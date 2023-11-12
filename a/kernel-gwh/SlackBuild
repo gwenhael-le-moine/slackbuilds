@@ -5,7 +5,7 @@ set -x
 
 CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
-BUILD=${BUILD:-8}
+BUILD=${BUILD:-10}
 BRANCH=${BRANCH:-stable}        # stable ; mainline
 ARCH=$(uname -m)
 
