@@ -11,16 +11,16 @@ OUTPUT=/tmp
 TMP=/tmp/$TAG
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-PKG=$TMP/pkg-$PRGNAM
+PKGNAM=$(basename $CWD)
+PKG=$TMP/pkg-$PKGNAM
 
 ARCH=$(uname -m)
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr $PKG $TMP/$PKGNAM
 
 mkdir -p $PKG
 
@@ -30,11 +30,21 @@ cd $REPOSITORY
 git pull --all
 
 cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM/
+cd $TMP/$PKGNAM/
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+case $VERSION in
+    trunk)
+        PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        PKGVERSION=$(git describe --tags --abbrev=0)
+        git checkout "$VERSION"
+        ;;
+    *)
+        PKGVERSION="$VERSION"
+        git checkout "$VERSION"
+        ;;
+esac
 
 # installation
 python3 ./setup.py install --root=$PKG
@@ -49,7 +59,7 @@ true > \$LOGFILE
 exec &> \$LOGFILE
 
 set -x
-echo "sway Starting: \$( date )"
+echo "$PKGNAM Starting: \$( date )"
 
 # Uncomment if mouse pointer is invisible
 #export WLR_NO_HARDWARE_CURSORS=1
@@ -79,7 +89,7 @@ cp resources/qtile-wayland.desktop $PKG$PREFIX/share/wayland-sessions/
 mkdir -p $PKG$PREFIX/share/xsessions/
 cp resources/qtile.desktop $PKG$PREFIX/share/xsessions/
 mkdir -p $PKG/etc/X11/xinit/
-cat <<EOF > $PKG/etc/X11/xinit/xinitrc.$PRGNAM
+cat <<EOF > $PKG/etc/X11/xinit/xinitrc.$PKGNAM
 #!/bin/sh
 
 userresources=\$HOME/.Xresources
@@ -114,8 +124,49 @@ EOF
 
 sed -i 's|Exec=qtile start -b wayland|Exec=/usr/bin/start_qtile.sh|' $PKG$PREFIX/share/wayland-sessions/qtile-wayland.desktop
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
+mkdir -p $PKG$PREFIX/doc/$PKGNAM
+cp LICENSE *.md $PKG$PREFIX/doc/$PKGNAM/
+
+######################
+# EMBED DEPENDENCIES #
+######################
+# qtile-extras
+EMBED_EXTRAS=${EMBED_EXTRAS:-"yes"}
+if [ "$EMBED_EXTRAS" = "yes" ]; then
+    EXTRAS_PKGNAM=qtile-extras
+    EXTRAS_GITHUB_REPO=elParaguayo/qtile-extras
+    EXTRAS_VERSION=${EXTRAS_VERSION:-$VERSION}
+    EXTRAS_REPOSITORY=/home/installs/SlackBuilds/_repositories/$EXTRAS_PKGNAM
+    [ ! -e "$EXTRAS_REPOSITORY" ] && git clone https://github.com/${EXTRAS_GITHUB_REPO}.git "$EXTRAS_REPOSITORY"
+    cd "$EXTRAS_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+
+    cp -R $EXTRAS_REPOSITORY $TMP/
+    cd $TMP/qtile-extras/ || exit 1
+    case $EXTRAS_VERSION in
+        trunk)
+            EXTRAS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            EXTRAS_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$EXTRAS_VERSION"
+            ;;
+        *)
+            git checkout "$EXTRAS_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+extras"
+    PKGVERSION="${PKGVERSION}+${EXTRAS_VERSION}"
+
+    # installation
+    python3 -m build --wheel
+    python3 -m installer --destdir $PKG --prefix /usr dist/*.whl
+
+    mkdir -p $PKG$PREFIX/doc/qtile-extras
+    cp CHANGELOG LICENSE ./*.md $PKG$PREFIX/doc/qtile-extras/
+fi
 
 # correction
 cd $PKG
@@ -134,19 +185,19 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (A tiling window manager written and configured in Python)
-$PRGNAM:
-$PRGNAM: A full-featured, hackable tiling window manager written and
-$PRGNAM: configured in Python
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: https://qtile.org
+$PKGNAM: $PKGNAM (A tiling window manager written and configured in Python)
+$PKGNAM:
+$PKGNAM: A full-featured, hackable tiling window manager written and
+$PKGNAM: configured in Python
+$PKGNAM: $([ "$EMBED_EXTRAS" = "yes" ] && echo "(includes qtile-extras)")
+$PKGNAM:
+$PKGNAM:
+$PKGNAM:
+$PKGNAM:
+$PKGNAM: $([ "$EMBED_EXTRAS" = "yes" ] && echo https://github.com/${EXTRAS_GITHUB_REPO})
+$PKGNAM: https://qtile.org
 EOF
 
 # empaquetage
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PKGNAM-$PKGVERSION-$ARCH-$BUILD$TAG.txz
