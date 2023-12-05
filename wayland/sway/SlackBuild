@@ -56,7 +56,7 @@ PKGNAM=${PRGNAM}
 ###########
 
 # Tray-menu patch
-PATCH_6249=${PATCH_6249:-"yes"}
+PATCH_6249=${PATCH_6249:-"no"}
 if [ "$PATCH_6249" = "yes" ]; then
     [ -e "$CWD"/patches/6249-tray-menu.patch ] && mv "$CWD"/patches/6249-tray-menu.patch{,.previous}
     wget -c https://patch-diff.githubusercontent.com/raw/swaywm/sway/pull/6249.patch -O "$CWD"/patches/6249-tray-menu.patch
