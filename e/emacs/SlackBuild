@@ -121,8 +121,9 @@ find . \
 SRCDIR=.
 EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
 
-      # --disable-libsystemd \
-      # --with-pgtk \
+      # --with-x \
+      # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+      # --without-toolkit-scroll-bars \
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
       $SRCDIR/configure \
@@ -146,9 +147,8 @@ CFLAGS="$SLKCFLAGS" \
       --with-xft \
       --with-xpm \
       --with-gpm=yes \
-      --with-x \
-      --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-      --without-toolkit-scroll-bars \
+      --disable-libsystemd \
+      --with-pgtk \
       --with-tree-sitter \
       --enable-link-time-optimization \
       --with-native-compilation=aot \
