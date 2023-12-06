@@ -4,7 +4,7 @@
 GITHUB_REPO=qtile/qtile
 VERSION=${VERSION:-latest}
 
-BUILD=1
+BUILD=4
 
 TAG=gwh
 OUTPUT=/tmp
@@ -259,17 +259,17 @@ cat <<EOF > $PKG/install/slack-desc
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PKGNAM: $PKGNAM (A tiling window manager written and configured in Python)
+$PKGNAM: $PKGNAM (A dynamic tiling window manager)
 $PKGNAM:
 $PKGNAM: A full-featured, hackable tiling window manager written and
 $PKGNAM: configured in Python
 $PKGNAM: $([ "$EMBED_EXTRAS" = "yes" ] && echo "(includes qtile-extras)")
-$PKGNAM:
-$PKGNAM:
-$PKGNAM:
-$PKGNAM:
-$PKGNAM: $([ "$EMBED_EXTRAS" = "yes" ] && echo https://github.com/${EXTRAS_GITHUB_REPO})
+$PKGNAM: $([ "$EMBED_PYWAYLAND" = "yes" ] && echo "(includes pywayland)")
+$PKGNAM: $([ "$EMBED_PYWLROOTS" = "yes" ] && echo "(includes pywlroots)")
 $PKGNAM: https://qtile.org
+$PKGNAM: $([ "$EMBED_PYWAYLAND" = "yes" ] && echo https://github.com/${PYWAYLAND_GITHUB_REPO})
+$PKGNAM: $([ "$EMBED_PYWLROOTS" = "yes" ] && echo https://github.com/${PYWLROOTS_GITHUB_REPO})
+$PKGNAM: $([ "$EMBED_EXTRAS" = "yes" ] && echo https://github.com/${EXTRAS_GITHUB_REPO})
 EOF
 
 # empaquetage
