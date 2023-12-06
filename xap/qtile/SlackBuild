@@ -4,7 +4,7 @@
 GITHUB_REPO=qtile/qtile
 VERSION=${VERSION:-latest}
 
-BUILD=4
+BUILD=5
 
 TAG=gwh
 OUTPUT=/tmp
@@ -85,6 +85,7 @@ chmod +x $PKG$PREFIX/bin/start_qtile.sh
 
 mkdir -p $PKG$PREFIX/share/wayland-sessions/
 cp resources/qtile-wayland.desktop $PKG$PREFIX/share/wayland-sessions/
+sed -i 's|Exec=qtile start -b wayland|Exec=/usr/bin/start_qtile.sh|' $PKG$PREFIX/share/wayland-sessions/qtile-wayland.desktop
 
 mkdir -p $PKG$PREFIX/share/xsessions/
 cp resources/qtile.desktop $PKG$PREFIX/share/xsessions/
@@ -122,10 +123,8 @@ else
 fi
 EOF
 
-sed -i 's|Exec=qtile start -b wayland|Exec=/usr/bin/start_qtile.sh|' $PKG$PREFIX/share/wayland-sessions/qtile-wayland.desktop
-
 mkdir -p $PKG$PREFIX/doc/$PKGNAM
-cp LICENSE *.md $PKG$PREFIX/doc/$PKGNAM/
+cp -R scripts/ docs/ LICENSE *.md $PKG$PREFIX/doc/$PKGNAM/
 
 ######################
 # EMBED DEPENDENCIES #
