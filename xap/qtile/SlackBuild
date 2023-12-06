@@ -168,6 +168,80 @@ if [ "$EMBED_EXTRAS" = "yes" ]; then
     cp CHANGELOG LICENSE ./*.md $PKG$PREFIX/doc/qtile-extras/
 fi
 
+# pywayland
+EMBED_PYWAYLAND=${EMBED_PYWAYLAND:-"yes"}
+if [ "$EMBED_PYWAYLAND" = "yes" ]; then
+    PYWAYLAND_PKGNAM=pywayland
+    PYWAYLAND_GITHUB_REPO=flacjacket/pywayland
+    PYWAYLAND_VERSION=${PYWAYLAND_VERSION:-$VERSION}
+    PYWAYLAND_REPOSITORY=/home/installs/SlackBuilds/_repositories/$PYWAYLAND_PKGNAM
+    [ ! -e "$PYWAYLAND_REPOSITORY" ] && git clone https://github.com/${PYWAYLAND_GITHUB_REPO}.git "$PYWAYLAND_REPOSITORY"
+    cd "$PYWAYLAND_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+
+    cp -R $PYWAYLAND_REPOSITORY $TMP/
+    cd $TMP/pywayland/ || exit 1
+    case $PYWAYLAND_VERSION in
+        trunk)
+            PYWAYLAND_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            PYWAYLAND_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$PYWAYLAND_VERSION"
+            ;;
+        *)
+            git checkout "$PYWAYLAND_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+pywayland"
+    PKGVERSION="${PKGVERSION}+${PYWAYLAND_VERSION}"
+
+    # installation
+    python3 ./setup.py install --root=$PKG
+
+    mkdir -p $PKG$PREFIX/doc/pywayland
+    cp LICENSE README.rst $PKG$PREFIX/doc/pywayland/
+fi
+
+# pywlroots
+EMBED_PYWLROOTS=${EMBED_PYWLROOTS:-"yes"}
+if [ "$EMBED_PYWLROOTS" = "yes" ]; then
+    PYWLROOTS_PKGNAM=pywlroots
+    PYWLROOTS_GITHUB_REPO=flacjacket/pywlroots
+    PYWLROOTS_VERSION=${PYWLROOTS_VERSION:-$VERSION}
+    PYWLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/$PYWLROOTS_PKGNAM
+    [ ! -e "$PYWLROOTS_REPOSITORY" ] && git clone https://github.com/${PYWLROOTS_GITHUB_REPO}.git "$PYWLROOTS_REPOSITORY"
+    cd "$PYWLROOTS_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+
+    cp -R $PYWLROOTS_REPOSITORY $TMP/
+    cd $TMP/pywlroots/ || exit 1
+    case $PYWLROOTS_VERSION in
+        trunk)
+            PYWLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            PYWLROOTS_VERSION=$(git describe --tags --abbrev=0)
+            git checkout "$PYWLROOTS_VERSION"
+            ;;
+        *)
+            git checkout "$PYWLROOTS_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+pywlroots"
+    PKGVERSION="${PKGVERSION}+${PYWLROOTS_VERSION}"
+
+    # installation
+    python3 ./setup.py install --root=$PKG
+
+    mkdir -p $PKG$PREFIX/doc/pywlroots
+    cp LICENSE README.rst $PKG$PREFIX/doc/pywlroots/
+fi
+
 # correction
 cd $PKG
 chown -R root:root *
