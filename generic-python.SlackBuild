@@ -3,7 +3,7 @@
 # Generic python SlackBuild
 
 # variables
-TAG=${TAG:-pip_gwh}
+TAG=${TAG:-pip3_gwh}
 TMP=/tmp/$TAG
 CWD=$(pwd)
 OUTPUT=/tmp
@@ -23,7 +23,7 @@ mkdir -p $PKG
 # installation
 EXTRA=""
 [ "x$VERSION" == "xpip" ] || EXTRA="==$VERSION"
-pip install --ignore-installed --root $PKG --no-deps $PRGNAM$EXTRA
+pip3 install --ignore-installed --root $PKG --no-deps $PRGNAM$EXTRA
 
 if [ -d $PKG/usr/share/man ]; then
     mv $PKG/usr/share/man $PKG/usr/
@@ -60,4 +60,4 @@ EOF
 # empaquetage
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/python-$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/python3-$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
