@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # variables
-GITHUB_REPO=emersion/kanshi
 VERSION=${VERSION:-latest}
 
 BUILD=1
@@ -25,7 +24,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone https://git.sr.ht/~emersion/kanshi $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
