@@ -42,15 +42,20 @@ find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin
 chmod 755 $PKG$PREFIX/bin/*
 
 mkdir -p $PKG$PREFIX/man/man1
-cp extra/alacritty.man $PKG$PREFIX/man/man1/alacritty.1
-gzip -9 $PKG$PREFIX/man/man1/alacritty.1
+mkdir -p $PKG$PREFIX/man/man5
+scdoc < extra/man/alacritty.1.scd | gzip -c | sudo tee $PKG$PREFIX/man/man1/alacritty.1.gz > /dev/null
+scdoc < extra/man/alacritty-msg.1.scd | gzip -c | sudo tee $PKG$PREFIX/man/man1/alacritty-msg.1.gz > /dev/null
+scdoc < extra/man/alacritty.5.scd | gzip -c | sudo tee $PKG$PREFIX/man/man5/alacritty.5.gz > /dev/null
+scdoc < extra/man/alacritty-bindings.5.scd | gzip -c | sudo tee $PKG$PREFIX/man/man5/alacritty-bindings.5.gz > /dev/null
+
 
 mkdir -p $PKG$PREFIX/info
 cp extra/alacritty.info $PKG$PREFIX/info/
 gzip -9 $PKG$PREFIX/info/alacritty.info
 
-mkdir -p $PKG$PREFIX/share/applications
+mkdir -p $PKG$PREFIX/share/applications $PKG$PREFIX/share/pixmaps
 cp extra/linux/Alacritty.desktop $PKG$PREFIX/share/applications/
+cp extra/logo/alacritty-term.svg $PKG$PREFIX/share/pixmaps/Alacritty.svg
 
 mkdir -p $PKG$PREFIX/share/appdata
 cp extra/linux/io.alacritty.Alacritty.appdata.xml $PKG$PREFIX/share/appdata/
