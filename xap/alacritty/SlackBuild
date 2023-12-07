@@ -68,7 +68,7 @@ cp extra/completions/_alacritty $PKG/usr/share/zsh/site-functions/
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -a docs/ extra/ *.md $PKG$PREFIX/doc/$PRGNAM
+cp -a docs/ extra/ scripts/ *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
 cd $PKG
