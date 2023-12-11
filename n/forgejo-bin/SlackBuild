@@ -5,7 +5,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(curl -q https://codeberg.org/forgejo/forgejo/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-5}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -62,7 +62,7 @@ chown -R gitea:gitea $PKG/var/log/gitea
 )
 
 mkdir -p $PKG/etc/rc.d/
-cat <<EOF > $PKG/etc/rc.d/rc.gitea
+cat <<EOF > $PKG/etc/rc.d/rc.$PRGNAM
 #!/bin/bash
 #Slackware startup deamon script
 
@@ -83,32 +83,36 @@ OPTIONS=" --config /etc/gitea/app.ini"
 
 PIDFILE=/var/lib/gitea/gitea.pid
 
-GITEA_WORK_DIR=$GITEA_WORK_DIR
-
 func_stop() {
     [ -e \$PIDFILE ] && kill \$(cat \$PIDFILE)
-    # if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
-    #     echo -n "Stopping \$NAME ... "
-    #     killall \$PROCESSNAME
-    #     sleep 2
-    # fi
+    rm \$PIDFILE
 
-    if [ ! "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
-        echo "Done!"
-    else
+    if [ ! "\$(pgrep gitea)" ]; then
         echo "Error!"
+    else
+        echo "Stopped!"
     fi
 }
 
 func_start() {
     echo -n "Starting \$NAME ... "
-    su - \$USERNAME -c "GITEA_WORK_DIR=$GITEA_WORK_DIR \$CMD --pid \$PIDFILE \$OPTIONS" &
+    su - \$USERNAME -c "\$CMD \$OPTIONS" &
+    echo \$\$ > \$PIDFILE
+
     sleep 2
 
-    if [ "\$(ps aux | grep \$PROCESSNAME | grep -v grep)" ]; then
-        echo "Done!"
+    if [ "\$(pgrep gitea)" ]; then
+        echo "Started!"
     else
         echo "Error!"
+    fi
+}
+
+func_status() {
+    if [ "\$(pgrep gitea)" ]; then
+        echo "Running!"
+    else
+        echo "NOT running!"
     fi
 }
 
@@ -127,12 +131,17 @@ case \$1 in
         sleep 2
         func_start
         ;;
+
+    "status")
+        func_status
+        ;;
+
     *)
         echo "Usage; start|stop|restart"
         ;;
 esac
 EOF
-chmod +x $PKG/etc/rc.d/rc.gitea
+chmod +x $PKG/etc/rc.d/rc.$PRGNAM
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
@@ -146,14 +155,14 @@ cat <<EOF > $PKG/install/slack-desc
        |-----handy-ruler--------------------------------------------------------|
 $PRGNAM: $PRGNAM (A painless self-hosted Git service.)
 $PRGNAM:
-$PRGNAM: Gitea is a community managed fork of Gogs, lightweight code hosting
-$PRGNAM: solution written in Go and published under the MIT license.
+$PRGNAM: Forgejo is a self-hosted lightweight software forge.
+$PRGNAM: Easy to install and low maintenance, it just does the job.
 $PRGNAM:
 $PRGNAM: edit /etc/gitea/app.ini
-$PRGNAM: see https://docs.gitea.io/en-us/config-cheat-sheet/
+$PRGNAM: see https://forgejo.org/docs/latest/admin/config-cheat-sheet/
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://gitea.io/
+$PRGNAM: https://forgejo.org/
 $PRGNAM:
 EOF
 

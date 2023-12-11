@@ -2,7 +2,7 @@
 
 # variables
 GITHUB_REPO=jwilm/alacritty
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-trunk}       # 'latest' will not select the actual latest tag
 BUILD=${BUILD:-1}
 
 TAG=gwh
