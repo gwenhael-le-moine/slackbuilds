@@ -126,8 +126,8 @@ CONFIGURE_OPTIONS="--prefix=/usr \
       --libdir=/usr/lib$(uname -m | grep -o 64 ) \
       --sysconfdir=/etc \
       --localstatedir=/var \
-      --program-prefix=\"\" \
-      --program-suffix=\"\" \
+      --program-prefix="" \
+      --program-suffix="" \
       --mandir=/usr/man \
       --infodir=/usr/info \
       --without-gconf \
@@ -151,17 +151,17 @@ CONFIGURE_OPTIONS="--prefix=/usr \
       --with-xinput \
       --with-compress-install \
       --without-gconf \
-      --with-gameuser=\":games\" \
+      --with-gameuser=":games" \
       --build=${ARCH}-slackware-linux"
 
 case $FLAVOR in
     pgtk)
-        VERSION=${VERSION}_pgtk
+        VERSION=pgtk_${VERSION}
         CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS \
           --with-pgtk"
         ;;
     *)                          # x11
-        VERSION=${VERSION}_x11
+        VERSION=x11_${VERSION}
         CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS \
           --with-x \
           --with-x-toolkit=${X_TOOLKIT:-gtk3} \
