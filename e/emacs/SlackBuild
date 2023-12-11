@@ -28,10 +28,11 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-4}
+BUILD=${BUILD:-5}
 TAG=gwh
 
 VERSION=${VERSION:-"latest"}
+FLAVOR=${FLAVOR:-x11}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
@@ -121,18 +122,12 @@ find . \
 SRCDIR=.
 EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
 
-      # --with-x \
-      # --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-      # --without-toolkit-scroll-bars \
-CFLAGS="$SLKCFLAGS" \
-      CXXFLAGS="$SLKCFLAGS" \
-      $SRCDIR/configure \
-      --prefix=/usr \
+CONFIGURE_OPTIONS="--prefix=/usr \
       --libdir=/usr/lib$(uname -m | grep -o 64 ) \
       --sysconfdir=/etc \
       --localstatedir=/var \
-      --program-prefix="" \
-      --program-suffix="" \
+      --program-prefix=\"\" \
+      --program-suffix=\"\" \
       --mandir=/usr/man \
       --infodir=/usr/info \
       --without-gconf \
@@ -148,7 +143,6 @@ CFLAGS="$SLKCFLAGS" \
       --with-xpm \
       --with-gpm=yes \
       --disable-libsystemd \
-      --with-pgtk \
       --with-tree-sitter \
       --enable-link-time-optimization \
       --with-native-compilation=aot \
@@ -157,8 +151,28 @@ CFLAGS="$SLKCFLAGS" \
       --with-xinput \
       --with-compress-install \
       --without-gconf \
-      --with-gameuser=":games" \
-      --build=${ARCH}-slackware-linux || exit 1
+      --with-gameuser=\":games\" \
+      --build=${ARCH}-slackware-linux"
+
+case $FLAVOR in
+    pgtk)
+        VERSION=${VERSION}_pgtk
+        CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS \
+          --with-pgtk"
+        ;;
+    *)                          # x11
+        VERSION=${VERSION}_x11
+        CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS \
+          --with-x \
+          --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+          --without-toolkit-scroll-bars"
+        ;;
+esac
+
+CFLAGS="$SLKCFLAGS" \
+      CXXFLAGS="$SLKCFLAGS" \
+      $SRCDIR/configure \
+      $CONFIGURE_OPTIONS || exit 1
 
 
 make bootstrap $NUMJOBS || exit 1
