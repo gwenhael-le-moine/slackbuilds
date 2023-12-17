@@ -28,11 +28,10 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-5}
+BUILD=${BUILD:-10}
 TAG=gwh
 
 VERSION=${VERSION:-"latest"}
-FLAVOR=${FLAVOR:-x11}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
@@ -74,8 +73,9 @@ PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" 
 
 NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
 
-TMP=${TMP:-/tmp}
-PKG=$TMP/package-$PKGNAM
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PKGNAM
+OUTPUT=${OUTPUT:-/tmp}
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -154,32 +154,37 @@ CONFIGURE_OPTIONS="--prefix=/usr \
       --with-gameuser=":games" \
       --build=${ARCH}-slackware-linux"
 
-case $FLAVOR in
-    pgtk)
-        VERSION=pgtk_${VERSION}
-        CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS \
-          --with-pgtk"
-        ;;
-    *)                          # x11
-        VERSION=x11_${VERSION}
-        CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS \
-          --with-x \
-          --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-          --without-toolkit-scroll-bars"
-        ;;
-esac
-
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
       $SRCDIR/configure \
-      $CONFIGURE_OPTIONS || exit 1
-
+      $CONFIGURE_OPTIONS \
+      --with-pgtk || exit 1
 
 make bootstrap $NUMJOBS || exit 1
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-mv $PKG/usr/bin/emacs-${EMACS_VERSION} $PKG/usr/bin/emacs
+# mv $PKG/usr/bin/emacs-${EMACS_VERSION} $PKG/usr/bin/emacs-pgtk
+( cd $PKG/usr/bin/
+  ln -s emacs-pgtk emacs-${EMACS_VERSION}
+)
+
+CFLAGS="$SLKCFLAGS" \
+      CXXFLAGS="$SLKCFLAGS" \
+      $SRCDIR/configure \
+      $CONFIGURE_OPTIONS \
+      --with-x \
+      --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+      --without-toolkit-scroll-bars || exit 1
+
+# make bootstrap $NUMJOBS || exit 1
+make $NUMJOBS || make || exit 1
+
+cat src/emacs > $PKG/usr/bin/emacs-${EMACS_VERSION}-x11
+chmod 1755 $PKG/usr/bin/emacs-${EMACS_VERSION}-x11
+( cd $PKG/usr/bin/
+  ln -s emacs-x11 emacs-${EMACS_VERSION}-x11
+)
 
 # Seems like this nonsense is finally obsolete:
 if [ -d $PKG/var/games/emacs ]; then
@@ -245,4 +250,4 @@ if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
 fi
 
 cd $PKG
-/sbin/makepkg --linkadd y --chown n --prepend $TMP/$PKGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PKGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz
