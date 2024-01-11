@@ -34,7 +34,7 @@ REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
 cd $PKG/$VHOSTROOT/htdocs
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
