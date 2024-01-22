@@ -43,8 +43,8 @@ ${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}:
-${PRGNAM}:
-${PRGNAM}:
+${PRGNAM}: (You need to download the game and put the file $PRGNAM-X.x.x-pc.zip
+${PRGNAM}:  and put it next to this script)
 ${PRGNAM}:
 ${PRGNAM}: https://whatalegendgame.com
 ${PRGNAM}:

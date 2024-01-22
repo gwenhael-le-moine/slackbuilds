@@ -6,8 +6,7 @@ OUTPUT=${OUTPUT:-/tmp}
 TMP=/tmp/$TAG
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(echo $PRGNAM-*.zip | grep -o "[0-9-]*" | sed 's|^-||' | sed 's|-$||' | tr - .)}
-ORIG_VERSION=$(echo $VERSION | tr . -)
+VERSION=${VERSION:-v$(echo $PRGNAM-*.zip | grep -o "[0-9.]*" | head -n1)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 
@@ -20,9 +19,9 @@ cd $TMP
 
 mkdir -p $PKG/usr/games/ $PKG/opt/
 cd $PKG/opt/
-[ ! -e $CWD/$PRGNAM-$ORIG_VERSION-pc.zip ] && exit 1
-unzip $CWD/$PRGNAM-$ORIG_VERSION-pc.zip
-mv $PRGNAM-$ORIG_VERSION-pc $PRGNAM
+[ ! -e $CWD/$PRGNAM-$VERSION-pc.zip ] && exit 1
+unzip $CWD/$PRGNAM-$VERSION-pc.zip
+mv $PRGNAM-$VERSION-pc $PRGNAM
 
 cd $PKG/usr/games/
 ln -s ../../opt/$PRGNAM/$PRGNAM.sh
@@ -44,10 +43,10 @@ ${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}:
-${PRGNAM}: (You need to download the game and put the file $PRGNAM-X-x-x-pc.zip
+${PRGNAM}: (You need to download the game and put the file $PRGNAM-vX.x.x-pc.zip
 ${PRGNAM}:  and put it next to this script)
 ${PRGNAM}:
-${PRGNAM}: https://summertimesaga.com
+${PRGNAM}: https://linktr.ee/timewizardstudios
 ${PRGNAM}:
 EOF
 
