@@ -75,45 +75,26 @@ CMD="/usr/bin/forgejo"
 # user used to run the daemon
 USERNAME=forgejo
 
-# Process name of daemon, for killing it.
-PROCESSNAME=\$CMD
-
 # Option to run with deamon
 OPTIONS=" --config /etc/forgejo/app.ini"
 
-PIDFILE=/var/lib/forgejo/forgejo.pid
+func_status() {
+    pgrep -u \$USERNAME forgejo && echo Running || echo Stopped
+}
 
 func_stop() {
-    [ -e \$PIDFILE ] && kill \$(cat \$PIDFILE)
-    rm \$PIDFILE
+    pkill -u \$USERNAME forgejo
 
-    if [ ! "\$(pgrep forgejo)" ]; then
-        echo "Error!"
-    else
-        echo "Stopped!"
-    fi
+    func_status
 }
 
 func_start() {
     echo -n "Starting \$NAME ... "
     su - \$USERNAME -c "\$CMD \$OPTIONS" &
-    echo \$\$ > \$PIDFILE
 
     sleep 2
 
-    if [ "\$(pgrep forgejo)" ]; then
-        echo "Started!"
-    else
-        echo "Error!"
-    fi
-}
-
-func_status() {
-    if [ "\$(pgrep forgejo)" ]; then
-        echo "Running!"
-    else
-        echo "NOT running!"
-    fi
+    func_status
 }
 
 
