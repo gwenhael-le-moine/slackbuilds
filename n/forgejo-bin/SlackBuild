@@ -5,7 +5,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(curl -q https://codeberg.org/forgejo/forgejo/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-5}
+BUILD=${BUILD:-6}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -17,13 +17,13 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
 mkdir -p $REPOSITORY
 
-GITEA_WORK_DIR=/var/lib/gitea
+FORGEJO_WORK_DIR=/var/lib/forgejo
 
-# Check if the gitea user and group exist. If not, then bail.
-if [ "$(id -g gitea 2> /dev/null)" != "817" -o "$(id -u gitea 2> /dev/null)" != "817" ]; then
-    echo "  You must have an 'gitea' user and group to run this script."
-    echo "    # groupadd -g 817 gitea"
-    echo "    # useradd -d /var/lib/gitea -g gitea -s /bin/bash -u 817 gitea --system "
+# Check if the forgejo user and group exist. If not, then bail.
+if [ "$(id -g forgejo 2> /dev/null)" != "817" -o "$(id -u forgejo 2> /dev/null)" != "817" ]; then
+    echo "  You must have an 'forgejo' user and group to run this script."
+    echo "    # groupadd -g 817 forgejo"
+    echo "    # useradd -d /var/lib/forgejo -g forgejo -s /bin/bash -u 817 forgejo --system "
     exit 1
 fi
 
@@ -41,20 +41,20 @@ xz -d $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz
 rm -fr $PKG
 
 mkdir -p  $PKG$PREFIX/bin
-cp $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/gitea
-chmod +x $PKG$PREFIX/bin/gitea
+cp $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/forgejo
+chmod +x $PKG$PREFIX/bin/forgejo
 
-mkdir -p $PKG/etc/gitea/
-cp $CWD/app.ini $PKG/etc/gitea/app.ini.new
-chown -R gitea:gitea $PKG/etc/gitea
-chmod 770 $PKG/etc/gitea
+mkdir -p $PKG/etc/forgejo/
+cp $CWD/app.ini $PKG/etc/forgejo/app.ini.new
+chown -R forgejo:forgejo $PKG/etc/forgejo
+chmod 770 $PKG/etc/forgejo
 
-mkdir -p $PKG${GITEA_WORK_DIR}/{custom,data/gitea-repositories,indexers,public,log,.ssh}
-chown -R gitea:gitea $PKG/var/lib/gitea
-chmod 750 $PKG${GITEA_WORK_DIR}/{data,indexers,log}
+mkdir -p $PKG${FORGEJO_WORK_DIR}/{custom,data/forgejo-repositories,indexers,public,log,.ssh}
+chown -R forgejo:forgejo $PKG/var/lib/forgejo
+chmod 750 $PKG${FORGEJO_WORK_DIR}/{data,indexers,log}
 
-mkdir -p $PKG/var/log/gitea
-chown -R gitea:gitea $PKG/var/log/gitea
+mkdir -p $PKG/var/log/forgejo
+chown -R forgejo:forgejo $PKG/var/log/forgejo
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
@@ -70,50 +70,31 @@ cat <<EOF > $PKG/etc/rc.d/rc.$PRGNAM
 NAME="Forgejo Daemon"
 
 # Command to run
-CMD="/usr/bin/gitea"
+CMD="/usr/bin/forgejo"
 
 # user used to run the daemon
-USERNAME=gitea
-
-# Process name of daemon, for killing it.
-PROCESSNAME=\$CMD
+USERNAME=forgejo
 
 # Option to run with deamon
-OPTIONS=" --config /etc/gitea/app.ini"
+OPTIONS=" --config /etc/forgejo/app.ini"
 
-PIDFILE=/var/lib/gitea/gitea.pid
+func_status() {
+    pgrep -u \$USERNAME forgejo && echo Running || echo Stopped
+}
 
 func_stop() {
-    [ -e \$PIDFILE ] && kill \$(cat \$PIDFILE)
-    rm \$PIDFILE
+    pkill -u \$USERNAME forgejo
 
-    if [ ! "\$(pgrep gitea)" ]; then
-        echo "Error!"
-    else
-        echo "Stopped!"
-    fi
+    func_status
 }
 
 func_start() {
     echo -n "Starting \$NAME ... "
     su - \$USERNAME -c "\$CMD \$OPTIONS" &
-    echo \$\$ > \$PIDFILE
 
     sleep 2
 
-    if [ "\$(pgrep gitea)" ]; then
-        echo "Started!"
-    else
-        echo "Error!"
-    fi
-}
-
-func_status() {
-    if [ "\$(pgrep gitea)" ]; then
-        echo "Running!"
-    else
-        echo "NOT running!"
-    fi
+    func_status
 }
 
 
@@ -158,7 +139,7 @@ $PRGNAM:
 $PRGNAM: Forgejo is a self-hosted lightweight software forge.
 $PRGNAM: Easy to install and low maintenance, it just does the job.
 $PRGNAM:
-$PRGNAM: edit /etc/gitea/app.ini
+$PRGNAM: edit /etc/forgejo/app.ini
 $PRGNAM: see https://forgejo.org/docs/latest/admin/config-cheat-sheet/
 $PRGNAM:
 $PRGNAM:

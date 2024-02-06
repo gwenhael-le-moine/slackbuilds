@@ -4,7 +4,7 @@
 #GITHUB_REPO=leonardolang/rkvm
 GITHUB_REPO=htrefil/rkvm
 VERSION=${VERSION:-latest}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -32,7 +32,7 @@ git pull --all
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
@@ -41,11 +41,11 @@ cargo build --release
 mkdir -p $PKG$PREFIX/bin
 find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
-(cd $PKG$PREFIX/bin/
- for i in *; do
-     mv $i rkvm-$i;
- done
-)
+# (cd $PKG$PREFIX/bin/
+#  for i in *; do
+#      mv $i rkvm-$i;
+#  done
+# )
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
