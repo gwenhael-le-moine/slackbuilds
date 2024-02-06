@@ -91,11 +91,14 @@ fi
 
 echo "Downloading necessary data to /tmp/"
 curl -s https://www.nongnu.org/eliot/download/letters.txt > /tmp/letters.txt
+echo -n "."
 
 echo > /tmp/ods9.txt
 for i in \$(seq 2 15); do
     curl -s https://raw.githubusercontent.com/patquoi/RadStudio/master/Duplicata/ods9/bin/ods9/\$i.txt >> /tmp/ods9.txt
+    echo -n "."
 done
+echo
 
 echo "Generating dictionary…"
 /usr/bin/compdic -d 'ODS 9.0' -l /tmp/letters.txt -i /tmp/ods9.txt -o /tmp/ods9.dawg
