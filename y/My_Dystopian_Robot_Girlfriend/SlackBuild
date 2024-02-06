@@ -8,7 +8,7 @@ TMP=/tmp/$TAG
 PRGNAM=$(basename $CWD)
 VERSION=${VERSION:-$(echo MDRG*.zip | grep -o "[0-9.]*" | head -n1)}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-11}
+BUILD=${BUILD:-12}
 
 PKG=$TMP/pkg-$PRGNAM
 
@@ -20,8 +20,8 @@ mkdir -p $TMP
 cd $TMP
 
 mkdir -p $PKG/opt/
-unzip -d $PKG/opt/ $CWD/MDRG$VERSION\ -\ Linux.zip
-mv $PKG/opt/MDRG$VERSION\ -\ Linux $PKG/opt/$PRGNAM
+unzip -d $PKG/opt/$PRGNAM/ $CWD/MDRG$VERSION\ -\ Linux.zip
+#mv $PKG/opt/MDRG$VERSION\ -\ Linux $PKG/opt/$PRGNAM
 
 chmod +x $PKG/opt/$PRGNAM/My\ Dystopian\ Robot\ Girlfriend.x86_64
 mkdir -p $PKG/opt/$PRGNAM/My\ Dystopian\ Robot\ Girlfriend_Data/Saves/
