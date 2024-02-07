@@ -34,7 +34,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-5}
+BUILD=${BUILD:-6}
 TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -55,6 +55,8 @@ if [ -z "$ARCH" ]; then
 fi
 
 VERSION=${VERSION:-latest}
+VARIANT=${VARIANT:-pgtk}        # pgtk or x11
+
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
 rm -rf "$PKG"
@@ -144,8 +146,8 @@ PATH=$(echo "$PATH" | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g
 PDUMPER=${PDUMPER:-"--with-pdumper=yes --with-dumping=pdumper"}
 
 GWH_OPTIONS="--with-tree-sitter \
-      --enable-link-time-optimization \
-      --with-native-compilation=aot"
+  --enable-link-time-optimization \
+  --with-native-compilation=aot"
 
 CONFIGURE_OPTIONS="--prefix=/usr \
   --sysconfdir=/etc \
@@ -163,56 +165,37 @@ CONFIGURE_OPTIONS="--prefix=/usr \
   --build=${ARCH}-slackware-linux"
 
 ###############
-# X11 variant #
+# GUI variant #
 ###############
-if [[ ! -v DISABLE_X11 ]]; then
+if [[ ! -v DISABLE_GUI ]]; then
   setup_sources
+
+  X11_OPTIONS="--with-x \
+  --with-x-toolkit=${X_TOOLKIT:-gtk3}"
+  PGTK_OPTIONS="--with-pgtk"
+
+  case $VARIANT in
+      pgtk)
+          GUI_OPTIONS=$PGTK_OPTIONS
+          ;;
+      x11)
+          GUI_OPTIONS=$X11_OPTIONS
+          ;;
+  esac
 
   CFLAGS="$SLKCFLAGS" \
         CXXFLAGS="$SLKCFLAGS" \
         ./configure \
         $CONFIGURE_OPTIONS \
-        --with-x \
-        --with-x-toolkit="${X_TOOLKIT:-gtk3}" || exit 1
+        $GUI_OPTIONS || exit 1
 
   make $NUMJOBS || make || exit 1
   make install DESTDIR="$PKG" || exit 1
 
   ( cd "$PKG/usr/bin" || exit 1
     rm emacs
-    mv "emacs-$VERSION" "emacs-$VERSION-with-x11"
-    ln -sf "emacs-$VERSION-with-x11" emacs-with-x11
-
-    # Create a plain "emacs" symlink pointing to emacs-with-x11:
-    ln -sf emacs-with-x11 emacs
-  )
-fi
-
-# Also add a version of the binary that is pure GTK:
-if [[ ! -v DISABLE_PGTK ]]; then
-  setup_sources
-
-  CFLAGS="$SLKCFLAGS" \
-        CXXFLAGS="$SLKCFLAGS" \
-        ./configure \
-        $CONFIGURE_OPTIONS \
-        --with-pgtk || exit 1
-
-  make $NUMJOBS || make || exit 1
-  if [[ -v DISABLE_X11 ]]; then
-    make install DESTDIR="$PKG" || exit 1
-  fi
-
-  # Install the pure gtk version:
-  cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
-  chown root:root "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
-  chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
-
-  # Create unversioned symlinks for all versions of emacs:
-  ( cd "$PKG/usr/bin" || exit 1
-    ln -sf "emacs-${VERSION}-with-pgtk" emacs-with-pgtk
-
-    [[ -v DISABLE_X11 ]] && ln -sf emacs-with-pgtk emacs
+    mv "emacs-$VERSION" "emacs-$VERSION"
+    ln -sf "emacs-$VERSION" emacs
   )
 fi
 
@@ -227,7 +210,7 @@ if [[ ! -v DISABLE_NOX11 ]]; then
         --with-x=no || exit 1
 
   make $NUMJOBS || make || exit 1
-  if [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]]; then
+  if [[ -v DISABLE_GUI ]]; then
   make install DESTDIR="$PKG" || exit 1
   fi
 
@@ -240,7 +223,7 @@ if [[ ! -v DISABLE_NOX11 ]]; then
   ( cd "$PKG/usr/bin" || exit 1
     ln -sf "emacs-$VERSION-no-x11" emacs-no-x11
 
-    [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]] && ln -sf emacs-no-x11 emacs
+    [[ -v DISABLE_GUI ]] && -sf emacs-no-x11 emacs
   )
 fi
 
@@ -323,4 +306,4 @@ fi
 EOF
 
 cd "$PKG" || exit 1
-/sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-${VERSION}_$VARIANT-$ARCH-$BUILD$TAG.txz"
