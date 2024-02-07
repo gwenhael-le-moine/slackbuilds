@@ -25,11 +25,16 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael@le-moine.org>
 
+if [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]] && [[ -v DISABLE_NOX11 ]]; then
+  echo "You cannot disable all 3 variants"
+  exit 1
+fi
+
 cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-4}
+BUILD=${BUILD:-5}
 TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -73,6 +78,7 @@ case $VERSION in
     latest)
         VERSION=$(git tag --sort=-taggerdate | head -n1)
         git checkout "$VERSION"
+        VERSION=$(echo $VERSION | sed 's|^emacs-||')
         ;;
     *)
         git checkout "emacs-$VERSION"
@@ -159,7 +165,7 @@ CONFIGURE_OPTIONS="--prefix=/usr \
 ###############
 # X11 variant #
 ###############
-if [[ ! -v NO_X11 ]]; then
+if [[ ! -v DISABLE_X11 ]]; then
   setup_sources
 
   CFLAGS="$SLKCFLAGS" \
@@ -169,7 +175,7 @@ if [[ ! -v NO_X11 ]]; then
         --with-x \
         --with-x-toolkit="${X_TOOLKIT:-gtk3}" || exit 1
 
-  make "$NUMJOBS" || make || exit 1
+  make $NUMJOBS || make || exit 1
   make install DESTDIR="$PKG" || exit 1
 
   ( cd "$PKG/usr/bin" || exit 1
@@ -183,7 +189,7 @@ if [[ ! -v NO_X11 ]]; then
 fi
 
 # Also add a version of the binary that is pure GTK:
-if [[ ! -v NO_PGTK ]]; then
+if [[ ! -v DISABLE_PGTK ]]; then
   setup_sources
 
   CFLAGS="$SLKCFLAGS" \
@@ -192,7 +198,10 @@ if [[ ! -v NO_PGTK ]]; then
         $CONFIGURE_OPTIONS \
         --with-pgtk || exit 1
 
-  make "$NUMJOBS" || make || exit 1
+  make $NUMJOBS || make || exit 1
+  if [[ -v DISABLE_X11 ]]; then
+    make install DESTDIR="$PKG" || exit 1
+  fi
 
   # Install the pure gtk version:
   cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
@@ -203,32 +212,37 @@ if [[ ! -v NO_PGTK ]]; then
   ( cd "$PKG/usr/bin" || exit 1
     ln -sf "emacs-${VERSION}-with-pgtk" emacs-with-pgtk
 
-    [[ -v NO_X11 ]] && ln -sf emacs-with-pgtk emacs
+    [[ -v DISABLE_X11 ]] && ln -sf emacs-with-pgtk emacs
   )
 fi
 
 # Also add a version of the binary that is not linked to X11:
-setup_sources
+if [[ ! -v DISABLE_NOX11 ]]; then
+  setup_sources
 
-CFLAGS="$SLKCFLAGS" \
-      CXXFLAGS="$SLKCFLAGS" \
-      ./configure \
-      $CONFIGURE_OPTIONS \
-      --with-x=no || exit 1
+  CFLAGS="$SLKCFLAGS" \
+        CXXFLAGS="$SLKCFLAGS" \
+        ./configure \
+        $CONFIGURE_OPTIONS \
+        --with-x=no || exit 1
 
-make "$NUMJOBS" || make || exit 1
+  make $NUMJOBS || make || exit 1
+  if [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]]; then
+  make install DESTDIR="$PKG" || exit 1
+  fi
 
-# Install the non-x version:
-cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-no-x11"
-chown root:root "$PKG/usr/bin/emacs-${VERSION}-no-x11"
-chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-no-x11"
+  # Install the non-x version:
+  cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-no-x11"
+  chown root:root "$PKG/usr/bin/emacs-${VERSION}-no-x11"
+  chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-no-x11"
 
-# Create unversioned symlinks for all versions of emacs:
-( cd "$PKG/usr/bin" || exit 1
-  ln -sf "emacs-$VERSION-no-x11" emacs-no-x11
+  # Create unversioned symlinks for all versions of emacs:
+  ( cd "$PKG/usr/bin" || exit 1
+    ln -sf "emacs-$VERSION-no-x11" emacs-no-x11
 
-  [[ -v NO_X11 ]] && [[ -v NO_PGTK ]] && ln -sf emacs-no-x11 emacs
-)
+    [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]] && ln -sf emacs-no-x11 emacs
+  )
+fi
 
 # Seems like this nonsense is finally obsolete:
 if [ -d "$PKG/var/games/emacs" ]; then
