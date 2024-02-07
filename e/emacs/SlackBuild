@@ -156,36 +156,65 @@ CONFIGURE_OPTIONS="--prefix=/usr \
   $GWH_OPTIONS \
   --build=${ARCH}-slackware-linux"
 
-#Build default version that is linked to X11
-setup_sources
+###############
+# X11 variant #
+###############
+if [[ ! -v NO_X11 ]]; then
+  setup_sources
 
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-./configure \
-  $CONFIGURE_OPTIONS \
-  --with-x \
-  --with-x-toolkit="${X_TOOLKIT:-gtk3}" || exit 1
+  CFLAGS="$SLKCFLAGS" \
+        CXXFLAGS="$SLKCFLAGS" \
+        ./configure \
+        $CONFIGURE_OPTIONS \
+        --with-x \
+        --with-x-toolkit="${X_TOOLKIT:-gtk3}" || exit 1
 
-make "$NUMJOBS" || make || exit 1
-make install DESTDIR="$PKG" || exit 1
+  make "$NUMJOBS" || make || exit 1
+  make install DESTDIR="$PKG" || exit 1
 
-( cd "$PKG/usr/bin" || exit 1
-  rm emacs
-  mv "emacs-$VERSION" "emacs-$VERSION-with-x11"
-  ln -sf "emacs-$VERSION-with-x11" emacs-with-x11
+  ( cd "$PKG/usr/bin" || exit 1
+    rm emacs
+    mv "emacs-$VERSION" "emacs-$VERSION-with-x11"
+    ln -sf "emacs-$VERSION-with-x11" emacs-with-x11
 
-  # Create a plain "emacs" symlink pointing to emacs-with-x11:
-  ln -sf emacs-with-x11 emacs
-)
+    # Create a plain "emacs" symlink pointing to emacs-with-x11:
+    ln -sf emacs-with-x11 emacs
+  )
+fi
+
+# Also add a version of the binary that is pure GTK:
+if [[ ! -v NO_PGTK ]]; then
+  setup_sources
+
+  CFLAGS="$SLKCFLAGS" \
+        CXXFLAGS="$SLKCFLAGS" \
+        ./configure \
+        $CONFIGURE_OPTIONS \
+        --with-pgtk || exit 1
+
+  make "$NUMJOBS" || make || exit 1
+
+  # Install the pure gtk version:
+  cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
+  chown root:root "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
+  chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
+
+  # Create unversioned symlinks for all versions of emacs:
+  ( cd "$PKG/usr/bin" || exit 1
+    ln -sf "emacs-${VERSION}-with-pgtk" emacs-with-pgtk
+
+    [[ -v NO_X11 ]] && ln -sf emacs-with-pgtk emacs
+  )
+fi
 
 # Also add a version of the binary that is not linked to X11:
 setup_sources
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-./configure \
-  $CONFIGURE_OPTIONS \
-  --with-x=no || exit 1
+      CXXFLAGS="$SLKCFLAGS" \
+      ./configure \
+      $CONFIGURE_OPTIONS \
+      --with-x=no || exit 1
 
 make "$NUMJOBS" || make || exit 1
 
@@ -197,27 +226,8 @@ chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-no-x11"
 # Create unversioned symlinks for all versions of emacs:
 ( cd "$PKG/usr/bin" || exit 1
   ln -sf "emacs-$VERSION-no-x11" emacs-no-x11
-)
 
-# Also add a version of the binary that is pure GTK:
-setup_sources
-
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-./configure \
-  $CONFIGURE_OPTIONS \
-  --with-pgtk || exit 1
-
-make "$NUMJOBS" || make || exit 1
-
-# Install the pure gtk version:
-cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
-chown root:root "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
-chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
-
-# Create unversioned symlinks for all versions of emacs:
-( cd "$PKG/usr/bin" || exit 1
-  ln -sf "emacs-${VERSION}-with-pgtk" emacs-with-pgtk
+  [[ -v NO_X11 ]] && [[ -v NO_PGTK ]] && ln -sf emacs-no-x11 emacs
 )
 
 # Seems like this nonsense is finally obsolete:
@@ -297,11 +307,6 @@ if [ ! -e usr/bin/ctags ]; then
   cp -a usr/man/man1/ctags-emacs.1.gz usr/man/man1/ctags.1.gz
 fi
 EOF
-
-# # Tag packages that use a toolkit other than default (currently gtk3):
-# if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
-#   TAG="_$X_TOOLKIT"
-# fi
 
 cd "$PKG" || exit 1
 /sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
