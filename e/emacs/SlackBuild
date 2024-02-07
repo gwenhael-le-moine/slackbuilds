@@ -25,26 +25,15 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael@le-moine.org>
 
-cd $(dirname $0) ; CWD=$(pwd)
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-3}
-TAG=gwh
+BUILD=${BUILD:-4}
+TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 
-# Determine version number the tarball is labeled with:
-TARBALLVER=${TARBALLVER:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-# OK, now what's being used as the source directory version number...  account
-# for subversions a, b, c, and d in the $TARBALLVER:
-SRCDIRVER=$(echo $TARBALLVER | tr -d a | tr -d b | tr -d c | tr -d d)
-# I guess this is the main "version"...  we don't use this variable anywhere below, but
-# defining it is traditional:
-VERSION=$SRCDIRVER
-
-# Don't use icecream:
-PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
-
-NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
+NUMJOBS=${NUMJOBS:-" -j$(( $(nproc) + 1 )) "}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PKGNAM
@@ -60,11 +49,68 @@ if [ -z "$ARCH" ]; then
   export ARCH
 fi
 
+VERSION=${VERSION:-latest}
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+
+[ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
+
+cd "$REPOSITORY" || exit 1
+git reset --hard HEAD
+git pull --all
+
+git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
+
+cp -R "$REPOSITORY" "$TMP/${PKGNAM}.ready"
+cd "$TMP/${PKGNAM}.ready" || exit 1
+
+case $VERSION in
+    trunk)
+        VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION=$(git tag --sort=-taggerdate | head -n1)
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "emacs-$VERSION"
+        ;;
+esac
+
+# # Determine version number the tarball is labeled with:
+# VERSION=${VERSION:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+
+setup_sources() {
+    cd "$TMP" || exit 1
+    rm -rf $PKGNAM
+    # tar xvf "$CWD/$PKGNAM-$VERSION.tar.xz" || exit 1
+    # mv "$PKGNAM-$VERSION" $PKGNAM
+    cp -a "$TMP/${PKGNAM}.ready" $PKGNAM
+    cd $PKGNAM || exit 1
+
+    chown -R root:root .
+    find . \
+         \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+         -exec chmod 755 {} \+ -o \
+         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+         -exec chmod 644 {} \+
+
+    # The defaults are a little too worried about adding a few more K of pure
+    # memory given the amount available on modern systems:
+    sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
+
+    [ -e Makefile ] && make distclean
+    ./autogen.sh
+
+    ( cd lisp || exit 1
+      make autoloads
+    )
+}
+
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
 # could be useful to other scripts.
-if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
-  echo "$PKGNAM-$TARBALLVER-$ARCH-$BUILD.txz"
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+  echo "$PKGNAM-$VERSION-$ARCH-$BUILD.txz"
   exit 0
 fi
 
@@ -82,6 +128,9 @@ else
   SLKCFLAGS="-O2"
 fi
 
+# Don't use icecream:
+PATH=$(echo "$PATH" | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
+
 # Without this, the emacs-no-x11 binary won't work with the installed files:
 PDUMPER=${PDUMPER:-"--with-pdumper=yes --with-dumping=pdumper"}
 
@@ -98,33 +147,16 @@ CONFIGURE_OPTIONS="--prefix=/usr \
   --infodir=/usr/info \
   --without-gconf \
   --without-gsettings \
+  --without-android \
   --with-modules \
   $PDUMPER \
   $GWH_OPTIONS \
   --build=${ARCH}-slackware-linux"
 
-rm -rf $PKG
-mkdir -p $TMP $PKG
+rm -rf "$PKG"
+mkdir -p "$TMP" "$PKG"
 
-
-setup_sources() {
-    cd $TMP
-    rm -rf $PKGNAM-$TARBALLVER
-    tar xvf $CWD/$PKGNAM-$TARBALLVER.tar.xz || exit 1
-    cd $PKGNAM-$SRCDIRVER || exit 1
-
-    chown -R root:root .
-    find . \
-         \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-         -exec chmod 755 {} \+ -o \
-         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-         -exec chmod 644 {} \+
-
-    # The defaults are a little too worried about adding a few more K of pure
-    # memory given the amount available on modern systems:
-    sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
-}
-
+#Build default version that is linked to X11
 setup_sources
 
 CFLAGS="$SLKCFLAGS" \
@@ -132,15 +164,15 @@ CXXFLAGS="$SLKCFLAGS" \
 ./configure \
   $CONFIGURE_OPTIONS \
   --with-x \
-  --with-x-toolkit=${X_TOOLKIT:-gtk3} || exit 1
+  --with-x-toolkit="${X_TOOLKIT:-gtk3}" || exit 1
 
-make $NUMJOBS || make || exit 1
-make install DESTDIR=$PKG || exit 1
+make "$NUMJOBS" || make || exit 1
+make install DESTDIR="$PKG" || exit 1
 
-( cd $PKG/usr/bin
+( cd "$PKG/usr/bin" || exit 1
   rm emacs
-  mv emacs-${SRCDIRVER} emacs-${TARBALLVER}-with-x11
-  ln -sf emacs-${TARBALLVER}-with-x11 emacs-with-x11
+  mv "emacs-$VERSION" "emacs-$VERSION-with-x11"
+  ln -sf "emacs-$VERSION-with-x11" emacs-with-x11
 
   # Create a plain "emacs" symlink pointing to emacs-with-x11:
   ln -sf emacs-with-x11 emacs
@@ -155,16 +187,16 @@ CXXFLAGS="$SLKCFLAGS" \
   $CONFIGURE_OPTIONS \
   --with-x=no || exit 1
 
-make $NUMJOBS || make || exit 1
+make "$NUMJOBS" || make || exit 1
 
 # Install the non-x version:
-cat src/emacs > $PKG/usr/bin/emacs-${TARBALLVER}-no-x11
-chown root:root $PKG/usr/bin/emacs-${TARBALLVER}-no-x11
-chmod 1755 $PKG/usr/bin/emacs-${TARBALLVER}-no-x11
+cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-no-x11"
+chown root:root "$PKG/usr/bin/emacs-${VERSION}-no-x11"
+chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-no-x11"
 
 # Create unversioned symlinks for all versions of emacs:
-( cd $PKG/usr/bin
-  ln -sf emacs-${TARBALLVER}-no-x11 emacs-no-x11
+( cd "$PKG/usr/bin" || exit 1
+  ln -sf "emacs-$VERSION-no-x11" emacs-no-x11
 )
 
 # Also add a version of the binary that is pure GTK:
@@ -176,75 +208,100 @@ CXXFLAGS="$SLKCFLAGS" \
   $CONFIGURE_OPTIONS \
   --with-pgtk || exit 1
 
-make $NUMJOBS || make || exit 1
+make "$NUMJOBS" || make || exit 1
 
 # Install the pure gtk version:
-cat src/emacs > $PKG/usr/bin/emacs-${TARBALLVER}-with-pgtk
-chown root:root $PKG/usr/bin/emacs-${TARBALLVER}-with-pgtk
-chmod 1755 $PKG/usr/bin/emacs-${TARBALLVER}-with-pgtk
+cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
+chown root:root "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
+chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-with-pgtk"
 
 # Create unversioned symlinks for all versions of emacs:
-( cd $PKG/usr/bin
-  ln -sf emacs-${TARBALLVER}-with-pgtk emacs-with-pgtk
+( cd "$PKG/usr/bin" || exit 1
+  ln -sf "emacs-${VERSION}-with-pgtk" emacs-with-pgtk
 )
 
 # Seems like this nonsense is finally obsolete:
-if [ -d $PKG/var/games/emacs ]; then
+if [ -d "$PKG/var/games/emacs" ]; then
   # I don't care for broken permissions.
-  chmod 755 $PKG/var/games/emacs
-  chown -R root:games $PKG/var/games/emacs
-  chmod 664 $PKG/var/games/emacs/*
+  chmod 755 "$PKG/var/games/emacs"
+  chown -R root:games "$PKG/var/games/emacs"
+  chmod 664 "$PKG/var/games/emacs/*"
 fi
 
 # This avoids a collision with Exuberant Ctags...
-mv $PKG/usr/bin/ctags $PKG/usr/bin/ctags-emacs
-if [ -r $PKG/usr/man/man1/ctags.1 ]; then
-  mv $PKG/usr/man/man1/ctags.1 $PKG/usr/man/man1/ctags-emacs.1
-elif [ -r $PKG/usr/man/man1/ctags.1.gz ]; then
-  mv $PKG/usr/man/man1/ctags.1.gz $PKG/usr/man/man1/ctags-emacs.1.gz
+mv "$PKG/usr/bin/ctags" "$PKG/usr/bin/ctags-emacs"
+if [ -r "$PKG/usr/man/man1/ctags.1" ]; then
+  mv "$PKG/usr/man/man1/ctags.1" "$PKG/usr/man/man1/ctags-emacs.1"
+elif [ -r "$PKG/usr/man/man1/ctags.1.gz" ]; then
+  mv "$PKG/usr/man/man1/ctags.1.gz" "$PKG/usr/man/man1/ctags-emacs.1.gz"
 fi
 
-find $PKG | xargs file | grep -e "executable" -e "shared object" \
+find -0 "$PKG" | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-( cd $PKG/usr/man
+( cd "$PKG/usr/man" || exit 1
   find . -type f -exec gzip -9 {} \+
   for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 )
 
-( cd $PKG/usr/info
+( cd "$PKG/usr/info" || exit 1
   rm -f dir
-  gzip -9 *
+  gzip -9 ./*
 )
 
-mkdir -p $PKG/usr/doc/$PKGNAM-$TARBALLVER
+mkdir -p "$PKG/usr/doc/$PKGNAM"
 cp -a \
   AUTHORS* COPYING* INSTALL* README* \
-  $PKG/usr/doc/$PKGNAM-$TARBALLVER
+  "$PKG/usr/doc/$PKGNAM"
 
 # Link the latest NEWS file:
-( cd $PKG/usr/doc/$PKGNAM-$TARBALLVER
-  if [ -r $PKG/usr/share/emacs/$SRCDIRVER/etc/NEWS ]; then
-    ln -sf /usr/share/emacs/$SRCDIRVER/etc/NEWS .
+( cd "$PKG/usr/doc/$PKGNAM" || exit 1
+  if [ -r "$PKG/usr/share/emacs/$VERSION/etc/NEWS" ]; then
+    ln -sf "/usr/share/emacs/$VERSION/etc/NEWS" .
   fi
 )
 
 # If there's a ChangeLog, installing at least part of the recent history
 # is useful, but don't let it get totally out of control:
 if [ -r ChangeLog ]; then
-  DOCSDIR=$(echo $PKG/usr/doc/${PKGNAM}-$TARBALLVER)
-  cat ChangeLog | head -n 1000 > $DOCSDIR/ChangeLog
-  touch -r ChangeLog $DOCSDIR/ChangeLog
+  DOCSDIR="$PKG/usr/doc/${PKGNAM}"
+  cat ChangeLog | head -n 1000 > "$DOCSDIR/ChangeLog"
+  touch -r ChangeLog "$DOCSDIR/ChangeLog"
 fi
 
-mkdir -p $PKG/install
-cat $CWD/slack-desc > $PKG/install/slack-desc
-zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
+     |-----handy-ruler------------------------------------------------------|
+emacs: emacs (GNU Emacs)
+emacs:
+emacs: Emacs is the extensible, customizable, self-documenting real-time
+emacs: display editor. If this seems to be a bit of a mouthful, an
+emacs: easier explanation is that Emacs is a text editor and more. At
+emacs: its core is an interpreter for Emacs Lisp, a dialect of the Lisp
+emacs: programming language with extensions to support text editing.
+emacs: This version supports X.
+emacs:
+emacs: Homepage: http://www.gnu.org/software/emacs/
+emacs:
+EOF
 
-# Tag packages that use a toolkit other than default (currently gtk3):
-if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
-  TAG="_$X_TOOLKIT"
+cat <<EOF > "$PKG/install/doinst.sh"
+# Vim ships a better (IMHO) version of ctags, and we don't want
+# to overwrite it with this one.  If you really want emacs' ctags
+# either copy or link it into place yourself, or remove the vim
+# packages and reinstall emacs.  Besides, does anyone know/use
+# *both* emacs and vi?  I'd think that would bring the universe
+# to an end.  ;-)
+if [ ! -e usr/bin/ctags ]; then
+  cp -a usr/bin/ctags-emacs usr/bin/ctags
+  cp -a usr/man/man1/ctags-emacs.1.gz usr/man/man1/ctags.1.gz
 fi
+EOF
 
-cd $PKG
-/sbin/makepkg -l y -c n $OUTPUT/$PKGNAM-$TARBALLVER-$ARCH-$BUILD$TAG.txz
+# # Tag packages that use a toolkit other than default (currently gtk3):
+# if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
+#   TAG="_$X_TOOLKIT"
+# fi
+
+cd "$PKG" || exit 1
+/sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"

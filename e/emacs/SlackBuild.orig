@@ -30,11 +30,20 @@ cd $(dirname $0) ; CWD=$(pwd)
 PKGNAM=emacs
 BUILD=${BUILD:-10}
 TAG=gwh
+OUTPUT=${OUTPUT:-/tmp}
 
 VERSION=${VERSION:-"latest"}
 PREFIX=${PREFIX:-/usr}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+
+# Don't use icecream:
+PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
+
+NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PKGNAM
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
@@ -69,15 +78,6 @@ else
   SLKCFLAGS="-O2"
 fi
 
-# Don't use icecream:
-PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
-
-NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
-
-TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/pkg-$PKGNAM
-OUTPUT=${OUTPUT:-/tmp}
-
 rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
@@ -108,7 +108,6 @@ case $VERSION in
         git checkout "$VERSION"
         ;;
     *)
-        VERSION=$VERSION
         git checkout "emacs-$VERSION"
         ;;
 esac
