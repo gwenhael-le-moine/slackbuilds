@@ -52,6 +52,9 @@ fi
 VERSION=${VERSION:-latest}
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
+rm -rf "$PKG"
+mkdir -p "$TMP" "$PKG"
+
 [ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
 cd "$REPOSITORY" || exit 1
@@ -152,9 +155,6 @@ CONFIGURE_OPTIONS="--prefix=/usr \
   $PDUMPER \
   $GWH_OPTIONS \
   --build=${ARCH}-slackware-linux"
-
-rm -rf "$PKG"
-mkdir -p "$TMP" "$PKG"
 
 #Build default version that is linked to X11
 setup_sources
