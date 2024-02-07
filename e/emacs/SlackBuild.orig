@@ -1,0 +1,254 @@
+#!/bin/bash
+
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2018, 2019, 2020  Patrick J. Volkerding, Sebeka, MN, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Written by Dušan Stefanović (stefanovic.dusan@gmail.com)
+# Modified by Robby Workman <rworkman@slackbuilds.org>
+# Modified by Patrick Volkerding <volkerdi@slackware.com>
+# Modified by Gwenhael Le Moine <gwenhael@le-moine.org>
+
+cd $(dirname $0) ; CWD=$(pwd)
+
+PKGNAM=emacs
+BUILD=${BUILD:-10}
+TAG=gwh
+
+VERSION=${VERSION:-"latest"}
+PREFIX=${PREFIX:-/usr}
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+
+# Automatically determine the architecture we're building on:
+if [ -z "$ARCH" ]; then
+  case "$(uname -m)" in
+    i?86) ARCH=i586 ;;
+    arm*) readelf /usr/bin/file -A | grep -E -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7hl ;;
+    # Unless $ARCH is already set, use uname -m for all other archs:
+    *) ARCH=$(uname -m) ;;
+  esac
+  export ARCH
+fi
+
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+  echo "$PKGNAM-$TARBALLVER-$ARCH-$BUILD.txz"
+  exit 0
+fi
+
+if [ "$ARCH" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+elif [ "$ARCH" = "armv7hl" ]; then
+  SLKCFLAGS="-O2 -march=armv7-a -mfpu=vfpv3-d16"
+else
+  SLKCFLAGS="-O2"
+fi
+
+# Don't use icecream:
+PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
+
+NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PKGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+rm -rf $PKGNAM
+
+[ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
+
+cd $REPOSITORY
+git reset --hard HEAD
+git pull --all
+
+git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
+
+[ -e Makefile ] && make distclean
+./autogen.sh
+
+rm lisp/loaddefs.el             # https://lists.gnu.org/r/emacs-devel/2021-04/msg01430.html
+
+cp -R $REPOSITORY $TMP/$PKGNAM
+cd $TMP/$PKGNAM || exit 1
+
+case $VERSION in
+    trunk)
+        VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION=$(git tag --sort=-taggerdate | head -n1)
+        git checkout "$VERSION"
+        ;;
+    *)
+        VERSION=$VERSION
+        git checkout "emacs-$VERSION"
+        ;;
+esac
+
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
+
+SRCDIR=.
+EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
+
+CONFIGURE_OPTIONS="--prefix=${PREFIX} \
+      --libdir=${PREFIX}/lib$(uname -m | grep -o 64 ) \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --program-prefix="" \
+      --program-suffix="" \
+      --mandir=${PREFIX}/man \
+      --infodir=${PREFIX}/info \
+      --without-gconf \
+      --without-gsettings \
+      --with-modules \
+      --with-dbus \
+      --with-gif \
+      --with-jpeg \
+      --with-png \
+      --with-rsvg \
+      --with-tiff \
+      --with-xft \
+      --with-xpm \
+      --with-gpm=yes \
+      --with-tree-sitter \
+      --enable-link-time-optimization \
+      --with-native-compilation=aot \
+      --with-json \
+      --with-compress-install \
+      --without-gconf \
+      --with-gameuser=":games" \
+      --build=${ARCH}-slackware-linux"
+      # --disable-libsystemd \
+      # --with-xinput \
+      # --with-xwidgets \
+
+CFLAGS="$SLKCFLAGS" \
+      CXXFLAGS="$SLKCFLAGS" \
+      $SRCDIR/configure \
+      $CONFIGURE_OPTIONS \
+      --with-pgtk || exit 1
+
+make bootstrap $NUMJOBS || exit 1
+make $NUMJOBS || make || exit 1
+make install DESTDIR=$PKG || exit 1
+
+# mv $PKG${PREFIX}/bin/emacs-${EMACS_VERSION} $PKG${PREFIX}/bin/emacs-pgtk
+( cd $PKG${PREFIX}/bin/
+  ln -s emacs-pgtk emacs-${EMACS_VERSION}
+)
+
+CFLAGS="$SLKCFLAGS" \
+      CXXFLAGS="$SLKCFLAGS" \
+      $SRCDIR/configure \
+      $CONFIGURE_OPTIONS \
+      --with-x \
+      --with-x-toolkit=${X_TOOLKIT:-gtk3} \
+      --without-toolkit-scroll-bars || exit 1
+
+# make bootstrap $NUMJOBS || exit 1
+make $NUMJOBS || make || exit 1
+
+cat src/emacs > $PKG${PREFIX}/bin/emacs-${EMACS_VERSION}-x11
+chmod 1755 $PKG${PREFIX}/bin/emacs-${EMACS_VERSION}-x11
+( cd $PKG${PREFIX}/bin/
+  ln -s emacs-x11 emacs-${EMACS_VERSION}-x11
+)
+
+# Seems like this nonsense is finally obsolete:
+if [ -d $PKG/var/games/emacs ]; then
+  # I don't care for broken permissions.
+  chmod 755 $PKG/var/games/emacs
+  chown -R root:games $PKG/var/games/emacs
+  chmod 664 $PKG/var/games/emacs/*
+fi
+
+# This avoids a collision with Exuberant Ctags...
+mv $PKG${PREFIX}/bin/ctags $PKG${PREFIX}/bin/ctags-emacs
+if [ -r $PKG${PREFIX}/man/man1/ctags.1 ]; then
+  mv $PKG${PREFIX}/man/man1/ctags.1 $PKG${PREFIX}/man/man1/ctags-emacs.1
+elif [ -r $PKG${PREFIX}/man/man1/ctags.1.gz ]; then
+  mv $PKG${PREFIX}/man/man1/ctags.1.gz $PKG${PREFIX}/man/man1/ctags-emacs.1.gz
+fi
+
+
+
+# gwh: 2022-12-06
+# tree-sitter grammars
+git clone https://github.com/casouri/tree-sitter-module
+cd tree-sitter-module
+sed -i 's|cc -c -I. parser.c|cc -fPIC -c -I. parser.c|' build.sh
+bash ./batch.sh
+cp dist/*.so "$PKG${PREFIX}/lib$(uname -m | grep -o 64)/"
+cd ..
+
+
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" \
+  | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+find $PKG${PREFIX}/man/ -type f -exec gzip -9 {} \+
+( cd $PKG${PREFIX}/man
+  for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
+)
+
+rm -f $PKG${PREFIX}/info/dir
+gzip -9 $PKG${PREFIX}/info/*
+
+
+mkdir -p $PKG${PREFIX}/doc/$PKGNAM-$EMACS_VERSION
+cp -a \
+  AUTHORS COPYING* INSTALL README* \
+  $PKG${PREFIX}/doc/$PKGNAM-$EMACS_VERSION
+
+# If there's a ChangeLog, installing at least part of the recent history
+# is useful, but don't let it get totally out of control:
+if [ -r ChangeLog ]; then
+  DOCSDIR=$(echo $PKG${PREFIX}/doc/${PKGNAM}-$EMACS_VERSION)
+  cat ChangeLog | head -n 1000 > $DOCSDIR/ChangeLog
+  touch -r ChangeLog $DOCSDIR/ChangeLog
+fi
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+
+# Tag packages that use a toolkit other than default (currently gtk3):
+if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
+  TAG="_$X_TOOLKIT"
+fi
+
+cd $PKG
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PKGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz

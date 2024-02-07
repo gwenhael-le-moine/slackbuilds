@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2018, 2019, 2020  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2018, 2019, 2020, 2021, 2023  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -28,12 +28,26 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-10}
+BUILD=${BUILD:-3}
 TAG=gwh
+OUTPUT=${OUTPUT:-/tmp}
 
-VERSION=${VERSION:-"latest"}
+# Determine version number the tarball is labeled with:
+TARBALLVER=${TARBALLVER:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+# OK, now what's being used as the source directory version number...  account
+# for subversions a, b, c, and d in the $TARBALLVER:
+SRCDIRVER=$(echo $TARBALLVER | tr -d a | tr -d b | tr -d c | tr -d d)
+# I guess this is the main "version"...  we don't use this variable anywhere below, but
+# defining it is traditional:
+VERSION=$SRCDIRVER
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+# Don't use icecream:
+PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
+
+NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/package-$PKGNAM
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
@@ -49,7 +63,7 @@ fi
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
 # could be useful to other scripts.
-if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
   echo "$PKGNAM-$TARBALLVER-$ARCH-$BUILD.txz"
   exit 0
 fi
@@ -68,122 +82,110 @@ else
   SLKCFLAGS="-O2"
 fi
 
-# Don't use icecream:
-PATH=$(echo $PATH | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
+# Without this, the emacs-no-x11 binary won't work with the installed files:
+PDUMPER=${PDUMPER:-"--with-pdumper=yes --with-dumping=pdumper"}
 
-NUMJOBS=${NUMJOBS:-" -j$(expr $(nproc) + 1) "}
+GWH_OPTIONS="--with-tree-sitter \
+      --enable-link-time-optimization \
+      --with-native-compilation=aot"
 
-TMP=${TMP:-/tmp/$TAG}
-PKG=$TMP/pkg-$PKGNAM
-OUTPUT=${OUTPUT:-/tmp}
+CONFIGURE_OPTIONS="--prefix=/usr \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --program-prefix="" \
+  --program-suffix="" \
+  --mandir=/usr/man \
+  --infodir=/usr/info \
+  --without-gconf \
+  --without-gsettings \
+  --with-modules \
+  $PDUMPER \
+  $GWH_OPTIONS \
+  --build=${ARCH}-slackware-linux"
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
-cd $TMP
-rm -rf $PKGNAM
 
-[ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
-cd $REPOSITORY
-git reset --hard HEAD
-git pull --all
+setup_sources() {
+    cd $TMP
+    rm -rf $PKGNAM-$TARBALLVER
+    tar xvf $CWD/$PKGNAM-$TARBALLVER.tar.xz || exit 1
+    cd $PKGNAM-$SRCDIRVER || exit 1
 
-git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
+    chown -R root:root .
+    find . \
+         \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+         -exec chmod 755 {} \+ -o \
+         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+         -exec chmod 644 {} \+
 
-[ -e Makefile ] && make distclean
-./autogen.sh
+    # The defaults are a little too worried about adding a few more K of pure
+    # memory given the amount available on modern systems:
+    sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
+}
 
-rm lisp/loaddefs.el             # https://lists.gnu.org/r/emacs-devel/2021-04/msg01430.html
-
-cp -R $REPOSITORY $TMP/$PKGNAM
-cd $TMP/$PKGNAM || exit 1
-
-case $VERSION in
-    trunk)
-        VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
-        ;;
-    latest)
-        VERSION=$(git tag --sort=-taggerdate | head -n1)
-        git checkout "$VERSION"
-        ;;
-    *)
-        VERSION=$VERSION
-        git checkout "emacs-$VERSION"
-        ;;
-esac
-
-chown -R root:root .
-find . \
-  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-  -exec chmod 755 {} \+ -o \
-  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-  -exec chmod 644 {} \+
-
-SRCDIR=.
-EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," $SRCDIR/configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
-
-CONFIGURE_OPTIONS="--prefix=/usr \
-      --libdir=/usr/lib$(uname -m | grep -o 64 ) \
-      --sysconfdir=/etc \
-      --localstatedir=/var \
-      --program-prefix="" \
-      --program-suffix="" \
-      --mandir=/usr/man \
-      --infodir=/usr/info \
-      --without-gconf \
-      --without-gsettings \
-      --with-modules \
-      --with-dbus \
-      --with-gif \
-      --with-jpeg \
-      --with-png \
-      --with-rsvg \
-      --with-tiff \
-      --with-xft \
-      --with-xpm \
-      --with-gpm=yes \
-      --disable-libsystemd \
-      --with-tree-sitter \
-      --enable-link-time-optimization \
-      --with-native-compilation=aot \
-      --with-json \
-      --with-xwidgets \
-      --with-xinput \
-      --with-compress-install \
-      --without-gconf \
-      --with-gameuser=":games" \
-      --build=${ARCH}-slackware-linux"
+setup_sources
 
 CFLAGS="$SLKCFLAGS" \
-      CXXFLAGS="$SLKCFLAGS" \
-      $SRCDIR/configure \
-      $CONFIGURE_OPTIONS \
-      --with-pgtk || exit 1
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  $CONFIGURE_OPTIONS \
+  --with-x \
+  --with-x-toolkit=${X_TOOLKIT:-gtk3} || exit 1
 
-make bootstrap $NUMJOBS || exit 1
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-# mv $PKG/usr/bin/emacs-${EMACS_VERSION} $PKG/usr/bin/emacs-pgtk
-( cd $PKG/usr/bin/
-  ln -s emacs-pgtk emacs-${EMACS_VERSION}
+( cd $PKG/usr/bin
+  rm emacs
+  mv emacs-${SRCDIRVER} emacs-${TARBALLVER}-with-x11
+  ln -sf emacs-${TARBALLVER}-with-x11 emacs-with-x11
+
+  # Create a plain "emacs" symlink pointing to emacs-with-x11:
+  ln -sf emacs-with-x11 emacs
 )
 
-CFLAGS="$SLKCFLAGS" \
-      CXXFLAGS="$SLKCFLAGS" \
-      $SRCDIR/configure \
-      $CONFIGURE_OPTIONS \
-      --with-x \
-      --with-x-toolkit=${X_TOOLKIT:-gtk3} \
-      --without-toolkit-scroll-bars || exit 1
+# Also add a version of the binary that is not linked to X11:
+setup_sources
 
-# make bootstrap $NUMJOBS || exit 1
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  $CONFIGURE_OPTIONS \
+  --with-x=no || exit 1
+
 make $NUMJOBS || make || exit 1
 
-cat src/emacs > $PKG/usr/bin/emacs-${EMACS_VERSION}-x11
-chmod 1755 $PKG/usr/bin/emacs-${EMACS_VERSION}-x11
-( cd $PKG/usr/bin/
-  ln -s emacs-x11 emacs-${EMACS_VERSION}-x11
+# Install the non-x version:
+cat src/emacs > $PKG/usr/bin/emacs-${TARBALLVER}-no-x11
+chown root:root $PKG/usr/bin/emacs-${TARBALLVER}-no-x11
+chmod 1755 $PKG/usr/bin/emacs-${TARBALLVER}-no-x11
+
+# Create unversioned symlinks for all versions of emacs:
+( cd $PKG/usr/bin
+  ln -sf emacs-${TARBALLVER}-no-x11 emacs-no-x11
+)
+
+# Also add a version of the binary that is pure GTK:
+setup_sources
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  $CONFIGURE_OPTIONS \
+  --with-pgtk || exit 1
+
+make $NUMJOBS || make || exit 1
+
+# Install the pure gtk version:
+cat src/emacs > $PKG/usr/bin/emacs-${TARBALLVER}-with-pgtk
+chown root:root $PKG/usr/bin/emacs-${TARBALLVER}-with-pgtk
+chmod 1755 $PKG/usr/bin/emacs-${TARBALLVER}-with-pgtk
+
+# Create unversioned symlinks for all versions of emacs:
+( cd $PKG/usr/bin
+  ln -sf emacs-${TARBALLVER}-with-pgtk emacs-with-pgtk
 )
 
 # Seems like this nonsense is finally obsolete:
@@ -202,40 +204,35 @@ elif [ -r $PKG/usr/man/man1/ctags.1.gz ]; then
   mv $PKG/usr/man/man1/ctags.1.gz $PKG/usr/man/man1/ctags-emacs.1.gz
 fi
 
-
-
-# gwh: 2022-12-06
-# tree-sitter grammars
-git clone https://github.com/casouri/tree-sitter-module
-cd tree-sitter-module
-sed -i 's|cc -c -I. parser.c|cc -fPIC -c -I. parser.c|' build.sh
-bash ./batch.sh
-cp dist/*.so "$PKG/usr/lib$(uname -m | grep -o 64)/"
-cd ..
-
-
-
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-find $PKG/usr/man/ -type f -exec gzip -9 {} \+
 ( cd $PKG/usr/man
+  find . -type f -exec gzip -9 {} \+
   for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 )
 
-rm -f $PKG/usr/info/dir
-gzip -9 $PKG/usr/info/*
+( cd $PKG/usr/info
+  rm -f dir
+  gzip -9 *
+)
 
-
-mkdir -p $PKG/usr/doc/$PKGNAM-$EMACS_VERSION
+mkdir -p $PKG/usr/doc/$PKGNAM-$TARBALLVER
 cp -a \
-  AUTHORS COPYING* INSTALL README* \
-  $PKG/usr/doc/$PKGNAM-$EMACS_VERSION
+  AUTHORS* COPYING* INSTALL* README* \
+  $PKG/usr/doc/$PKGNAM-$TARBALLVER
+
+# Link the latest NEWS file:
+( cd $PKG/usr/doc/$PKGNAM-$TARBALLVER
+  if [ -r $PKG/usr/share/emacs/$SRCDIRVER/etc/NEWS ]; then
+    ln -sf /usr/share/emacs/$SRCDIRVER/etc/NEWS .
+  fi
+)
 
 # If there's a ChangeLog, installing at least part of the recent history
 # is useful, but don't let it get totally out of control:
 if [ -r ChangeLog ]; then
-  DOCSDIR=$(echo $PKG/usr/doc/${PKGNAM}-$EMACS_VERSION)
+  DOCSDIR=$(echo $PKG/usr/doc/${PKGNAM}-$TARBALLVER)
   cat ChangeLog | head -n 1000 > $DOCSDIR/ChangeLog
   touch -r ChangeLog $DOCSDIR/ChangeLog
 fi
@@ -250,4 +247,4 @@ if [ -z "$TAG" ] && [ ! -z "$X_TOOLKIT" ]; then
 fi
 
 cd $PKG
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PKGNAM-${EMACS_VERSION}_$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg -l y -c n $OUTPUT/$PKGNAM-$TARBALLVER-$ARCH-$BUILD$TAG.txz
