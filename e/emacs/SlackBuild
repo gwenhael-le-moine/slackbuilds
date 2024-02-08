@@ -25,16 +25,10 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael@le-moine.org>
 
-if [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]] && [[ -v DISABLE_NOX11 ]]; then
-  echo "You cannot disable all 3 variants"
-  exit 1
-fi
-
 cd "$(dirname "$0")" || exit 1
-#CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-8}
+BUILD=${BUILD:-9}
 TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -55,7 +49,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 VERSION=${VERSION:-latest}
-VARIANT=${VARIANT:-pgtk}        # pgtk or x11
+UI=${UI:-pgtk}        # pgtk or x11 or nox
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
@@ -70,8 +64,9 @@ git pull --all
 
 git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
 
-cp -R "$REPOSITORY" "$TMP/${PKGNAM}.ready"
-cd "$TMP/${PKGNAM}.ready" || exit 1
+[ -e "$TMP/${PKGNAM}" ] && rm -fr "${TMP:?}/${PKGNAM}"
+cp -R "$REPOSITORY" "$TMP/${PKGNAM}"
+cd "$TMP/${PKGNAM}" || exit 1
 
 case $VERSION in
     trunk)
@@ -86,38 +81,6 @@ case $VERSION in
         git checkout "emacs-$VERSION"
         ;;
 esac
-
-EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," ./configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
-
-# # Determine version number the tarball is labeled with:
-# VERSION=${VERSION:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-
-setup_sources() {
-    cd "$TMP" || exit 1
-    rm -rf $PKGNAM
-    # tar xvf "$CWD/$PKGNAM-$VERSION.tar.xz" || exit 1
-    # mv "$PKGNAM-$VERSION" $PKGNAM
-    cp -a "$TMP/${PKGNAM}.ready" $PKGNAM
-    cd $PKGNAM || exit 1
-
-    chown -R root:root .
-    find . \
-         \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-         -exec chmod 755 {} \+ -o \
-         \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-         -exec chmod 644 {} \+
-
-    # The defaults are a little too worried about adding a few more K of pure
-    # memory given the amount available on modern systems:
-    sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
-
-    [ -e Makefile ] && make distclean
-    ./autogen.sh
-
-    ( cd lisp || exit 1
-      make autoloads
-    )
-}
 
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
@@ -144,7 +107,24 @@ fi
 # Don't use icecream:
 PATH=$(echo "$PATH" | sed "s|/usr/libexec/icecc/bin||g" | tr -s : | sed "s/^://g" | sed "s/:$//g")
 
-# Without this, the emacs-no-x11 binary won't work with the installed files:
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \+ -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \+
+
+# The defaults are a little too worried about adding a few more K of pure
+# memory given the amount available on modern systems:
+sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
+
+[ -e Makefile ] && make distclean
+./autogen.sh
+
+( cd lisp || exit 1
+  make autoloads
+)
+
 PDUMPER=${PDUMPER:-"--with-pdumper=yes --with-dumping=pdumper"}
 
 GWH_OPTIONS="--with-tree-sitter \
@@ -166,62 +146,31 @@ CONFIGURE_OPTIONS="--prefix=/usr \
   $GWH_OPTIONS \
   --build=${ARCH}-slackware-linux"
 
-###############
-# GUI variant #
-###############
-if [[ ! -v DISABLE_GUI ]]; then
-  setup_sources
-
-  X11_OPTIONS="--with-x \
+X11_OPTIONS="--with-x \
   --with-x-toolkit=${X_TOOLKIT:-gtk3}"
-  PGTK_OPTIONS="--with-pgtk"
+PGTK_OPTIONS="--with-pgtk"
+NOX_OPTIONS="--with-x=no"
 
-  case $VARIANT in
-      pgtk)
-          GUI_OPTIONS=$PGTK_OPTIONS
-          ;;
-      x11)
-          GUI_OPTIONS=$X11_OPTIONS
-          ;;
-  esac
+case $UI in
+    pgtk)
+        GUI_OPTIONS=$PGTK_OPTIONS
+        ;;
+    nox)
+        GUI_OPTIONS=$NOX_OPTIONS
+        ;;
+    x11)
+        GUI_OPTIONS=$X11_OPTIONS
+        ;;
+esac
 
-  CFLAGS="$SLKCFLAGS" \
-        CXXFLAGS="$SLKCFLAGS" \
-        ./configure \
-        $CONFIGURE_OPTIONS \
-        $GUI_OPTIONS || exit 1
+CFLAGS="$SLKCFLAGS" \
+      CXXFLAGS="$SLKCFLAGS" \
+      ./configure \
+      $CONFIGURE_OPTIONS \
+      $GUI_OPTIONS || exit 1
 
-  make $NUMJOBS || make || exit 1
-  make install DESTDIR="$PKG" || exit 1
-fi
-
-# Also add a version of the binary that is not linked to X11:
-if [[ ! -v DISABLE_NOX11 ]]; then
-  setup_sources
-
-  CFLAGS="$SLKCFLAGS" \
-        CXXFLAGS="$SLKCFLAGS" \
-        ./configure \
-        $CONFIGURE_OPTIONS \
-        --with-x=no || exit 1
-
-  make $NUMJOBS || make || exit 1
-  if [[ -v DISABLE_GUI ]]; then
-  make install DESTDIR="$PKG" || exit 1
-  fi
-
-  # Install the non-x version:
-  cat src/emacs > "$PKG/usr/bin/emacs-no-x11-${EMACS_VERSION}"
-  chown root:root "$PKG/usr/bin/emacs-no-x11-${EMACS_VERSION}"
-  chmod 1755 "$PKG/usr/bin/emacs-no-x11-${EMACS_VERSION}"
-
-  # Create unversioned symlinks for all versions of emacs:
-  ( cd "$PKG/usr/bin" || exit 1
-    ln -sf "emacs-no-x11-${EMACS_VERSION}" emacs-no-x11
-
-    [[ -v DISABLE_GUI ]] && ln -sf emacs-no-x11 emacs
-  )
-fi
+make $NUMJOBS || make || exit 1
+make install DESTDIR="$PKG" || exit 1
 
 # Seems like this nonsense is finally obsolete:
 if [ -d "$PKG/var/games/emacs" ]; then
@@ -254,7 +203,7 @@ find -0 "$PKG" | xargs file | grep -e "executable" -e "shared object" \
 
 mkdir -p "$PKG/usr/doc/$PKGNAM"
 cp -a \
-  AUTHORS* COPYING* INSTALL* README* \
+  AUTHORS* COPYING* INSTALL* README* ChangeLog* \
   "$PKG/usr/doc/$PKGNAM"
 
 # Link the latest NEWS file:
@@ -263,14 +212,6 @@ cp -a \
     ln -sf "/usr/share/emacs/$VERSION/etc/NEWS" .
   fi
 )
-
-# If there's a ChangeLog, installing at least part of the recent history
-# is useful, but don't let it get totally out of control:
-if [ -r ChangeLog ]; then
-  DOCSDIR="$PKG/usr/doc/${PKGNAM}"
-  cat ChangeLog | head -n 1000 > "$DOCSDIR/ChangeLog"
-  touch -r ChangeLog "$DOCSDIR/ChangeLog"
-fi
 
 mkdir -p "$PKG/install"
 cat <<EOF > "$PKG/install/slack-desc"
@@ -302,4 +243,4 @@ fi
 EOF
 
 cd "$PKG" || exit 1
-/sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-${VERSION}_$VARIANT-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-${VERSION}_$UI-$ARCH-$BUILD$TAG.txz"
