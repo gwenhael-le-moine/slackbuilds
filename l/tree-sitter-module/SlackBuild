@@ -19,6 +19,9 @@ fi
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
+
+PREFIX=${PREFIX:-/usr}
+
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 set -e
