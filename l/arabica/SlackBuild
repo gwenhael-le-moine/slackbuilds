@@ -74,17 +74,6 @@ CFLAGS="$SLKCFLAGS" \
 make
 make install DESTDIR=$PKG
 
-# find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
-#     | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
-
-# find $PKG/usr/man -type f -exec gzip -9 {} \;
-# for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-
-# mkdir $PKG/usr/doc
-# mv $PKG/usr/share/doc/motion $PKG/usr/doc/$PRGNAM
-# mv $PKG/usr/share/$PRGNAM/examples $PKG/usr/doc/$PRGNAM/
-# rm -rf $PKG/usr/share # We moved the docs from there
-
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
 # HOW TO EDIT THIS FILE:
@@ -99,11 +88,11 @@ $PRGNAM: $PRGNAM (An XML and HTML processing toolkit)
 $PRGNAM:
 $PRGNAM: Arabica is an XML and HTML processing toolkit, providing SAX2, DOM,
 $PRGNAM: XPath, and XSLT implementations, written in Standard C++
-$PRGNAM: 
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: https://github.com/jezhiggins/arabica
 EOF
