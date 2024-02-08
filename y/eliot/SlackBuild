@@ -7,6 +7,8 @@ VERSION=${VERSION:-latest}
 BUILD=${BUILD:-3}
 TAG=${TAG:-gwh}
 
+PREFIX=${PREFIX:-/usr}
+
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in
     i?86) ARCH=i486 ;;
@@ -63,10 +65,10 @@ CFLAGS="$SLKCFLAGS" \
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
       ./configure \
-      --prefix=/usr \
+      --prefix=${PREFIX} \
       --sysconfdir=/etc \
-      --mandir=/usr/man \
-      --libdir=/usr/lib$(uname -m | grep -o 64) \
+      --mandir=${PREFIX}/man \
+      --libdir=${PREFIX}/lib$(uname -m | grep -o 64) \
       --build=$ARCH-slackware-linux \
       --host=$ARCH-slackware-linux
 
@@ -76,12 +78,12 @@ make install DESTDIR=$PKG
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
     | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
-# find $PKG/usr/man -type f -exec gzip -9 {} \;
-# for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
+# find $PKG${PREFIX}/man -type f -exec gzip -9 {} \;
+# for i in $( find $PKG${PREFIX}/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
-mkdir -p $PKG/usr/doc/$PRGNAM
-cp -R AUTHORS ChangeLog COPYING* INSTALL LGPL-2.0.txt NEWS README THANKS TODO $PKG/usr/doc/$PRGNAM
-cat <<EOF > $PKG/usr/doc/$PRGNAM/gen-ODS9-dawg.bash
+mkdir -p $PKG${PREFIX}/doc/$PRGNAM
+cp -R AUTHORS ChangeLog COPYING* INSTALL LGPL-2.0.txt NEWS README THANKS TODO $PKG${PREFIX}/doc/$PRGNAM
+cat <<EOF > $PKG${PREFIX}/doc/$PRGNAM/gen-ODS9-dawg.bash
 #!/bin/bash
 
 if [ \$UID = 0 ]; then
@@ -101,14 +103,14 @@ done
 echo
 
 echo "Generating dictionary…"
-/usr/bin/compdic -d 'ODS 9.0' -l /tmp/letters.txt -i /tmp/ods9.txt -o /tmp/ods9.dawg
+${PREFIX}/bin/compdic -d 'ODS 9.0' -l /tmp/letters.txt -i /tmp/ods9.txt -o /tmp/ods9.dawg
 
 echo "Installing dictionary into ~/.config/eliot/ods9.dawg…"
 mkdir -p ~/.config/eliot/
 [ -e ~/.config/eliot/ods9.dawg ] && mv ~/.config/eliot/ods9.dawg ~/.config/eliot/ods9.dawg.orig
 cp /tmp/ods9.dawg ~/.config/eliot/ods9.dawg
 EOF
-chmod +x $PKG/usr/doc/$PRGNAM/gen-ODS9-dawg.bash
+chmod +x $PKG${PREFIX}/doc/$PRGNAM/gen-ODS9-dawg.bash
 
 mkdir -p $PKG/install
 cat <<EOF > $PKG/install/slack-desc
@@ -128,7 +130,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: (see helper script /usr/doc/$PRGNAM/gen-ODS9-dawg.bash)
+$PRGNAM: (see helper script ${PREFIX}/doc/$PRGNAM/gen-ODS9-dawg.bash)
 $PRGNAM:
 $PRGNAM: https://www.nongnu.org/eliot/fr/index.html
 EOF

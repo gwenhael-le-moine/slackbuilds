@@ -18,9 +18,6 @@ ARCH=$(uname -m)
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 PREFIX=/usr
 
-EMACS=$(basename $(ls /usr/bin/emacs-2*))
-EMACS_VERSION=$(echo "$EMACS" | grep -o "\-[0-9\.]*\-" | tr -d - | head -n1)
-
 # nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 

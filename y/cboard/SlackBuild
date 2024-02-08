@@ -18,7 +18,7 @@ OUTPUT=/tmp
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
-PREFIX=/usr
+PREFIX=${PREFIX:-/usr}
 
 # Cleaning
 rm -fr $PKG $TMP/$PRGNAM

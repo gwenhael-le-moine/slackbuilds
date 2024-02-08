@@ -64,7 +64,7 @@ chown -R root:root ./*
 
 find . -name \.git\* -exec rm -fr {} \;
 
-[ -d ./usr/man ] && find ./usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d .${PREFIX}/man ] && find .${PREFIX}/man -type f -name "*.?" -exec gzip -9f {} \;
 
 # # Strip binaries
 # cd $PKG

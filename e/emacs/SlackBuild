@@ -51,6 +51,8 @@ fi
 VERSION=${VERSION:-latest}
 UI=${UI:-pgtk}        # pgtk or x11 or nox
 
+PREFIX=${PREFIX:-/usr}
+
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
 
 rm -rf "$PKG"
@@ -131,13 +133,13 @@ GWH_OPTIONS="--with-tree-sitter \
   --enable-link-time-optimization \
   --with-native-compilation=aot"
 
-CONFIGURE_OPTIONS="--prefix=/usr \
+CONFIGURE_OPTIONS="--prefix=${PREFIX} \
   --sysconfdir=/etc \
   --localstatedir=/var \
   --program-prefix="" \
   --program-suffix="" \
-  --mandir=/usr/man \
-  --infodir=/usr/info \
+  --mandir=${PREFIX}/man \
+  --infodir=${PREFIX}/info \
   --without-gconf \
   --without-gsettings \
   --without-android \
@@ -181,35 +183,35 @@ if [ -d "$PKG/var/games/emacs" ]; then
 fi
 
 # This avoids a collision with Exuberant Ctags...
-mv "$PKG/usr/bin/ctags" "$PKG/usr/bin/ctags-emacs"
-if [ -r "$PKG/usr/man/man1/ctags.1" ]; then
-  mv "$PKG/usr/man/man1/ctags.1" "$PKG/usr/man/man1/ctags-emacs.1"
-elif [ -r "$PKG/usr/man/man1/ctags.1.gz" ]; then
-  mv "$PKG/usr/man/man1/ctags.1.gz" "$PKG/usr/man/man1/ctags-emacs.1.gz"
+mv "$PKG${PREFIX}/bin/ctags" "$PKG${PREFIX}/bin/ctags-emacs"
+if [ -r "$PKG${PREFIX}/man/man1/ctags.1" ]; then
+  mv "$PKG${PREFIX}/man/man1/ctags.1" "$PKG${PREFIX}/man/man1/ctags-emacs.1"
+elif [ -r "$PKG${PREFIX}/man/man1/ctags.1.gz" ]; then
+  mv "$PKG${PREFIX}/man/man1/ctags.1.gz" "$PKG${PREFIX}/man/man1/ctags-emacs.1.gz"
 fi
 
 find -0 "$PKG" | xargs file | grep -e "executable" -e "shared object" \
   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-( cd "$PKG/usr/man" || exit 1
+( cd "$PKG${PREFIX}/man" || exit 1
   find . -type f -exec gzip -9 {} \+
   for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 )
 
-( cd "$PKG/usr/info" || exit 1
+( cd "$PKG${PREFIX}/info" || exit 1
   rm -f dir
   gzip -9 ./*
 )
 
-mkdir -p "$PKG/usr/doc/$PKGNAM"
+mkdir -p "$PKG${PREFIX}/doc/$PKGNAM"
 cp -a \
   AUTHORS* COPYING* INSTALL* README* ChangeLog* \
-  "$PKG/usr/doc/$PKGNAM"
+  "$PKG${PREFIX}/doc/$PKGNAM"
 
 # Link the latest NEWS file:
-( cd "$PKG/usr/doc/$PKGNAM" || exit 1
-  if [ -r "$PKG/usr/share/emacs/$VERSION/etc/NEWS" ]; then
-    ln -sf "/usr/share/emacs/$VERSION/etc/NEWS" .
+( cd "$PKG${PREFIX}/doc/$PKGNAM" || exit 1
+  if [ -r "$PKG${PREFIX}/share/emacs/$VERSION/etc/NEWS" ]; then
+    ln -sf "${PREFIX}/share/emacs/$VERSION/etc/NEWS" .
   fi
 )
 
