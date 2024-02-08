@@ -31,10 +31,10 @@ if [[ -v DISABLE_X11 ]] && [[ -v DISABLE_PGTK ]] && [[ -v DISABLE_NOX11 ]]; then
 fi
 
 cd "$(dirname "$0")" || exit 1
-CWD=$(pwd)
+#CWD=$(pwd)
 
 PKGNAM=emacs
-BUILD=${BUILD:-6}
+BUILD=${BUILD:-8}
 TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -80,12 +80,14 @@ case $VERSION in
     latest)
         VERSION=$(git tag --sort=-taggerdate | head -n1)
         git checkout "$VERSION"
-        VERSION=$(echo $VERSION | sed 's|^emacs-||')
+        VERSION=${VERSION#emacs-}
         ;;
     *)
         git checkout "emacs-$VERSION"
         ;;
 esac
+
+EMACS_VERSION=$(grep "AC_INIT(\[GNU Emacs\]," ./configure.ac | cut -d, -f 2 | tr -d \  | tr -d [ | tr -d ])
 
 # # Determine version number the tarball is labeled with:
 # VERSION=${VERSION:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
@@ -191,12 +193,6 @@ if [[ ! -v DISABLE_GUI ]]; then
 
   make $NUMJOBS || make || exit 1
   make install DESTDIR="$PKG" || exit 1
-
-  ( cd "$PKG/usr/bin" || exit 1
-    rm emacs
-    mv "emacs-$VERSION" "emacs-$VERSION"
-    ln -sf "emacs-$VERSION" emacs
-  )
 fi
 
 # Also add a version of the binary that is not linked to X11:
@@ -215,15 +211,15 @@ if [[ ! -v DISABLE_NOX11 ]]; then
   fi
 
   # Install the non-x version:
-  cat src/emacs > "$PKG/usr/bin/emacs-${VERSION}-no-x11"
-  chown root:root "$PKG/usr/bin/emacs-${VERSION}-no-x11"
-  chmod 1755 "$PKG/usr/bin/emacs-${VERSION}-no-x11"
+  cat src/emacs > "$PKG/usr/bin/emacs-no-x11-${EMACS_VERSION}"
+  chown root:root "$PKG/usr/bin/emacs-no-x11-${EMACS_VERSION}"
+  chmod 1755 "$PKG/usr/bin/emacs-no-x11-${EMACS_VERSION}"
 
   # Create unversioned symlinks for all versions of emacs:
   ( cd "$PKG/usr/bin" || exit 1
-    ln -sf "emacs-$VERSION-no-x11" emacs-no-x11
+    ln -sf "emacs-no-x11-${EMACS_VERSION}" emacs-no-x11
 
-    [[ -v DISABLE_GUI ]] && -sf emacs-no-x11 emacs
+    [[ -v DISABLE_GUI ]] && ln -sf emacs-no-x11 emacs
   )
 fi
 
