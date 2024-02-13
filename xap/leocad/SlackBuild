@@ -16,7 +16,6 @@ VERSION=${VERSION:-latest}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
-# nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 
 mkdir -p $PKG
@@ -46,7 +45,7 @@ cp -a docs/leocad.1 $PKG/usr/man/man1
 find $PKG/usr/man -type f -exec gzip -9 {} \;
 for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
-LIBRARY_URL=$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases | grep -o "http.*Library-.*zip" | head -n1)
+LIBRARY_URL=$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases | grep -o "http.*Library-.*zip" | sort | tail -n1)
 LIBRARY_FILE=$(echo $LIBRARY_URL | grep -o "Library-[0-9.]*.zip")
 LIBRARY_VERSION=$(echo $LIBRARY_FILE | grep -o "[0-9.]*")
 [ ! -e $REPOSITORY/$LIBRARY_FILE ] && wget -c -O $REPOSITORY/$LIBRARY_FILE $LIBRARY_URL
