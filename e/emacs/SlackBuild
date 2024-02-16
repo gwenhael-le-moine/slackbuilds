@@ -28,7 +28,7 @@
 cd "$(dirname "$0")" || exit 1
 
 PKGNAM=emacs
-BUILD=${BUILD:-9}
+BUILD=${BUILD:-11}
 TAG=${TAG:-gwh}
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -36,6 +36,37 @@ NUMJOBS=${NUMJOBS:-" -j$(( $(nproc) + 1 )) "}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PKGNAM
+
+# Build Emacs with native compilation. This has better performance, but the
+# installed package is larger. Pass NATIVECOMP=NO to do a normal build.
+NATIVECOMP=${NATIVECOMP:-YES}
+
+# When building with native compilation, link to the X11 libraries. This option
+# is only for native compilation builds -- regular builds will include both
+# an X11 and non-X11 version of Emacs.
+WITHX=${WITHX:-YES}
+
+# Pass this variable set to "--with-pgtk" to use GTK+3 without linking to X11
+# libraries. This might be suitable if you're going to run under Wayland.
+PGTK_OPTION=${PGTK_OPTION:-"--with-pgtk"}
+
+# Set the X related options. The default X_TOOLKIT will be GTK+3, but you may
+# set the X_TOOLKIT variable to any of these: gtk, gtk2, gtk3, lucid, athena, motif.
+if [ "$WITHX" = "YES" ]; then
+  if [ "$PGTK_OPTION" = "--with-pgtk" ]; then
+    X_TOOLKIT=gtk3
+  fi
+  X_OPTIONS="--with-x --with-x-toolkit=${X_TOOLKIT:-gtk3}"
+else
+  X_OPTIONS="--with-x=no"
+fi
+
+# Set the proper options for native compilation or not:
+if [ "$NATIVECOMP" = "YES" ]; then
+  PDUMPER=${PDUMPER:-"--with-dumping=pdumper --with-native-compilation"}
+else
+  PDUMPER=${PDUMPER:-"--with-pdumper=no --with-dumping=unexec --without-native-compilation"}
+fi
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
@@ -49,7 +80,6 @@ if [ -z "$ARCH" ]; then
 fi
 
 VERSION=${VERSION:-latest}
-UI=${UI:-pgtk}        # pgtk or x11 or nox
 
 PREFIX=${PREFIX:-/usr}
 
@@ -127,13 +157,10 @@ sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g
   make autoloads
 )
 
-PDUMPER=${PDUMPER:-"--with-pdumper=yes --with-dumping=pdumper"}
-
-GWH_OPTIONS="--with-tree-sitter \
-  --enable-link-time-optimization \
-  --with-native-compilation=aot"
-
-CONFIGURE_OPTIONS="--prefix=${PREFIX} \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  --prefix=${PREFIX} \
   --sysconfdir=/etc \
   --localstatedir=/var \
   --program-prefix="" \
@@ -142,37 +169,18 @@ CONFIGURE_OPTIONS="--prefix=${PREFIX} \
   --infodir=${PREFIX}/info \
   --without-gconf \
   --without-gsettings \
-  --without-android \
   --with-modules \
+  $X_OPTIONS \
+  $PGTK_OPTION \
   $PDUMPER \
-  $GWH_OPTIONS \
-  --build=${ARCH}-slackware-linux"
+  --build=${ARCH}-slackware-linux || exit 1
 
-X11_OPTIONS="--with-x \
-  --with-x-toolkit=${X_TOOLKIT:-gtk3}"
-PGTK_OPTIONS="--with-pgtk"
-NOX_OPTIONS="--with-x=no"
-
-case $UI in
-    pgtk)
-        GUI_OPTIONS=$PGTK_OPTIONS
-        ;;
-    nox)
-        GUI_OPTIONS=$NOX_OPTIONS
-        ;;
-    x11)
-        GUI_OPTIONS=$X11_OPTIONS
-        ;;
-esac
-
-CFLAGS="$SLKCFLAGS" \
-      CXXFLAGS="$SLKCFLAGS" \
-      ./configure \
-      $CONFIGURE_OPTIONS \
-      $GUI_OPTIONS || exit 1
-
-make $NUMJOBS || make || exit 1
-make install DESTDIR="$PKG" || exit 1
+if [ "$NATIVECOMP" = "YES" ]; then
+  make NATIVE_FULL_AOT=1 bootstrap $NUMJOBS || make NATIVE_FULL_AOT=1 || exit 1
+else
+  make $NUMJOBS || make || exit 1
+fi
+make install DESTDIR=$PKG || exit 1
 
 # Seems like this nonsense is finally obsolete:
 if [ -d "$PKG/var/games/emacs" ]; then
@@ -243,6 +251,15 @@ if [ ! -e usr/bin/ctags ]; then
   cp -a usr/man/man1/ctags-emacs.1.gz usr/man/man1/ctags.1.gz
 fi
 EOF
+
+# Tag packages that use a toolkit other than default (currently gtk3):
+if [ -z "$UI" ] && [ -n "$X_TOOLKIT" ]; then
+  if [ "$PGTK_OPTION" = "--with-pgtk" ]; then
+    UI="_pgtk"
+  else
+    UI="_$X_TOOLKIT"
+  fi
+fi
 
 cd "$PKG" || exit 1
 /sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-${VERSION}_$UI-$ARCH-$BUILD$TAG.txz"
