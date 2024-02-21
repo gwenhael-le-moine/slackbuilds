@@ -1,0 +1,253 @@
+#!/bin/bash
+
+# variables
+GITHUB_REPO=labwc/labwc
+VERSION=${VERSION:-"latest"}
+BUILD=12
+
+TAG=gwh
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+CWD=$(pwd)
+
+PRGNAM=$(basename "$CWD")
+PKG=$TMP/pkg-$PRGNAM
+
+ARCH=$(uname -m)
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+MESONFLAGS=""
+
+# nettoyage préalable
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+# mise en place
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git reset --hard HEAD
+git pull --all
+
+cp -R "$REPOSITORY" $TMP/
+
+cd "$TMP/$PRGNAM/" || exit 1
+case $VERSION in
+    trunk)
+        # PKGVERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+        PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        PKGVERSION=$(git tag --sort=-taggerdate | head -n1)
+        git checkout "$PKGVERSION"
+        ;;
+    *)
+        PKGVERSION=$VERSION
+        MESONFLAGS="-Dc_args=\"-Wno-error=switch\""
+        git checkout "$PKGVERSION"
+        ;;
+esac
+PKGNAM=${PRGNAM}
+
+######################
+# EMBED DEPENDENCIES #
+######################
+# # wlroots
+# EMBED_WLROOTS=${EMBED_WLROOTS:-"yes"}
+# if [ "$EMBED_WLROOTS" = "yes" ]; then
+#     WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
+#     WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+#     [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
+#     cd "$WLROOTS_REPOSITORY" || exit 1
+#     git reset --hard HEAD
+#     git pull --all
+
+#     mkdir -p "$TMP/$PRGNAM"/subprojects/
+#     cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
+#     cd "$TMP/$PRGNAM"/subprojects/wlroots || exit 1
+#     case $WLROOTS_VERSION in
+#         trunk)
+#             # WLROOTS_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+#             WLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+#             ;;
+#         latest)
+#             WLROOTS_VERSION=$(git tag --sort=-taggerdate | head -n1)
+#             git checkout "$WLROOTS_VERSION"
+#             ;;
+#         *)
+#             git checkout "$WLROOTS_VERSION"
+#             ;;
+#     esac
+#     PKGNAM="${PKGNAM}+wlroots"
+#     PKGVERSION="${PKGVERSION}+${WLROOTS_VERSION}"
+# fi
+
+# libliftoff
+EMBED_LIBLIFTOFF=${EMBED_LIBLIFTOFF:-"yes"}
+if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
+    LIBLIFTOFF_VERSION=${LIBLIFTOFF_VERSION:-$VERSION}
+    LIBLIFTOFF_REPOSITORY=/home/installs/SlackBuilds/_repositories/libliftoff
+    [ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
+    cd "$LIBLIFTOFF_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$LIBLIFTOFF_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libliftoff
+    cd "$TMP/$PRGNAM"/subprojects/libliftoff || exit 1
+    case $LIBLIFTOFF_VERSION in
+        trunk)
+            # LIBLIFTOFF_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            LIBLIFTOFF_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            LIBLIFTOFF_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            git checkout "$LIBLIFTOFF_VERSION"
+            ;;
+        *)
+            git checkout "$LIBLIFTOFF_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+libliftoff"
+    PKGVERSION="${PKGVERSION}+${LIBLIFTOFF_VERSION}"
+fi
+
+# libdisplay-info
+EMBED_LIBDISPLAYINFO=${EMBED_LIBDISPLAYINFO:-"yes"}
+if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
+    LIBDISPLAYINFO_VERSION=${LIBDISPLAYINFO_VERSION:-$VERSION}
+    LIBDISPLAYINFO_REPOSITORY=/home/installs/SlackBuilds/_repositories/libdisplay-info
+    [ ! -e "$LIBDISPLAYINFO_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libdisplay-info.git "$LIBDISPLAYINFO_REPOSITORY"
+    cd "$LIBDISPLAYINFO_REPOSITORY" || exit 1
+    git reset --hard HEAD
+    git pull --all
+
+    mkdir -p "$TMP/$PRGNAM"/subprojects/
+    cp -a "$LIBDISPLAYINFO_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libdisplay-info
+    cd "$TMP/$PRGNAM"/subprojects/libdisplay-info || exit 1
+    case $LIBDISPLAYINFO_VERSION in
+        trunk)
+            # LIBDISPLAYINFO_VERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
+            LIBDISPLAYINFO_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+            ;;
+        latest)
+            LIBDISPLAYINFO_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            git checkout "$LIBDISPLAYINFO_VERSION"
+            ;;
+        *)
+            git checkout "$LIBDISPLAYINFO_VERSION"
+            ;;
+    esac
+    PKGNAM="${PKGNAM}+libdisplay_info"
+    PKGVERSION="${PKGVERSION}+${LIBDISPLAYINFO_VERSION}"
+fi
+
+
+# Back to compiling…
+cd "$TMP/$PRGNAM/" || exit 1
+
+meson setup \
+      --prefix /usr \
+      --mandir /usr/man/ \
+      --force-fallback-for=wlroots \
+      "$MESONFLAGS" \
+      build/
+
+ninja -C build/
+
+meson install --destdir="$PKG" -C build/ # --skip-subprojects
+
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM/"
+
+cat <<EOF > "$PKG$PREFIX/bin/start_labwc.sh"
+#!/bin/bash
+
+#set -e
+
+LOGFILE=~/.wsession-errors
+true > \$LOGFILE
+exec &> \$LOGFILE
+
+set -x
+echo "labwc Starting: \$( date )"
+
+# Uncomment if mouse pointer is invisible
+#export WLR_NO_HARDWARE_CURSORS=1
+
+unset QT_QPA_PLATFORM
+
+export WLR_RENDERER=vulkan
+export CLUTTER_BACKEND=wayland
+export SDL_VIDEODRIVER=wayland
+export XDG_SESSION_DESKTOP=labwc
+export XDG_SESSION_TYPE=wayland
+export QT_PLATFORMTHEME=qt5ct
+export QT_PLATFORM_PLUGIN=qt5ct
+
+export QT_QPA_PLATFORMTHEME=qt5ct
+export MOZ_ENABLE_WAYLAND=1
+export XDG_CURRENT_DESKTOP=labwc
+export XDG_PICTURES_DIR=~/.wallpapers
+
+export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
+
+mkdir -p \$XDG_RUNTIME_DIR
+chmod 0700 \$XDG_RUNTIME_DIR
+
+# avoid wlr error
+unset DISPLAY
+
+killall daemon
+
+exec dbus-run-session /usr/bin/labwc
+#dbus-launch --sh-syntax --exit-with-session /usr/bin/labwc
+#exec /usr/bin/labwc
+EOF
+chmod +x "$PKG$PREFIX/bin/start_labwc.sh"
+sed -i 's|Exec=labwc|Exec=/usr/bin/start_labwc.sh|' "$PKG$PREFIX/share/wayland-sessions/labwc.desktop"
+
+###############
+# corrections #
+###############
+cd "$PKG" || exit 1
+chown -R root:root ./*
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -name "*.?" -type f -exec gzip -9 {} \;
+
+# Don't package wlroots includes or .so link as we don't want to interfere with SBo's wlroots
+find "$PKG$PREFIX/lib$(uname -m | grep -o 64)/" -type l -exec rm {} \;
+rm -r "$PKG$PREFIX/lib$(uname -m | grep -o 64)/pkgconfig/"
+rm -r "$PKG$PREFIX/include/"
+
+####################
+# Actual packaging #
+####################
+mkdir -p "$PKG/install"
+
+cat <<EOF > "$PKG/install/slack-desc"
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (A Wayland window-stacking compositor)
+$PRGNAM:
+$PRGNAM: Labwc is a wlroots-based window-stacking compositor for wayland,
+$PRGNAM: inspired by openbox.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
+EOF
+
+# empaquetage
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/${PKGNAM}-$(echo "$PKGVERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
