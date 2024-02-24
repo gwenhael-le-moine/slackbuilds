@@ -255,9 +255,9 @@ EOF
 # Tag packages that use a toolkit other than default (currently gtk3):
 if [ -z "$UI" ] && [ -n "$X_TOOLKIT" ]; then
   if [ "$PGTK_OPTION" = "--with-pgtk" ]; then
-    UI="_pgtk"
+    UI="pgtk"
   else
-    UI="_$X_TOOLKIT"
+    UI="$X_TOOLKIT"
   fi
 fi
 
