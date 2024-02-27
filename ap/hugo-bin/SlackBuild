@@ -2,49 +2,51 @@
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 GITHUB_REPO=gohugoio/hugo
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/tags | jq -r '.[0].name' | tr -d v)}
+FLAVOR=${FLAVOR:-_extended}
 ARCH=$(uname -m)
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
+
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
-mkdir -p $REPOSITORY
+mkdir -p "$REPOSITORY"
 
 HUGO_ARCH="64bit"
 case $(uname -m) in
     "x86_64")
-	HUGO_ARCH="64bit"
-	;;
+        HUGO_ARCH="64bit"
+        ;;
     "aarch64")
-	HUGO_ARCH="ARM64"
-	;;
+        HUGO_ARCH="ARM64"
+        ;;
     "arm*")
-	HUGO_ARCH="ARM"
-	;;
+        HUGO_ARCH="ARM"
+        ;;
 esac
 
-[ ! -e $REPOSITORY/hugo_${VERSION}_Linux-${HUGO_ARCH}.tar.gz ] && wget -c -O $REPOSITORY/hugo_${VERSION}_Linux-${HUGO_ARCH}.tar.gz https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_Linux-${HUGO_ARCH}.tar.gz
+[ ! -e "$REPOSITORY/hugo${FLAVOR}_${VERSION}_Linux-${HUGO_ARCH}.tar.gz" ] && wget -c -O "$REPOSITORY/hugo${FLAVOR}_${VERSION}_Linux-${HUGO_ARCH}.tar.gz" "https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo${FLAVOR}_${VERSION}_Linux-${HUGO_ARCH}.tar.gz"
 
-rm -fr $PKG
-mkdir -p $PKG/usr/{bin,doc/hugo}/
+rm -fr "$PKG"
+mkdir -p "$PKG"/usr/{bin,doc/hugo}/
 
-cd $PKG/usr/bin/
-tar xvf $REPOSITORY/hugo_${VERSION}_Linux-${HUGO_ARCH}.tar.gz
-mv README.md LICENSE $PKG/usr/doc/hugo/
-chmod +x $PKG/usr/bin/hugo
+cd "$PKG/usr/bin/" || exit 1
+tar xf "$REPOSITORY/hugo${FLAVOR}_${VERSION}_Linux-${HUGO_ARCH}.tar.gz"
+mv README.md LICENSE "$PKG/usr/doc/hugo/"
+chmod +x "$PKG/usr/bin/hugo"
 
-mkdir -p $PKG/usr/share/zsh/site-functions
-$PKG/usr/bin/hugo completion zsh > $PKG/usr/share/zsh/site-functions/_hugo
+mkdir -p "$PKG/usr/share/zsh/site-functions"
+"$PKG/usr/bin/hugo" completion zsh > "$PKG/usr/share/zsh/site-functions/_hugo"
 
-mkdir -p $PKG/install
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -58,14 +60,13 @@ ${PRGNAM}:
 ${PRGNAM}: This software does not utilize Adobe Digital Editions nor Wine. It is
 ${PRGNAM}: completely free and open-source software written natively for Linux.
 ${PRGNAM}:
-${PRGNAM}: 
-${PRGNAM}: 
+${PRGNAM}:
+${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}: https://gohugo.io
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend ${OUTPUT}/${PRGNAM}-$(echo ${VERSION} | tr - _)-${ARCH}-${BUILD}${TAG}.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "${OUTPUT}/${PRGNAM}-$(echo "${VERSION}" | tr - _)-${ARCH}-${BUILD}${TAG}.txz"
