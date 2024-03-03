@@ -47,7 +47,7 @@ chown -R root:root ./*
 # embaumement
 mkdir -p "$PKG/install"
 cat <<EOF > "$PKG"/install/slack-desc
-$PRGNAM: $PRGNAM (checks your $HOME for unwanted files and directories.)
+$PRGNAM: $PRGNAM (checks your \$HOME for unwanted files and directories.)
 $PRGNAM:
 $PRGNAM: A shell script which checks your $HOME for unwanted files and directories.
 $PRGNAM: When it encounters a file it knows about, it will tell you whether it's
