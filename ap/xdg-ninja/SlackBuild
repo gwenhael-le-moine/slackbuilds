@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename "$CWD")
+GITHUB_REPO=b3nj5m1n/xdg-ninja
+VERSION=${VERSION:-trunk}
+ARCH=${ARCH:-noarch}
+BUILD=2
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+# mise en place
+cd $TMP || exit 1
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
+
+# installation
+make install DESTDIR="$PKG" PREFIX=$PREFIX
+mv "$PKG$PREFIX"/share/man/ "$PKG$PREFIX/"
+mv "$PKG$PREFIX"/share/doc/ "$PKG$PREFIX/"
+
+# correction
+cd "$PKG" || exit 1
+chown -R root:root ./*
+
+[ -d "$PKG"/usr/man ] && find "$PKG"/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# embaumement
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG"/install/slack-desc
+$PRGNAM: $PRGNAM (checks your $HOME for unwanted files and directories.)
+$PRGNAM:
+$PRGNAM: A shell script which checks your $HOME for unwanted files and directories.
+$PRGNAM: When it encounters a file it knows about, it will tell you whether it's
+$PRGNAM: possible to move this file to an appropriate location, and how to do it.
+$PRGNAM: The configurations are from the arch wiki page on XDG_BASE_DIR, antidot
+$PRGNAM: (thanks to Scr0nch for writing a conversion tool), and contributed by
+$PRGNAM: other users.
+$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
+EOF
+
+# empaquetage
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
