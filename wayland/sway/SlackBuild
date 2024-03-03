@@ -191,9 +191,9 @@ cat <<EOF > "$PKG$PREFIX/bin/start_sway.sh"
 
 #set -e
 
-LOGFILE=~/.wsession-errors
-true > \$LOGFILE
-exec &> \$LOGFILE
+# LOGFILE=~/.wsession-errors
+# true > \$LOGFILE
+# exec &> \$LOGFILE
 
 set -x
 echo "sway Starting: \$( date )"
