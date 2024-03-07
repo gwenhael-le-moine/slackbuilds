@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename "$CWD")
+GITHUB_REPO=facundoolano/jorge
+VERSION=${VERSION:-latest}
+ARCH=${ARCH:-noarch}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+# mise en place
+cd $TMP || exit 1
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
+
+go build
+
+# installation
+mkdir -p "$PKG$PREFIX"/bin/
+cp jorge "$PKG$PREFIX"/bin/
+
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -a docs/ LICENSE README.md "$PKG$PREFIX/doc/$PRGNAM"
+
+# correction
+cd "$PKG" || exit 1
+chown -R root:root ./*
+
+[ -d "$PKG"/usr/man ] && find "$PKG"/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# embaumement
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG"/install/slack-desc
+$PRGNAM: $PRGNAM ( jorge is a personal site generator with org-mode support )
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
+EOF
+
+# empaquetage
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
