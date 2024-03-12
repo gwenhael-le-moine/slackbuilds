@@ -9,7 +9,7 @@ TAG=gwh
 TMP=/tmp/$TAG
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -19,67 +19,66 @@ REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-mkdir -p $PKG
+mkdir -p "$PKG"
 
 # mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
-cd $REPOSITORY
+cd "$TMP" || exit 1
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+cp -R "$REPOSITORY" $TMP/
+cd $TMP/"$PRGNAM" || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 cargo build --release
 
-mkdir -p $PKG$PREFIX/bin
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
-chmod 755 $PKG$PREFIX/bin/*
+mkdir -p "$PKG$PREFIX"/bin
+find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX"/bin/ \;
+chmod 755 "$PKG$PREFIX"/bin/*
 
-mkdir -p $PKG$PREFIX/man/man1
-mkdir -p $PKG$PREFIX/man/man5
-scdoc < extra/man/alacritty.1.scd | gzip -c | sudo tee $PKG$PREFIX/man/man1/alacritty.1.gz > /dev/null
-scdoc < extra/man/alacritty-msg.1.scd | gzip -c | sudo tee $PKG$PREFIX/man/man1/alacritty-msg.1.gz > /dev/null
-scdoc < extra/man/alacritty.5.scd | gzip -c | sudo tee $PKG$PREFIX/man/man5/alacritty.5.gz > /dev/null
-scdoc < extra/man/alacritty-bindings.5.scd | gzip -c | sudo tee $PKG$PREFIX/man/man5/alacritty-bindings.5.gz > /dev/null
+mkdir -p "$PKG$PREFIX"/man/man{1,5}
+scdoc < extra/man/alacritty.1.scd | gzip -c | sudo tee "$PKG$PREFIX"/man/man1/alacritty.1.gz > /dev/null
+scdoc < extra/man/alacritty-msg.1.scd | gzip -c | sudo tee "$PKG$PREFIX"/man/man1/alacritty-msg.1.gz > /dev/null
+scdoc < extra/man/alacritty.5.scd | gzip -c | sudo tee "$PKG$PREFIX"/man/man5/alacritty.5.gz > /dev/null
+scdoc < extra/man/alacritty-bindings.5.scd | gzip -c | sudo tee "$PKG$PREFIX"/man/man5/alacritty-bindings.5.gz > /dev/null
 
 
-mkdir -p $PKG$PREFIX/info
-cp extra/alacritty.info $PKG$PREFIX/info/
-gzip -9 $PKG$PREFIX/info/alacritty.info
+mkdir -p "$PKG$PREFIX"/info
+cp extra/alacritty.info "$PKG$PREFIX"/info/
+gzip -9 "$PKG$PREFIX"/info/alacritty.info
 
-mkdir -p $PKG$PREFIX/share/applications $PKG$PREFIX/share/pixmaps
-cp extra/linux/Alacritty.desktop $PKG$PREFIX/share/applications/
-cp extra/logo/alacritty-term.svg $PKG$PREFIX/share/pixmaps/Alacritty.svg
+mkdir -p "$PKG$PREFIX"/share/applications "$PKG$PREFIX"/share/pixmaps
+cp extra/linux/Alacritty.desktop "$PKG$PREFIX"/share/applications/
+cp extra/logo/alacritty-term.svg "$PKG$PREFIX"/share/pixmaps/Alacritty.svg
 
-mkdir -p $PKG$PREFIX/share/appdata
-cp extra/linux/io.alacritty.Alacritty.appdata.xml $PKG$PREFIX/share/appdata/
+mkdir -p "$PKG$PREFIX"/share/appdata
+cp extra/linux/io.alacritty.Alacritty.appdata.xml "$PKG$PREFIX"/share/appdata/
 
-mkdir -p $PKG/usr/share/bash-completion/completions
-cp extra/completions/alacritty.bash $PKG/usr/share/bash-completion/completions/alacritty
+mkdir -p "$PKG$PREFIX"/share/bash-completion/completions
+cp extra/completions/alacritty.bash "$PKG$PREFIX"/share/bash-completion/completions/alacritty
 
-mkdir -p $PKG/usr/share/zsh/site-functions
-cp extra/completions/_alacritty $PKG/usr/share/zsh/site-functions/
+mkdir -p "$PKG$PREFIX"/share/zsh/site-functions
+cp extra/completions/_alacritty "$PKG$PREFIX"/share/zsh/site-functions/
 
 # move doc/ to the appropriate location
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -a docs/ extra/ scripts/ *.md $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -a docs/ extra/ scripts/ ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
-mkdir -p $PKG/install
+mkdir -p "$PKG"/install
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -102,5 +101,5 @@ $PRGNAM:
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
