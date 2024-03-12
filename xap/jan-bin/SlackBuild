@@ -1,0 +1,54 @@
+#!/bin/bash -e
+
+# variables
+CWD=$(pwd)
+
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/janhq/jan/releases/latest | jq -r .tag_name)}
+
+PRGNAM=$(basename "$CWD")
+ARCH="AppImage"
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr "$PKG"
+
+mkdir -p "$PKG/opt/$PRGNAM"
+
+# mise en place
+cd "$PKG/opt/$PRGNAM" || exit 1
+
+wget -c "https://github.com/janhq/jan/releases/download/${VERSION}/jan-linux-x86_64-${VERSION//v/}.AppImage" -O "${PRGNAM}-${VERSION}.AppImage"
+chmod +x "${PRGNAM}-${VERSION}.AppImage"
+
+mkdir -p "$PKG$PREFIX/bin/"
+cd "$PKG$PREFIX/bin/" || exit 1
+ln -s "../../opt/$PRGNAM/${PRGNAM}-${VERSION}.AppImage" "$PRGNAM"
+
+# correction
+cd "$PKG" || exit 1
+chown -R root:root ./*
+
+# embaumement
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
+$PRGNAM: $PRGNAM (an open source, local alternative to ChatGPT)
+$PRGNAM:
+$PRGNAM: Jan is an open-source ChatGPT alternative that runs 100%
+$PRGNAM: offline on your computer.
+$PRGNAM: Jan runs on any hardware. From PCs to multi-GPU clusters,
+$PRGNAM: Jan supports universal architectures
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/janhq/jan
+$PRGNAM:
+EOF
+
+# empaquetage
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/_}-$ARCH-$BUILD$TAG.txz"
