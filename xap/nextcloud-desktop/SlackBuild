@@ -50,7 +50,7 @@ cmake \
     ..
 
 # compilation
-make -j3
+make -j$(nproc)
 
 # installation
 make install DESTDIR=$PKG

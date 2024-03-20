@@ -59,7 +59,7 @@ cmake . \
       -DUSE_PYTHON=ON \
       -DCMAKE_INSTALL_PREFIX=/usr \
       -DCMAKE_INSTALL_MANDIR=/usr/man
-make || exit 1
+make -j$(nproc) || exit 1
 make install DESTDIR=$PKG || exit 1
 
 [ -e $PKG/usr/share/man ] && mv $PKG/usr/share/man $PKG/usr/
