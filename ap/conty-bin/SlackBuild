@@ -6,7 +6,7 @@ PRGNAM=$(basename $CWD)
 GITHUB_REPO=Kron4ek/Conty
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-4}
+BUILD=${BUILD:-5}
 TAG=${TAG:-gwh}
 
 EDITION=${EDITION:-"_lite_dwarfs"} # "", "_lite", "_dwarfs", "_lite_dwarfs"
@@ -45,7 +45,7 @@ Exec=$PREFIX/bin/steam
 Name=Steam
 EOF
 
-for prg in wine winetricks lutris playonlinux4; do
+for prg in lutris playonlinux4; do
     ln -s conty $prg
 cat <<EOF > $PKG$PREFIX/share/applications/$prg.desktop
 [Desktop Entry]
