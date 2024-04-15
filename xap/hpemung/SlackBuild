@@ -1,0 +1,88 @@
+#!/bin/bash
+set -x
+
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+
+BUILD=1
+VERSION=${VERSION:-latest}
+
+ARCH=$(uname -m)
+LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
+
+TAG=gwh
+OUTPUT=/tmp
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+
+PREFIX=/usr
+
+mkdir -p $TMP
+
+# Cleaning
+rm -fr $TMP/$PRGNAM $PKG
+
+# Fetching sources
+[ ! -e $REPOSITORY ] && git clone https://codeberg.org/gwh/hpemung.git $REPOSITORY
+cd $REPOSITORY
+git pull --all
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+
+# Preparation
+cd $TMP/$PRGNAM
+
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
+[ "x$VERSION" == "x" ] && VERSION=trunk
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Building
+make all PREFIX=/usr
+
+# Installation
+make install DESTDIR=$PKG PREFIX=/usr
+
+# # Cleaning
+# cd $PKG
+# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+cd $PKG
+
+[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
+
+# Packaging
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (HP48 emulator)
+$PRGNAM:
+$PRGNAM: hpemung is an emulator of the Saturn Processor and the I/O of an
+$PRGNAM: HP48 calculator. There is a debugger for the Saturn Processor.
+$PRGNAM:
+$PRGNAM: initialization:
+$PRGNAM: $ $PREFIX/share/$PRGNAM/setup-hpemung-home.sh
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://codeberg.org/gwh/hpemung.git
+$PRGNAM:
+EOF
+
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
