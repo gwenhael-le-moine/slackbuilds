@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# variables
+TAG=gwh
+TMP=/tmp/$TAG
+CWD=$(pwd)
+OUTPUT=/tmp
+
+PRGNAM=$(basename "$CWD")
+PKG=$TMP/pkg-$PRGNAM
+
+ARCH=$(uname -m)
+BUILD=2
+VERSION=${VERSION:-0.9}
+MAGIC_NUMBER=${MAGIC_NUMBER:-b5f46e3}
+
+rm -fr "$PKG" "${TMP:?}"/"$PRGNAM"
+
+mkdir -p "$PKG"
+
+mkdir -p "$PKG"/usr/bin/
+wget -c "https://openrgb.org/releases/release_${VERSION}/OpenRGB_${VERSION}_x86_64_${MAGIC_NUMBER}.AppImage" -O "$PKG"/usr/bin/"$PRGNAM"
+chmod +x "$PKG"/usr/bin/"$PRGNAM"
+
+mkdir -p "$PKG"/usr/lib/udev/rules.d/
+wget -c "https://gitlab.com/CalcProgrammer1/OpenRGB/-/jobs/artifacts/master/raw/60-openrgb.rules?job=Linux+64+AppImage&inline=false" -O "$PKG"/usr/lib/udev/rules.d/60-openrgb.rules
+
+mkdir -p "$PKG"/usr/share/applications/
+cat <<EOF > "$PKG"/usr/share/applications/"$PRGNAM".desktop
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Version=$VERSION
+Name=$PRGNAM
+GenericName=$PRGNAM
+Comment=LEDs control
+Exec=/usr/bin/$PRGNAM
+Terminal=false
+Categories=System
+EOF
+
+# correction
+cd "$PKG" || exit 1
+chown -R root:root ./*
+
+# embaumement
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/doinst.sh
+udevadm control --reload-rules
+udevadm trigger
+
+if [ -x /usr/bin/update-desktop-database ]; then
+  /usr/bin/update-desktop-database -q usr/share/applications >/dev/null 2>&1
+fi
+
+if [ -x /usr/bin/update-mime-database ]; then
+  /usr/bin/update-mime-database usr/share/mime >/dev/null 2>&1
+fi
+
+if [ -e usr/share/icons/hicolor/icon-theme.cache ]; then
+  if [ -x /usr/bin/gtk-update-icon-cache ]; then
+    /usr/bin/gtk-update-icon-cache -f usr/share/icons/hicolor >/dev/null 2>&1
+  fi
+fi
+EOF
+
+cat <<EOF > "$PKG"/install/slack-desc
+      |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (LEDs control)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://www.openrgb.org/
+$PRGNAM:
+EOF
+
+# empaquetage
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION}_AppImage-$ARCH-$BUILD$TAG.txz"
