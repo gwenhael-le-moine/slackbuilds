@@ -1,0 +1,99 @@
+From 03c14421354e54332e12f78d029dcaa9919fd161 Mon Sep 17 00:00:00 2001
+From: Florian Franzen <Florian.Franzen@gmail.com>
+Date: Sat, 2 Mar 2024 11:19:37 +0000
+Subject: [PATCH] Tray: don't invoke dbus menu when tray is disabled
+
+---
+ swaybar/input.c     | 26 +++++++++++++++++---------
+ swaybar/tray/tray.c |  2 +-
+ 2 files changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/swaybar/input.c b/swaybar/input.c
+index dfac5480f4..54e1d5cde5 100644
+--- a/swaybar/input.c
++++ b/swaybar/input.c
+@@ -137,8 +137,9 @@ static void wl_pointer_enter(void *data, struct wl_pointer *wl_pointer,
+ 	}
+ 
+ #if HAVE_TRAY
+-	if (dbusmenu_pointer_enter(data, wl_pointer, serial, surface, surface_x,
+-		surface_y)) {
++	struct swaybar_config *config = seat->bar->config;
++	if (!config->tray_hidden && dbusmenu_pointer_enter(data, wl_pointer, serial,
++		surface, surface_x, surface_y)) {
+ 		return;
+ 	}
+ #endif
+@@ -147,12 +148,14 @@ static void wl_pointer_enter(void *data, struct wl_pointer *wl_pointer,
+ static void wl_pointer_leave(void *data, struct wl_pointer *wl_pointer,
+ 		uint32_t serial, struct wl_surface *surface) {
+ #if HAVE_TRAY
+-	if (dbusmenu_pointer_leave(data, wl_pointer, serial, surface)) {
++	struct swaybar_seat *seat = data;
++	struct swaybar_config *config = seat->bar->config;
++	if (!config->tray_hidden && dbusmenu_pointer_leave(data, wl_pointer, serial,
++		surface)) {
+ 		return;
+ 	}
+ #endif
+ 
+-	struct swaybar_seat *seat = data;
+ 	seat->pointer.current = NULL;
+ }
+ 
+@@ -162,7 +165,9 @@ static void wl_pointer_motion(void *data, struct wl_pointer *wl_pointer,
+ 	seat->pointer.x = wl_fixed_to_double(surface_x);
+ 	seat->pointer.y = wl_fixed_to_double(surface_y);
+ #if HAVE_TRAY
+-	if (dbusmenu_pointer_motion(data, wl_pointer, time, surface_x, surface_y)) {
++	struct swaybar_config *config = seat->bar->config;
++	if (!config->tray_hidden && dbusmenu_pointer_motion(data, wl_pointer, time,
++		surface_x, surface_y)) {
+ 		return;
+ 	}
+ #endif
+@@ -204,8 +209,9 @@ static void wl_pointer_button(void *data, struct wl_pointer *wl_pointer,
+ 		uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
+ 	struct swaybar_seat *seat = data;
+ #if HAVE_TRAY
+-	if (dbusmenu_pointer_button(seat, wl_pointer, serial, time, button,
+-				state)) {
++	struct swaybar_config *config = seat->bar->config;
++	if (!config->tray_hidden && dbusmenu_pointer_button(seat, wl_pointer, serial,
++		time, button, state)) {
+ 		return;
+ 	}
+ #endif
+@@ -327,7 +333,8 @@ static void wl_pointer_axis(void *data, struct wl_pointer *wl_pointer,
+ 	}
+ 
+ #if HAVE_TRAY
+-	if (dbusmenu_pointer_axis(data, wl_pointer)) {
++	struct swaybar_config *config = seat->bar->config;
++	if (!config->tray_hidden && dbusmenu_pointer_axis(data, wl_pointer)) {
+ 		return;
+ 	}
+ #endif
+@@ -349,7 +356,8 @@ static void wl_pointer_frame(void *data, struct wl_pointer *wl_pointer) {
+ 	struct swaybar_output *output = pointer->current;
+ 
+ #if HAVE_TRAY
+-	if (dbusmenu_pointer_frame(data, wl_pointer)) {
++	struct swaybar_config *config = seat->bar->config;
++	if (!config->tray_hidden && dbusmenu_pointer_frame(data, wl_pointer)) {
+ 		return;
+ 	}
+ #endif
+diff --git a/swaybar/tray/tray.c b/swaybar/tray/tray.c
+index b0545f4a70..e4a680342b 100644
+--- a/swaybar/tray/tray.c
++++ b/swaybar/tray/tray.c
+@@ -110,7 +110,7 @@ static int cmp_output(const void *item, const void *cmp_to) {
+ 
+ uint32_t render_tray(cairo_t *cairo, struct swaybar_output *output, double *x) {
+ 	struct swaybar_config *config = output->bar->config;
+-	if (config->tray_outputs) {
++	if (config->tray_outputs && !config->tray_hidden) {
+ 		if (list_seq_find(config->tray_outputs, cmp_output, output) == -1) {
+ 			return 0;
+ 		}
