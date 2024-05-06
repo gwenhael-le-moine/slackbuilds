@@ -10,34 +10,37 @@ PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
-BUILD=2
-VERSION=${VERSION:-0.9}
-MAGIC_NUMBER=${MAGIC_NUMBER:-b5f46e3}
+BUILD=1
+VERSION=${VERSION:-latest}
+
+REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 rm -fr "$PKG" "${TMP:?}"/"$PRGNAM"
 
 mkdir -p "$PKG"
 
-mkdir -p "$PKG"/usr/bin/
-wget -c "https://openrgb.org/releases/release_${VERSION}/OpenRGB_${VERSION}_x86_64_${MAGIC_NUMBER}.AppImage" -O "$PKG"/usr/bin/"$PRGNAM"
-chmod +x "$PKG"/usr/bin/"$PRGNAM"
+# mise en place
+[ ! -e "$REPOSITORY" ] && git clone https://gitlab.com/CalcProgrammer1/OpenRGB.git "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --all
 
-mkdir -p "$PKG"/usr/lib/udev/rules.d/
-wget -c "https://gitlab.com/CalcProgrammer1/OpenRGB/-/jobs/artifacts/master/raw/60-openrgb.rules?job=Linux+64+AppImage&inline=false" -O "$PKG"/usr/lib/udev/rules.d/60-openrgb.rules
+cp -R "$REPOSITORY" "$TMP"/"$PRGNAM"
+cd "$TMP"/"$PRGNAM"/ || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" #|| git checkout $VERSION
 
-mkdir -p "$PKG"/usr/share/applications/
-cat <<EOF > "$PKG"/usr/share/applications/"$PRGNAM".desktop
-#!/usr/bin/env xdg-open
-[Desktop Entry]
-Type=Application
-Version=$VERSION
-Name=$PRGNAM
-GenericName=$PRGNAM
-Comment=LEDs control
-Exec=/usr/bin/$PRGNAM
-Terminal=false
-Categories=System
-EOF
+qmake6  DOCS_DIR=/usr/doc/"$PRGNAM" MAN_DIR=/usr/man/man1 OpenRGB.pro
+CFLAGS="$SLKCFLAGS" \
+      CXXFLAGS="$SLKCFLAGS" \
+      make
+make INSTALL_ROOT="$PKG" install
+
+find "$PKG" -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+    | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+
+find "$PKG"/usr/man -type f -exec gzip -9 {} \;
+for i in $( find "$PKG"/usr/man -type l ) ; do ln -s "$( readlink "$i" ).gz" "$i.gz" ; rm "$i" ; done
 
 # correction
 cd "$PKG" || exit 1
@@ -76,9 +79,9 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: https://www.openrgb.org/
-$PRGNAM:
+$PRGNAM: REQUIRES: mbedtls
 EOF
 
 # empaquetage
 cd "$PKG" || exit 1
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION}_AppImage-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION}-$ARCH-$BUILD$TAG.txz"
