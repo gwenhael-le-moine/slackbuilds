@@ -59,7 +59,7 @@ PKGNAM=${PRGNAM}
 PATCH=${PATCH:-"no"}
 if [ "$PATCH" = "yes" ]; then
     for p in "$CWD"/patches/*.patch; do
-	patch -p1 < "$p"
+        patch -p1 < "$p"
     done
     PKGVERSION="${PKGVERSION}_patched"
 fi
@@ -203,7 +203,14 @@ echo "sway Starting: \$( date )"
 
 unset QT_QPA_PLATFORM
 
-export WLR_RENDERER=vulkan
+
+# vulklan seems buggy with Intel IGP
+if \$(lsmod | grep -q "^i915.*$"); then
+   export WLR_RENDERER=gles2
+else
+   export WLR_RENDERER=vulkan
+fi
+
 export CLUTTER_BACKEND=wayland
 export SDL_VIDEODRIVER=wayland
 export XDG_SESSION_DESKTOP=sway
