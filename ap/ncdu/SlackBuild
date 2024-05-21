@@ -3,7 +3,7 @@
 # variables
 VERSION=${VERSION:-latest}
 
-BUILD=1
+BUILD=2
 
 TAG=gwh
 OUTPUT=/tmp
@@ -37,8 +37,8 @@ cd "$TMP/$PRGNAM/" || exit 1
 [ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
 
 #zig build -Drelease-safe --prefix "$PKG$PREFIX" install
-make
-make install PREFIX="$PKG$PREFIX" MANDIR="$PKG$PREFIX"/man/man1
+#make ZIG_FLAGS=" --release=safe " #"fast -fno-sanitize=undefined "
+make install PREFIX="$PKG$PREFIX" MANDIR="$PKG$PREFIX"/man/man1 ZIG_FLAGS=" --release=safe "
 
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
 cp -a LICENSES/ ChangeLog ./*.md "$PKG$PREFIX/doc/$PRGNAM/"
