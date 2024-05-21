@@ -12,11 +12,11 @@ PKG=$TMP/pkg-$PRGNAM
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 GITHUB_REPO=Fred78290/nct6687d
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 KERNEL_VERSION=$(uname -r)
 
 ARCH=$(uname -m)
-BUILD=1
+BUILD=3
 
 PREFIX=/usr
 
@@ -29,7 +29,6 @@ mkdir -p $PKG
 cd $REPOSITORY
 git pull --all
 
-# nettoyage préalable
 rm -fr $PKG $TMP/$PRGNAM
 
 cp -R $REPOSITORY $TMP/$PRGNAM
@@ -53,6 +52,14 @@ make
 # installation
 mkdir -p $PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/
 cp ${KERNEL_VERSION}/nct6687.ko $PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/
+
+mkdir -p $PKG/etc/modprobe.d/
+cat <<EOF > $PKG/etc/modprobe.d/blacklist_nct6683.conf
+# Do not load the nct6683 module on boot.
+blacklist nct6683
+# uncomment the line below if blacklisting is not sufficient
+# install nct6683 /bin/true
+EOF
 
 mkdir -p $PKG/usr/doc/$PRGNAM/
 cp -R images/ LICENSE *.md $PKG/usr/doc/$PRGNAM/
