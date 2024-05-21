@@ -112,7 +112,9 @@ echo OK
 
 echo -n "building initrd… "
 cd /
-eval \$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|")
+UCODE=""
+[ -e /boot/intel-ucode.cpio] && UCODE="-P /boot/intel-ucode.cpio"
+eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|") ${UCODE}"
 echo "OK"
 
 [ -L /boot/initrd-gwh.gz ] && rm /boot/initrd-gwh.gz
