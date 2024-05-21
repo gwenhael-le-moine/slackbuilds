@@ -3,14 +3,13 @@ set -x
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 
 BUILD=1
 GITHUB_REPO=gwenhael-le-moine/x48ng
 VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
-LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
 TAG=gwh
 OUTPUT=/tmp
@@ -24,21 +23,25 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $TMP/$PRGNAM $PKG
+rm -fr "${TMP:?}"/"$PRGNAM" "$PKG"
 
 # Fetching sources
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/$PRGNAM
+cp -R "$REPOSITORY" $TMP/"$PRGNAM"
 
 # Preparation
-cd $TMP/$PRGNAM
+cd $TMP/"$PRGNAM" || exit 1
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git describe --tags --abbrev=0)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
+[ "$VERSION" == "" ] && VERSION=trunk
+if [ "$VERSION" == "trunk" ]; then
+    VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+else
+    git checkout "$VERSION"
+fi
 
 chown -R root:root .
 find . \
@@ -51,16 +54,16 @@ find . \
 make all PREFIX=/usr
 
 # Installation
-make install DESTDIR=$PKG PREFIX=/usr
+make install DESTDIR="$PKG" PREFIX=/usr
 
-# # Cleaning
-# cd $PKG
-# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# Cleaning
+cd "$PKG" || exit 1
+find -0 . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find -0 . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
-cd $PKG
+cd "$PKG" || exit 1
 
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -name "*.?" -exec gzip -9 {} \;
 
 chown -R root:root .
 find . \
@@ -86,4 +89,4 @@ $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr -d '-')-$ARCH-$BUILD$TAG.txz"
