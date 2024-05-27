@@ -5,7 +5,7 @@ set -x
 
 CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
-BUILD=${BUILD:-11}
+BUILD=${BUILD:-13}
 BRANCH=${BRANCH:-stable}        # stable ; mainline
 ARCH=$(uname -m)
 
@@ -86,13 +86,21 @@ fi
 
 VERSION=$(basename "$(find "$PKG/lib/modules/" -type d -maxdepth 1 -mindepth 1 | head -n1)")
 
+# Fix build and source symlinks if they are pointing into $TMP:
+( cd $PKG/lib/modules/${VERSION}
+  for symlink in build ; do
+      target=$(readlink $symlink)
+      if echo $target | grep -q "^$PKG/" ; then
+          rm -f $symlink
+          ln -sf $(echo $target | sed "s|$PKG/|/|g") $symlink
+      fi
+  done
+)
+
 mkdir -p "$PKG/boot/"
 cp System.map "$PKG/boot/System.map-gwh-$VERSION"
 cp .config "$PKG/boot/config-gwh-$VERSION"
 cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
-# cp System.map "$PKG/boot/System.map-gwh"
-# cp .config "$PKG/boot/config-gwh"
-# cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh"
 
 make clean
 
@@ -100,9 +108,6 @@ cd "$PKG/boot/" || exit 1
 ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
 ln -s "config-gwh-$VERSION" config-gwh
 ln -s "System.map-gwh-$VERSION" System.map-gwh
-# ln -s vmlinuz-gwh "vmlinuz-gwh-$VERSION"
-# ln -s config-gwh "config-gwh-$VERSION"
-# ln -s System.map-gwh "System.map-gwh-$VERSION"
 
 mkdir -p "$PKG/install"
 cat <<EOF > "$PKG/install/doinst.sh"
@@ -113,7 +118,7 @@ echo OK
 echo -n "building initrd… "
 cd /
 UCODE=""
-[ -e /boot/intel-ucode.cpio] && UCODE="-P /boot/intel-ucode.cpio"
+[ -e /boot/intel-ucode.cpio] && UCODE="-P /boot/intel-ucode.cpio" ]
 eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|") ${UCODE}"
 echo "OK"
 
