@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-GITHUB_REPO=Peltoche/lsd
+GITHUB_REPO=lsd-rs/lsd
 VERSION=${VERSION:-latest}
 BUILD=${BUILD:-1}
 
@@ -31,7 +31,7 @@ git pull --all
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 

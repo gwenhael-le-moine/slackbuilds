@@ -37,7 +37,7 @@ case $VERSION in
         PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
-        PKGVERSION=$(git tag --sort=-taggerdate | head -n1)
+        PKGVERSION=$(git tag --sort=-version:refname | head -n1)
         git checkout "$VERSION"
         ;;
     *)
