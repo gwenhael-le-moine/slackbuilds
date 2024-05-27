@@ -11,7 +11,7 @@ GITHUB_REPO=kovidgoyal/kitty
 VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
-BUILD=1
+BUILD=2
 
 PKG=$TMP/pkg-$PRGNAM
 
@@ -47,7 +47,11 @@ cp -R "$REPOSITORY" "$TMP"/"$PRGNAM"
 cd "$TMP"/"$PRGNAM"/ || exit 1
 [ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
 [ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" # || git checkout $VERSION
+if [ "$VERSION" == "trunk" ]; then
+    VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+else
+    git checkout "$VERSION"
+fi
 
 # installation
 mkdir -p "$PKG"/
@@ -64,14 +68,17 @@ OVERRIDE_CPPFLAGS="$SLKCFLAGS -Wl,-s" \
                  --verbose linux-package \
                  --ignore-compiler-warnings
 
-#mv linux-package "$PKG"/usr
-
 mkdir -p "$PKG"/usr/bin "$PKG"/usr/share "$PKG/usr/lib$LIBDIRSUFFIX"
 cp -a linux-package/bin/* "$PKG"/usr/bin
 cp -a linux-package/share/* "$PKG"/usr/share
 cp -a linux-package/lib*/* "$PKG/usr/lib$LIBDIRSUFFIX"
 strip "$PKG"/usr/bin/"$PRGNAM"
 
+mkdir -p "$PKG$PREFIX"/share/bash-completion/completions
+cp extra/completions/alacritty.bash "$PKG$PREFIX"/share/bash-completion/completions/alacritty
+
+mkdir -p "$PKG$PREFIX"/share/zsh/site-functions
+cp "$PKG/usr/lib$LIBDIRSUFFIX"/kitty/shell-integration/zsh/completions/_kitty "$PKG$PREFIX"/share/zsh/site-functions/
 
 mkdir -p "$PKG"/usr/doc/"$PRGNAM"
 cp -R ./*.md ./*.rst LICENSE "$PKG"/usr/doc/"$PRGNAM"
@@ -84,7 +91,7 @@ chown -R root:root ./*
 mkdir -p "$PKG"/install
 
 cat <<EOF > "$PKG"/install/slack-desc
-$PRGNAM: $PRGNAM (A cross-platform, fast, feature full, GPU based terminal emulator)
+$PRGNAM: $PRGNAM (The fast, feature-rich, GPU based terminal emulator)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
