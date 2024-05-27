@@ -40,7 +40,7 @@ case $VERSION in
         PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
-        PKGVERSION=$(git tag --sort=-taggerdate | head -n1)
+        PKGVERSION=$(git tag --sort=-version:refname | head -n1)
         git checkout "$PKGVERSION"
         ;;
     *)
@@ -73,7 +73,7 @@ PKGNAM=${PRGNAM}
 #             WLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 #             ;;
 #         latest)
-#             WLROOTS_VERSION=$(git tag --sort=-taggerdate | head -n1)
+#             WLROOTS_VERSION=$(git tag --sort=-version:refname | head -n1)
 #             git checkout "$WLROOTS_VERSION"
 #             ;;
 #         *)
@@ -103,7 +103,7 @@ if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
             LIBLIFTOFF_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
-            LIBLIFTOFF_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            LIBLIFTOFF_VERSION=$(git tag --sort=-version:refname | head -n1)
             git checkout "$LIBLIFTOFF_VERSION"
             ;;
         *)
@@ -133,7 +133,7 @@ if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
             LIBDISPLAYINFO_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
-            LIBDISPLAYINFO_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            LIBDISPLAYINFO_VERSION=$(git tag --sort=-version:refname | head -n1)
             git checkout "$LIBDISPLAYINFO_VERSION"
             ;;
         *)

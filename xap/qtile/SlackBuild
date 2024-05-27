@@ -37,7 +37,7 @@ case $VERSION in
         PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
-        PKGVERSION=$(git tag --sort=-taggerdate | head -n1)
+        PKGVERSION=$(git tag --sort=-version:refname | head -n1)
         git checkout "$VERSION"
         ;;
     *)
@@ -149,7 +149,7 @@ if [ "$EMBED_EXTRAS" = "yes" ]; then
             EXTRAS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
-            EXTRAS_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            EXTRAS_VERSION=$(git tag --sort=-version:refname | head -n1)
             git checkout "$EXTRAS_VERSION"
             ;;
         *)
@@ -187,7 +187,7 @@ if [ "$EMBED_PYWAYLAND" = "yes" ]; then
             PYWAYLAND_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
-            PYWAYLAND_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            PYWAYLAND_VERSION=$(git tag --sort=-version:refname | head -n1)
             git checkout "$PYWAYLAND_VERSION"
             ;;
         *)
@@ -224,7 +224,7 @@ if [ "$EMBED_PYWLROOTS" = "yes" ]; then
             PYWLROOTS_VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
             ;;
         latest)
-            PYWLROOTS_VERSION=$(git tag --sort=-taggerdate | head -n1)
+            PYWLROOTS_VERSION=$(git tag --sort=-version:refname | head -n1)
             git checkout "$PYWLROOTS_VERSION"
             ;;
         *)

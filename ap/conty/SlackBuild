@@ -35,7 +35,7 @@ case $VERSION in
         VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
-        VERSION=$(git tag --sort=-taggerdate | head -n1)
+        VERSION=$(git tag --sort=-version:refname | head -n1)
         git checkout "$VERSION"
         ;;
     *)

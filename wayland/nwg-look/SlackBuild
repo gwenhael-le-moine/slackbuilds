@@ -31,7 +31,7 @@ git pull --all
 cp -R "$REPOSITORY" $TMP/
 cd "$TMP/$PRGNAM/" || exit
 
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-taggerdate | head -n1)
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "$VERSION" == "" ] && VERSION=trunk
 if [ "$VERSION" == "trunk" ]; then
     VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
