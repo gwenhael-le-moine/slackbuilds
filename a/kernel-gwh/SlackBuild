@@ -5,7 +5,7 @@ set -x
 
 CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
-BUILD=${BUILD:-13}
+BUILD=${BUILD:-14}
 BRANCH=${BRANCH:-stable}        # stable ; mainline
 ARCH=$(uname -m)
 
@@ -118,8 +118,8 @@ echo OK
 echo -n "building initrd… "
 cd /
 UCODE=""
-[ -e /boot/intel-ucode.cpio] && UCODE="-P /boot/intel-ucode.cpio" ]
-eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|") ${UCODE}"
+[ -e /boot/intel-ucode.cpio ] && UCODE="-P /boot/intel-ucode.cpio"
+eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|") \${UCODE}"
 echo "OK"
 
 [ -L /boot/initrd-gwh.gz ] && rm /boot/initrd-gwh.gz
