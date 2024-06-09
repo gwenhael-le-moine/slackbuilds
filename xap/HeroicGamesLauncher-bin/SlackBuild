@@ -8,7 +8,7 @@ OUTPUT=${OUTPUT:-/tmp}
 PRGNAM=$(basename "$CWD")
 ARCH=${ARCH:-$(uname -m | grep -q 64 && echo "x86_64" || echo "i386")}
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Heroic-Games-Launcher/HeroicGamesLauncher/tags | grep name | head -n1 | grep -o "v[0-9.]*" | tr -d v)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 
 rm -rf "$PKG"
@@ -30,7 +30,7 @@ EOF
 chmod +x "$PKG"/usr/bin/heroic
 
 mkdir -p "$PKG"/usr/share/applications/
-cat <<EOF > "$PKG"/usr/share/applications/itch.desktop
+cat <<EOF > "$PKG"/usr/share/applications/"$PRGNAM".desktop
 [Desktop Entry]
 Type=Application
 Name=$PRGNAM
