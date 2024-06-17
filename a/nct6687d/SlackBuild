@@ -6,7 +6,7 @@ TAG=gwh
 TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
@@ -16,33 +16,33 @@ VERSION=${VERSION:-"trunk"}
 KERNEL_VERSION=$(uname -r)
 
 ARCH=$(uname -m)
-BUILD=3
+BUILD=4
 
 PREFIX=/usr
 
 SLCKFLAGS="-fPIC -O2"
 
-mkdir -p $PKG
+mkdir -p "$PKG"
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr "$PKG $TMP/$PRGNAM"
 
-cp -R $REPOSITORY $TMP/$PRGNAM
-cd $TMP/$PRGNAM
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
 case $VERSION in
     trunk)
         VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
         VERSION=$(git tag --sort=-version:refname | head -n1)
-        git checkout $VERSION
+        git checkout "$VERSION"
         ;;
     *)
-        git checkout $VERSION
+        git checkout "$VERSION"
         ;;
 esac
 
@@ -50,36 +50,35 @@ esac
 make
 
 # installation
-mkdir -p $PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/
-cp ${KERNEL_VERSION}/nct6687.ko $PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/
+mkdir -p "$PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/"
+cp "${KERNEL_VERSION}/nct6687.ko" "$PKG/lib/modules/${KERNEL_VERSION}/kernel/drivers/hwmon/"
 
-mkdir -p $PKG/etc/modprobe.d/
-cat <<EOF > $PKG/etc/modprobe.d/blacklist_nct6683.conf
+mkdir -p "$PKG/etc/modprobe.d/"
+cat <<EOF > "$PKG"/etc/modprobe.d/blacklist_nct6683.conf
 # Do not load the nct6683 module on boot.
 blacklist nct6683
 # uncomment the line below if blacklisting is not sufficient
 # install nct6683 /bin/true
 EOF
 
-mkdir -p $PKG/usr/doc/$PRGNAM/
-cp -R images/ LICENSE *.md $PKG/usr/doc/$PRGNAM/
+mkdir -p "$PKG/usr/doc/$PRGNAM/"
+cp -R images/ LICENSE ./*.md "$PKG/usr/doc/$PRGNAM/"
 
 # correction
-cd $PKG
-chown -R root:root *
-
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-
-# Strip binaries
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
 # embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/doinst.sh
+#!/bin/bash
+
+depmod
+
+modprobe nct6687
+EOF
+
+cat <<EOF > "$PKG"/install/slack-desc
 $PRGNAM: $PRGNAM (Linux kernel module for Nuvoton NCT6687-R)
 $PRGNAM:
 $PRGNAM:
@@ -94,6 +93,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')_${KERNEL_VERSION}-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/}_${KERNEL_VERSION}-$ARCH-$BUILD$TAG.txz"

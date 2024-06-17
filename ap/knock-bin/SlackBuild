@@ -2,10 +2,10 @@
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/BentonEdmondson/knock/tags | jq -r '.[1].name')}
+PRGNAM=$(basename "$CWD")
+VERSION=1.3.1
 ARCH=$(uname -m)
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
@@ -13,28 +13,30 @@ OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
 
-mkdir -p $REPOSITORY
+mkdir -p "$REPOSITORY"
 
-[ ! -e $REPOSITORY/knock-${VERSION}-${ARCH}-linux ] && wget -c -O $REPOSITORY/knock-${VERSION}-${ARCH}-linux https://github.com/BentonEdmondson/knock/releases/download/${VERSION}/knock-${VERSION}-${ARCH}-linux
+#[ ! -e $REPOSITORY/knock-${VERSION}-${ARCH}-linux ] && wget -c -O $REPOSITORY/knock-${VERSION}-${ARCH}-linux https://github.com/BentonEdmondson/knock/releases/download/${VERSION}/knock-${VERSION}-${ARCH}-linux
+[ ! -e "$REPOSITORY/knock-${VERSION}-${ARCH}-linux" ] && wget -c -O "$REPOSITORY/knock-${VERSION}-${ARCH}-linux" "https://web.archive.org/web/20220906155522/https://objects.githubusercontent.com/github-production-release-asset-2e65be/387297733/401c45b4-aa84-483a-a8ec-47bb4b74ac30?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20220906%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220906T155522Z&X-Amz-Expires=300&X-Amz-Signature=f96d4fad08463e050e4bfa44d2035d604f81f5a054d7c6c7f705e18a9146cb67&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=387297733&response-content-disposition=attachment%3B%20filename%3Dknock-1.3.1-x86_64-linux&response-content-type=application%2Foctet-stream"
 
-DOCS="license readme.md demo.png"
+DOCS="license readme.md"
+# for i in $DOCS; do
+#     [ ! -e $REPOSITORY/${i}-${VERSION} ] && wget -c -O $REPOSITORY/${i}-${VERSION} https://raw.githubusercontent.com/BentonEdmondson/knock/${VERSION}/$i
+# done
+
+rm -fr "$PKG"
+mkdir -p "$PKG"/usr/bin/
+
+cp "$REPOSITORY/knock-${VERSION}-${ARCH}-linux" "$PKG"/usr/bin/knock
+chmod +x "$PKG"/usr/bin/knock
+
+mkdir -p "$PKG"/usr/doc/knock/
 for i in $DOCS; do
-    [ ! -e $REPOSITORY/${i}-${VERSION} ] && wget -c -O $REPOSITORY/${i}-${VERSION} https://raw.githubusercontent.com/BentonEdmondson/knock/${VERSION}/$i
+    [ -e "$CWD/${i}" ] && cp "$CWD/${i}" "$PKG"/usr/doc/knock/"$i"
 done
 
-rm -fr $PKG
-mkdir -p $PKG/usr/{bin,doc/knock}/
+mkdir -p "$PKG"/install
 
-cp $REPOSITORY/knock-${VERSION}-${ARCH}-linux $PKG/usr/bin/knock
-chmod +x $PKG/usr/bin/knock
-
-for i in $DOCS; do
-    cp $REPOSITORY/${i}-${VERSION} $PKG/usr/doc/knock/$i
-done
-
-mkdir -p $PKG/install
-
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -56,6 +58,5 @@ ${PRGNAM}:
 ${PRGNAM}: https://github.com/BentonEdmondson/knock
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend ${OUTPUT}/${PRGNAM}-$(echo ${VERSION} | tr - _)-${ARCH}-${BUILD}${TAG}.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "${OUTPUT}/${PRGNAM}-${VERSION//-/_}-${ARCH}-${BUILD}${TAG}.txz"
