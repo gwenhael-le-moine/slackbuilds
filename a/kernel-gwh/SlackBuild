@@ -1,11 +1,11 @@
 #!/bin/bash
 
 set -e
-set -x
+#set -x
 
 CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
-BUILD=${BUILD:-14}
+BUILD=${BUILD:-19}
 BRANCH=${BRANCH:-stable}        # stable ; mainline
 ARCH=$(uname -m)
 
@@ -16,7 +16,6 @@ OUTPUT=/tmp
 
 NUMJOBS=${NUMJOBS:-$(nproc)}
 
-ANEW=${ANEW:-true}
 CONFIG=${CONFIG:-""}
 
 REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
@@ -28,22 +27,18 @@ mkdir -p "$REPOSITORY"
 rm -fr "$PKG"
 
 mkdir -p "$PKG/usr/src/"
-if [ -e "/usr/src/linux-$VERSION" ] && [[ "$ANEW" != "true" ]]; then
-    cp -a "/usr/src/linux-$VERSION" "$PKG/usr/src/"
+if [ "$BRANCH" == "stable" ]; then
+    SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo "$VERSION" | cut -d. -f1).x"
 else
-    if [ "$BRANCH" == "stable" ]; then
-        SRC_URL="https://cdn.kernel.org/pub/linux/kernel/v$(echo "$VERSION" | cut -d. -f1).x"
-    else
-        SRC_URL="https://git.kernel.org/torvalds/t"
-    fi
-
-    [ ! -e "$REPOSITORY"/linux-"$VERSION".tar.gz ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O "$REPOSITORY/linux-$VERSION.tar.gz"
-    tar xf "$REPOSITORY/linux-$VERSION.tar.gz" -C "$PKG/usr/src/"
+    SRC_URL="https://git.kernel.org/torvalds/t"
 fi
 
+[ ! -e "$REPOSITORY"/linux-"$VERSION".tar.gz ] && wget -c "$SRC_URL/linux-$VERSION.tar.gz" -O "$REPOSITORY/linux-$VERSION.tar.gz"
+tar xf "$REPOSITORY/linux-$VERSION.tar.gz" -C "$PKG/usr/src/"
+
 cd "$PKG/usr/src/" || exit 1
-mv "linux-$VERSION" "linux-${VERSION}-gwh"
-cd "linux-${VERSION}-gwh"
+mv "linux-$VERSION" "linux-gwh"
+cd "linux-gwh" || exit 1
 
 if [ -n "$CONFIG" ] && [ -e "$CONFIG" ]; then
     cat "$CONFIG" > .config
@@ -51,8 +46,6 @@ fi
 if [ ! -f .config ]; then
     zcat /proc/config.gz > .config
 fi
-
-# read
 
 make oldconfig "$@"
 
@@ -86,28 +79,25 @@ fi
 
 VERSION=$(basename "$(find "$PKG/lib/modules/" -type d -maxdepth 1 -mindepth 1 | head -n1)")
 
+cd ..
+mv "$PKG/usr/src/linux-gwh" "$PKG/usr/src/linux-${VERSION}"
+cd "$PKG/usr/src/linux-${VERSION}" || exit 1
+
 # Fix build and source symlinks if they are pointing into $TMP:
-( cd $PKG/lib/modules/${VERSION}
-  for symlink in build ; do
-      target=$(readlink $symlink)
-      if echo $target | grep -q "^$PKG/" ; then
-          rm -f $symlink
-          ln -sf $(echo $target | sed "s|$PKG/|/|g") $symlink
-      fi
-  done
+( cd "$PKG"/lib/modules/"${VERSION}"
+  target=$(readlink build)
+  if echo "$target" | grep -q "^$PKG/" ; then
+      rm -f build
+      ln -sf "/usr/src/linux-${VERSION}" build
+  fi
 )
 
 mkdir -p "$PKG/boot/"
-cp System.map "$PKG/boot/System.map-gwh-$VERSION"
-cp .config "$PKG/boot/config-gwh-$VERSION"
-cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-gwh-$VERSION"
+cp System.map "$PKG/boot/System.map-$VERSION"
+cp .config "$PKG/boot/config-$VERSION"
+cp "arch/${ARCH}/boot/bzImage" "$PKG/boot/vmlinuz-$VERSION"
 
 make clean
-
-cd "$PKG/boot/" || exit 1
-ln -s "vmlinuz-gwh-$VERSION" vmlinuz-gwh
-ln -s "config-gwh-$VERSION" config-gwh
-ln -s "System.map-gwh-$VERSION" System.map-gwh
 
 mkdir -p "$PKG/install"
 cat <<EOF > "$PKG/install/doinst.sh"
@@ -119,11 +109,8 @@ echo -n "building initrd… "
 cd /
 UCODE=""
 [ -e /boot/intel-ucode.cpio ] && UCODE="-P /boot/intel-ucode.cpio"
-eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-gwh-${VERSION}.gz|") \${UCODE}"
+eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-${VERSION}-gwh.gz|") \${UCODE}"
 echo "OK"
-
-[ -L /boot/initrd-gwh.gz ] && rm /boot/initrd-gwh.gz
-ln -s /boot/initrd-gwh-${VERSION}.gz /boot/initrd-gwh.gz
 
 grub-mkconfig -o /boot/grub/grub.cfg
 EOF

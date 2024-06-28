@@ -93,4 +93,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/}_${KERNEL_VERSION}-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/}_${KERNEL_VERSION//-/}-$ARCH-$BUILD$TAG.txz"
