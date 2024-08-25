@@ -168,7 +168,6 @@ meson setup \
       -Dstrip=true \
       -Ddefault-wallpaper=true \
       -Dswaybar=true \
-      -Dxwayland=enabled \
       -Dtray=enabled \
       -Dgdk-pixbuf=enabled \
       -Dswaynag=true \

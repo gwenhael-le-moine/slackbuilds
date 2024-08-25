@@ -33,7 +33,7 @@ cd "$TMP"/"$PRGNAM"/ || exit 1
 qmake6  DOCS_DIR=/usr/doc/"$PRGNAM" MAN_DIR=/usr/man/man1 OpenRGB.pro
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
-      make
+      make -j $(nproc)
 make INSTALL_ROOT="$PKG" install
 
 find "$PKG" -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \

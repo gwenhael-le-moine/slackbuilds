@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 GITHUB_REPO=wez/wezterm
 VERSION=${VERSION:-latest}
 
@@ -36,11 +36,29 @@ cd $TMP/$PRGNAM
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
-cargo build --release
+./get-deps
+cargo build --release  --features distro-defaults
 
 mkdir -p $PKG$PREFIX/bin
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
+find target/release/ -type f -executable -maxdepth 1 -not -name \*.so -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
+
+install -Dm 644 assets/icon/terminal.png $PKG/usr/share/icons/hicolor/128x128/apps/org.wezfurlong.$PRGNAM.png
+install -Dm 644 assets/$PRGNAM.desktop $PKG/usr/share/applications/org.wezfurlong.$PRGNAM.desktop
+install -Dm 644 assets/$PRGNAM.appdata.xml $PKG/usr/share/metainfo/org.wezfurlong.$PRGNAM.appdata.xml
+install -Dm 644 assets/$PRGNAM-nautilus.py $PKG/usr/share/nautilus-python/extensions/$PRGNAM-nautilus.py
+install -Dm 755 assets/open-$PRGNAM-here -t $PKG/usr/bin
+install -Dm 644 assets/shell-completion/bash $PKG/usr/share/bash-completion/completions/$PRGNAM
+install -Dm 644 assets/shell-completion/fish $PKG/usr/share/fish/vendor_completions.d/$PRGNAM.fish
+install -Dm 644 assets/shell-completion/zsh $PKG/usr/share/zsh/site-functions/_$PRGNAM
+
+install -Dm 644 assets/shell-integration/* -t $PKG/etc/profile.d
+
+mkdir -p $PKG/usr/share/terminfo
+tic -x -o $PKG/usr/share/terminfo termwiz/data/$PRGNAM.terminfo
+
+find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
