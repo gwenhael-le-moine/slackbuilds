@@ -10,7 +10,7 @@ PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
-BUILD=1
+BUILD=2
 VERSION=${VERSION:-latest}
 
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
@@ -29,6 +29,15 @@ cd "$TMP"/"$PRGNAM"/ || exit 1
 [ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "$VERSION" == "" ] && VERSION=trunk
 [ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" #|| git checkout $VERSION
+
+# Override default udev rule location since it would put it in a
+# non-standard location in Slackware
+sed -i 's|$$PREFIX/lib/udev/|/lib/udev/|g' OpenRGB.pro
+sed -i 's|/usr/lib/udev/|/lib/udev/|' README.md ResourceManager.cpp
+
+# This fixes breakage if someone is running experimental versions (master branch)
+# It does not affect the current release
+sed -i '/.*certs\.h/'d dependencies/hueplusplus-1.?.0/src/EntertainmentMode.cpp
 
 qmake6  DOCS_DIR=/usr/doc/"$PRGNAM" MAN_DIR=/usr/man/man1 OpenRGB.pro
 CFLAGS="$SLKCFLAGS" \
