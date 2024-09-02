@@ -12,6 +12,7 @@ PKG=$TMP/pkg-$PRGNAM
 REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
 
 GITHUB_REPO=Fred78290/nct6687d
+#GITHUB_REPO=gwenhael-le-moine/nct6687d
 VERSION=${VERSION:-"trunk"}
 KERNEL_VERSION=$(uname -r)
 
@@ -29,7 +30,7 @@ mkdir -p "$PKG"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
-rm -fr "$PKG $TMP/$PRGNAM"
+rm -fr "$PKG" "$TMP/$PRGNAM"
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 cd "$TMP/$PRGNAM" || exit 1
@@ -45,6 +46,11 @@ case $VERSION in
         git checkout "$VERSION"
         ;;
 esac
+
+if [ -e "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch ]; then
+    patch -p1 < "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch
+    VERSION="${VERSION}_patched"
+fi
 
 # compilation
 make
