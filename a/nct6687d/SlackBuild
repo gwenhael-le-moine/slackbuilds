@@ -17,11 +17,7 @@ VERSION=${VERSION:-"trunk"}
 KERNEL_VERSION=$(uname -r)
 
 ARCH=$(uname -m)
-BUILD=4
-
-PREFIX=/usr
-
-SLCKFLAGS="-fPIC -O2"
+BUILD=7
 
 mkdir -p "$PKG"
 
@@ -30,7 +26,7 @@ mkdir -p "$PKG"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
-rm -fr "$PKG" "$TMP/$PRGNAM"
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 cd "$TMP/$PRGNAM" || exit 1
@@ -47,10 +43,15 @@ case $VERSION in
         ;;
 esac
 
-if [ -e "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch ]; then
-    patch -p1 < "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch
-    VERSION="${VERSION}_patched"
-fi
+# if [ -e "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch ]; then
+#     patch -p1 < "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch
+#     VERSION="${VERSION}_patched"
+# fi
+
+# if [ -e "$CWD"/ec431bf2ce2c017e4d3ec9a4bda6300ac5a46780.patch ]; then
+#     patch -p1 < "$CWD"/ec431bf2ce2c017e4d3ec9a4bda6300ac5a46780.patch
+#     VERSION="${VERSION}_patched"
+# fi
 
 # compilation
 make
