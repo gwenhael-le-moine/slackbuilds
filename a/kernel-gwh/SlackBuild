@@ -106,10 +106,11 @@ grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub
 echo OK
 
 echo -n "building initrd… "
-cd /
-UCODE=""
-[ -e /boot/intel-ucode.cpio ] && UCODE="-P /boot/intel-ucode.cpio"
-eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-${VERSION}.gz|") \${UCODE}"
+# cd /
+# UCODE=""
+# [ -e /boot/intel-ucode.cpio ] && UCODE="-P /boot/intel-ucode.cpio"
+# eval "\$(/usr/share/mkinitrd/mkinitrd_command_generator.sh -k $VERSION -r | sed "s|/boot/initrd.gz|/boot/initrd-${VERSION}.gz|") \${UCODE}"
+dracut --hostonly --force --kver "$VERSION" "/boot/initrd-$VERSION.img"
 echo "OK"
 
 grub-mkconfig -o /boot/grub/grub.cfg
