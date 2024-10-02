@@ -96,5 +96,5 @@ $PRGNAM:
 $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+rm -f "$PKG"/{,usr/}"lib$(uname -m | grep -o 64)"/*.la
 /sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr -d '-')-$ARCH-$BUILD$TAG.txz"
