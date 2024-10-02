@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
 
-BUILD=1
+BUILD=2
 GITHUB_REPO=gwenhael-le-moine/x48ng
 VERSION=${VERSION:-latest}
 
@@ -51,10 +51,10 @@ find . \
      -exec chmod 644 {} \;
 
 # Building
-make all PREFIX=/usr
+make all PREFIX=/usr WITH_SDL2=yes
 
 # Installation
-make install DESTDIR="$PKG" PREFIX=/usr
+make install DESTDIR="$PKG" PREFIX=/usr WITH_SDL2=yes
 
 # Cleaning
 cd "$PKG" || exit 1
