@@ -24,7 +24,7 @@ mkdir -p $PKG/opt/$PRGNAM
 # mise en place
 cd $PKG/opt/$PRGNAM
 
-wget -c https://github.com/nextcloud/desktop/releases/download/${VERSION}/Nextcloud-$(echo ${VERSION} | sed 's|^v||')-x86_64.AppImage -O ${PRGNAM}-${VERSION}.AppImage
+wget -c https://github.com/nextcloud-releases/desktop/releases/download/${VERSION}/Nextcloud-$(echo ${VERSION} | sed 's|^v||')-x86_64.AppImage -O ${PRGNAM}-${VERSION}.AppImage
 chmod +x ${PRGNAM}-${VERSION}.AppImage
 
 mkdir -p $PKG$PREFIX/bin/
