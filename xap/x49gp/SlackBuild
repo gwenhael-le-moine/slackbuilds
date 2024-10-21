@@ -64,7 +64,7 @@ cp "$CWD"/hp4950v215.zip "$PKG"$PREFIX/doc/"$PRGNAM"/hp4950v215.zip
 unzip -o -d "$PKG"$PREFIX/share/"$PRGNAM"/ "$PKG"$PREFIX/doc/"$PRGNAM"/hp4950v215.zip
 
 mkdir -p "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/
-[ ! -e "$CWD"/newrpl/newrplfw.bin ] && wget -c -O "$CWD"/newrpl/newrplfw.bin https://www.hpgcc3.org/downloads/newrplfw.bin
+[ ! -e "$CWD"/newrpl/newrplfw.bin ] && wget -c -O "$CWD"/newrpl/newrplfw.bin https://hpgcc3.org/downloads/newrplfw.bin
 cp "$CWD"/newrpl/newrplfw.bin "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/newrplfw.bin
 echo "newrplfw.bin" > "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/update.scp
 
