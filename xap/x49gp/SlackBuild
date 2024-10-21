@@ -3,15 +3,13 @@ set -x
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 GITHUB_REPO=gwenhael-le-moine/x49gp #claudiobsd/x49gp
 VERSION=${VERSION:-latest}
-NEWRPL_VERSION=1487
 
-BUILD=8
+BUILD=11
 
 ARCH=$(uname -m)
-LIBSUFFIX=$(echo $ARCH | grep -o "\(64\)")
 
 TAG=gwh
 OUTPUT=/tmp
@@ -26,18 +24,18 @@ PREFIX=/usr
 mkdir -p $TMP
 
 # Cleaning
-rm -fr $TMP/$PRGNAM $PKG
+rm -fr "$TMP"/"$PRGNAM" "$PKG"
 
 # Fetching sources
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/$PRGNAM
-cd $TMP/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+cp -R "$REPOSITORY" "$TMP"/"$PRGNAM"
+cd "$TMP"/"$PRGNAM" || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
 # Preparation
 chown -R root:root .
@@ -48,52 +46,35 @@ find . \
      -exec chmod 644 {} \;
 
 make INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
-make sdcard INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 
 # Installing
-mkdir -p $PKG
-make install DESTDIR=$PKG INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
+mkdir -p "$PKG"
+make install DESTDIR="$PKG" INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM/
-cp README* sdcard $PKG$PREFIX/doc/$PRGNAM/
+mkdir -p "$PKG"$PREFIX/doc/"$PRGNAM"/
+cp README* "$PKG"$PREFIX/doc/"$PRGNAM"/
 
-mkdir -p $PKG$PREFIX/share/applications/
-cat <<EOF > $PKG$PREFIX/share/applications/$PRGNAM.desktop
-[Desktop Entry]
-Encoding=UTF-8
-Version=1.0
-Type=Application
-Terminal=false
-Exec=$PREFIX/bin/x49gp
-Name=x49gp
-Icon=/usr/share/x49gp/hp50g.png
-EOF
+mkdir -p "$PKG"$PREFIX/share/"$PRGNAM"
+[ ! -e "$CWD"/hp-arm-models-bootloader.zip ] && wget -c -O "$CWD"/hp-arm-models-bootloader.zip https://www.hpcalc.org/hp49/pc/rom/hp-arm-models-bootloader.zip
+cp "$CWD"/hp-arm-models-bootloader.zip "$PKG"$PREFIX/doc/"$PRGNAM"/hp-arm-models-bootloader.zip
+unzip -o -d "$PKG"$PREFIX/share/"$PRGNAM"/firmware/ "$PKG"$PREFIX/doc/"$PRGNAM"/hp-arm-models-bootloader.zip
 
-cat <<EOF > $PKG$PREFIX/doc/$PRGNAM/post-install.sh
-#!/bin/bash
+[ ! -e "$CWD"/hp4950v215.zip ] && wget -c -O "$CWD"/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
+cp "$CWD"/hp4950v215.zip "$PKG"$PREFIX/doc/"$PRGNAM"/hp4950v215.zip
+unzip -o -d "$PKG"$PREFIX/share/"$PRGNAM"/ "$PKG"$PREFIX/doc/"$PRGNAM"/hp4950v215.zip
 
-mkdir -p $PREFIX/share/$PRGNAM
-[ ! -e $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip ] && wget -c -O $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip https://www.hpcalc.org/hp49/pc/rom/hp-arm-models-bootloader.zip
-unzip -d $PREFIX/share/$PRGNAM/firmware/ $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip
-rm $PREFIX/doc/$PRGNAM/hp-arm-models-bootloader.zip
-
-[ ! -e $PREFIX/doc/$PRGNAM/hp4950v215.zip ] && wget -c -O $PREFIX/doc/$PRGNAM/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
-unzip -d $PREFIX/share/$PRGNAM/ $PREFIX/doc/$PRGNAM/hp4950v215.zip
-rm $PREFIX/doc/$PRGNAM/hp4950v215.zip
-
-mkdir -p $PREFIX/share/$PRGNAM/newrpl/
-wget -c -O $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin.new https://www.hpgcc3.org/downloads/newrplfw.bin
-mv $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin.new $PREFIX/share/$PRGNAM/newrpl/newrplfw.bin
-echo "newrplfw.bin" > $PREFIX/share/$PRGNAM/newrpl/update.scp
-EOF
+mkdir -p "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/
+[ ! -e "$CWD"/newrpl/newrplfw.bin ] && wget -c -O "$CWD"/newrpl/newrplfw.bin https://www.hpgcc3.org/downloads/newrplfw.bin
+cp "$CWD"/newrpl/newrplfw.bin "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/newrplfw.bin
+echo "newrplfw.bin" > "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/update.scp
 
 # # Cleaning
 # cd $PKG
 # find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 # find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-cd $PKG
+cd "$PKG" || exit 1
 
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+[ -d "$PKG"$PREFIX/man ] && find "$PKG"$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
 
 chown -R root:root .
 find . \
@@ -108,8 +89,6 @@ cat <<EOF > install/doinst.sh
 #!/bin/bash
 
 cat /usr/doc/x49gp/README.md | grep "First launch setup" --before-context=2 --after-context=28
-
-echo "Run $PREFIX/doc/$PRGNAM/post-install.sh"
 EOF
 
 cat <<EOF > install/slack-desc
@@ -126,5 +105,5 @@ $PRGNAM: https://sourceforge.net/projects/x49gp/
 $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG"/{,usr/}"lib$(uname -m | grep -o 64)"/*.la
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/"$PRGNAM"-"$(echo "$VERSION" | tr -d '-')"-"$ARCH"-$BUILD$TAG.txz
