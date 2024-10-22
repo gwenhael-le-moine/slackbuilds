@@ -7,7 +7,7 @@ PRGNAM=$(basename "$CWD")
 GITHUB_REPO=gwenhael-le-moine/x49gp #claudiobsd/x49gp
 VERSION=${VERSION:-latest}
 
-BUILD=11
+BUILD=12
 
 ARCH=$(uname -m)
 
@@ -46,6 +46,7 @@ find . \
      -exec chmod 644 {} \;
 
 make INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
+make pull-firmware
 
 # Installing
 mkdir -p "$PKG"
@@ -54,25 +55,11 @@ make install DESTDIR="$PKG" INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
 mkdir -p "$PKG"$PREFIX/doc/"$PRGNAM"/
 cp README* "$PKG"$PREFIX/doc/"$PRGNAM"/
 
-mkdir -p "$PKG"$PREFIX/share/"$PRGNAM"
-[ ! -e "$CWD"/hp-arm-models-bootloader.zip ] && wget -c -O "$CWD"/hp-arm-models-bootloader.zip https://www.hpcalc.org/hp49/pc/rom/hp-arm-models-bootloader.zip
-cp "$CWD"/hp-arm-models-bootloader.zip "$PKG"$PREFIX/doc/"$PRGNAM"/hp-arm-models-bootloader.zip
-unzip -o -d "$PKG"$PREFIX/share/"$PRGNAM"/firmware/ "$PKG"$PREFIX/doc/"$PRGNAM"/hp-arm-models-bootloader.zip
-
-[ ! -e "$CWD"/hp4950v215.zip ] && wget -c -O "$CWD"/hp4950v215.zip https://www.hpcalc.org/hp49/pc/rom/hp4950v215.zip
-cp "$CWD"/hp4950v215.zip "$PKG"$PREFIX/doc/"$PRGNAM"/hp4950v215.zip
-unzip -o -d "$PKG"$PREFIX/share/"$PRGNAM"/ "$PKG"$PREFIX/doc/"$PRGNAM"/hp4950v215.zip
-
-mkdir -p "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/
-[ ! -e "$CWD"/newrplfw.bin ] && wget -c -O "$CWD"/newrplfw.bin https://hpgcc3.org/downloads/newrplfw.bin
-cp "$CWD"/newrplfw.bin "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/newrplfw.bin
-echo "newrplfw.bin" > "$PKG"$PREFIX/share/"$PRGNAM"/newrpl/update.scp
-
 # # Cleaning
-# cd $PKG
-# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 cd "$PKG" || exit 1
+
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 [ -d "$PKG"$PREFIX/man ] && find "$PKG"$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
 
