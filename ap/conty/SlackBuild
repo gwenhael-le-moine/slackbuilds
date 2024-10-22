@@ -6,7 +6,7 @@ PRGNAM=$(basename "$CWD")
 GITHUB_REPO=Kron4ek/Conty
 VERSION=${VERSION:-"latest"}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-5}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -58,6 +58,9 @@ cp conty.sh "$PKG$PREFIX/bin/${PRGNAM}"
 cd "$PKG$PREFIX/bin/" || exit 1
 cat <<EOF > steam
 #!/bin/bash
+
+# https://github.com/ValveSoftware/steam-for-linux/issues/11358
+unset SDL_VIDEODRIVER
 
 $PREFIX/bin/conty steam "\$@"
 EOF

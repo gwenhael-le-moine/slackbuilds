@@ -6,7 +6,7 @@ PRGNAM=$(basename $CWD)
 GITHUB_REPO=Kron4ek/Conty
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-5}
+BUILD=${BUILD:-6}
 TAG=${TAG:-gwh}
 
 EDITION=${EDITION:-"_lite_dwarfs"} # "", "_lite", "_dwarfs", "_lite_dwarfs"
@@ -30,6 +30,9 @@ cp $REPOSITORY/conty${EDITION}-${VERSION}.sh $PKG$PREFIX/bin/conty
 cd $PKG$PREFIX/bin/
 cat <<EOF > steam
 #!/bin/bash
+
+# https://github.com/ValveSoftware/steam-for-linux/issues/11358
+unset SDL_VIDEODRIVER
 
 $PREFIX/bin/conty steam "\$@"
 EOF
