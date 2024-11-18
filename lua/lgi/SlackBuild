@@ -15,7 +15,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 

@@ -19,7 +19,7 @@ fi
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 if [ "$ARCH" = "i486" ]; then
     SLKCFLAGS="-O2 -march=i486 -mtune=i686"

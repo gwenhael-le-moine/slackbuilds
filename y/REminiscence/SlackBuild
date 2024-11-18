@@ -14,7 +14,7 @@ VERSION=${VERSION:-$(curl -s http://cyxdown.free.fr/reminiscence/CHANGES.txt | g
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
 mkdir -p $REPOSITORY
 

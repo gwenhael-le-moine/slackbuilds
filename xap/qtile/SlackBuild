@@ -16,7 +16,7 @@ PKG=$TMP/pkg-$PKGNAM
 
 ARCH=$(uname -m)
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PKGNAM
 PREFIX=/usr
 
 # nettoyage préalable
@@ -135,7 +135,7 @@ if [ "$EMBED_EXTRAS" = "yes" ]; then
     EXTRAS_PKGNAM=qtile-extras
     EXTRAS_GITHUB_REPO=elParaguayo/qtile-extras
     EXTRAS_VERSION=${EXTRAS_VERSION:-$VERSION}
-    EXTRAS_REPOSITORY=/home/installs/SlackBuilds/_repositories/$EXTRAS_PKGNAM
+    EXTRAS_REPOSITORY=/var/cache/SlackBuilds.gwh/$EXTRAS_PKGNAM
     [ ! -e "$EXTRAS_REPOSITORY" ] && git clone https://github.com/${EXTRAS_GITHUB_REPO}.git "$EXTRAS_REPOSITORY"
     cd "$EXTRAS_REPOSITORY" || exit 1
     git reset --hard HEAD
@@ -173,7 +173,7 @@ if [ "$EMBED_PYWAYLAND" = "yes" ]; then
     PYWAYLAND_PKGNAM=pywayland
     PYWAYLAND_GITHUB_REPO=flacjacket/pywayland
     PYWAYLAND_VERSION=${PYWAYLAND_VERSION:-$VERSION}
-    PYWAYLAND_REPOSITORY=/home/installs/SlackBuilds/_repositories/$PYWAYLAND_PKGNAM
+    PYWAYLAND_REPOSITORY=/var/cache/SlackBuilds.gwh/$PYWAYLAND_PKGNAM
     [ ! -e "$PYWAYLAND_REPOSITORY" ] && git clone https://github.com/${PYWAYLAND_GITHUB_REPO}.git "$PYWAYLAND_REPOSITORY"
     cd "$PYWAYLAND_REPOSITORY" || exit 1
     git reset --hard HEAD
@@ -210,7 +210,7 @@ if [ "$EMBED_PYWLROOTS" = "yes" ]; then
     PYWLROOTS_PKGNAM=pywlroots
     PYWLROOTS_GITHUB_REPO=flacjacket/pywlroots
     PYWLROOTS_VERSION=${PYWLROOTS_VERSION:-$VERSION}
-    PYWLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/$PYWLROOTS_PKGNAM
+    PYWLROOTS_REPOSITORY=/var/cache/SlackBuilds.gwh/$PYWLROOTS_PKGNAM
     [ ! -e "$PYWLROOTS_REPOSITORY" ] && git clone https://github.com/${PYWLROOTS_GITHUB_REPO}.git "$PYWLROOTS_REPOSITORY"
     cd "$PYWLROOTS_REPOSITORY" || exit 1
     git reset --hard HEAD

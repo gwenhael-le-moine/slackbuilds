@@ -11,7 +11,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 ARCH='noarch'
 BUILD=1

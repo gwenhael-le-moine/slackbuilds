@@ -13,7 +13,7 @@ ARCH=$(uname -m)
 BUILD=2
 VERSION=${VERSION:-latest}
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 rm -fr "$PKG" "${TMP:?}"/"$PRGNAM"
 

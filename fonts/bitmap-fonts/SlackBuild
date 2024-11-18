@@ -14,7 +14,7 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 # nettoyage préalable
 rm -fr "$PKG" "${TMP:?}/$PRGNAM"

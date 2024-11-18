@@ -22,7 +22,7 @@ OUTPUT=${OUTPUT:-/tmp}
 
 PREFIX=${PREFIX:-/usr}
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 set -e
 

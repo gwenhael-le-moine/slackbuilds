@@ -26,7 +26,7 @@ set -eu
 rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 [ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
 ( cd $REPOSITORY
   git pull )

@@ -83,7 +83,7 @@ VERSION=${VERSION:-latest}
 
 PREFIX=${PREFIX:-/usr}
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PKGNAM
 
 rm -rf "$PKG"
 mkdir -p "$TMP" "$PKG"

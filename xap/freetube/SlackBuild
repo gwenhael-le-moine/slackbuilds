@@ -16,7 +16,7 @@ PKG=$TMP/pkg-$PKGNAM
 
 ARCH=$(uname -m)
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PKGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PKGNAM
 PREFIX=/usr
 
 # nettoyage préalable

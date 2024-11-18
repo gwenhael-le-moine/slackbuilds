@@ -12,7 +12,7 @@ TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PKGNAM}
+REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
 
 mkdir -p "$REPOSITORY"
 

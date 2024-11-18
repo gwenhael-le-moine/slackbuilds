@@ -9,7 +9,7 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 GITHUB_REPO=Fred78290/nct6687d
 #GITHUB_REPO=gwenhael-le-moine/nct6687d

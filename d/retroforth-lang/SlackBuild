@@ -14,7 +14,7 @@ VERSION=${VERSION:-trunk}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 PREFIX=${PREFIX:-/usr}
 

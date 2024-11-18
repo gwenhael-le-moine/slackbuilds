@@ -15,7 +15,7 @@ BUILD=2
 
 PKG=$TMP/pkg-$PRGNAM
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 LIBDIRSUFFIX=$(uname -m | grep -o 64)
 

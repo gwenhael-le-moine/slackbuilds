@@ -15,7 +15,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 PREFIX=/usr
 MESONFLAGS=""
@@ -71,7 +71,7 @@ fi
 EMBED_WLROOTS=${EMBED_WLROOTS:-"yes"}
 if [ "$EMBED_WLROOTS" = "yes" ]; then
     WLROOTS_VERSION=${WLROOTS_VERSION:-$VERSION}
-    WLROOTS_REPOSITORY=/home/installs/SlackBuilds/_repositories/wlroots
+    WLROOTS_REPOSITORY=/var/cache/SlackBuilds.gwh/wlroots
     [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
     cd "$WLROOTS_REPOSITORY" || exit 1
     git reset --hard HEAD
@@ -101,7 +101,7 @@ fi
 EMBED_LIBLIFTOFF=${EMBED_LIBLIFTOFF:-"yes"}
 if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
     LIBLIFTOFF_VERSION=${LIBLIFTOFF_VERSION:-$VERSION}
-    LIBLIFTOFF_REPOSITORY=/home/installs/SlackBuilds/_repositories/libliftoff
+    LIBLIFTOFF_REPOSITORY=/var/cache/SlackBuilds.gwh/libliftoff
     [ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
     cd "$LIBLIFTOFF_REPOSITORY" || exit 1
     git reset --hard HEAD
@@ -131,7 +131,7 @@ fi
 EMBED_LIBDISPLAYINFO=${EMBED_LIBDISPLAYINFO:-"yes"}
 if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
     LIBDISPLAYINFO_VERSION=${LIBDISPLAYINFO_VERSION:-$VERSION}
-    LIBDISPLAYINFO_REPOSITORY=/home/installs/SlackBuilds/_repositories/libdisplay-info
+    LIBDISPLAYINFO_REPOSITORY=/var/cache/SlackBuilds.gwh/libdisplay-info
     [ ! -e "$LIBDISPLAYINFO_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libdisplay-info.git "$LIBDISPLAYINFO_REPOSITORY"
     cd "$LIBDISPLAYINFO_REPOSITORY" || exit 1
     git reset --hard HEAD

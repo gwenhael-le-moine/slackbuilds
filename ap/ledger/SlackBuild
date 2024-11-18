@@ -14,7 +14,7 @@ ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-3}
 TAG=${TAG:-gwh}
 
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}

@@ -30,7 +30,7 @@ TAG=${TAG:-gwh}
 PKGTYPE=${PKGTYPE:-txz}
 
 GITHUB_REPO=djpohly/dwl
-REPOSITORY=/home/installs/SlackBuilds/_repositories/$PRGNAM
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 VERSION=${VERSION:-"latest"}
 
 if [ -z "$ARCH" ]; then

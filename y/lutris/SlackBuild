@@ -45,7 +45,7 @@ OUTPUT=${OUTPUT:-/tmp}
 
 DOCS="AUTHORS LICENSE INSTALL.rst README.rst"
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
 mkdir -p $REPOSITORY
 

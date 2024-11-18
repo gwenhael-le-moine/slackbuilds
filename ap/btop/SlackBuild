@@ -14,7 +14,7 @@ OUTPUT=${OUTPUT:-/tmp}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
 # nettoyage préalable
@@ -54,7 +54,7 @@ PKGNAM=${PRGNAM}
 EMBED_ROCM_SMI_LIB=${EMBED_ROCM_SMI_LIB:-"yes"}
 if [ "$EMBED_ROCM_SMI_LIB" = "yes" ]; then
     ROCM_SMI_LIB_VERSION=${ROCM_SMI_LIB_VERSION:-$VERSION}
-    ROCM_SMI_LIB_REPOSITORY=/home/installs/SlackBuilds/_repositories/rocm_smi_lib
+    ROCM_SMI_LIB_REPOSITORY=/var/cache/SlackBuilds.gwh/rocm_smi_lib
     [ ! -e "$ROCM_SMI_LIB_REPOSITORY" ] && git clone https://github.com/rocm/rocm_smi_lib.git "$ROCM_SMI_LIB_REPOSITORY"
     cd "$ROCM_SMI_LIB_REPOSITORY" || exit 1
     git reset --hard HEAD

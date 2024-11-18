@@ -16,7 +16,7 @@ PREFIX=/usr
 
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Jarred-Sumner/bun/tags | jq -r '.[0].name')}
 
-REPOSITORY=${REPOSITORY:-/home/installs/SlackBuilds/_repositories/$PRGNAM}
+REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
 BINARCH=x64
 

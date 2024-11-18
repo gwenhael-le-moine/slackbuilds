@@ -14,7 +14,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=/tmp
 
-REPOSITORIES=/home/installs/SlackBuilds/_repositories
+REPOSITORIES=/var/cache/SlackBuilds.gwh
 
 PREFIX=/usr
 
