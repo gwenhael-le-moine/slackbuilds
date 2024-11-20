@@ -4,7 +4,7 @@ set -x
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=gwenhael-le-moine/x49gpng
+GITHUB_REPO=gwenhael-le-moine/x50ng
 VERSION=${VERSION:-latest}
 
 BUILD=12
@@ -75,20 +75,20 @@ mkdir install
 cat <<EOF > install/doinst.sh
 #!/bin/bash
 
-cat /usr/doc/x49gp/README.md | grep "First launch setup" --before-context=2 --after-context=28
+cat /usr/doc/x50ng/README.md | grep "First launch setup" --before-context=2 --after-context=28
 EOF
 
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (HP49/50 emulator, rebooted)
 $PRGNAM:
 $PRGNAM: Emulator of the newer Hewlett Packard Handheld Calculator Models with ARM CPU
-$PRGNAM: (HP49g+ HP50).
+$PRGNAM: (HP49g+ and HP50).
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://sourceforge.net/projects/x49gp/
+$PRGNAM:
 $PRGNAM: https://github.com/${GITHUB_REPO}
 EOF
 
