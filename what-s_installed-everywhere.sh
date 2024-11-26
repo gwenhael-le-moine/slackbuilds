@@ -24,7 +24,7 @@ fi
 if [ "$SHORT_HOSTNAME" == "gwenhael" ]; then
     PKGs_gwenhael=$PKGs_local
 else
-    PKGs_gwenhael=$(ls /var/lib/pkgtools/packages/ | sed 's|^\(.*\)-.*-.*-.*$|\1|')
+    PKGs_gwenhael=$(ssh gwenhael ls /var/lib/pkgtools/packages/ | sed 's|^\(.*\)-.*-.*-.*$|\1|')
 fi
 
 PKG_OK="|    x     "
