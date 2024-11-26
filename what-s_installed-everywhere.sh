@@ -27,10 +27,10 @@ else
     PKGs_gwenhael=$(ls /var/lib/pkgtools/packages/ | sed 's|^\(.*\)-.*-.*-.*$|\1|')
 fi
 
-echo "| tibou    | titplume | tibonom  | gwenhael |"
-echo "|----------+----------+----------+----------+-------"
 PKG_OK="|    x     "
 PKG_KO="|          "
+echo "| tibou    | titplume | tibonom  | gwenhael |"
+echo "|----------+----------+----------+----------+-------"
 for cat in a ap d l lua n wayland xap y; do
     cd $cat
     for p in $(ls -1); do
