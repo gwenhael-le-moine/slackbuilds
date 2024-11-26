@@ -29,17 +29,41 @@ fi
 
 PKG_OK="|    x     "
 PKG_KO="|          "
-echo "| tibou    | titplume | tibonom  | gwenhael |"
-echo "|----------+----------+----------+----------+-------"
+counter=0
+echo "| tibou    | titplume | tibonom  | gwenhael | NB |"
+echo "|----------+----------+----------+----------+----+-----"
 for cat in a ap d l lua n wayland xap y; do
     cd $cat
     for p in $(ls -1); do
-        echo -n $PKGs_tibou | grep -q " $(echo $p | tr -d /) " && echo -n "$PKG_OK" || echo -n "$PKG_KO"
-        echo -n $PKGs_titplume | grep -q " $(echo $p | tr -d /) " && echo -n "$PKG_OK" || echo -n "$PKG_KO"
-        echo -n $PKGs_tibonom | grep -q " $(echo $p | tr -d /) " && echo -n "$PKG_OK" || echo -n "$PKG_KO"
-        echo -n $PKGs_gwenhael | grep -q " $(echo $p | tr -d /) " && echo -n "$PKG_OK" || echo -n "$PKG_KO"
+        if echo -n $PKGs_tibou | grep -q " $(echo $p | tr -d /) "; then
+            echo -n "$PKG_OK";
+            counter=$((counter + 1));
+        else
+            echo -n "$PKG_KO";
+        fi
+        if echo -n $PKGs_titplume | grep -q " $(echo $p | tr -d /) "; then
+            echo -n "$PKG_OK";
+            counter=$((counter + 1));
+        else
+            echo -n "$PKG_KO";
+        fi
+        if echo -n $PKGs_tibonom | grep -q " $(echo $p | tr -d /) "; then
+            echo -n "$PKG_OK";
+            counter=$((counter + 1));
+        else
+            echo -n "$PKG_KO";
+        fi
+        if echo -n $PKGs_gwenhael | grep -q " $(echo $p | tr -d /) "; then
+            echo -n "$PKG_OK";
+            counter=$((counter + 1));
+        else
+            echo -n "$PKG_KO";
+        fi
 
+        echo -n "| $counter  "
         echo "| $cat/$p"
+
+        counter=0
     done | sort
     cd ..
 done
