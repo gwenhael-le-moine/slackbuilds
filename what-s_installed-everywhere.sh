@@ -32,7 +32,7 @@ PKG_KO="|          "
 counter=0
 echo "| tibou    | titplume | tibonom  | gwenhael | NB |"
 echo "|----------+----------+----------+----------+----+-----"
-for cat in a ap d l lua n wayland xap y; do
+for cat in a ap d fonts l n xap y; do
     cd $cat
     for p in $(ls -1); do
         if echo -n $PKGs_tibou | grep -q " $(echo $p | tr -d /) "; then
