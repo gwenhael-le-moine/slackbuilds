@@ -38,7 +38,7 @@ rm -rf $PKG
 mkdir -p $PKG/usr/share/fonts/misc/
 cd $PKG/usr/share/fonts/misc/
 
-for i in /usr/share/fonts/misc/ter-u*; do
+for i in /usr/share/fonts/misc/ter-u*.pcf.gz; do
     f=$(echo $(basename $i) | sed 's|\.gz$||')
     zcat $i > $f
     fonttosfnt -o "${f/pcf/otb}" "$f"

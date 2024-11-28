@@ -43,9 +43,12 @@ case $VERSION in
         ;;
 esac
 
-mkdir -p "$PKG/usr/share/fonts/"
-cp -avr "$REPOSITORY/bitmap/" "$PKG/usr/share/fonts/"
-#chmod 0644 "$PKG/usr/share/fonts/*"
+mkdir -p "$PKG/usr/share/fonts/bitmap/"
+
+find "$REPOSITORY/bitmap/" -type f -name \*f -exec cp {} "$PKG/usr/share/fonts/bitmap/" \;
+find  "$PKG/usr/share/fonts/bitmap/" -name \*f -exec gzip -9 {} \;
+
+find "$REPOSITORY/bitmap/" -type f -name \*.gz -exec cp {} "$PKG/usr/share/fonts/bitmap/" \;
 
 mkdir -p "$PKG/usr/doc/$PRGNAM/"
 cp -avr "$REPOSITORY/README.md"  "$REPOSITORY/screenshots/" "$PKG/usr/doc/$PRGNAM/"
