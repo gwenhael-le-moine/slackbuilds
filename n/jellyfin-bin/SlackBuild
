@@ -1,0 +1,140 @@
+#!/bin/bash
+
+CWD=$(pwd)
+
+PKGNAM=$(basename "$CWD")
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-gwh}
+
+TMP=${TMP:-/tmp/$TAG}
+PKG=$TMP/pkg-$PKGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
+
+mkdir -p "$REPOSITORY"
+
+# echo $ARCH | grep -q arm && SRC_ARCH=arm-7
+# echo $ARCH | grep -q 86 && SRC_ARCH=386
+echo "$ARCH" | grep -q 64 && SRC_ARCH=amd64
+
+mkdir -p "$REPOSITORY"
+[ ! -e "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz" ] && wget -c "https://repo.jellyfin.org/files/server/linux/latest-stable/amd64/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz" -O "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz"
+
+rm -fr "$PKG"
+
+mkdir -p "$PKG/opt"
+cd "$PKG/opt" || exit 1
+tar xvf "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz"
+
+mkdir -p "$PKG/etc/default/"
+cat <<EOF > "$PKG/etc/default/jellyfin"
+# Below is the default values. Change them as you need them
+USER=root
+GROUP=root
+#USER=jellyfin
+#GROUP=jellyfin
+
+DATADIR=/opt/jellyfin/data
+CACHEDIR=/opt/jellyfin/cache
+CONFIGDIR=/opt/jellyfin/config
+LOGDIR=/opt/jellyfin/log
+EOF
+
+mkdir -p "$PKG/etc/rc.d/"
+cat <<EOF > "$PKG/etc/rc.d/rc.$PKGNAM"
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          Jellyfin Media Server
+# Required-Start:
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: Jellyfin Media Server
+# Description:       Runs Jellyfin Media Server
+### END INIT INFO
+
+# Load the defaults
+. /etc/default/jellyfin
+
+
+start() {
+if [ -x /opt/jellyfin/jellyfin/jellyfin ]; then
+   echo "Starting Jellyfin Media Server"
+   /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid -- \
+       /opt/jellyfin/jellyfin/jellyfin \
+       -d \$DATADIR \
+       -C \$CACHEDIR \
+       -c \$CONFIGDIR \
+       -l \$LOGDIR \
+       -u \$USER:\$GROUP
+fi
+}
+
+stop() {
+echo "Stopping Jellyfin Media Server"
+if /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --running ; then
+        /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --stop
+fi
+}
+
+restart() {
+echo "Restarting Jellyfin Media Server"
+if /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --running ; then
+        /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --restart
+ fi
+}
+
+status() {
+/usr/bin/daemon --name=jellyfin --running --pidfile=/var/run/jellyfin.pid --verbose
+}
+
+case "\$1" in
+start)
+        start
+        ;;
+stop)
+        stop
+        ;;
+restart)
+        restart
+        ;;
+status)
+        status
+        ;;
+*)
+        echo "Usage: \$0 {start|stop|restart|status}"
+        exit 1
+esac
+EOF
+chmod +x "$PKG/etc/rc.d/rc.$PKGNAM"
+
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+            |-----handy-ruler------------------------------------------------------|
+jellyfin-bin: jellyfin-bin (The Free Software Media System)
+jellyfin-bin:
+jellyfin-bin:
+jellyfin-bin: Jellyfin is a volunteer-built media solution that puts you in control
+jellyfin-bin: of your media. Stream to any device from your own server, with no
+jellyfin-bin: strings attached. Your media, your server, your way.
+jellyfin-bin:
+jellyfin-bin: https://jellyfin.org/
+jellyfin-bin:
+jellyfin-bin:
+jellyfin-bin:
+EOF
+
+cd "$PKG" || exit 1
+
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
