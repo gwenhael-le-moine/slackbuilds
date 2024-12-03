@@ -79,6 +79,7 @@ if [ -z "$ARCH" ]; then
   export ARCH
 fi
 
+BRANCH=${BRANCH:-master}
 VERSION=${VERSION:-latest}
 
 PREFIX=${PREFIX:-/usr}
@@ -100,9 +101,12 @@ git clean -dfX                  # https://github.com/commercial-emacs/commercial
 cp -R "$REPOSITORY" "$TMP/${PKGNAM}"
 cd "$TMP/${PKGNAM}" || exit 1
 
+git checkout "$BRANCH"
+git pull
+
 case $VERSION in
     trunk)
-        VERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        VERSION="${BRANCH//-/_}_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
         VERSION=$(git tag --sort=-version:refname | head -n1)
