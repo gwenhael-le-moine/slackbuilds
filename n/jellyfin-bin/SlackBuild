@@ -5,8 +5,8 @@ CWD=$(pwd)
 PKGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
+BUILD=${BUILD:-3}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
@@ -25,18 +25,24 @@ mkdir -p "$REPOSITORY"
 
 rm -fr "$PKG"
 
-mkdir -p "$PKG/opt"
-cd "$PKG/opt" || exit 1
+mkdir -p "$PKG/opt/jellyfin"
+cd "$PKG/opt/jellyfin" || exit 1
+mkdir -p data cache config log
+
 tar xvf "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz"
+mv jellyfin jellyfin-${VERSION}
+cd jellyfin-${VERSION} || exit 1
+chown -R root:root .
+find -L . \
+ \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+  -o -perm 511 \) -exec chmod 755 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+
 
 mkdir -p "$PKG/etc/default/"
 cat <<EOF > "$PKG/etc/default/jellyfin"
 # Below is the default values. Change them as you need them
-USER=root
-GROUP=root
-#USER=jellyfin
-#GROUP=jellyfin
-
 DATADIR=/opt/jellyfin/data
 CACHEDIR=/opt/jellyfin/cache
 CONFIGDIR=/opt/jellyfin/config
@@ -62,15 +68,14 @@ cat <<EOF > "$PKG/etc/rc.d/rc.$PKGNAM"
 
 
 start() {
-if [ -x /opt/jellyfin/jellyfin/jellyfin ]; then
+if [ -x /opt/jellyfin/jellyfin-${VERSION}/jellyfin ]; then
    echo "Starting Jellyfin Media Server"
    /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid -- \
-       /opt/jellyfin/jellyfin/jellyfin \
+       /opt/jellyfin/jellyfin-${VERSION}/jellyfin \
        -d \$DATADIR \
        -C \$CACHEDIR \
        -c \$CONFIGDIR \
-       -l \$LOGDIR \
-       -u \$USER:\$GROUP
+       -l \$LOGDIR
 fi
 }
 
