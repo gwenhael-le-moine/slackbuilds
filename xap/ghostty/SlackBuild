@@ -36,21 +36,10 @@ cd "$TMP/$PRGNAM" || exit 1
 [ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
 
 DESTDIR=$PKG \
-zig build \
-  --prefix /usr \
-  -Doptimize=ReleaseFast \
-  -Dcpu=baseline
-
-# # installation
-# mkdir -p "$PKG$PREFIX"/bin/
-# cp duf "$PKG$PREFIX"/bin/
-
-# mkdir -p "$PKG$PREFIX"/man/man1/
-# cp duf.1 "$PKG$PREFIX"/man/man1/
-# gzip -9 "$PKG$PREFIX"/man/man1/duf.1
-
-# mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-# cp -a LICENSE README.md duf.png "$PKG$PREFIX/doc/$PRGNAM"
+    zig build \
+    --prefix /usr \
+    -Doptimize=ReleaseFast \
+    -Dcpu=baseline
 
 # correction
 cd "$PKG" || exit 1
