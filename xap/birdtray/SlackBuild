@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename $CWD)
+GITHUB_REPO=gyunaev/birdtray
+VERSION=${VERSION:-latest}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr $PKG $TMP/$PRGNAM
+
+mkdir -p $PKG
+
+# mise en place
+cd $TMP
+[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+
+cd $REPOSITORY
+git pull --all
+
+cp -R $REPOSITORY $TMP/$PRGNAM
+cd $TMP/$PRGNAM
+
+[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "x$VERSION" == "x" ] && VERSION=trunk
+[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+git submodule update --init --recursive
+
+# configuration
+mkdir build
+cd build/
+
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DCMAKE_BUILD_TYPE=Release  \
+    ..
+
+# compilation
+make -j$(nproc)
+
+# installation
+make install DESTDIR=$PKG
+
+# correction
+cd $PKG
+chown -R root:root ./*
+
+find $PKG -name \.git\* -exec rm -fr {} \;
+
+[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# Strip binaries
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (Independent tray icon for Thunderbird)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz

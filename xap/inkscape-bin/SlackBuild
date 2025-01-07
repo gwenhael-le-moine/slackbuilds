@@ -6,7 +6,7 @@ VERSION=${VERSION:-1.4}
 ITEMNB=${ITEMNB:-53678}
 COMMITNB=${COMMITNB:-e7c3feb}
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 ARCH="AppImage"
 BUILD=1
 
@@ -18,27 +18,27 @@ OUTPUT=/tmp
 PREFIX=/usr
 
 # nettoyage préalable
-rm -fr $PKG
+rm -fr "$PKG"
 
-mkdir -p $PKG/opt/$PRGNAM
+mkdir -p "$PKG"/opt/"$PRGNAM"
 
 # mise en place
-cd $PKG/opt/$PRGNAM
+cd "$PKG"/opt/"$PRGNAM" || exit 1
 
-wget -c https://inkscape.org/gallery/item/${ITEMNB}/Inkscape-${COMMITNB}-x86_64.AppImage -O ${PRGNAM}-${VERSION}.AppImage
-chmod +x ${PRGNAM}-${VERSION}.AppImage
+wget -c https://inkscape.org/gallery/item/"${ITEMNB}"/Inkscape-"${COMMITNB}"-x86_64.AppImage -O "${PRGNAM}"-"${VERSION}".AppImage
+chmod +x "${PRGNAM}"-"${VERSION}".AppImage
 
-mkdir -p $PKG$PREFIX/bin/
-cd $PKG$PREFIX/bin/
-ln -s /opt/$PRGNAM/${PRGNAM}-${VERSION}.AppImage inkscape
+mkdir -p "$PKG$PREFIX"/bin/
+cd "$PKG$PREFIX"/bin/ || exit 1
+ln -s /opt/"$PRGNAM"/"${PRGNAM}"-"${VERSION}".AppImage inkscape
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
 # embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/slack-desc
 $PRGNAM: $PRGNAM (A powerful, free design tool)
 $PRGNAM:
 $PRGNAM: Whether you are an illustrator, designer, web designer
@@ -47,9 +47,9 @@ $PRGNAM: Inkscape is for you!
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: https://www.inkscape.org
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM:
 EOF
 
 # empaquetage
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/"$PRGNAM"-"${VERSION//-/}"-$ARCH-$BUILD$TAG.txz
