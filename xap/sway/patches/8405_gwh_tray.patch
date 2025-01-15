@@ -1,28 +1,4 @@
 Les fichiers binaires sway.orig/.git/index et sway/.git/index sont différents
-diff -ruN sway.orig/.git/logs/HEAD sway/.git/logs/HEAD
---- sway.orig/.git/logs/HEAD	2025-01-15 10:56:48.974138179 +0100
-+++ sway/.git/logs/HEAD	2025-01-15 10:56:44.664138048 +0100
-@@ -1 +1 @@
--0000000000000000000000000000000000000000 0b08dce08cbcf515103d8a7fd8c390ed04c93428 Gwenhael Le Moine <gwenhael.le.moine@gmail.com> 1736935008 +0100	clone: from https://github.com/swaywm/sway
-+0000000000000000000000000000000000000000 0b08dce08cbcf515103d8a7fd8c390ed04c93428 Gwenhael Le Moine <gwenhael.le.moine@gmail.com> 1736935004 +0100	clone: from https://github.com/swaywm/sway
-diff -ruN sway.orig/.git/logs/refs/heads/master sway/.git/logs/refs/heads/master
---- sway.orig/.git/logs/refs/heads/master	2025-01-15 10:56:48.974138179 +0100
-+++ sway/.git/logs/refs/heads/master	2025-01-15 10:56:44.664138048 +0100
-@@ -1 +1 @@
--0000000000000000000000000000000000000000 0b08dce08cbcf515103d8a7fd8c390ed04c93428 Gwenhael Le Moine <gwenhael.le.moine@gmail.com> 1736935008 +0100	clone: from https://github.com/swaywm/sway
-+0000000000000000000000000000000000000000 0b08dce08cbcf515103d8a7fd8c390ed04c93428 Gwenhael Le Moine <gwenhael.le.moine@gmail.com> 1736935004 +0100	clone: from https://github.com/swaywm/sway
-diff -ruN sway.orig/.git/logs/refs/remotes/origin/HEAD sway/.git/logs/refs/remotes/origin/HEAD
---- sway.orig/.git/logs/refs/remotes/origin/HEAD	2025-01-15 10:56:48.974138179 +0100
-+++ sway/.git/logs/refs/remotes/origin/HEAD	2025-01-15 10:56:44.664138048 +0100
-@@ -1 +1 @@
--0000000000000000000000000000000000000000 0b08dce08cbcf515103d8a7fd8c390ed04c93428 Gwenhael Le Moine <gwenhael.le.moine@gmail.com> 1736935008 +0100	clone: from https://github.com/swaywm/sway
-+0000000000000000000000000000000000000000 0b08dce08cbcf515103d8a7fd8c390ed04c93428 Gwenhael Le Moine <gwenhael.le.moine@gmail.com> 1736935004 +0100	clone: from https://github.com/swaywm/sway
-Les fichiers binaires sway.orig/.git/objects/pack/pack-116630a40316ebe74a42de89184639b81bbae110.idx et sway/.git/objects/pack/pack-116630a40316ebe74a42de89184639b81bbae110.idx sont différents
-Les fichiers binaires sway.orig/.git/objects/pack/pack-116630a40316ebe74a42de89184639b81bbae110.pack et sway/.git/objects/pack/pack-116630a40316ebe74a42de89184639b81bbae110.pack sont différents
-Les fichiers binaires sway.orig/.git/objects/pack/pack-116630a40316ebe74a42de89184639b81bbae110.rev et sway/.git/objects/pack/pack-116630a40316ebe74a42de89184639b81bbae110.rev sont différents
-Les fichiers binaires sway.orig/.git/objects/pack/pack-3f045f74027e2f52e9f1cab2698135483c67b5a1.idx et sway/.git/objects/pack/pack-3f045f74027e2f52e9f1cab2698135483c67b5a1.idx sont différents
-Les fichiers binaires sway.orig/.git/objects/pack/pack-3f045f74027e2f52e9f1cab2698135483c67b5a1.pack et sway/.git/objects/pack/pack-3f045f74027e2f52e9f1cab2698135483c67b5a1.pack sont différents
-Les fichiers binaires sway.orig/.git/objects/pack/pack-3f045f74027e2f52e9f1cab2698135483c67b5a1.rev et sway/.git/objects/pack/pack-3f045f74027e2f52e9f1cab2698135483c67b5a1.rev sont différents
 diff -ruN sway.orig/include/sway/server.h sway/include/sway/server.h
 --- sway.orig/include/sway/server.h	2025-01-15 10:56:48.998138180 +0100
 +++ sway/include/sway/server.h	2025-01-15 10:57:01.104138550 +0100
