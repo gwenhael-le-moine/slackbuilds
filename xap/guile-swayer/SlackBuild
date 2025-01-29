@@ -40,13 +40,8 @@ autoreconf -i
 ./configure \
     --prefix=/usr
 
-# compilation
-#make -j3 PREFIX=$PREFIX
-
 # installation
 make install DESTDIR=$PKG
-
-chmod a+s $PKG/usr/bin/brightnessctl
 
 mkdir -p $PKG/usr/doc/$PRGNAM
 cp LICENSE README* $PKG/usr/doc/$PRGNAM/
@@ -65,9 +60,6 @@ chown -R root:root *
 
 # embaumement
 mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
-chmod a+s /usr/bin/brightnessctl
-EOF
 
 cat <<EOF > $PKG/install/slack-desc
 $PRGNAM: $PRGNAM ( Extensible Guile bindings for SwayWM )
