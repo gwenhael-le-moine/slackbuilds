@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PKGNAM=$(basename "$CWD")
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -24,6 +24,9 @@ VERSION=$(echo terminus-ttf-*/ | rev | cut -f 1 -d - | rev | sed 's|/$||')
 chmod 0644 "terminus-ttf-${VERSION}"/*
 
 mv "terminus-ttf-${VERSION}"/*.ttf .
+for f in ./*-$VERSION.ttf; do
+    mv ./$f ./${f%-$VERSION.ttf}.ttf
+done
 mkdir -p "$PKG"/usr/doc/
 mv "terminus-ttf-${VERSION}"/ "$PKG"/usr/doc/terminus-ttf
 
