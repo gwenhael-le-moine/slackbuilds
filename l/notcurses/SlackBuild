@@ -36,11 +36,12 @@ cd $TMP/$PRGNAM
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 # configuration
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64 \
 cmake \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_INSTALL_DATADIR=$PREFIX \
     -DCMAKE_INSTALL_DOCDIR=$PREFIX/doc/$PRGNAM \
-    -DUSE_MULTIMEDIA=none \
+    -DUSE_MULTIMEDIA=ffmpeg \
     .
 
 # compilation
