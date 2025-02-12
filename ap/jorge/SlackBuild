@@ -6,8 +6,8 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 GITHUB_REPO=facundoolano/jorge
 VERSION=${VERSION:-latest}
-ARCH=${ARCH:-noarch}
-BUILD=1
+ARCH=${ARCH:-"$(uname -m)"}
+BUILD=${BUILD:-2}
 
 TAG=gwh
 TMP=/tmp/$TAG
