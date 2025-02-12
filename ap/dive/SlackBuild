@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-GITHUB_REPO=wagoodman/dive
+GITHUB_REPO=jauderho/dive
 VERSION=${VERSION:-latest}
 BUILD=${BUILD:-1}
 
