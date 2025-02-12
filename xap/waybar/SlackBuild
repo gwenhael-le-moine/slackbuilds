@@ -81,14 +81,13 @@ CFLAGS="$SLKCFLAGS" \
       -Dsystemd=disabled \
       -Ddbusmenu-gtk=auto \
       -Dmpd=auto \
-      -Dgtk-layer-shell=auto \
       -Drfkill=auto \
       -Dsndio=disabled \
       -Dtests=disabled \
-      -Dexperimental=true \
+      -Dcava=disabled \
+      -Dexperimental=false
 
-      "${NINJA:=ninja}"
-DESTDIR=$PKG $NINJA install
+DESTDIR=$PKG ninja install
 cd ..
 
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
