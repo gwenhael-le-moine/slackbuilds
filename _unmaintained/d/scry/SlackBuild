@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=crystal-lang-tools/scry
+UPSTREAM_REPO=https://github.com/crystal-lang-tools/scry
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
@@ -27,7 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
@@ -71,7 +71,7 @@ $PRGNAM: is compatible with any client that implements this protocol.
 $PRGNAM:
 $PRGNAM: The server is implemented in Crystal.
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

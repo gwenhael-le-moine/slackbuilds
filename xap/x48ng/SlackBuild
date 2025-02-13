@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 
 BUILD=2
-GITHUB_REPO=gwenhael-le-moine/x48ng
+UPSTREAM_REPO=https://github.com/gwenhael-le-moine/x48ng
 VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
@@ -26,7 +26,7 @@ mkdir -p $TMP
 rm -fr "${TMP:?}"/"$PRGNAM" "$PKG"
 
 # Fetching sources
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
@@ -85,7 +85,7 @@ $PRGNAM: $ $PREFIX/share/$PRGNAM/setup-x48ng-home.sh
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: http://x48.berlios.de/
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la

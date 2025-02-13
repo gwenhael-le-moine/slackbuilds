@@ -2,7 +2,7 @@
 
 # variables
 BUILD=${BUILD:-2}
-GITHUB_REPO=wez/wezterm
+UPSTREAM_REPO=https://github.com/wez/wezterm
 VERSION=${VERSION:-latest}
 
 TAG=gwh
@@ -25,7 +25,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -92,7 +92,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: https://wezfurlong.org/wezterm/
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage

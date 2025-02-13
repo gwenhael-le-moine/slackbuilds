@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-GITHUB_REPO=martinvonz/jj
+UPSTREAM_REPO=https://github.com/martinvonz/jj
 VERSION=${VERSION:-latest}
 BUILD=${BUILD:-1}
 
@@ -25,7 +25,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -83,7 +83,7 @@ $PRGNAM: (working-copy-as-a-commit, undo functionality, automatic rebase,
 $PRGNAM: safe replication via rsync, Dropbox, or distributed file system).
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage

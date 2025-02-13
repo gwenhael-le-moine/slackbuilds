@@ -11,8 +11,8 @@ PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
-GITHUB_REPO=Fred78290/nct6687d
-#GITHUB_REPO=gwenhael-le-moine/nct6687d
+UPSTREAM_REPO=https://github.com/Fred78290/nct6687d
+#UPSTREAM_REPO=https://github.com/gwenhael-le-moine/nct6687d
 VERSION=${VERSION:-"trunk"}
 KERNEL_VERSION=$(uname -r)
 
@@ -22,7 +22,7 @@ BUILD=7
 mkdir -p "$PKG"
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
@@ -95,7 +95,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

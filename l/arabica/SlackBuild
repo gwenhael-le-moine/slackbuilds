@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=jezhiggins/arabica
+UPSTREAM_REPO=https://github.com/jezhiggins/arabica
 VERSION=${VERSION:-latest}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
@@ -38,7 +38,7 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM
 
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

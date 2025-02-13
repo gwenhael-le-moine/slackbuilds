@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
-GITHUB_REPO=factor/factor
+UPSTREAM_REPO=https://github.com/factor/factor
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 BUILD=${BUILD:-3}
 
@@ -24,7 +24,7 @@ rm -fr $PKG $TMP/$PRGNAM
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

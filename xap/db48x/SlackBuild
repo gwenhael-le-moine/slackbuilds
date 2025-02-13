@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 
 BUILD=1
-GITHUB_REPO=c3d/db48x
+UPSTREAM_REPO=https://github.com/c3d/db48x
 VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
@@ -26,7 +26,7 @@ mkdir -p $TMP
 rm -fr "${TMP:?}"/"$PRGNAM" "$PKG"
 
 # Fetching sources
-[ ! -e "$REPOSITORY" ] && git clone --recursive https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --recursive ${UPSTREAM_REPO}.git "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
@@ -93,7 +93,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 rm -f "$PKG"/{,usr/}"lib$(uname -m | grep -o 64)"/*.la

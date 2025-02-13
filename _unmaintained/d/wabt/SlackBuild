@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=WebAssembly/wabt
+UPSTREAM_REPO=https://github.com/WebAssembly/wabt
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
@@ -27,7 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone --recursive https://github.com/${GITHUB_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --recursive ${UPSTREAM_REPO} $REPOSITORY
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM
@@ -78,7 +78,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

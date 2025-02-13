@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=gohugoio/hugo
+UPSTREAM_REPO=https://github.com/gohugoio/hugo
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/tags | jq -r '.[0].name' | tr -d v)}
 FLAVOR=${FLAVOR:-_extended}
 ARCH=$(uname -m)

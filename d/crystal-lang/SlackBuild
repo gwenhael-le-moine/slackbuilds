@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
 ARCH=$(uname -m)
-GITHUB_REPO=crystal-lang/crystal
+UPSTREAM_REPO=https://github.com/crystal-lang/crystal
 VERSION=${VERSION:-latest}
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
@@ -21,7 +21,7 @@ rm -fr "$PKG" "${TMP:?}/$PRGNAM/"
 mkdir -p $TMP/
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit
 git pull --all
 
@@ -47,7 +47,7 @@ make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(un
 # shards #
  ########
 SHARDS_PRGNAM=shards
-SHARDS_GITHUB_REPO=crystal-lang/shards
+SHARDS_UPSTREAM_REPO=https://github.com/crystal-lang/shards
 SHARDS_VERSION=${SHARDS_VERSION:-$(curl -s https://api.github.com/repos/${SHARDS_GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 SHARDS_REPOSITORY=${SHARDS_REPOSITORY:-/var/cache/SlackBuilds.gwh/$SHARDS_PRGNAM}
 SHARDS_PKG=$TMP/pkg-$SHARDS_PRGNAM

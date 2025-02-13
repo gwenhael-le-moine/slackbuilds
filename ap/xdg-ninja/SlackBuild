@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=b3nj5m1n/xdg-ninja
+UPSTREAM_REPO=https://github.com/b3nj5m1n/xdg-ninja
 VERSION=${VERSION:-trunk}
 ARCH=${ARCH:-noarch}
 BUILD=2
@@ -25,7 +25,7 @@ mkdir -p "$PKG"
 
 # mise en place
 cd $TMP || exit 1
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 cd "$TMP/$PRGNAM" || exit 1
@@ -56,7 +56,7 @@ $PRGNAM: The configurations are from the arch wiki page on XDG_BASE_DIR, antidot
 $PRGNAM: (thanks to Scr0nch for writing a conversion tool), and contributed by
 $PRGNAM: other users.
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage

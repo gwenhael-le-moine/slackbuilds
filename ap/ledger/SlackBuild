@@ -8,7 +8,7 @@ set -e
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=ledger/ledger
+UPSTREAM_REPO=https://github.com/ledger/ledger
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-3}
@@ -37,7 +37,7 @@ mkdir -p $TMP $PKG/usr
 cd $TMP
 rm -rf $PRGNAM
 
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 ( cd $REPOSITORY && git pull && git submodule update --init )
 cp -R $REPOSITORY $PRGNAM
 

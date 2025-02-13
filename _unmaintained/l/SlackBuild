@@ -9,7 +9,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
 
-GITHUB_REPO=krakjoe/apcu
+UPSTREAM_REPO=https://github.com/krakjoe/apcu
 VERSION=${VERSION:-latest}
 
 EXT=tar.gz
@@ -31,7 +31,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -83,7 +83,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

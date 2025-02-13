@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=aquasecurity/trivy
+UPSTREAM_REPO=https://github.com/aquasecurity/trivy
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/tags | jq -r '.[0].name' | tr -d v)}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
@@ -29,7 +29,7 @@ case $(uname -m) in
         ;;
 esac
 
-[ ! -e $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz ] && wget -c -O $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz
+[ ! -e $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz ] && wget -c -O $REPOSITORY/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz ${UPSTREAM_REPO}/releases/download/v${VERSION}/trivy_${VERSION}_Linux-${GO_ARCH}.tar.gz
 
 rm -fr $PKG
 mkdir -p $PKG/usr/{bin,doc/$PRGNAM}/

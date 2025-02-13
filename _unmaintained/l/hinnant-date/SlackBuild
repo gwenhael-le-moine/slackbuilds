@@ -6,7 +6,7 @@ set -e
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=HowardHinnant/date
+UPSTREAM_REPO=https://github.com/HowardHinnant/date
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
@@ -27,7 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 

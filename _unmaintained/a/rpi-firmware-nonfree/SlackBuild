@@ -3,7 +3,7 @@
 # variables
 CWD=$(pwd)
 
-GITHUB_REPO=RPi-Distro/firmware-nonfree
+UPSTREAM_REPO=https://github.com/RPi-Distro/firmware-nonfree
 VERSION=${VERSION:-latest}
 BUILD=${BUILD:-1}
 
@@ -24,7 +24,7 @@ REPOSITORY=${REPOSITORY:=/var/cache/SlackBuilds.gwh/$PRGNAM}
 rm -fr $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 ( cd $REPOSITORY; git pull )
 [ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "x$VERSION" == "x" ] && VERSION=trunk
@@ -58,7 +58,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

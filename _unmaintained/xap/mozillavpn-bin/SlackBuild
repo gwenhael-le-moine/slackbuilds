@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=mozilla-mobile/mozilla-vpn-client
+UPSTREAM_REPO=https://github.com/mozilla-mobile/mozilla-vpn-client
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/tags | jq -r '.[0].name' | tr -d v)}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}

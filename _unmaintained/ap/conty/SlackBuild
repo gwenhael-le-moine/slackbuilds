@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=Kron4ek/Conty
+UPSTREAM_REPO=https://github.com/Kron4ek/Conty
 VERSION=${VERSION:-"latest"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-5}
@@ -22,7 +22,7 @@ rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 mkdir -p "$PKG"
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git reset --hard HEAD
 git pull --all
@@ -117,7 +117,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

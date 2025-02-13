@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=awesome
-GITHUB_REPO=awesomeWM/awesome
+UPSTREAM_REPO=https://github.com/awesomeWM/awesome
 VERSION=${VERSION:-latest}
 
 ARCH=${ARCH:-$(uname -m)}
@@ -30,7 +30,7 @@ SRC_PATH=$REPOSITORIES/$PRGNAM
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORIES/$PRGNAM
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone ${UPSTREAM_REPO}.git $REPOSITORIES/$PRGNAM
 ( cd $REPOSITORIES/$PRGNAM; git pull )
 
 rm -fr $TMP/$PRGNAM

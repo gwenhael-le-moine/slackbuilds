@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $(pwd))
-GITHUB_REPO=ebeem/guile-swayer
+UPSTREAM_REPO=https://github.com/ebeem/guile-swayer
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
@@ -18,7 +18,7 @@ REPOSITORIES=/var/cache/SlackBuilds.gwh
 
 PREFIX=/usr
 
-[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORIES/$PRGNAM
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone ${UPSTREAM_REPO}.git $REPOSITORIES/$PRGNAM
 cd $REPOSITORIES/$PRGNAM
 git pull --all
 
@@ -71,7 +71,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM: see https://github.com/ebeem/dotfiles/tree/main/.config/sway
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 
-GITHUB_REPO=pluxml/PluXml
+UPSTREAM_REPO=https://github.com/pluxml/PluXml
 VERSION=${VERSION:-latest}
 
 PRGNAM=$(basename $CWD)
@@ -27,7 +27,7 @@ rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 ( cd $REPOSITORY
   git pull )
 

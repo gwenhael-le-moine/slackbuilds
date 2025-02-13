@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=Kron4ek/Conty
+UPSTREAM_REPO=https://github.com/Kron4ek/Conty
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-6}
@@ -20,7 +20,7 @@ REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
 mkdir -p $REPOSITORY
 
-[ ! -e $REPOSITORY/conty${EDITION}-${VERSION}.sh ] && wget -c https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/conty${EDITION}.sh -O $REPOSITORY/conty${EDITION}-${VERSION}.sh
+[ ! -e $REPOSITORY/conty${EDITION}-${VERSION}.sh ] && wget -c ${UPSTREAM_REPO}/releases/download/${VERSION}/conty${EDITION}.sh -O $REPOSITORY/conty${EDITION}-${VERSION}.sh
 
 rm -fr $PKG
 
@@ -75,7 +75,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

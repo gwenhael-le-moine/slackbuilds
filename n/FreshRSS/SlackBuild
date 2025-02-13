@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
-GITHUB_REPO=FreshRSS/FreshRSS
+UPSTREAM_REPO=https://github.com/FreshRSS/FreshRSS
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-noarch}
 BUILD=${BUILD:-2}
@@ -22,7 +22,7 @@ PREFIX=/usr
 rm -fr $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 
 mkdir -p $PKG/opt/
 

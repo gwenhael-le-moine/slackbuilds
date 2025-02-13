@@ -2,7 +2,7 @@
 
 # variables
 CWD=$(pwd)
-GITHUB_REPO=edrlab/thorium-reader
+UPSTREAM_REPO=https://github.com/edrlab/thorium-reader
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)}
 
 PRGNAM=$(basename $CWD)
@@ -26,7 +26,7 @@ mkdir -p $PKG/opt/$PRGNAM
 # mise en place
 cd $PKG/opt/$PRGNAM
 
-wget -c https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/Thorium-${VERSION#v}.AppImage -O ${PRGNAM}-${VERSION}.AppImage
+wget -c ${UPSTREAM_REPO}/releases/download/${VERSION}/Thorium-${VERSION#v}.AppImage -O ${PRGNAM}-${VERSION}.AppImage
 chmod +x ${PRGNAM}-${VERSION}.AppImage
 
 mkdir -p $PKG$PREFIX/bin/

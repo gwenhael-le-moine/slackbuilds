@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=casouri/tree-sitter-module
+UPSTREAM_REPO=https://github.com/casouri/tree-sitter-module
 VERSION=${VERSION:-trunk}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
@@ -31,7 +31,7 @@ mkdir -p "$TMP" "$PKG" "$OUTPUT"
 cd "$TMP"
 rm -rf "$PRGNAM"
 
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
@@ -78,7 +78,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 cd "$PKG" || exit 1

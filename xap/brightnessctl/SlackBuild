@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename $(pwd))
-GITHUB_REPO=Hummer12007/brightnessctl
+UPSTREAM_REPO=https://github.com/Hummer12007/brightnessctl
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
@@ -18,7 +18,7 @@ REPOSITORIES=/var/cache/SlackBuilds.gwh
 
 PREFIX=/usr
 
-[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORIES/$PRGNAM
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone ${UPSTREAM_REPO}.git $REPOSITORIES/$PRGNAM
 cd $REPOSITORIES/$PRGNAM
 git pull --all
 
@@ -78,7 +78,7 @@ $PRGNAM:
 $PRGNAM: It can also preserve current brightness before applying the operation
 $PRGNAM: (allowing for usecases like disabling backlight on lid close).
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

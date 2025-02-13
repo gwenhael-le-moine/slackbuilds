@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 
-GITHUB_REPO=pavouk/lgi
+UPSTREAM_REPO=https://github.com/pavouk/lgi
 VERSION=${VERSION:-latest}
 
 # default settings
@@ -22,7 +22,7 @@ DOCS="ABOUT-NLS AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO"
 rm -rf $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 VERSION="git_r$( cd $REPOSITORY && git rev-list --count HEAD )"
@@ -74,7 +74,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

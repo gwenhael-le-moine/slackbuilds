@@ -11,7 +11,7 @@ PKG=$TMP/pkg-$PRGNAM
 
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
-GITHUB_REPO=postmodern/chruby
+UPSTREAM_REPO=https://github.com/postmodern/chruby
 VERSION=${VERSION:-latest}
 
 ARCH='noarch'
@@ -24,7 +24,7 @@ SLCKFLAGS="-fPIC -O2"
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -71,7 +71,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

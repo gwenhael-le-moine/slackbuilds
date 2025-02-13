@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-GITHUB_REPO=inclement/vivarium
+UPSTREAM_REPO=https://github.com/inclement/vivarium
 VERSION=${VERSION:-"latest"}
 BUILD=4
 
@@ -24,7 +24,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -138,7 +138,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage

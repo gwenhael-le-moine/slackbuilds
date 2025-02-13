@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=Tecate/bitmap-fonts
+UPSTREAM_REPO=https://github.com/Tecate/bitmap-fonts
 #VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)} # or VERSION=trunk
 VERSION=${VERSION:-trunk}
 BUILD=${BUILD:-1}
@@ -22,7 +22,7 @@ rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 mkdir -p "$PKG"
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git reset --hard HEAD
 git pull --all

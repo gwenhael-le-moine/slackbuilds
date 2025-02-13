@@ -4,7 +4,7 @@
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=muesli/duf
+UPSTREAM_REPO=https://github.com/muesli/duf
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-noarch}
 BUILD=1
@@ -25,7 +25,7 @@ mkdir -p "$PKG"
 
 # mise en place
 cd $TMP || exit 1
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
 cd $REPOSITORY
 git pull --all
 
@@ -66,7 +66,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage

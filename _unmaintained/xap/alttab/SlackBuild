@@ -2,7 +2,7 @@
 set -x
 
 PRGNAM=$(basename $(pwd))
-GITHUB_REPO=sagb/alttab
+UPSTREAM_REPO=https://github.com/sagb/alttab
 VERSION=${VERSION:-latest}
 
 BUILD=1
@@ -26,7 +26,7 @@ mkdir -p $TMP
 rm -fr $PRGNAM $PKG
 
 # Fetching sources
-[ ! -e $REPOSITORY ] && git clone https://github.com/${GITHUB_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
 git pull --all
 
@@ -86,7 +86,7 @@ $PRGNAM: it's lightweight and depends only on basic X11 libs, conforming to the 
 $PRGNAM: lightweight WM.alttab is X11 window switcher designed for minimalistic window
 $PRGNAM: managers or standalone X11 session.
 $PRGNAM:
-$PRGNAM: https://github.com/${GITHUB_REPO}
+$PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 

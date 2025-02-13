@@ -7,7 +7,7 @@ CWD=$(pwd)
 OUTPUT=/tmp
 
 PRGNAM=$(basename "$CWD")
-GITHUB_REPO=kovidgoyal/kitty
+UPSTREAM_REPO=https://github.com/kovidgoyal/kitty
 VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
@@ -39,7 +39,7 @@ rm -fr "$PKG" "${TMP:?}"/"$PRGNAM"
 mkdir -p "$PKG"
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/${GITHUB_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
