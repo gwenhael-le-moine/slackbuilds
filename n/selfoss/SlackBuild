@@ -7,7 +7,7 @@ PRGNAM=$(basename $CWD)
 UPSTREAM_REPO=https://github.com/fossar/selfoss
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-noarch}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -45,6 +45,7 @@ npm run install-dependencies:client
 npm run build
 
 chown -R apache:apache $PKG/opt/$PRGNAM/
+sudo -u apache php -f ./utils/generate-config-example.php
 
 # correction
 cd $PKG
