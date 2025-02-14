@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# variables
+CWD=$(pwd)
+
+PRGNAM=$(basename "$CWD")
+UPSTREAM_REPO="https://github.com/hyprwm/$PRGNAM"
+VERSION=${VERSION:-latest}
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
+
+PREFIX=/usr
+
+# nettoyage préalable
+rm -fr "$PKG" "$TMP"/"$PRGNAM"
+
+mkdir -p "$PKG"
+
+# mise en place
+cd "$TMP" || exit 1
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+
+cd "$REPOSITORY" || exit1
+git pull --all
+
+cp -R "$REPOSITORY" "$TMP"/"$PRGNAM"
+cd "$TMP"/"$PRGNAM" || exit 1
+
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" # || git checkout $VERSION
+git submodule update --init --recursive
+
+# configuration
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DCMAKE_BUILD_TYPE=Release  \
+    -B build
+
+# compilation
+#make -j$(nproc)
+cmake --build build -j $(nproc)
+
+# installation
+cmake --install build --prefix "$PKG"$PREFIX --strip
+
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp LICENSE VERSION ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+
+# correction
+cd "$PKG" || exit 1
+chown -R root:root ./*
+
+[ -d "$PKG"/usr/man ] && find "$PKG"/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+
+# embaumement
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/slack-desc
+$PRGNAM: $PRGNAM ( Hyprland's idle daemon )
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: ${UPSTREAM_REPO}
+$PRGNAM:
+EOF
+
+# empaquetage
+rm -f "$PKG"/{,usr/}lib$(uname -m | grep -o 64)/*.la
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT"/"$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
