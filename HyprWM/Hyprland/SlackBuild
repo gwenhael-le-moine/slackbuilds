@@ -7,7 +7,7 @@ PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO="https://github.com/hyprwm/$PRGNAM"
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=1
+BUILD=2
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -44,6 +44,7 @@ cmake --no-warn-unused-cli \
       -DCMAKE_BUILD_TYPE:STRING=Release \
       -DCMAKE_INSTALL_PREFIX:STRING=${PREFIX} \
       -DNO_SYSTEMD:STRING=true \
+      -DNO_UWSM:STRING=true \
       -S . \
       -B ./build
 
