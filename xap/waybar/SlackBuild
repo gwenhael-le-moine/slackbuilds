@@ -34,7 +34,7 @@ else
 fi
 
 # nettoyage préalable
-rm -fr "$PKG" "$TMP"/"$PRGNAM"
+rm -fr "$PKG" "${TMP:?}"/"$PRGNAM"
 
 mkdir -p "$PKG"
 
@@ -99,7 +99,7 @@ cat <<EOF > "$PKG/install/slack-desc"
 # customary to leave one space after the ':'.
 
      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Highly customizable Wayland bar for Sway)
+$PRGNAM: $PRGNAM (Highly customizable Wayland bar)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
