@@ -7,7 +7,7 @@ PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO="https://github.com/hyprwm/$PRGNAM"
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=2
+BUILD=3
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -56,6 +56,59 @@ cmake --install build --prefix "$PKG"$PREFIX --strip
 
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM/"
 cp -R LICENSE VERSION ./*.md docs/ example/ assets/ "$PKG$PREFIX/doc/$PRGNAM/"
+
+cat <<EOF > "$PKG$PREFIX/bin/start_hyprland.sh"
+#!/bin/bash
+
+#set -e
+
+# LOGFILE=~/.wsession-errors
+# true > \$LOGFILE
+# exec &> \$LOGFILE
+
+set -x
+echo "hyprland Starting: \$( date )"
+
+# Uncomment if mouse pointer is invisible
+#export WLR_NO_HARDWARE_CURSORS=1
+
+# unset QT_QPA_PLATFORM
+
+
+# # vulklan seems buggy with Intel IGP
+# if \$(lsmod | grep -q "^i915.*$"); then
+#    export WLR_RENDERER=gles2
+# else
+#    export WLR_RENDERER=vulkan
+# fi
+
+# export CLUTTER_BACKEND=wayland
+# export SDL_VIDEODRIVER=wayland
+# export XDG_SESSION_DESKTOP=hyprland
+# export XDG_SESSION_TYPE=wayland
+# export QT_PLATFORMTHEME=qt5ct
+# export QT_PLATFORM_PLUGIN=qt5ct
+
+# export QT_QPA_PLATFORMTHEME=qt5ct
+# export MOZ_ENABLE_WAYLAND=1
+# export XDG_CURRENT_DESKTOP=hyprland
+# export XDG_PICTURES_DIR=~/.wallpapers
+
+# export HYPRLANDSOCK=/run/user/\$(id -u)/hyprland-ipc.\$(id -u).\$(pgrep -x hyprland).sock
+# export XDG_RUNTIME_DIR=/tmp/xdg-runtime-\$(id -u)
+
+# mkdir -p \$XDG_RUNTIME_DIR
+# chmod 0700 \$XDG_RUNTIME_DIR
+
+# # avoid wlr error
+# unset DISPLAY
+
+killall daemon
+
+exec dbus-run-session /usr/bin/Hyprland
+EOF
+chmod +x "$PKG$PREFIX/bin/start_hyprland.sh"
+sed -i 's|Exec=Hyprland|Exec=/usr/bin/start_hyprland.sh|' "$PKG$PREFIX/share/wayland-sessions/hyprland.desktop"
 
 # correction
 cd "$PKG" || exit 1
