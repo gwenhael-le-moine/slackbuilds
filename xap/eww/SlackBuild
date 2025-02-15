@@ -3,7 +3,7 @@
 # variables
 UPSTREAM_REPO=https://github.com/elkowar/eww
 VERSION=${VERSION:-latest}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -40,6 +40,13 @@ cargo build --release --features "wayland"
 mkdir -p $PKG$PREFIX/bin
 find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
 chmod 755 $PKG$PREFIX/bin/*
+
+mkdir -p $PKG/usr/share/bash-completion/completions
+$PKG/usr/bin/eww shell-completionss --shell bash > $PKG/usr/share/bash-completion/completions/eww
+
+mkdir -p $PKG/usr/share/zsh/site-functions
+$PKG/usr/bin/eww shell-completionss --shell zsh > $PKG/usr/share/zsh/site-functions/_eww
+chmod 0644 $PKG/usr/share/zsh/site-functions/_eww $PKG/usr/share/bash-completion/completions/eww
 
 # move doc/ to the appropriate location
 mkdir -p $PKG$PREFIX/doc/$PRGNAM
