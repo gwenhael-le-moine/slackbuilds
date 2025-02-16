@@ -36,7 +36,12 @@ cd $TMP/$PRGNAM/
 [ "x$VERSION" == "x" ] && VERSION=trunk
 [ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
-meson setup --prefix /usr --mandir /usr/man/ build/
+meson setup \
+      --prefix /usr \
+      --mandir /usr/man/ \
+      -Dman-pages=enabled \
+      build/
+
 ninja -C build/
 cd build/
 meson install --destdir=$PKG
