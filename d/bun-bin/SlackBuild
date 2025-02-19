@@ -14,7 +14,7 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Jarred-Sumner/bun/tags | jq -r '.[0].name')}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/oven-sh/bun/tags | jq -r '.[0].name')}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
@@ -26,7 +26,7 @@ mkdir -p $REPOSITORY
 rm -fr $PKG
 
 # download
-[ ! -e $REPOSITORY/bun-linux-${BINARCH}-${VERSION}.zip ] && wget -c https://github.com/Jarred-Sumner/bun/releases/download/bun-${VERSION}/bun-linux-${BINARCH}.zip -O $REPOSITORY/bun-linux-${BINARCH}-${VERSION}.zip
+[ ! -e $REPOSITORY/bun-linux-${BINARCH}-${VERSION}.zip ] && wget -c https://github.com/oven-sh/bun/releases/download/bun-${VERSION}/bun-linux-${BINARCH}.zip -O $REPOSITORY/bun-linux-${BINARCH}-${VERSION}.zip
 
 # installation
 mkdir -p $PKG/usr
