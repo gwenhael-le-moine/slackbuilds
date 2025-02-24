@@ -6,13 +6,21 @@ PKGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 TAG=${TAG:-gwh}
-BUILD=${BUILD:-3}
+BUILD=${BUILD:-8}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
+
+# Check if the jellyfin user and group exist. If not, then bail.
+# if [ "$(id -g jellyfin 2> /dev/null)" != "857" -o "$(id -u jellyfin 2> /dev/null)" != "857" ]; then
+#     echo "  You must have an 'jellyfin' user and group to run this script."
+#     echo "    # groupadd -g 857 jellyfin"
+#     echo "    # useradd -d /var/lib/jellyfin -g jellyfin -s /bin/bash -u 857 jellyfin --system "
+#     exit 1
+# fi
 
 mkdir -p "$REPOSITORY"
 
@@ -21,17 +29,29 @@ mkdir -p "$REPOSITORY"
 echo "$ARCH" | grep -q 64 && SRC_ARCH=amd64
 
 mkdir -p "$REPOSITORY"
-[ ! -e "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz" ] && wget -c "https://repo.jellyfin.org/files/server/linux/latest-stable/amd64/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz" -O "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz"
+[ ! -e "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" ] && \
+    wget -c "https://repo.jellyfin.org/files/server/linux/latest-stable/amd64/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" \
+	 -O "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
 
 rm -fr "$PKG"
 
-mkdir -p "$PKG/opt/jellyfin"
-cd "$PKG/opt/jellyfin" || exit 1
-mkdir -p data cache config log
+mkdir -p "$PKG/var/lib/jellyfin/data" \
+      "$PKG/var/lib/jellyfin/cache" \
+      "$PKG/var/lib/jellyfin/config" \
+      "$PKG/var/log/jellyfin" \
+      "$PKG/run/jellyfin"
+# chown -R jellyfin:jellyfin "$PKG/var/lib/jellyfin/data" \
+#       "$PKG/var/lib/jellyfin/cache" \
+#       "$PKG/var/lib/jellyfin/config" \
+#       "$PKG/var/log/jellyfin" \
+#       "$PKG/run/jellyfin"
 
-tar xvf "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.xz"
-mv jellyfin jellyfin-${VERSION}
-cd jellyfin-${VERSION} || exit 1
+mkdir -p "$PKG/opt"
+cd "$PKG/opt/" || exit 1
+
+tar xvf "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
+
+cd jellyfin || exit 1
 chown -R root:root .
 find -L . \
  \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
@@ -39,14 +59,15 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
+ln -s ../../var/lib/jellyfin/data data
 
 mkdir -p "$PKG/etc/default/"
 cat <<EOF > "$PKG/etc/default/jellyfin"
 # Below is the default values. Change them as you need them
-DATADIR=/opt/jellyfin/data
-CACHEDIR=/opt/jellyfin/cache
-CONFIGDIR=/opt/jellyfin/config
-LOGDIR=/opt/jellyfin/log
+DATADIR=/var/lib/jellyfin/data
+CACHEDIR=/var/lib/jellyfin/cache
+CONFIGDIR=/var/lib/jellyfin/config
+LOGDIR=/var/log/jellyfin
 EOF
 
 mkdir -p "$PKG/etc/rc.d/"
@@ -68,33 +89,36 @@ cat <<EOF > "$PKG/etc/rc.d/rc.$PKGNAM"
 
 
 start() {
-if [ -x /opt/jellyfin/jellyfin-${VERSION}/jellyfin ]; then
+if [ -x /opt/jellyfin/jellyfin ]; then
    echo "Starting Jellyfin Media Server"
-   /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid -- \
-       /opt/jellyfin/jellyfin-${VERSION}/jellyfin \
-       -d \$DATADIR \
-       -C \$CACHEDIR \
-       -c \$CONFIGDIR \
+   #/usr/bin/daemon --user=jellyfin
+   /usr/bin/daemon \\
+    --name=jellyfin \\
+    --pidfile=/run/jellyfin/pid -- \\
+       /opt/jellyfin/jellyfin \\
+       -d \$DATADIR \\
+       -C \$CACHEDIR \\
+       -c \$CONFIGDIR \\
        -l \$LOGDIR
 fi
 }
 
 stop() {
 echo "Stopping Jellyfin Media Server"
-if /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --running ; then
-        /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --stop
+if /usr/bin/daemon --name=jellyfin --pidfile=/run/jellyfin/pid --running ; then
+        /usr/bin/daemon --name=jellyfin --pidfile=/run/jellyfin/pid --stop
 fi
 }
 
 restart() {
 echo "Restarting Jellyfin Media Server"
-if /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --running ; then
-        /usr/bin/daemon --name=jellyfin --pidfile=/var/run/jellyfin.pid --restart
+if /usr/bin/daemon --name=jellyfin --pidfile=/run/jellyfin/pid --running ; then
+        /usr/bin/daemon --name=jellyfin --pidfile=/run/jellyfin/pid --restart
  fi
 }
 
 status() {
-/usr/bin/daemon --name=jellyfin --running --pidfile=/var/run/jellyfin.pid --verbose
+/usr/bin/daemon --name=jellyfin --running --pidfile=/run/jellyfin/pid --verbose
 }
 
 case "\$1" in
