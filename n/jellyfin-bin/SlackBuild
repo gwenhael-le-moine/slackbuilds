@@ -6,7 +6,7 @@ PKGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 TAG=${TAG:-gwh}
-BUILD=${BUILD:-8}
+BUILD=${BUILD:-9}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
@@ -31,7 +31,7 @@ echo "$ARCH" | grep -q 64 && SRC_ARCH=amd64
 mkdir -p "$REPOSITORY"
 [ ! -e "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" ] && \
     wget -c "https://repo.jellyfin.org/files/server/linux/latest-stable/amd64/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" \
-	 -O "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
+         -O "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
 
 rm -fr "$PKG"
 
@@ -91,6 +91,7 @@ cat <<EOF > "$PKG/etc/rc.d/rc.$PKGNAM"
 start() {
 if [ -x /opt/jellyfin/jellyfin ]; then
    echo "Starting Jellyfin Media Server"
+   mkdir -p /run/jellyfin/
    #/usr/bin/daemon --user=jellyfin
    /usr/bin/daemon \\
     --name=jellyfin \\
