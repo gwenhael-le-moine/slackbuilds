@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 UPSTREAM_REPO=https://github.com/Kron4ek/Conty
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Kron4ek/Conty/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-6}
 TAG=${TAG:-gwh}
