@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # variables
-VERSION=${VERSION:-"latest"}
-BUILD=${BUILD:-1}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-2}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -39,10 +39,10 @@ mkdir -p "$PKG$PREFIX/bin"
 cp bin/uxn{asm,cli,emu} "$PKG$PREFIX/bin/"
 
 mkdir -p "$PKG$PREFIX/share/$PRGNAM/"
-cp bin/*.rom "$PKG$PREFIX/share/$PRGNAM/"
+cp boot.rom "$PKG$PREFIX/share/$PRGNAM/"
 
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp -R LICENSE README.md "$PKG$PREFIX/doc/$PRGNAM"
+cp -R projects/ LICENSE README.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
 cd "$PKG" || exit 1
