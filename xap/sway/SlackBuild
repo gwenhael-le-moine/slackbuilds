@@ -3,7 +3,7 @@
 # variables
 UPSTREAM_REPO=https://github.com/swaywm/sway
 VERSION=${VERSION:-"latest"}
-BUILD=15
+BUILD=16
 
 TAG=gwh
 OUTPUT=/tmp
@@ -200,8 +200,8 @@ echo "sway Starting: \$( date )"
 # Uncomment if mouse pointer is invisible
 #export WLR_NO_HARDWARE_CURSORS=1
 
-unset QT_QPA_PLATFORM
-
+export MOZ_ENABLE_WAYLAND=1
+export ELECTRON_OZONE_PLATFORM_HINT=auto
 
 # vulklan seems buggy with Intel IGP
 if \$(lsmod | grep -q "^i915.*$"); then
@@ -210,16 +210,27 @@ else
    export WLR_RENDERER=vulkan
 fi
 
-export CLUTTER_BACKEND=wayland
-export SDL_VIDEODRIVER=wayland
-export XDG_SESSION_DESKTOP=sway
-export XDG_SESSION_TYPE=wayland
-export QT_PLATFORMTHEME=qt5ct
-export QT_PLATFORM_PLUGIN=qt5ct
-
-export QT_QPA_PLATFORMTHEME=qt5ct
+# Web-related environment variables
 export MOZ_ENABLE_WAYLAND=1
+export ELECTRON_OZONE_PLATFORM_HINT=auto
+
+# QT environment variables
+export QT_QPA_PLATFORM=wayland
+export QT_QPA_PLATFORMTHEME=qt5ct
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
+export QT_STYLE_OVERRIDE=kvantum
+
+# Toolkit Backend Variables
+export CLUTTER_BACKEND=wayland
+export GDK_BACKEND=wayland,x11,*
+export SDL_VIDEODRIVER=wayland
+export CLUTTER_BACKEND=wayland
+
+# XDG Specifications
 export XDG_CURRENT_DESKTOP=sway
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=sway
 export XDG_PICTURES_DIR=~/.wallpapers
 
 export SWAYSOCK=/run/user/\$(id -u)/sway-ipc.\$(id -u).\$(pgrep -x sway).sock
@@ -231,11 +242,12 @@ chmod 0700 \$XDG_RUNTIME_DIR
 # avoid wlr error
 unset DISPLAY
 
+# for pipewire?
 killall daemon
 
+# Update D-Bus activation environment
+dbus-update-activation-environment --all
 exec dbus-run-session /usr/bin/sway
-#dbus-launch --sh-syntax --exit-with-session /usr/bin/sway
-#exec /usr/bin/sway
 EOF
 chmod +x "$PKG$PREFIX/bin/start_sway.sh"
 sed -i 's|Exec=sway|Exec=/usr/bin/start_sway.sh|' "$PKG$PREFIX/share/wayland-sessions/sway.desktop"
