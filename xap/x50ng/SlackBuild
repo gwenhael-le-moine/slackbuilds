@@ -1,10 +1,10 @@
 #!/bin/bash
-set -x
+#set -x
 
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-UPSTREAM_REPO=https://github.com/gwenhael-le-moine/x50ng
+UPSTREAM_REPO=https://codeberg.org/gwh/x50ng
 VERSION=${VERSION:-latest}
 
 BUILD=12
