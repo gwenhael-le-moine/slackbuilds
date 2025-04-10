@@ -44,10 +44,10 @@ cd $PRGNAM
 
 # configuration
 CFLAGS=$SLCKFLAGS \
-CPPFLAGS=$SLCKFLAGS \
-./configure \
-                  --prefix=$PREFIX \
-                  --lua-version=$(lua -v  | rg -o "[0-9]\.[0-9]" | head -n1)
+    CPPFLAGS=$SLCKFLAGS \
+    ./configure \
+    --prefix=$PREFIX \
+    --lua-version=$(lua -v  | rg -o "[0-9]\.[0-9]" | head -n1)
 
 # compilation
 make -j3 PREFIX=$PREFIX
