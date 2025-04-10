@@ -16,7 +16,7 @@ PKG=$TMP/pkg-$PRGNAM
 DOCS="COPYING* README*"
 
 ARCH=$(uname -m)
-BUILD=1
+BUILD=2
 
 PREFIX=/usr
 
@@ -30,7 +30,7 @@ mkdir -p $PKG
 # mise en place
 cd $TMP
 #[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
-[ ! -e $REPOSITORIES/$PRGNAM ] && git clone http://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
+[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
 ( cd $REPOSITORIES/$PRGNAM;
   git pull
 )
@@ -46,8 +46,8 @@ cd $PRGNAM
 CFLAGS=$SLCKFLAGS \
 CPPFLAGS=$SLCKFLAGS \
 ./configure \
-		  --prefix=$PREFIX \
-		  --lua-version=$(lua -v  | rg -o "[0-9]\.[0-9]" | head -n1)
+                  --prefix=$PREFIX \
+                  --lua-version=$(lua -v  | rg -o "[0-9]\.[0-9]" | head -n1)
 
 # compilation
 make -j3 PREFIX=$PREFIX
@@ -59,13 +59,13 @@ mkdir -p $PKG/etc/profile.d/
 cat <<EOF > $PKG/etc/profile.d/luarocks.sh
 #!/bin/bash
 
-export PATH=\$PATH:$PREFIX/lib64/luarocks/bin
+[[ -x $(which luarocks) ]] && eval $(luarocks path)
 EOF
-cat <<EOF > $PKG/etc/profile.d/luarocks.csh
-#!/bin/csh
+# cat <<EOF > $PKG/etc/profile.d/luarocks.csh
+# #!/bin/csh
 
-setenv PATH \$PATH:$PREFIX/lib64/luarocks/bin
-EOF
+# setenv PATH \$PATH:$PREFIX/lib64/luarocks/bin
+# EOF
 chmod +x $PKG/etc/profile.d/*
 
 # correction
