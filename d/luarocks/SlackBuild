@@ -8,7 +8,6 @@ TMP=/tmp/$TAG
 OUTPUT=/tmp
 CWD=$(pwd)
 REPOSITORIES=/var/cache/SlackBuilds.gwh
-REPOSITORY=$REPOSITORIES/$PRGNAM
 
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
@@ -16,7 +15,7 @@ PKG=$TMP/pkg-$PRGNAM
 DOCS="COPYING* README*"
 
 ARCH=$(uname -m)
-BUILD=2
+BUILD=3
 
 PREFIX=/usr
 
@@ -59,7 +58,7 @@ mkdir -p $PKG/etc/profile.d/
 cat <<EOF > $PKG/etc/profile.d/luarocks.sh
 #!/bin/bash
 
-[[ -x $(which luarocks) ]] && eval $(luarocks path)
+eval \$(luarocks path)
 EOF
 # cat <<EOF > $PKG/etc/profile.d/luarocks.csh
 # #!/bin/csh
