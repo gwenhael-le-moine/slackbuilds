@@ -9,10 +9,8 @@ OUTPUT=/tmp
 CWD=$(pwd)
 REPOSITORIES=/var/cache/SlackBuilds.gwh
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
-
-DOCS="COPYING* README*"
 
 ARCH=$(uname -m)
 BUILD=3
@@ -22,40 +20,38 @@ PREFIX=/usr
 SLCKFLAGS="-fPIC -O2"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-mkdir -p $PKG
+mkdir -p "$PKG"
 
 # mise en place
-cd $TMP
-#[ ! -e $REPOSITORIES ] && mkdir -p $REPOSITORIES
-[ ! -e $REPOSITORIES/$PRGNAM ] && git clone https://github.com/keplerproject/luarocks.git $REPOSITORIES/$PRGNAM
-( cd $REPOSITORIES/$PRGNAM;
+[ ! -e "$REPOSITORIES/$PRGNAM" ] && git clone https://github.com/keplerproject/luarocks.git "$REPOSITORIES/$PRGNAM"
+( cd "$REPOSITORIES/$PRGNAM" || exit 1
   git pull
 )
 
-cp -R $REPOSITORIES/$PRGNAM $TMP/$PRGNAM
-cd $PRGNAM
+cp -R "$REPOSITORIES/$PRGNAM" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
 # configuration
 CFLAGS=$SLCKFLAGS \
     CPPFLAGS=$SLCKFLAGS \
     ./configure \
     --prefix=$PREFIX \
-    --lua-version=$(lua -v  | rg -o "[0-9]\.[0-9]" | head -n1)
+    --lua-version="$(lua -v  | rg -o "[0-9]\.[0-9]" | head -n1)"
 
 # compilation
 make -j3 PREFIX=$PREFIX
 
 # installation
-make install DESTDIR=$PKG ROCKS_TREE=$PREFIX/lib64/luarocks
+make install DESTDIR="$PKG" ROCKS_TREE=$PREFIX/lib64/luarocks
 
-mkdir -p $PKG/etc/profile.d/
-cat <<EOF > $PKG/etc/profile.d/luarocks.sh
+mkdir -p "$PKG/etc/profile.d/"
+cat <<EOF > "$PKG/etc/profile.d/luarocks.sh"
 #!/bin/bash
 
 eval \$(luarocks path)
@@ -65,28 +61,28 @@ EOF
 
 # setenv PATH \$PATH:$PREFIX/lib64/luarocks/bin
 # EOF
-chmod +x $PKG/etc/profile.d/*
+chmod +x "$PKG/etc/profile.d/*"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-mkdir -p $PKG/usr/doc/$PRGNAM
-cd $TMP/$PRGNAM
-cp -R *.md COPYING $PKG/usr/doc/$PRGNAM
+mkdir -p "$PKG/usr/doc/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+cp -R ./*.md COPYING "$PKG/usr/doc/$PRGNAM"
 
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d "$PKG/usr/man" ] && find "$PKG/usr/man" -type f -name "*.?" -exec gzip -9f {} \;
 
 # Strip binaries
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+( cd "$PKG" || exit 1
+  find . -print0 | xargs -0 file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . -print0 | xargs -0 file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 )
 
 
 # embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
 $PRGNAM: $PRGNAM (deployment and management system for Lua modules.)
 $PRGNAM:
 $PRGNAM: LuaRocks allows you to install Lua modules as self-contained packages
@@ -101,6 +97,6 @@ $PRGNAM:
 EOF
 
 # empaquetage
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
