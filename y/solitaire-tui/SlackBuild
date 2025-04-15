@@ -2,7 +2,7 @@
 
 # variables
 UPSTREAM_REPO=https://github.com/brianstrauch/solitaire-tui
-#VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)} # or VERSION=trunk
+#VERSION=${VERSION:-$(curl -s https://api.github.com/repos/brianstrauch/solitaire-tui/releases/latest | jq -r .tag_name)} # or VERSION=trunk
 VERSION=${VERSION:-trunk}
 
 BUILD=${BUILD:-1}
@@ -84,7 +84,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/$GITHUB_REPO
+$PRGNAM: https://github.com/brianstrauch/solitaire-tui
 EOF
 
 # empaquetage

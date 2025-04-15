@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 UPSTREAM_REPO=https://github.com/racket/racket
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^v||')}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/racket/racket/releases/latest | jq -r .tag_name | sed 's|^v||')}
 BUILD=3
 TAG=gwh
 

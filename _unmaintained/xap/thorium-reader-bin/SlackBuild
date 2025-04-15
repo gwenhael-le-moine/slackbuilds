@@ -3,7 +3,7 @@
 # variables
 CWD=$(pwd)
 UPSTREAM_REPO=https://github.com/edrlab/thorium-reader
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/edrlab/thorium-reader/releases/latest | jq -r .tag_name)}
 
 PRGNAM=$(basename $CWD)
 ARCH="AppImage"
@@ -48,7 +48,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: https://www.edrlab.org/software/thorium-reader/
-$PRGNAM: https://github.com/$(GITHUB_REPO)
+$PRGNAM: https://github.com/edrlab/thorium-reader
 $PRGNAM:
 EOF
 

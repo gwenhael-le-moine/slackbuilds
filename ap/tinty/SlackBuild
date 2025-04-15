@@ -2,7 +2,7 @@
 
 # variables
 UPSTREAM_REPO=https://github.com/tinted-theming/tinty
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)} # or VERSION=trunk
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/tinted-theming/tinty/releases/latest | jq -r .tag_name)} # or VERSION=trunk
 
 BUILD=${BUILD:-1}
 
@@ -82,7 +82,7 @@ $PRGNAM: projects including any third-party template repository that follows
 $PRGNAM: the Base16 builder specification.
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/$GITHUB_REPO
+$PRGNAM: https://github.com/tinted-theming/tinty
 EOF
 
 # empaquetage

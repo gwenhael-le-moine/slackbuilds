@@ -48,7 +48,7 @@ make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(un
  ########
 SHARDS_PRGNAM=shards
 SHARDS_UPSTREAM_REPO=https://github.com/crystal-lang/shards
-SHARDS_VERSION=${SHARDS_VERSION:-$(curl -s https://api.github.com/repos/${SHARDS_GITHUB_REPO}/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
+SHARDS_VERSION=${SHARDS_VERSION:-$(curl -s https://api.github.com/repos/crystal-lang/shards/releases/latest | jq -r .tag_name | sed 's|^null$|trunk|')} # or VERSION=trunk
 SHARDS_REPOSITORY=${SHARDS_REPOSITORY:-/var/cache/SlackBuilds.gwh/$SHARDS_PRGNAM}
 SHARDS_PKG=$TMP/pkg-$SHARDS_PRGNAM
 
@@ -56,7 +56,7 @@ SHARDS_PKG=$TMP/pkg-$SHARDS_PRGNAM
 rm -fr "$SHARDS_PKG" "${TMP:?}/$SHARDS_PRGNAM/"
 
 # mise en place
-[ ! -e "$SHARDS_REPOSITORY" ] && git clone https://github.com/${SHARDS_GITHUB_REPO} "$SHARDS_REPOSITORY"
+[ ! -e "$SHARDS_REPOSITORY" ] && git clone ${SHARDS_UPSTREAM_REPO} "$SHARDS_REPOSITORY"
 cd "$SHARDS_REPOSITORY" || exit
 git pull --all
 

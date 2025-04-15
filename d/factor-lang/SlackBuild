@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename $CWD)
 ARCH=$(uname -m)
 UPSTREAM_REPO=https://github.com/factor/factor
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/factor/factor/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 BUILD=${BUILD:-3}
 
 TAG=gwh

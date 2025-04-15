@@ -2,7 +2,7 @@
 
 # variables
 UPSTREAM_REPO=https://github.com/nielssp/csol
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)} # or VERSION=trunk
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/nielssp/csol/releases/latest | jq -r .tag_name)} # or VERSION=trunk
 
 BUILD=${BUILD:-1}
 
@@ -75,7 +75,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: https://github.com/$GITHUB_REPO
+$PRGNAM: https://github.com/nielssp/csol
 EOF
 
 # empaquetage

@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO=https://github.com/Tecate/bitmap-fonts
-#VERSION=${VERSION:-$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r .tag_name)} # or VERSION=trunk
+#VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Tecate/bitmap-fonts/releases/latest | jq -r .tag_name)} # or VERSION=trunk
 VERSION=${VERSION:-trunk}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
