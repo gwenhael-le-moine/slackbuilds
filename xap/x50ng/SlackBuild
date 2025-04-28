@@ -7,7 +7,7 @@ PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO=https://codeberg.org/gwh/x50ng
 VERSION=${VERSION:-latest}
 
-BUILD=12
+BUILD=13
 
 ARCH=$(uname -m)
 
@@ -45,17 +45,14 @@ find . \
      \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
      -exec chmod 644 {} \;
 
-make INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
+make PREFIX=/usr MANDIR=/usr/man/man1
 make pull-firmware
 
 # Installing
 mkdir -p "$PKG"
-make install DESTDIR="$PKG" INSTALL_PREFIX=/usr INSTALL_MAN_DIR=/usr/man/man1
+make install DESTDIR="$PKG" PREFIX=/usr MANDIR=/usr/man/man1
 
-mkdir -p "$PKG"$PREFIX/doc/"$PRGNAM"/
-cp README* "$PKG"$PREFIX/doc/"$PRGNAM"/
-
-# # Cleaning
+# Cleaning
 cd "$PKG" || exit 1
 
 find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
@@ -72,12 +69,6 @@ find . \
 
 # Packaging
 mkdir install
-cat <<EOF > install/doinst.sh
-#!/bin/bash
-
-cat /usr/doc/x50ng/README.md | grep "First launch setup" --before-context=2 --after-context=28
-EOF
-
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (HP49/50 emulator, rebooted)
 $PRGNAM:
