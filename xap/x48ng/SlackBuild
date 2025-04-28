@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 
 BUILD=2
-UPSTREAM_REPO=https://github.com/gwenhael-le-moine/x48ng
+UPSTREAM_REPO=https://codeberg.org/gwh/x48ng
 VERSION=${VERSION:-latest}
 
 ARCH=$(uname -m)
