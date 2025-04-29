@@ -5,6 +5,9 @@
 cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
+# FIXME: these are broken because onig_sys doesn't build with gcc 15.1
+        # ap/bat \
+        # ap/delta \
 for pkg in \
         l/fcft \
         l/fmt \
@@ -14,7 +17,6 @@ for pkg in \
         l/tllist \
         a/nct6687d \
         ap/aegis-rs \
-        ap/bat \
         ap/fd \
         ap/getssl \
         ap/glow \
@@ -64,6 +66,6 @@ for pkg in \
     ;
 do
     cd $pkg || exit 1
-    VERSION=trunk bash -e ./SlackBuild
+    VERSION=trunk "$CWD"/make-pkg.bash
     cd "$CWD" || exit 1
 done
