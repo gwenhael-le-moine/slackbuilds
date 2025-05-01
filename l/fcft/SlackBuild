@@ -1,14 +1,16 @@
 #!/bin/bash
-# variables
+
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
 VERSION=${VERSION:-latest}
 BUILD=2
 
 TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
-CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 
 ARCH=$(uname -m)
@@ -16,46 +18,55 @@ ARCH=$(uname -m)
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 PREFIX=/usr
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+mkdir -p "$TMP"
 
-mkdir -p $PKG
+# nettoyage préalable
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://codeberg.org/dnkl/fcft.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone https://codeberg.org/dnkl/fcft.git "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM/
+cp -R "$REPOSITORY" $TMP/
+cd "$TMP/$PRGNAM/" || exit 1
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+    exit 0
+fi
 
 meson setup \
       --prefix /usr \
       --mandir /usr/man/ \
        build/
 ninja -C build/
-cd build/
-meson install --destdir=$PKG
+cd build/ || exit 1
+meson install --destdir="$PKG"
 cd ../
 
-mkdir -p $PKG$PREFIX/doc/
-# cp LICENSE *.md $PKG$PREFIX/doc/$PRGNAM/
-mv $PKG$PREFIX/share/doc/$PRGNAM $PKG$PREFIX/doc/
-rm -fr $PKG$PREFIX/share/
+mkdir -p "$PKG$PREFIX/doc/"
+mv "$PKG$PREFIX/share/doc/$PRGNAM" "$PKG$PREFIX/doc/"
+rm -fr "$PKG$PREFIX/share/"
 
 # correction
-cd $PKG
-chown -R root:root *
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+cd "$PKG" || exit 1
+chown -R root:root ./*
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -name "*.?" -type f -exec gzip -9 {} \;
 
 # embaumement
-mkdir -p $PKG/install
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below kanshis it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -77,5 +88,5 @@ $PRGNAM: https://codeberg.org/dnkl/fcft
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
