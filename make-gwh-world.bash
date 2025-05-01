@@ -65,7 +65,5 @@ for pkg in \
         y/solitaire-tui \
     ;
 do
-    cd $pkg || exit 1
-    VERSION=trunk "$CWD"/make-pkg.bash
-    cd "$CWD" || exit 1
+    VERSION=trunk "$CWD"/make-pkg.bash "$pkg"
 done
