@@ -1,40 +1,59 @@
-#!/bin/bash -e
+#!/bin/bash
 
-# variables
-VERSION=${VERSION:-latest}
-
-BUILD=3
-TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-PKG=$TMP/pkg-$PRGNAM
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://git.code.sf.net/p/newrpl/sources"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
 
-ARCH=$(uname -m)
+TAG="gwh"
+TMP="/tmp/$TAG"
 
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-PREFIX=/usr
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
-NPROC=$(nproc)
+ARCH=${ARCH:-$(uname -m)}
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-mkdir -p $PKG
-
-# mise en place
-[ ! -e $REPOSITORY ] && git clone https://git.code.sf.net/p/newrpl/sources $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
+git submodule update --init
 
-cp -R $REPOSITORY $TMP/
+mkdir -p "$TMP"
 
-cd $TMP/$PRGNAM/
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="$(git rev-list --count master)_git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 # https://www.hpmuseum.org/forum/thread-17667-post-154012.html#pid154012
 # elf2rom is only needed to build actual calculator firmware
@@ -43,64 +62,64 @@ cd $TMP/$PRGNAM/
 # mkdir build-elf2rom
 # cd build-elf2rom/
 # qmake ../tools/elf2rom//elf2rom.pro
-# make -j$NPROC
+# make -j"$NPROC"
 # cp elf2rom ../tools-bin/
 
-# cd $TMP/$PRGNAM/
+# cd "$TMP/$PRGNAM/" || exit 1
 # mkdir build-bmp2font
 # cd build-bmp2font/
 # qmake ../tools/fonts/bmp2font//bmp2font.pro
-# make -j$NPROC
+# make -j"$NPROC"
 # cp bmp2font ../tools-bin/
 
-cd $TMP/$PRGNAM/
+cd "$TMP/$PRGNAM/" || exit 1
 mkdir build-comp
-cd build-comp/
+cd build-comp/ || exit 1
 qmake ../newrpl-comp.pro
-make -j$NPROC
+make -j"$NPROC"
 cp newrpl-comp ../tools-bin/
 
-cd $TMP/$PRGNAM/
+cd "$TMP/$PRGNAM/" || exit 1
 mkdir build-base
-cd build-base/
+cd build-base/ || exit 1
 qmake ../newrpl/newRPL-base.pro
-make -j$NPROC
+make -j"$NPROC"
 
-cd $TMP/$PRGNAM/
+cd "$TMP/$PRGNAM/" || exit 1
 mkdir build-ui
-cd build-ui/
+cd build-ui/ || exit 1
 qmake ../newrpl-ui.pro
-make -j$NPROC
+make -j"$NPROC"
 
-cd $TMP/$PRGNAM/
+cd "$TMP/$PRGNAM/" || exit 1
 mkdir build-ui-prime
-cd build-ui-prime/
+cd build-ui-prime/ || exit 1
 qmake ../newrpl-ui-prime.pro
-make -j$NPROC
+make -j"$NPROC"
 
-cd $TMP/$PRGNAM/
-mkdir -p $PKG$PREFIX/bin/
-cp build-comp/newrpl-comp $PKG$PREFIX/bin/
+cd "$TMP/$PRGNAM/" || exit 1
+mkdir -p "$PKG$PREFIX"/bin/
+cp build-comp/newrpl-comp "$PKG$PREFIX"/bin/
 
-cp build-base/newrpl-base $PKG$PREFIX/bin/newrpl-tui
-cp build-ui/newrpl-ui $PKG$PREFIX/bin/
-cp build-ui-prime/newrpl-ui $PKG$PREFIX/bin/newrpl-ui-prime
+cp build-base/newrpl-base "$PKG$PREFIX"/bin/newrpl-tui
+cp build-ui/newrpl-ui "$PKG$PREFIX"/bin/
+cp build-ui-prime/newrpl-ui "$PKG$PREFIX"/bin/newrpl-ui-prime
 
-# cp build-elf2rom/elf2rom $PKG$PREFIX/bin/newrpl-elf2rom
-# cp build-bmp2font/bmp2font $PKG$PREFIX/bin/newrpl-bmp2font
+# cp build-elf2rom/elf2rom "$PKG$PREFIX"/bin/newrpl-elf2rom
+# cp build-bmp2font/bmp2font "$PKG$PREFIX"/bin/newrpl-bmp2font
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp LICENSE* $PKG$PREFIX/doc/$PRGNAM/
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp LICENSE* "$PKG$PREFIX/doc/$PRGNAM"/
 
 # correction
-cd $PKG
-chown -R root:root *
-# find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+cd "$PKG" || exit 1
+chown -R root:root ./*
+# find "$PKG$PREFIX"/man -name "*.?" -type f -exec gzip -9 {} \;
 
 # embaumement
-mkdir -p $PKG/install
+mkdir -p "$PKG"/install
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -123,5 +142,4 @@ $PRGNAM: https://newrpl.wiki.hpgcc3.org/doku.php?id=start
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

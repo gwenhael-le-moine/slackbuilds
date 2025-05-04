@@ -1,45 +1,54 @@
 #!/bin/bash
-set -x -e
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 ARCH=$(uname -m)
-VERSION=$(curl -s https://ziglang.org/download/index.json | jq 'keys' | grep -v master | grep -v \\\[ | grep -v \\\] | tr -d , | tr -d \" | tr -d \  | sort -V | tail -n1)
-BUILD=1
+VERSION=${VERSION:-"$(curl -s https://ziglang.org/download/index.json | jq 'keys' | grep -v master | grep -v \\\[ | grep -v \\\] | tr -d , | tr -d \" | tr -d \  | sort -V | tail -n1)"}
+BUILD=${BUILD:-1}
 
-TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
-PKG=$TMP/pkg-$PRGNAM
+TAG="gwh"
+OUTPUT=${OUTPUT:-"/tmp"}
+TMP="/tmp/$TAG"
+PKG="$TMP/pkg-$PRGNAM"
 PREFIX=/usr
 
-REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM"}
 
-mkdir -p $REPOSITORY
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+mkdir -p "$REPOSITORY"
 
 # cleaning
-rm -fr $PKG
+rm -fr "$PKG"
 
 # unpacking
-[ ! -e $REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz ] && wget -c https://ziglang.org/download/${VERSION}/zig-linux-${ARCH}-${VERSION}.tar.xz -O $REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz
+[ ! -e "$REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz" ] && wget -c "https://ziglang.org/download/${VERSION}/zig-linux-${ARCH}-${VERSION}.tar.xz" -O "$REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz"
 
-mkdir -p $TMP
-cd $TMP
-tar xvf $REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz
-cd zig-linux-${ARCH}-${VERSION}
+mkdir -p "$TMP"
+cd "$TMP" || exit 1
+tar xvf "$REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz"
+cd "zig-linux-${ARCH}-${VERSION}" || exit 1
 
 # installation
-mkdir -p $PKG$PREFIX/bin/
-install -D zig $PKG$PREFIX/bin/zig
+mkdir -p "$PKG$PREFIX"/bin/
+install -D zig "$PKG$PREFIX"/bin/zig
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-install -D LICENSE $PKG$PREFIX/doc/zig/LICENSE
-cp -r lib $PKG$PREFIX
-cp -r doc/ $PKG$PREFIX/doc/zig/
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+install -D LICENSE "$PKG$PREFIX"/doc/zig/LICENSE
+cp -r lib "$PKG$PREFIX"
+cp -r doc/ "$PKG$PREFIX"/doc/zig/
 
 # packaging
-cd $PKG
+cd "$PKG" || exit 1
 mkdir install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (robust, optimal, and clear programming language)
@@ -55,5 +64,4 @@ $PRGNAM: https://ziglang.org/
 $PRGNAM:
 EOF
 
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | tr -d '-')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

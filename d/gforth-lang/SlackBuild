@@ -1,72 +1,93 @@
 #!/bin/bash
 
-# variables
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-latest}
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://git.savannah.gnu.org/git/gforth"}
+VERSION=${VERSION:-"latest"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
+
 ARCH=${ARCH:-$(uname -m)}
-BUILD=1
 
-TAG=gwh
-TMP=/tmp/$TAG
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=/tmp
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --all
+git submodule update --init
 
-PREFIX=/usr
+mkdir -p "$TMP"
 
-SLCKFLAGS=" -O "
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+mkdir -p "$PKG"
 
-mkdir -p $PKG
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-taggerdate | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
 
-# mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://git.savannah.gnu.org/git/gforth.git $REPOSITORY
-
-cp -R $REPOSITORY $TMP/$PRGNAM
-cd $TMP/$PRGNAM
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 # configuration
-./BUILD-FROM-SCRATCH --prefix=${PREFIX} \
-                     --mandir=${PREFIX}/man \
-                     --infodir=${PREFIX}/info \
-                     --libdir=${PREFIX}/lib$(uname -m | grep -o 64)
+./BUILD-FROM-SCRATCH --prefix="${PREFIX}" \
+                     --mandir="${PREFIX}/man" \
+                     --infodir="${PREFIX}/info" \
+                     --libdir="${PREFIX}/lib$(uname -m | grep -o 64)"
 
 # compilation
 make -j3
 
 # installation
-make install DESTDIR=$PKG
+make install DESTDIR="$PKG"
 
-rm $PKG$PREFIX/info/dir
+rm "$PKG$PREFIX"/info/dir
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R AUTHORS Agenda BUGS BUILD-FROM-SCRATCH COPYING* ChangeLog* INSTALL* NEWS* README* ToDo* test/ doc/ *.md $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -R AUTHORS Agenda BUGS BUILD-FROM-SCRATCH COPYING* ChangeLog* INSTALL* NEWS* README* ToDo* test/ doc/ ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-find $PKG -name \.git\* -exec rm -fr {} \;
+find "$PKG" -name \.git\* -exec rm -fr {} \;
 
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d "$PKG"/usr/man ] && find "$PKG"/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
 # Strip binaries
-cd $PKG
+cd "$PKG"
 find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 # embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/slack-desc
 $PRGNAM: $PRGNAM (implementation of the Forth 2012 language.)
 $PRGNAM:
 $PRGNAM: A free, fast, featureful and portable implementation of the Forth 2012
@@ -80,5 +101,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
