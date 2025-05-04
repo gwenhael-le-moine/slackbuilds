@@ -1,64 +1,81 @@
 #!/bin/bash
 
-# variables
-#UPSTREAM_REPO=https://github.com/leonardolang/rkvm
-UPSTREAM_REPO=https://github.com/htrefil/rkvm
-VERSION=${VERSION:-latest}
-BUILD=${BUILD:-2}
-
-TAG=gwh
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=${OUTPUT:-/tmp}
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/htrefil/rkvm"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
-PREFIX=${PREFIX:-/usr}
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
-
-mkdir -p $PKG
-
-# mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM
-[ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+mkdir -p "$TMP"
 
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+#configuration
+
+#build
 cargo build --release
 
-mkdir -p $PKG$PREFIX/bin
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
-chmod 755 $PKG$PREFIX/bin/*
-# (cd $PKG$PREFIX/bin/
-#  for i in *; do
-#      mv $i rkvm-$i;
-#  done
-# )
+#install
+mkdir -p "$PKG$PREFIX/bin"
+find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX/bin/" \;
+chmod 755 "$PKG$PREFIX/bin"/*
 
 # move doc/ to the appropriate location
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R example/ LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -R example/ LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
-cat <<EOF > $PKG$PREFIX/doc/$PRGNAM/setup-keys.sh
+cat <<EOF > "$PKG$PREFIX/doc/$PRGNAM/setup-keys.sh"
 #!/bin/bash
 $PREFIX/bin/rkvm-certificate-gen /etc/rkvm/identity.p12.new /etc/rkvm/certificate.pem.new /etc/rkvm/key.pem.new -i \$(hostname -I | cut -d\\  -f1)
 EOF
-chmod +x $PKG$PREFIX/doc/$PRGNAM/setup-keys.sh
+chmod +x "$PKG$PREFIX/doc/$PRGNAM/setup-keys.sh"
 
-mkdir -p $PKG/etc/rc.d
-cat <<EOF > $PKG/etc/rc.d/rc.rkvm-server
+mkdir -p "$PKG/etc/rc.d"
+cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-server"
 #!/bin/bash
 
 start() {
@@ -91,7 +108,8 @@ case \$1 in
         ;;
 esac
 EOF
-cat <<EOF > $PKG/etc/rc.d/rc.rkvm-client
+
+cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-client"
 #!/bin/bash
 
 start() {
@@ -125,8 +143,8 @@ case \$1 in
 esac
 EOF
 
-mkdir -p $PKG/etc/rkvm
-cat <<EOF > $PKG/etc/rkvm/server.toml.new
+mkdir -p "$PKG/etc/rkvm"
+cat <<EOF > "$PKG/etc/rkvm/server.toml.new"
 listen-address = "0.0.0.0:5258"
 # Switch to next client by pressing the right alt key.
 switch-keys = ["RightAlt"]
@@ -140,15 +158,15 @@ certificate-path = "/etc/rkvm/certificate.pem"
 EOF
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -type f -not -name \*.gz -exec gzip -9 {} \;
 
-# embaumement
-mkdir -p $PKG/install
+# packaging
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -171,5 +189,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

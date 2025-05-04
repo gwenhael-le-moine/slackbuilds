@@ -27,13 +27,11 @@ for pkg in \
         ap/nvtop \
         ap/pastel \
         ap/pandoc-bin \
-        ap/qman \
         ap/ripgrep \
         ap/rkvm \
         ap/starship \
         ap/tinty \
         ap/vivid \
-        ap/xdg-ninja \
         ap/zauth \
         d/crystal-lang \
         d/factor-lang \

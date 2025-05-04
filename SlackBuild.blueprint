@@ -23,6 +23,7 @@ PREFIX=${PREFIX:-"/usr"}
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
+git submodule update --init
 
 mkdir -p "$TMP"
 

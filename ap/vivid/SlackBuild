@@ -1,60 +1,83 @@
 #!/bin/bash
 
-# variables
-UPSTREAM_REPO=https://github.com/sharkdp/vivid
-VERSION=${VERSION:-latest}
-BUILD=${BUILD:-1}
-
-TAG=gwh
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/sharkdp/vivid"}
+VERSION=${VERSION:-"latest"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
 PRGNAM=$(basename "$CWD")
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=${OUTPUT:-/tmp}
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
-PREFIX=${PREFIX:-/usr}
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-# nettoyage préalable
-rm -fr "$PKG" ${TMP:?}/"$PRGNAM"
-
-mkdir -p "$PKG"
-
-# mise en place
-cd $TMP || exit 1
-[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R "$REPOSITORY" $TMP/
-cd "$TMP/$PRGNAM" || exit 1
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" #|| git checkout $VERSION
+mkdir -p "$TMP"
 
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+#configuration
+
+#build
 cargo build --release
 
+#install
 mkdir -p "$PKG$PREFIX/bin"
 find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX/bin/" \;
-chmod 755 "$PKG$PREFIX"/bin/*
+chmod 755 "$PKG$PREFIX/bin"/*
 
-# move doc/ to the appropriate location
+#install docs
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp -R LICENSE* ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+cp LICENSE* ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
 cd "$PKG" || exit 1
 chown -R root:root ./*
 
-[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -type f -not -name \*.gz -exec gzip -9 {} \;
 
-# embaumement
-mkdir -p "$PKG"/install
+# packaging
+mkdir -p "$PKG/install"
 
-cat <<EOF > "$PKG"/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -77,4 +100,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
