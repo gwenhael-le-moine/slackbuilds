@@ -5,28 +5,27 @@
 cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-# FIXME: these are broken because onig_sys doesn't build with gcc 15.1
-        # ap/bat \
-        # ap/delta \
 for pkg in \
-        l/fcft \
-        l/fmt \
-        l/libscfg \
-        l/notcurses \
-        l/spdlog \
-        l/tllist \
-        a/nct6687d \
+    a/nct6687d \
         ap/aegis-rs \
+        ap/bat \
+        ap/btop \
+        ap/checkssl \
+        ap/delta \
         ap/fd \
         ap/getssl \
         ap/glow \
         ap/gopsuinfo \
+        ap/hledger-bin \
         ap/jellyfin-tui \
         ap/just \
         ap/ledger \
+        ap/libtree \
         ap/lsd \
+        ap/ncdu \
         ap/nvtop \
         ap/pastel \
+        ap/qman \
         ap/ripgrep \
         ap/rkvm \
         ap/starship \
@@ -34,7 +33,22 @@ for pkg in \
         ap/vivid \
         ap/xdg-ninja \
         ap/zauth \
+        d/crystal-lang \
+        d/factor-lang \
+        d/gforth-lang \
+        d/luarocks \
+        d/rpn-lang \
+        d/uxn \
+        d/zig-lang-bin \
         e/emacs \
+        l/fcft \
+        l/fmt \
+        l/libscfg \
+        l/notcurses \
+        l/spdlog \
+        l/tllist \
+        n/forgejo-bin \
+        n/jellyfin-bin \
         xap/brightnessctl \
         xap/cmd-polkit \
         xap/dunst \
@@ -65,5 +79,6 @@ for pkg in \
         y/solitaire-tui \
     ;
 do
-    VERSION=trunk "$CWD"/make-pkg.bash "$pkg"
+    # VERSION=trunk
+    "$CWD"/make-pkg.bash "$pkg"
 done

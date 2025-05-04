@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
 # variables
 UPSTREAM_REPO=https://github.com/brianstrauch/solitaire-tui
 #VERSION=${VERSION:-$(curl -s https://api.github.com/repos/brianstrauch/solitaire-tui/releases/latest | jq -r .tag_name)} # or VERSION=trunk
@@ -9,9 +12,8 @@ BUILD=${BUILD:-1}
 
 TAG=gwh
 TMP=/tmp/$TAG
-CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -20,29 +22,40 @@ ARCH=${ARCH:-$(uname -m)}
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+mkdir -p "$TMP"
 
-mkdir -p $PKG
+# nettoyage préalable
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
 
 # mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
-cd $REPOSITORY
+cd "$TMP" || exit 1
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+cp -R "$REPOSITORY" $TMP/
+cd "$TMP/$PRGNAM" || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
-go build -o $PRGNAM
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
-mkdir -p $PKG$PREFIX/bin
+go build -o "$PRGNAM"
+
+mkdir -p "$PKG$PREFIX/bin"
 #find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
-cp $PRGNAM $PKG$PREFIX/bin/$PRGNAM
-chmod 755 $PKG$PREFIX/bin/*
+cp "$PRGNAM" "$PKG$PREFIX/bin/$PRGNAM"
+chmod 755 "$PKG$PREFIX/bin"/*
 
 # mkdir -p $PKG/usr/share/bash-completion/completions
 # $PKG/usr/bin/tinty generate-completion bash > $PKG/usr/share/bash-completion/completions/tinty
@@ -53,19 +66,19 @@ chmod 755 $PKG$PREFIX/bin/*
 # chmod 0644 $PKG/usr/share/zsh/site-functions/_tinty
 
 # move doc/ to the appropriate location
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp *.md LICENSE* $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp ./*.md LICENSE* "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
-mkdir -p $PKG/install
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -88,5 +101,5 @@ $PRGNAM: https://github.com/brianstrauch/solitaire-tui
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

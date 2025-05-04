@@ -12,21 +12,22 @@ PKG=$TMP/pkg-$PRGNAM
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 UPSTREAM_REPO=https://github.com/Fred78290/nct6687d
-#UPSTREAM_REPO=https://github.com/gwenhael-le-moine/nct6687d
 VERSION=${VERSION:-"trunk"}
 KERNEL_VERSION=$(uname -r)
 
 ARCH=$(uname -m)
 BUILD=7
 
-mkdir -p "$PKG"
-
 # mise en place
 [ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
 
+mkdir -p "$TMP"
+
 rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 cd "$TMP/$PRGNAM" || exit 1
@@ -43,15 +44,14 @@ case $VERSION in
         ;;
 esac
 
-# if [ -e "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch ]; then
-#     patch -p1 < "$CWD"/66c35797a515d14a6482fbb9da2f58b407083591.patch
-#     VERSION="${VERSION}_patched"
-# fi
-
-# if [ -e "$CWD"/ec431bf2ce2c017e4d3ec9a4bda6300ac5a46780.patch ]; then
-#     patch -p1 < "$CWD"/ec431bf2ce2c017e4d3ec9a4bda6300ac5a46780.patch
-#     VERSION="${VERSION}_patched"
-# fi
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}_${KERNEL_VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 # compilation
 make
@@ -100,4 +100,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION//-/}_${KERNEL_VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

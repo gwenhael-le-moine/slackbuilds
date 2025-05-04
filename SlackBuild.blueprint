@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 # variables
-UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/sharkdp/bat"}
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://XXX"}
 VERSION=${VERSION:-"latest"}
 BUILD=${BUILD:-1}
 
@@ -57,16 +57,12 @@ fi
 #configuration
 
 #build
-cargo build --release
 
 #install
-mkdir -p "$PKG$PREFIX/bin"
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX/bin/" \;
-chmod 755 "$PKG$PREFIX/bin"/*
 
 #install docs
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp LICENSE* ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+cp ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
 cd "$PKG" || exit 1
@@ -86,14 +82,14 @@ cat <<EOF > "$PKG/install/slack-desc"
 # customary to leave one space after the ':'.
 
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (A cat(1) clone with wings.)
+$PRGNAM: $PRGNAM ()
 $PRGNAM:
-$PRGNAM: Key features:
-$PRGNAM:  . Syntax highlighting
-$PRGNAM:  . Git integration
-$PRGNAM:  . Show non-printable characters
-$PRGNAM:  . Automatic paging
-$PRGNAM:  . File concatenation
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: ${UPSTREAM_REPO}

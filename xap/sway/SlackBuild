@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
 # variables
 UPSTREAM_REPO=https://github.com/swaywm/sway
 VERSION=${VERSION:-"latest"}
@@ -8,7 +11,6 @@ BUILD=17
 TAG=gwh
 OUTPUT=/tmp
 TMP=/tmp/$TAG
-CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
