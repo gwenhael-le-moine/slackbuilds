@@ -1,8 +1,9 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(wget -O - -o /dev/null http://status.calibre-ebook.com/latest)}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
@@ -13,27 +14,36 @@ OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-mkdir -p $REPOSITORY
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
-[ ! -e $REPOSITORY/calibre-${VERSION}-${ARCH}.txz ] && wget -c -O $REPOSITORY/calibre-${VERSION}-${ARCH}.txz http://download.calibre-ebook.com/${VERSION}/calibre-${VERSION}-${ARCH}.txz
+mkdir -p "$REPOSITORY"
 
-rm -fr $PKG
-mkdir -p $PKG/opt/calibre
+[ ! -e "$REPOSITORY/calibre-${VERSION}-${ARCH}.txz" ] && wget -c -O "$REPOSITORY/calibre-${VERSION}-${ARCH}.txz" "http://download.calibre-ebook.com/${VERSION}/calibre-${VERSION}-${ARCH}.txz"
 
-tar xvf $REPOSITORY/calibre-${VERSION}-${ARCH}.txz -C $PKG/opt/calibre
+rm -fr "$PKG"
+mkdir -p "$PKG/opt/calibre"
 
-mkdir -p $PKG/usr/bin
+tar xvf "$REPOSITORY/calibre-${VERSION}-${ARCH}.txz" -C "$PKG/opt/calibre"
 
-$PKG/opt/calibre/calibre_postinstall --root=$PKG/usr
+mkdir -p "$PKG/usr/bin"
 
-mkdir -p $PKG/etc/rc.d/
-cp $CWD/rc.calibre-server $PKG/etc/rc.d/rc.calibre-server.new
+"$PKG/opt/calibre/calibre_postinstall" --root="$PKG/usr"
 
-cd $PKG/usr/bin
+mkdir -p "$PKG/etc/rc.d/"
+cp "$CWD"/rc.calibre-server "$PKG"/etc/rc.d/rc.calibre-server.new
+
+cd "$PKG"/usr/bin || exit 1
 find . -type l -exec sh -c 'rm "$1"; ln -s ../../opt/calibre/$(basename $1)' _ {} \;
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG"/install/doinst.sh
 #!/bin/bash
 config() {
   NEW="\$1"
@@ -51,7 +61,7 @@ config() {
 config etc/rc.d/rc.calibre-server.new
 EOF
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -73,6 +83,6 @@ ${PRGNAM}: different ebook formats.
 ${PRGNAM}: ${PRGNAM} home: http://calibre-ebook.com/
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --remove-tmp-rpaths --linkadd y --chown n --prepend ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
+# empaquetage
+cd "$PKG" || exit 1
+/sbin/makepkg --remove-tmp-rpaths --linkadd y --chown n --prepend "${OUTPUT}/$PACKAGE_NAME"

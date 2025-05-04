@@ -1,37 +1,59 @@
 #!/bin/bash
-# variables
-VERSION=${VERSION:-latest}
-BUILD=2
 
-TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-PKG=$TMP/pkg-$PRGNAM
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://codeberg.org/dnkl/fuzzel"}
+VERSION=${VERSION:-"latest"}
+BUILD=${BUILD:-1}
 
-ARCH=$(uname -m)
+TAG="gwh"
+TMP="/tmp/$TAG"
 
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-PREFIX=/usr
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+ARCH=${ARCH:-$(uname -m)}
 
-mkdir -p $PKG
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-# mise en place
-[ ! -e $REPOSITORY ] && git clone https://codeberg.org/dnkl/fuzzel.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --all
+git submodule update --init
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM/
+mkdir -p "$TMP"
 
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 meson setup \
       --prefix /usr \
@@ -39,22 +61,23 @@ meson setup \
        build/
 ninja -C build/
 cd build/
-meson install --destdir=$PKG
+meson install --destdir="$PKG"
 cd ../
 
-mkdir -p $PKG$PREFIX/doc/
-mv $PKG$PREFIX/share/doc/$PRGNAM/ $PKG$PREFIX/doc/
-rm -fr $PKG$PREFIX/share/doc
+mkdir -p "$PKG$PREFIX/doc/"
+mv "$PKG$PREFIX/share/doc/$PRGNAM"/ "$PKG$PREFIX/doc"/
+rm -fr "$PKG$PREFIX/share/doc"
 
 # correction
-cd $PKG
-chown -R root:root *
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -name "*.?" -type f -exec gzip -9 {} \;
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-# embaumement
-mkdir -p $PKG/install
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -type f -not -name \*.gz -exec gzip -9 {} \;
 
-cat <<EOF > $PKG/install/slack-desc
+# packaging
+mkdir -p "$PKG/install"
+
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below kanshis it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -76,5 +99,5 @@ $PRGNAM: https://codeberg.org/dnkl/fuzzel
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
