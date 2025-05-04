@@ -77,6 +77,8 @@ for pkg in \
         y/solitaire-tui \
     ;
 do
-    # VERSION=trunk
-    "$CWD"/make-pkg.bash "$pkg"
+    PKGNAM="$(PRINT_PACKAGE_NAME=yes "$CWD"/make-pkg.bash "$pkg" | tail -n1)"
+    if [ ! -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ]; then
+       "$CWD"/make-pkg.bash "$pkg" || echo ">>> FAILED: $PKGNAM"
+    fi
 done

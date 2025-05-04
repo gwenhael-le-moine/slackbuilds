@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://git.sr.ht/~leon_plickat/wlopm"}
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG="gwh"

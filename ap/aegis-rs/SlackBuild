@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 # variables
 UPSTREAM_REPO=https://github.com/Granddave/aegis-rs
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-trunk}
 BUILD=${BUILD:-1}
 
 TAG=gwh

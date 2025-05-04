@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://code.blicky.net/yorhel/ncdu"}
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG="gwh"

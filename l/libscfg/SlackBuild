@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO="https://git.sr.ht/~emersion/libscfg"
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=1
 

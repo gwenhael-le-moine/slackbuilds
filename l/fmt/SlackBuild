@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/fmtlib/fmt"}
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG="gwh"
@@ -67,7 +67,7 @@ make -j"$(nproc)"
 make install DESTDIR="$PKG"
 
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp -R ./*.rst ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+cp -R LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
 cd "$PKG" || exit 1

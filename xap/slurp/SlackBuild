@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/emersion/slurp"}
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG="gwh"

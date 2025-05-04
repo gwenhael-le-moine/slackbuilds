@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://codeberg.org/gwh/x50ng"}
-VERSION=${VERSION:-"latest"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG="gwh"
@@ -73,10 +73,7 @@ make install DESTDIR="$PKG" PREFIX=/usr MANDIR=/usr/man/man1
 # Cleaning
 cd "$PKG" || exit 1
 
-find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-
-[ -d "$PKG"$PREFIX/man ] && find "$PKG"$PREFIX/man -type f -name "*.?" -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -name "*.?" -exec gzip -9 {} \;
 
 chown -R root:root .
 find . \
