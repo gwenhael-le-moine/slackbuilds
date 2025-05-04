@@ -1,9 +1,9 @@
 #!/bin/bash
-set -x -e
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 ARCH=$(uname -m)
 BUILD=6
 
@@ -13,36 +13,45 @@ TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
 PREFIX=/usr
 
-LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/releases | grep browser_download_url | grep linux-${ARCH} | head -n 1 | cut -d '"' -f 4)
-VERSION=$(echo $LATEST_RELEASE_URL | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
-CLEAN_VERSION=$(echo $VERSION | tr '-' '_')
+LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/crystal-lang/crystal/releases | grep browser_download_url | grep linux-"${ARCH}" | head -n 1 | cut -d '"' -f 4)
+VERSION=$(echo "$LATEST_RELEASE_URL" | grep -o "/crystal-[0-9.-]*-" | sed "s|/crystal-\([0-9.-]*\)-|\1|g")
+CLEAN_VERSION=${VERSION//-/_}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-mkdir -p $REPOSITORY
+PACKAGE_NAME="$PRGNAM-$CLEAN_VERSION$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+mkdir -p "$REPOSITORY"
 
 # cleaning
-rm -fr $PKG
+rm -fr "$PKG"
 
 # download
-[ ! -e $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz ] && wget -c https://github.com/manastech/crystal/releases/download/$(echo $VERSION | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz -O $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
+[ ! -e "$REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz" ] && wget -c "https://github.com/manastech/crystal/releases/download/$(echo "$VERSION" | grep -o "[0-9.]*" | head -n1)/crystal-${VERSION}-linux-${ARCH}.tar.gz" -O "$REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz"
 
-[ ! -e $REPOSITORY/completion.zsh ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O $REPOSITORY/completion.zsh
+[ ! -e "$REPOSITORY/completion.zsh" ] && wget -c https://raw.githubusercontent.com/crystal-lang/crystal/master/etc/completion.zsh -O "$REPOSITORY/completion.zsh"
 
 # installation
-mkdir -p $PKG
-cd $PKG
-tar xvf $REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz
-mv crystal-$VERSION $PKG$PREFIX
-mkdir -p $PKG$PREFIX/doc/
-mv $PKG$PREFIX/share/licenses $PKG$PREFIX/doc/$PRGNAM
-mv $PKG$PREFIX/share/man $PKG$PREFIX/
+mkdir -p "$PKG"
+cd "$PKG" || exit 1
+tar xvf "$REPOSITORY/crystal-${VERSION}-linux-${ARCH}.tar.gz"
+mv "crystal-$VERSION" "$PKG$PREFIX"
+mkdir -p "$PKG$PREFIX/doc/"
+mv "$PKG$PREFIX/share/licenses" "$PKG$PREFIX/doc/$PRGNAM"
+mv "$PKG$PREFIX/share/man" "$PKG$PREFIX/"
 
-mkdir -p $PKG$PREFIX/share/zsh/site-functions/
-cp -R $REPOSITORY/completion.zsh $PKG$PREFIX/share/zsh/site-functions/_crystal
+mkdir -p "$PKG$PREFIX/share/zsh/site-functions/"
+cp -R "$REPOSITORY/completion.zsh" "$PKG$PREFIX/share/zsh/site-functions/_crystal"
 
 # packaging
-cd $PKG
+cd "$PKG" || exit 1
 mkdir install
 cat <<EOF > install/slack-desc
 $PRGNAM: $PRGNAM (The Crystal Programming Language)
@@ -58,5 +67,4 @@ $PRGNAM:
 $PRGNAM: http://crystal-lang.org/
 EOF
 
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$CLEAN_VERSION-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

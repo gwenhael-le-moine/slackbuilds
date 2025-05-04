@@ -1,6 +1,6 @@
 #!/bin/bash
-set -x -e
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
@@ -36,13 +36,6 @@ else
     git checkout "$VERSION"
 fi
 
-make -j"$(nproc)" interpreter=1 release=1
-
-# installation
-make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR="$PKG"
-
-[ -d "$PKG/usr/man" ] && find "$PKG/usr/man" -type f -name "*.?" -exec gzip -9f {} \;
-
  ########
 # shards #
  ########
@@ -70,6 +63,24 @@ if [ "$SHARDS_VERSION" == "trunk" ]; then
 else
     git checkout "$SHARDS_VERSION"
 fi
+
+PACKAGE_NAME="$PRGNAM-${VERSION}_${SHARDS_VERSION}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+cd "$TMP/$PRGNAM/" || exit
+
+make -j"$(nproc)" interpreter=1 release=1
+
+# installation
+make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR="$PKG"
+
+[ -d "$PKG/usr/man" ] && find "$PKG/usr/man" -type f -name "*.?" -exec gzip -9f {} \;
 
 make -j"$(nproc)" release=1
 
@@ -101,5 +112,4 @@ $PRGNAM:
 $PRGNAM: http://crystal-lang.org/
 EOF
 
-rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-${VERSION}_${SHARDS_VERSION}-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
