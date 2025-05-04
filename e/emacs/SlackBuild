@@ -80,7 +80,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 BRANCH=${BRANCH:-master}
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-trunk}
 
 PREFIX=${PREFIX:-/usr}
 
@@ -118,11 +118,21 @@ case $VERSION in
         ;;
 esac
 
+# Tag packages that use a toolkit other than default (currently gtk3):
+if [ -z "$UI" ] && [ -n "$X_TOOLKIT" ]; then
+  if [ "$PGTK_OPTION" = "--with-pgtk" ]; then
+    UI="pgtk"
+  else
+    UI="$X_TOOLKIT"
+  fi
+fi
+
+PACKAGE_NAME="$PKGNAM-${VERSION}_$UI-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
 # could be useful to other scripts.
 if [ -n "${PRINT_PACKAGE_NAME}" ]; then
-  echo "$PKGNAM-$VERSION-$ARCH-$BUILD.txz"
+  echo "$PACKAGE_NAME"
   exit 0
 fi
 
@@ -152,14 +162,14 @@ find . \
 
 # The defaults are a little too worried about adding a few more K of pure
 # memory given the amount available on modern systems:
-sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
+[ -e src/puresize.h ] && sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
 
 [ -e Makefile ] && make distclean
 ./autogen.sh
 
-( cd lisp || exit 1
-  make autoloads
-)
+# ( cd lisp || exit 1
+#   make autoloads
+# )
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
@@ -195,15 +205,15 @@ if [ -d "$PKG/var/games/emacs" ]; then
 fi
 
 # This avoids a collision with Exuberant Ctags...
-mv "$PKG${PREFIX}/bin/ctags" "$PKG${PREFIX}/bin/ctags-emacs"
+[ -e "$PKG${PREFIX}/bin/ctags" ] && mv "$PKG${PREFIX}/bin/ctags" "$PKG${PREFIX}/bin/ctags-emacs"
 if [ -r "$PKG${PREFIX}/man/man1/ctags.1" ]; then
   mv "$PKG${PREFIX}/man/man1/ctags.1" "$PKG${PREFIX}/man/man1/ctags-emacs.1"
 elif [ -r "$PKG${PREFIX}/man/man1/ctags.1.gz" ]; then
   mv "$PKG${PREFIX}/man/man1/ctags.1.gz" "$PKG${PREFIX}/man/man1/ctags-emacs.1.gz"
 fi
 
-find -0 "$PKG" | xargs file | grep -e "executable" -e "shared object" \
-  | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# find -0 "$PKG" | xargs file | grep -e "executable" -e "shared object" \
+#   | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 ( cd "$PKG${PREFIX}/man" || exit 1
   find . -type f -exec gzip -9 {} \+
@@ -217,7 +227,7 @@ find -0 "$PKG" | xargs file | grep -e "executable" -e "shared object" \
 
 mkdir -p "$PKG${PREFIX}/doc/$PKGNAM"
 cp -a \
-  AUTHORS* COPYING* INSTALL* README* ChangeLog* \
+  BUGS* CONTRIBUTE* COPYING* INSTALL* README* ChangeLog* \
   "$PKG${PREFIX}/doc/$PKGNAM"
 
 # Link the latest NEWS file:
@@ -256,14 +266,5 @@ if [ ! -e usr/bin/ctags ]; then
 fi
 EOF
 
-# Tag packages that use a toolkit other than default (currently gtk3):
-if [ -z "$UI" ] && [ -n "$X_TOOLKIT" ]; then
-  if [ "$PGTK_OPTION" = "--with-pgtk" ]; then
-    UI="pgtk"
-  else
-    UI="$X_TOOLKIT"
-  fi
-fi
-
 cd "$PKG" || exit 1
-/sbin/makepkg -l y -c n "$OUTPUT/$PKGNAM-${VERSION}_$UI-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg -l y -c n "$OUTPUT/$PACKAGE_NAME"
