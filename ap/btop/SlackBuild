@@ -1,50 +1,51 @@
 #!/bin/bash
 
-# variables
-VERSION=${VERSION:-latest}
-BUILD=${BUILD:-1}
-
-TAG=gwh
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/aristocratos/btop"}
+VERSION=${VERSION:-"latest"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
 PRGNAM=$(basename "$CWD")
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=${OUTPUT:-/tmp}
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
-PREFIX=${PREFIX:-/usr}
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-# nettoyage préalable
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --all
+
+mkdir -p "$TMP"
+
 rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
 mkdir -p "$PKG"
 
-# mise en place
-cd "$TMP" || exit 1
-[ ! -e "$REPOSITORY" ] && git clone https://github.com/aristocratos/btop.git "$REPOSITORY"
-cd "$REPOSITORY" || exit 1
-git pull --all
-
-cp -R "$REPOSITORY" "$TMP"/
-
-cd "$TMP/$PRGNAM/" || exit 1
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
 case $VERSION in
     trunk)
-        # PKGVERSION="git_r$(git log -1 --format=%h_%ad --date=format:%Y.%m.%d)"
-        PKGVERSION="r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        PKGVERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
-        PKGVERSION=$(git tag --sort=-version:refname | head -n1)
+        PKGVERSION="$(git tag --sort=-version:refname | head -n1)"
         git checkout "$PKGVERSION"
         ;;
     *)
-        PKGVERSION=$VERSION
+        PKGVERSION="$VERSION"
         git checkout "$PKGVERSION"
         ;;
 esac
+
 PKGNAM=${PRGNAM}
 
 ######################
@@ -78,6 +79,15 @@ if [ "$EMBED_ROCM_SMI_LIB" = "yes" ]; then
     esac
     PKGNAM="${PKGNAM}+rocm_smi_lib"
     PKGVERSION="${PKGVERSION}+${ROCM_SMI_LIB_VERSION}"
+fi
+
+PACKAGE_NAME="$PKGNAM-${PKGVERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
 fi
 
 cd "$TMP/$PRGNAM/" || exit 1
@@ -121,5 +131,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PKGNAM-$PKGVERSION-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
