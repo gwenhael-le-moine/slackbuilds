@@ -11,6 +11,7 @@ for pkg in \
         ap/bat \
         ap/btop \
         ap/checkssl \
+        ap/conty-bin \
         ap/delta \
         ap/fd \
         ap/getssl \

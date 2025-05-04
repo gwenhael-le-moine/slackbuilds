@@ -1,8 +1,9 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO=https://github.com/Kron4ek/Conty
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/Kron4ek/Conty/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
@@ -18,16 +19,25 @@ PREFIX=/usr
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-mkdir -p $REPOSITORY
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
-[ ! -e $REPOSITORY/conty${EDITION}-${VERSION}.sh ] && wget -c ${UPSTREAM_REPO}/releases/download/${VERSION}/conty${EDITION}.sh -O $REPOSITORY/conty${EDITION}-${VERSION}.sh
+mkdir -p "$REPOSITORY"
 
-rm -fr $PKG
+[ ! -e "$REPOSITORY/conty${EDITION}-${VERSION}.sh" ] && wget -c "${UPSTREAM_REPO}/releases/download/${VERSION}/conty${EDITION}.sh" -O "$REPOSITORY/conty${EDITION}-${VERSION}.sh"
 
-mkdir -p $PKG$PREFIX/bin
-cp $REPOSITORY/conty${EDITION}-${VERSION}.sh $PKG$PREFIX/bin/conty
+rm -fr "$PKG"
 
-cd $PKG$PREFIX/bin/
+mkdir -p "$PKG$PREFIX/bin"
+cp "$REPOSITORY/conty${EDITION}-${VERSION}.sh" "$PKG$PREFIX/bin/conty"
+
+cd "$PKG$PREFIX/bin/" || exit 1
 cat <<EOF > steam
 #!/bin/bash
 
@@ -37,8 +47,8 @@ unset SDL_VIDEODRIVER
 $PREFIX/bin/conty steam "\$@"
 EOF
 
-mkdir -p $PKG$PREFIX/share/applications/
-cat <<EOF > $PKG$PREFIX/share/applications/steam.desktop
+mkdir -p "$PKG$PREFIX/share/applications/"
+cat <<EOF > "$PKG$PREFIX/share/applications/steam.desktop"
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
@@ -50,7 +60,7 @@ EOF
 
 for prg in lutris playonlinux4; do
     ln -s conty $prg
-cat <<EOF > $PKG$PREFIX/share/applications/$prg.desktop
+cat <<EOF > "$PKG$PREFIX/share/applications/$prg.desktop"
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
@@ -61,10 +71,10 @@ Name=$prg
 EOF
 done
 
-chmod +x $PKG$PREFIX/bin/*
+chmod +x "$PKG$PREFIX/bin"/*
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
        |-----handy-ruler--------------------------------------------------------|
 $PRGNAM: $PRGNAM (Easy to use non-root container packed into a single executable)
 $PRGNAM:
@@ -79,5 +89,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 $PRGNAM:
 EOF
 
-cd $PKG
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION${EDITION}-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
