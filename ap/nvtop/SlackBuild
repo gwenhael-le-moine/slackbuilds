@@ -1,73 +1,88 @@
 #!/bin/bash
 
-# variables
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-UPSTREAM_REPO=https://github.com/Syllo/nvtop
-VERSION=${VERSION:-latest}
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/Syllo/nvtop"}
+VERSION=${VERSION:-"latest"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
+
 ARCH=${ARCH:-$(uname -m)}
-BUILD=1
 
-TAG=gwh
-TMP=/tmp/$TAG
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=/tmp
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --all
 
-PREFIX=/usr
+mkdir -p "$TMP"
 
-SLCKFLAGS=" -O "
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+mkdir -p "$PKG"
 
-mkdir -p $PKG
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
 
-# mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
-
-cp -R $REPOSITORY $TMP/$PRGNAM
-cd $TMP/$PRGNAM
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 # configuration
 cmake -DNVIDIA_SUPPORT=ON \
       -DAMDGPU_SUPPORT=ON \
-      -DCMAKE_INSTALL_PREFIX=$PREFIX \
-      -DCMAKE_INSTALL_MANDIR=$PREFIX/man \
-      -DCMAKE_INSTALL_DOCDIR=$PREFIX/doc/$PRGNAM \
+      -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+      -DCMAKE_INSTALL_MANDIR="$PREFIX/man" \
+      -DCMAKE_INSTALL_DOCDIR="$PREFIX/doc/$PRGNAM" \
       .
 
 # compilation
 make -j$(nproc)
 
 # installation
-make install DESTDIR=$PKG PREFIX=$PREFIX
-mv $PKG$PREFIX/share/man/ $PKG$PREFIX/
-rm -r $PKG$PREFIX/share/
+make install DESTDIR="$PKG" PREFIX="$PREFIX"
+mv "$PKG$PREFIX/share/man/" "$PKG$PREFIX/"
+rm -r "$PKG$PREFIX/share/"
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R COPYING LICENSE README.* $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -R COPYING LICENSE README.* "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -type f -not -name \*.gz -exec gzip -9 {} \;
 
-# Strip binaries
-cd $PKG
-find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# packaging
+mkdir -p "$PKG/install"
 
-# embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 $PRGNAM: $PRGNAM (AMD and NVIDIA GPUs htop like monitoring tool)
 $PRGNAM:
 $PRGNAM: Nvtop stands for Neat Videocard TOP, a (h)top like task monitor for AMD and NVIDIA GPUs.
@@ -81,5 +96,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
