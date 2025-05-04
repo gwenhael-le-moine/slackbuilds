@@ -1,8 +1,9 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jgm/pandoc/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
@@ -13,23 +14,32 @@ OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-mkdir -p $REPOSITORY
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
-[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz https://github.com/jgm/pandoc/releases/download/$VERSION/pandoc-$VERSION-linux-amd64.tar.gz
+mkdir -p "$REPOSITORY"
 
-rm -fr $PKG
-mkdir -p $PKG
+[ ! -e "$REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz" ] && wget -c -O "$REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz" "https://github.com/jgm/pandoc/releases/download/$VERSION/pandoc-$VERSION-linux-amd64.tar.gz"
 
-cd $PKG
-tar xvf $REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz
+rm -fr "$PKG"
+mkdir -p "$PKG"
 
-mv pandoc-${VERSION} usr
+cd "$PKG" || exit 1
+tar xvf "$REPOSITORY/${PRGNAM}-${VERSION}-${ARCH}.txz"
+
+mv "pandoc-${VERSION}" usr
 mv usr/share/man usr/
 rm -r usr/share
 
-mkdir -p $PKG/install
+mkdir -p "$PKG/install"
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -51,6 +61,6 @@ ${PRGNAM}:
 ${PRGNAM}: https://pandoc.org
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.txz
+# empaquetage
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

@@ -26,6 +26,7 @@ for pkg in \
         ap/ncdu \
         ap/nvtop \
         ap/pastel \
+        ap/pandoc-bin \
         ap/qman \
         ap/ripgrep \
         ap/rkvm \
