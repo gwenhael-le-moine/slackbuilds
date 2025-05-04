@@ -32,9 +32,9 @@ git pull --all
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="$(git rev-list --count master)_git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="$(git rev-list --count master)_git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 # https://www.hpmuseum.org/forum/thread-17667-post-154012.html#pid154012
 # elf2rom is only needed to build actual calculator firmware

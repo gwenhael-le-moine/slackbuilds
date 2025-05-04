@@ -34,9 +34,9 @@ REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 cp -R $REPOSITORY $PKG/$VHOSTROOT/htdocs
 cd $PKG/$VHOSTROOT/htdocs
 
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 rm -fr $PKG/$VHOSTROOT/htdocs/.git
 mv $PKG/$VHOSTROOT/htdocs/install.php $PKG/$VHOSTROOT/htdocs/install.php.disabled

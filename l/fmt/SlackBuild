@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# variables
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 UPSTREAM_REPO=https://github.com/fmtlib/fmt
 VERSION=${VERSION:-latest}
 ARCH=${ARCH:-$(uname -m)}
@@ -18,22 +18,31 @@ REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
 
 PREFIX=/usr
 
-SLCKFLAGS=" -O "
+mkdir -p "$TMP"
 
 # nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-mkdir -p $PKG
+mkdir -p "$PKG"
 
 # mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
+cd "$TMP" || exit 1
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 
-cp -R $REPOSITORY $TMP/$PRGNAM
-cd $TMP/$PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 # configuration
 cmake \
@@ -41,30 +50,25 @@ cmake \
     .
 
 # compilation
-make -j$(nproc)
+make -j"$(nproc)"
 
 # installation
-make install DESTDIR=$PKG
+make install DESTDIR="$PKG"
 
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp -R *.rst *.md $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -R ./*.rst ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 2
+chown -R root:root ./*
 
-find $PKG -name \.git\* -exec rm -fr {} \;
+find "$PKG" -name \.git\* -exec rm -fr {} \;
 
-[ -d $PKG${PREFIX}/man ] && find $PKG${PREFIX}/man -type f -name "*.?" -exec gzip -9f {} \;
-
-# # Strip binaries
-# cd $PKG
-# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+[ -d "$PKG${PREFIX}/man" ] && find "$PKG${PREFIX}/man" -type f -name "*.?" -exec gzip -9f {} \;
 
 # embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG/install"
+cat <<EOF > "$PKG/install/slack-desc"
 $PRGNAM: $PRGNAM ( A modern formatting library )
 $PRGNAM:
 $PRGNAM:
@@ -78,5 +82,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

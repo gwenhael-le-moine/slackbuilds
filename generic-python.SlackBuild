@@ -22,7 +22,7 @@ mkdir -p $PKG
 
 # installation
 EXTRA=""
-[ "x$VERSION" == "xpip" ] || EXTRA="==$VERSION"
+[ "$VERSION" == "pip" ] || EXTRA="==$VERSION"
 pip3 install --ignore-installed --root $PKG --no-deps $PRGNAM$EXTRA
 
 if [ -d $PKG/usr/share/man ]; then

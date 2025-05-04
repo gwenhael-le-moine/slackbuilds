@@ -37,11 +37,12 @@ cd "$TMP/$PRGNAM/" || exit 1
 [ "$VERSION" == "" ] && VERSION=trunk
 [ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 
+PACKAGE_NAME="$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
 # could be useful to other scripts.
 if [ -n "${PRINT_PACKAGE_NAME}" ]; then
-    echo "$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+    echo "$PACKAGE_NAME"
     exit 0
 fi
 
@@ -89,4 +90,4 @@ EOF
 
 # empaquetage
 rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

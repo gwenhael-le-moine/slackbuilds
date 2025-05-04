@@ -1,8 +1,9 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 VERSION=${VERSION:-latest}
 BUILD=${BUILD:-3}
 TAG=${TAG:-gwh}
@@ -47,9 +48,9 @@ cd $TMP
 cp -R $REPOSITORY $PRGNAM
 
 cd $PRGNAM
-[ "x$VERSION" == "xlatest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "x$VERSION" == "x" ] && VERSION=trunk
-[ "x$VERSION" == "xtrunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
+[ "$VERSION" == "" ] && VERSION=trunk
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
 
 chown -R root:root .
 find -L . \
