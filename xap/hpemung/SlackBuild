@@ -1,42 +1,59 @@
 #!/bin/bash
-set -x
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://codeberg.org/gwh/hpemung"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
 PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
-BUILD=1
-VERSION=${VERSION:-latest}
+ARCH=${ARCH:-$(uname -m)}
 
-ARCH=$(uname -m)
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
-PKG=$TMP/pkg-$PRGNAM
-
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-
-PREFIX=/usr
-
-mkdir -p $TMP
-
-# Cleaning
-rm -fr "${TMP:?}"/"$PRGNAM" "$PKG"
-
-# Fetching sources
-[ ! -e "$REPOSITORY" ] && git clone https://codeberg.org/gwh/hpemung.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --all
+git submodule update --init
 
-cp -R "$REPOSITORY" "$TMP"/"$PRGNAM"
+mkdir -p "$TMP"
 
-# Preparation
-cd "$TMP"/"$PRGNAM" || exit 1
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
-[ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout "$VERSION"
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 chown -R root:root .
 find . \
@@ -50,11 +67,6 @@ make all PREFIX=/usr
 
 # Installation
 make install DESTDIR="$PKG" PREFIX=/usr
-
-# # Cleaning
-# cd $PKG
-# find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-# find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 cd "$PKG" || exit 1
 
@@ -83,4 +95,6 @@ $PRGNAM: https://codeberg.org/gwh/hpemung.git
 $PRGNAM:
 EOF
 
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT"/"$PRGNAM"-"$(echo "$VERSION" | tr -d '-')"-"$ARCH"-"$BUILD""$TAG".txz
+# empaquetage
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

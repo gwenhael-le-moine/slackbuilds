@@ -61,7 +61,6 @@ for pkg in \
         xap/guile-swayer \
         xap/hpemung \
         xap/i3status-rust \
-        xap/lswt \
         xap/nextcloud-desktop \
         xap/openrgb \
         xap/saturnng \
