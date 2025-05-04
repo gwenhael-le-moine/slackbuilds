@@ -33,9 +33,18 @@ git pull --all
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 cd "$TMP/$PRGNAM" || exit 1
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
 
 PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
@@ -81,5 +90,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage
-rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+cd "$PKG" || exit 1
 /sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

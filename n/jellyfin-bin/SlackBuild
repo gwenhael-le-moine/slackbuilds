@@ -22,6 +22,15 @@ REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
 #     exit 1
 # fi
 
+PACKAGE_NAME="$PKGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
 mkdir -p "$REPOSITORY"
 
 # echo $ARCH | grep -q arm && SRC_ARCH=arm-7
@@ -167,4 +176,4 @@ EOF
 
 cd "$PKG" || exit 1
 
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PKGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

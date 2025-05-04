@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 # variables
-UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/gabime/spdlog"}
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://gitlab.com/bjk/cboard"}
 VERSION=${VERSION:-"latest"}
 BUILD=${BUILD:-1}
 
@@ -55,19 +55,26 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     exit 0
 fi
 
-# configuration
-cmake \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    .
+chown -R root:root .
+find . \
+     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+     -exec chmod 755 {} \; -o \
+     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+     -exec chmod 644 {} \;
 
-# compilation
-make -j"$(nproc)"
+rm -fr debian
+./autogen.sh
+./configure \
+    --prefix="$PREFIX" \
+    --mandir="$PREFIX"/man
 
-# installation
+make
+
+# Installation
 make install DESTDIR="$PKG"
 
-mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp -R INSTALL LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+mkdir -p $PKG$PREFIX/doc/"$PRGNAM"
+cp COPYING NEWS doc/config.example INSTALL README KnownBugs THANKS TODO "$PKG$PREFIX/doc/$PRGNAM"
 
 # correction
 cd "$PKG" || exit 1
@@ -79,16 +86,17 @@ chown -R root:root ./*
 mkdir -p "$PKG/install"
 
 cat <<EOF > "$PKG/install/slack-desc"
-$PRGNAM: $PRGNAM ( Fast C++ logging library. )
+$PRGNAM: $PRGNAM (ncurses chess frontend)
+$PRGNAM:
+$PRGNAM: CBoard (Curses/Console Board) is an Ncurses frontend to chess engines
+$PRGNAM: supporting the XBoard protocol. Supports reading and writing PGN
+$PRGNAM: including roster tags, RAV, FEN, NAG and comments.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
+$PRGNAM: http://benkibbey.wordpress.com/cboard/
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage

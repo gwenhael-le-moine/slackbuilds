@@ -74,7 +74,6 @@ for pkg in \
         xap/wlr-randr \
         xap/x48ng \
         xap/x50ng \
-        y/cboard \
         y/csol \
         y/solitaire-tui \
     ;

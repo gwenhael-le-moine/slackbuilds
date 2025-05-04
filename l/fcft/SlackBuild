@@ -3,39 +3,48 @@
 cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-VERSION=${VERSION:-latest}
-BUILD=2
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://codeberg.org/dnkl/fcft"}
+VERSION=${VERSION:-"latest"}
+BUILD=${BUILD:-1}
 
-TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
+TAG="gwh"
+TMP="/tmp/$TAG"
 
 PRGNAM=$(basename "$CWD")
-PKG=$TMP/pkg-$PRGNAM
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
-ARCH=$(uname -m)
+ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-PREFIX=/usr
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
+
+[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --all
+git submodule update --init
 
 mkdir -p "$TMP"
 
-# nettoyage préalable
 rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
 mkdir -p "$PKG"
 
-# mise en place
-[ ! -e "$REPOSITORY" ] && git clone https://codeberg.org/dnkl/fcft.git "$REPOSITORY"
-cd "$REPOSITORY" || exit 1
-git pull --all
-
-cp -R "$REPOSITORY" $TMP/
-cd "$TMP/$PRGNAM/" || exit 1
-
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout "$VERSION"
+        ;;
+    *)
+        git checkout "$VERSION"
+        ;;
+esac
 
 PACKAGE_NAME="$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
@@ -89,5 +98,5 @@ $PRGNAM: https://codeberg.org/dnkl/fcft
 EOF
 
 # empaquetage
-rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
+cd "$PKG" || exit 1
 /sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

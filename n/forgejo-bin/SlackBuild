@@ -1,8 +1,9 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -q https://codeberg.org/forgejo/forgejo/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-6}
@@ -15,7 +16,7 @@ PREFIX=/usr
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-mkdir -p $REPOSITORY
+mkdir -p "$REPOSITORY"
 
 FORGEJO_WORK_DIR=/var/lib/forgejo
 
@@ -27,42 +28,51 @@ if [ "$(id -g forgejo 2> /dev/null)" != "817" -o "$(id -u forgejo 2> /dev/null)"
     exit 1
 fi
 
-echo $ARCH | grep -q arm && SRC_ARCH=arm-7
-echo $ARCH | grep -q 86 && SRC_ARCH=386
-echo $ARCH | grep -q 64 && SRC_ARCH=amd64
+echo "$ARCH" | grep -q arm && SRC_ARCH=arm-7
+echo "$ARCH" | grep -q 86 && SRC_ARCH=386
+echo "$ARCH" | grep -q 64 && SRC_ARCH=amd64
 
-mkdir -p $REPOSITORY
-
-if [ ! -e $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz ]; then
-    wget -c https://codeberg.org/forgejo/forgejo/releases/download/${VERSION}/forgejo-${VERSION#v}-linux-${SRC_ARCH}.xz -O $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
 fi
-xz -d $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz
 
-rm -fr $PKG
+mkdir -p "$REPOSITORY"
 
-mkdir -p  $PKG$PREFIX/bin
-cp $REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH} $PKG$PREFIX/bin/forgejo
-chmod +x $PKG$PREFIX/bin/forgejo
+if [ ! -e "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz" ]; then
+    wget -c "https://codeberg.org/forgejo/forgejo/releases/download/${VERSION}/forgejo-${VERSION#v}-linux-${SRC_ARCH}.xz" -O "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz"
+fi
+xz -d "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz"
 
-mkdir -p $PKG/etc/forgejo/
-cp $CWD/app.ini $PKG/etc/forgejo/app.ini.new
-chown -R forgejo:forgejo $PKG/etc/forgejo
-chmod 770 $PKG/etc/forgejo
+rm -fr "$PKG"
 
-mkdir -p $PKG${FORGEJO_WORK_DIR}/{custom,data/forgejo-repositories,indexers,public,log,.ssh}
-chown -R forgejo:forgejo $PKG/var/lib/forgejo
-chmod 750 $PKG${FORGEJO_WORK_DIR}/{data,indexers,log}
+mkdir -p "$PKG$PREFIX/bin"
+cp "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}" "$PKG$PREFIX/bin/forgejo"
+chmod +x "$PKG$PREFIX"/bin/forgejo
 
-mkdir -p $PKG/var/log/forgejo
-chown -R forgejo:forgejo $PKG/var/log/forgejo
+mkdir -p "$PKG"/etc/forgejo/
+cp "$CWD"/app.ini "$PKG"/etc/forgejo/app.ini.new
+chown -R forgejo:forgejo "$PKG"/etc/forgejo
+chmod 770 "$PKG"/etc/forgejo
 
-( cd $PKG
+mkdir -p "$PKG${FORGEJO_WORK_DIR}"/{custom,data/forgejo-repositories,indexers,public,log,.ssh}
+chown -R forgejo:forgejo "$PKG"/var/lib/forgejo
+chmod 750 "$PKG${FORGEJO_WORK_DIR}"/{data,indexers,log}
+
+mkdir -p "$PKG"/var/log/forgejo
+chown -R forgejo:forgejo "$PKG"/var/log/forgejo
+
+( cd "$PKG" || exit 1
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
   find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 )
 
-mkdir -p $PKG/etc/rc.d/
-cat <<EOF > $PKG/etc/rc.d/rc.$PRGNAM
+mkdir -p "$PKG/etc/rc.d/"
+cat <<EOF > "$PKG/etc/rc.d/rc.$PRGNAM"
 #!/bin/bash
 #Slackware startup deamon script
 
@@ -122,10 +132,10 @@ case \$1 in
         ;;
 esac
 EOF
-chmod +x $PKG/etc/rc.d/rc.$PRGNAM
+chmod +x "$PKG/etc/rc.d/rc.$PRGNAM"
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/slack-desc
            # HOW TO EDIT THIS FILE:
            # The "handy ruler" below makes it easier to edit a package description.  Line
            # up the first '|' above the ':' following the base package name, and the '|'
@@ -147,7 +157,6 @@ $PRGNAM: https://forgejo.org/
 $PRGNAM:
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
+cd "$PKG" || exit 1
 
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | tr - _)-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
