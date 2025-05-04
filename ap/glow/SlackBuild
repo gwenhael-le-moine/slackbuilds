@@ -99,4 +99,5 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 # empaquetage
+cd "$PKG" || exit 1
 /sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
