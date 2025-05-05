@@ -11,6 +11,15 @@ VERSION=${VERSION:-$(curl -s https://api.github.com/repos/itchio/itch-setup/tags
 BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
 rm -rf "$PKG"
 mkdir -p "$PKG"/usr/{bin,libexec/"$PRGNAM"} "$OUTPUT"
 
@@ -66,4 +75,4 @@ $PRGNAM:
 EOF
 
 cd "$PKG" || exit 1
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

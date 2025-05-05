@@ -4,8 +4,8 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-VERSION=${VERSION:-latest}
-BUILD=${BUILD:-3}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
 PREFIX=${PREFIX:-/usr}
@@ -35,22 +35,40 @@ fi
 
 set -e
 
-rm -rf $PKG
-mkdir -p $TMP $PKG $OUTPUT
-cd $TMP
-rm -rf $PRGNAM
+rm -rf "$PKG"
+mkdir -p "$TMP" "$PKG" "$OUTPUT"
+cd "$TMP" || exit 1
+rm -rf "$PRGNAM"
 
-[ ! -e $REPOSITORY ] && git clone git://git.savannah.nongnu.org/eliot.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone git://git.savannah.nongnu.org/eliot.git "$REPOSITORY"
+cd "$REPOSITORY"
 git pull --quiet --all
 
-cd $TMP
-cp -R $REPOSITORY $PRGNAM
+cd "$TMP"
+cp -R "$REPOSITORY" "$PRGNAM"
 
-cd $PRGNAM
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout --quiet $VERSION
+cd "$PRGNAM"
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout --quiet "$VERSION"
+        ;;
+    *)
+        git checkout --quiet "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//eliot_/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 chown -R root:root .
 find -L . \
@@ -66,25 +84,22 @@ CFLAGS="$SLKCFLAGS" \
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
       ./configure \
-      --prefix=${PREFIX} \
+      --prefix="${PREFIX}" \
       --sysconfdir=/etc \
-      --mandir=${PREFIX}/man \
-      --libdir=${PREFIX}/lib$(uname -m | grep -o 64) \
-      --build=$ARCH-slackware-linux \
-      --host=$ARCH-slackware-linux
+      --mandir="${PREFIX}"/man \
+      --libdir="${PREFIX}/lib$(uname -m | grep -o 64)" \
+      --build="$ARCH-slackware-linux" \
+      --host="$ARCH-slackware-linux"
 
 make
-make install DESTDIR=$PKG
+make install DESTDIR="$PKG"
 
-find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+find "$PKG" -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
     | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
-# find $PKG${PREFIX}/man -type f -exec gzip -9 {} \;
-# for i in $( find $PKG${PREFIX}/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-
-mkdir -p $PKG${PREFIX}/doc/$PRGNAM
-cp -R AUTHORS ChangeLog COPYING* INSTALL LGPL-2.0.txt NEWS README THANKS TODO $PKG${PREFIX}/doc/$PRGNAM
-cat <<EOF > $PKG${PREFIX}/doc/$PRGNAM/gen-ODS9-dawg.bash
+mkdir -p "$PKG${PREFIX}/doc/$PRGNAM"
+cp -R AUTHORS ChangeLog COPYING* INSTALL LGPL-2.0.txt NEWS README THANKS TODO "$PKG${PREFIX}/doc/$PRGNAM"
+cat <<EOF > "$PKG${PREFIX}/doc/$PRGNAM"/gen-ODS9-dawg.bash
 #!/bin/bash
 
 if [ \$UID = 0 ]; then
@@ -111,10 +126,10 @@ mkdir -p ~/.config/eliot/
 [ -e ~/.config/eliot/ods9.dawg ] && mv ~/.config/eliot/ods9.dawg ~/.config/eliot/ods9.dawg.orig
 cp /tmp/ods9.dawg ~/.config/eliot/ods9.dawg
 EOF
-chmod +x $PKG${PREFIX}/doc/$PRGNAM/gen-ODS9-dawg.bash
+chmod +x "$PKG${PREFIX}/doc/$PRGNAM"/gen-ODS9-dawg.bash
 
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.
 # Line up the first '|' above the ':' following the base package name, and
@@ -136,6 +151,5 @@ $PRGNAM:
 $PRGNAM: https://www.nongnu.org/eliot/fr/index.html
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo $VERSION | sed 's|eliot_||')-$ARCH-$BUILD$TAG.${PKGTYPE:-txz}
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

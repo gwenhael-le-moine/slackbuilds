@@ -16,11 +16,21 @@ rm -rf "$PKG"
 mkdir -p "$PKG"/usr/share/fonts/TTF/
 cd "$PKG"/usr/share/fonts/TTF/ || exit 1
 
-wget -c "https://files.ax86.net/terminus-ttf/files/latest.zip"
+wget --quiet -c "https://files.ax86.net/terminus-ttf/files/latest.zip"
 unzip latest.zip
 rm latest.zip
 
 VERSION=$(echo terminus-ttf-*/ | rev | cut -f 1 -d - | rev | sed 's|/$||')
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
 chmod 0644 "terminus-ttf-${VERSION}"/*
 
 mv "terminus-ttf-${VERSION}"/*.ttf .

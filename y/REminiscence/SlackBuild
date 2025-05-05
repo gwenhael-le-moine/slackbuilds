@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# --- INIT ---
-# Set initial variables:
-CWD=`pwd`
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
+PRGNAM=$(basename "$CWD")
 TAG=${TAG:-gwh}
 OUTPUT=/tmp
 TMP=${TMP:-/tmp/$TAG}
@@ -16,7 +15,16 @@ BUILD=1
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-mkdir -p $REPOSITORY
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+mkdir -p "$REPOSITORY"
 
 if [ "$ARCH" = "i386" ]; then
   SLKCFLAGS="-O2 -march=i386 -mtune=i686"
@@ -29,26 +37,26 @@ elif [ "$ARCH" = "x86_64" ]; then
 fi
 
 # --- PACKAGE BUILDING ---
-[ ! -e $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2 ] && wget -c -O $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2 http://cyxdown.free.fr/reminiscence/REminiscence-${VERSION}.tar.bz2
-[ ! -e $REPOSITORY/CHANGES-${VERSION}.txt ] && wget -c -O $REPOSITORY/CHANGES-${VERSION}.txt http://cyxdown.free.fr/reminiscence/CHANGES.txt
-[ ! -e $REPOSITORY/flashback-x86_64.tar.gz ] & wget -c -O $REPOSITORY/flashback-x86_64.tar.gz https://lutris.net/files/games/flashback/flashback-x86_64.tar.gz
-[ ! -e $REPOSITORY/stb_vorbis.c ] & wget -c -O $REPOSITORY/stb_vorbis.c https://raw.githubusercontent.com/nothings/stb/master/stb_vorbis.c
+[ ! -e "$REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2" ] && wget -c -O "$REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2" "http://cyxdown.free.fr/reminiscence/REminiscence-${VERSION}.tar.bz2"
+[ ! -e "$REPOSITORY/CHANGES-${VERSION}.txt" ] && wget -c -O "$REPOSITORY/CHANGES-${VERSION}.txt" "http://cyxdown.free.fr/reminiscence/CHANGES.txt"
+[ ! -e "$REPOSITORY/flashback-x86_64.tar.gz" ] && wget -c -O "$REPOSITORY/flashback-x86_64.tar.gz" "https://lutris.net/files/games/flashback/flashback-x86_64.tar.gz"
+[ ! -e "$REPOSITORY/stb_vorbis.c" ] && wget -c -O "$REPOSITORY/stb_vorbis.c" "https://raw.githubusercontent.com/nothings/stb/refs/heads/master/stb_vorbis.c"
 
-rm -rf $PKG $TMP/${PRGNAM}-${VERSION}
-mkdir -p $TMP
+rm -rf "$PKG" "$TMP/${PRGNAM}-${VERSION}"
+mkdir -p "$TMP"
 
 echo "Extracting the program tarball for $PRGNAM..."
-[ -e $TMP/${PRGNAM}-${VERSION} ] && rm -r $TMP/${PRGNAM}-${VERSION}
-cd $TMP
-tar xf $REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2
+[ -e "$TMP/${PRGNAM}-${VERSION}" ] && rm -r "$TMP/${PRGNAM}-${VERSION}"
+cd "$TMP" || exit 1
+tar xf "$REPOSITORY/${PRGNAM}-${VERSION}.tar.bz2"
 
-cd ${PRGNAM}-${VERSION}
+cd "${PRGNAM}-${VERSION}" || exit 1
 
-chown -R root.root *
+chown -R root.root ./*
 find . -perm 777 -exec chmod 755 {} \;
 
-zcat $CWD/nices_path.patch.gz | patch -p1
-cp $REPOSITORY/stb_vorbis.c .
+zcat "$CWD"/nices_path.patch.gz | patch -p1
+cp "$REPOSITORY"/stb_vorbis.c .
 
 # --- BUILDING ---
 
@@ -58,45 +66,38 @@ CFLAGS="$SLKCFLAGS" \
 #
 # Install all the needed stuff to the package dir
 #
-mkdir -p $PKG/usr/games $PKG/usr/share/games/ $PKG/var/lib/$PRGNAM
-mv rs $PKG/usr/games/
+mkdir -p "$PKG"/usr/games "$PKG"/usr/share/games/ "$PKG/var/lib/$PRGNAM"
+mv rs "$PKG"/usr/games/
 
-cd $PKG/usr/games/
+cd "$PKG"/usr/games/ || exit 1
 ln -s rs REminiscence
 ln -s rs flashback
 
-cd $PKG/usr/share/games/
-tar xf $REPOSITORY/flashback-x86_64.tar.gz # jeu lui-même
-mv flashback $PRGNAM
+cd "$PKG"/usr/share/games/ || exit 1
+tar xf "$REPOSITORY"/flashback-x86_64.tar.gz
+mv flashback "$PRGNAM"
 
-mkdir -p $PKG/usr/share/pixmaps
-cp $CWD/flashback.png $PKG/usr/share/pixmaps
+mkdir -p "$PKG"/usr/share/pixmaps
+cp "$CWD"/flashback.png "$PKG"/usr/share/pixmaps
 
 # --- DOCUMENTATION ---
-cd $TMP/${PRGNAM}-${VERSION}
-mkdir -p $PKG/usr/doc/$PRGNAM
-cp -a $REPOSITORY/CHANGES-${VERSION}.txt README.txt $PKG/usr/doc/$PRGNAM
-chmod -R a-w $PKG/usr/doc/$PRGNAM/*
-
-# Compress the man page(s)
-[ -d $PKG/usr/man ] && find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-
-# Strip binaries
-find $PKG | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-find $PKG | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+cd "$TMP/${PRGNAM}-${VERSION}"
+mkdir -p "$PKG/usr/doc/$PRGNAM"
+cp -a "$REPOSITORY/CHANGES-${VERSION}.txt" README.txt "$PKG/usr/doc/$PRGNAM"
+chmod -R a-w "$PKG/usr/doc/$PRGNAM"/*
 
 # --- OWNERSHIP, RIGHTS ---
 
-chmod -R o-w $PKG
-chown -R root:root $PKG/*
-chmod a+rwx $PKG/var/lib/REminiscence
+chmod -R o-w "$PKG"
+chown -R root:root "$PKG"/*
+chmod a+rwx "$PKG"/var/lib/REminiscence
 
 
 # --- PACKAGE DESCRIPTION ---
 
-mkdir -p $PKG/install
+mkdir -p "$PKG"/install
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -110,7 +111,7 @@ ${PRGNAM}:
 ${PRGNAM}: ${PRGNAM} is a re-implementation of the engine used in the game
 ${PRGNAM}: Flashback made by Delphine Software and released in 1992.
 ${PRGNAM}:
-${PRGNAM}: 
+${PRGNAM}:
 ${PRGNAM}:
 ${PRGNAM}: Original files included.
 ${PRGNAM}:
@@ -121,6 +122,5 @@ EOF
 # --- BUILDING ---
 
 # Build the package:
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n $OUTPUT/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n "$OUTPUT/$PACKAGE_NAME"
