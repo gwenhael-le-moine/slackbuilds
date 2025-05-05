@@ -55,8 +55,12 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     exit 0
 fi
 
-cmake . -DCMAKE_INSTALL_PREFIX=/usr
+cmake . \
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+      -DCMAKE_INSTALL_PREFIX=/usr
+
 make
+
 # installation
 make install DESTDIR="$PKG" PREFIX="$PREFIX"
 mv "$PKG$PREFIX"/share/man/ "$PKG$PREFIX/"
