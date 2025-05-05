@@ -1,67 +1,87 @@
 #!/bin/bash
 
-# variables
-TAG=gwh
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
-OUTPUT=/tmp
 
-PRGNAM=$(basename $CWD)
-PKG=$TMP/pkg-$PRGNAM
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/leozide/leocad"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
 
-ARCH=$(uname -m)
-BUILD=1
-UPSTREAM_REPO=https://github.com/leozide/leocad
-VERSION=${VERSION:-latest}
+TAG="gwh"
+TMP="/tmp/$TAG"
 
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
-rm -fr $PKG $TMP/$PRGNAM
+ARCH=${ARCH:-$(uname -m)}
 
-mkdir -p $PKG
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-# mise en place
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
-cd $REPOSITORY
-git pull --quiet --all
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --quiet --all > /dev/null 2>&1
 
-cp -R $REPOSITORY $TMP/$PRGNAM
-cd $TMP/$PRGNAM/
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout --quiet $VERSION
+mkdir -p "$TMP"
 
-qmake-qt5 DISABLE_UPDATE_CHECK=1 DOCS_DIR=/usr/doc/$PRGNAM MAN_DIR=/usr/man/man1 leocad.pro
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout --quiet "$VERSION"
+        ;;
+    *)
+        git checkout --quiet "$VERSION"
+        ;;
+esac
+
+LIBRARY_URL=$(curl -s https://api.github.com/repos/leozide/leocad/releases | grep -o "http.*Library-.*zip" | sort | tail -n1)
+LIBRARY_FILE=$(echo "$LIBRARY_URL" | grep -o "Library-[0-9.]*.zip")
+LIBRARY_VERSION=$(echo "$LIBRARY_FILE" | grep -o "[0-9.]*")
+[ ! -e "$REPOSITORY/$LIBRARY_FILE" ] && wget --quiet -c -O "$REPOSITORY/$LIBRARY_FILE" "$LIBRARY_URL"
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}_${LIBRARY_VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+qmake-qt5 DISABLE_UPDATE_CHECK=1 DOCS_DIR=/usr/doc/"$PRGNAM" MAN_DIR=/usr/man/man1 leocad.pro
 CFLAGS="$SLKCFLAGS" \
       CXXFLAGS="$SLKCFLAGS" \
       make
 make INSTALL_ROOT="$PKG" install
 
-find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
-    | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
-
-mkdir -p $PKG/usr/man/man1
-cp -a docs/leocad.1 $PKG/usr/man/man1
-find $PKG/usr/man -type f -exec gzip -9 {} \;
-for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-
-LIBRARY_URL=$(curl -s https://api.github.com/repos/leozide/leocad/releases | grep -o "http.*Library-.*zip" | sort | tail -n1)
-LIBRARY_FILE=$(echo $LIBRARY_URL | grep -o "Library-[0-9.]*.zip")
-LIBRARY_VERSION=$(echo $LIBRARY_FILE | grep -o "[0-9.]*")
-[ ! -e $REPOSITORY/$LIBRARY_FILE ] && wget -c -O $REPOSITORY/$LIBRARY_FILE $LIBRARY_URL
+mkdir -p "$PKG"/usr/man/man1
+cp -a docs/leocad.1 "$PKG"/usr/man/man1
+find "$PKG"/usr/man -type f -exec gzip -9 {} \;
+for i in $( find "$PKG"/usr/man -type l ) ; do ln -s "$( readlink "$i" ).gz" "$i.gz" ; rm "$i" ; done
 
 # Data from zip-file + set permissions
-mkdir -p $PKG/usr/share/leocad
-unzip $REPOSITORY/$LIBRARY_FILE -d $PKG/usr/share/leocad/
-chown -R root:root $PKG
+mkdir -p "$PKG"/usr/share/leocad
+unzip "$REPOSITORY/$LIBRARY_FILE" -d "$PKG"/usr/share/leocad/
+chown -R root:root "$PKG"
 
 # correction
-cd $PKG
-chown -R root:root *
+cd "$PKG" || exit 1
+chown -R root:root ./*
 
 # embaumement
-mkdir -p $PKG/install
-cat <<EOF > $PKG/install/doinst.sh
+mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/doinst.sh
 if [ -x /usr/bin/update-desktop-database ]; then
   /usr/bin/update-desktop-database -q usr/share/applications >/dev/null 2>&1
 fi
@@ -77,7 +97,7 @@ if [ -e usr/share/icons/hicolor/icon-theme.cache ]; then
 fi
 EOF
 
-cat <<EOF > $PKG/install/slack-desc
+cat <<EOF > "$PKG"/install/slack-desc
       |-----handy-ruler------------------------------------------------------|
 $PRGNAM: $PRGNAM (CAD program for toy bricks)
 $PRGNAM:
@@ -93,6 +113,5 @@ $PRGNAM:
 EOF
 
 # empaquetage
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$(echo ${VERSION}_${LIBRARY_VERSION} | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"

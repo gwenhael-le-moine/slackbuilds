@@ -24,16 +24,16 @@ rm -rf "$PKG"
 mkdir -p "$PKG"/usr/bin "$PKG"/opt "$OUTPUT"
 
 cd  "$PKG"/opt || exit 1
-wget -c "https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher/releases/download/v$VERSION/heroic-$VERSION.tar.xz" -O "heroic-$VERSION.tar.xz"
-tar xf "heroic-$VERSION.tar.xz"
-rm "heroic-$VERSION.tar.xz"
+wget --quiet -c "https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher/releases/download/v$VERSION/Heroic-$VERSION-linux-x64.tar.xz" -O "Heroic-$VERSION-linux-x64.tar.xz"
+tar xf "Heroic-$VERSION-linux-x64.tar.xz"
+rm "Heroic-$VERSION-linux-x64.tar.xz"
 
 cat <<EOF > "$PKG"/usr/bin/heroic
 #!/bin/bash
 
 set -eu
 
-cd /opt/"heroic-$VERSION"/
+cd /opt/"Heroic-$VERSION-linux-x64"/
 ./heroic -- "$@"
 EOF
 chmod +x "$PKG"/usr/bin/heroic

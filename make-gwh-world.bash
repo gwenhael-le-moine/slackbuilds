@@ -74,7 +74,7 @@ CWD=$(pwd)
 for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
     do
         echo -n "$pkg > "
-        if ! grep -q "PRINT_PACKAGE_NAME" "$pkg"/SlackBuild; then
+        if [ ! -e "$pkg"/SlackBuild ] || ! grep -q "PRINT_PACKAGE_NAME" "$pkg"/SlackBuild; then
             echo "INCOMPATIBLE"
             continue
         fi
