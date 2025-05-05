@@ -42,7 +42,6 @@ for pkg in \
         d/zig-lang-bin \
         e/emacs \
         l/fcft \
-        l/fmt \
         l/libscfg \
         l/notcurses \
         l/spdlog \
