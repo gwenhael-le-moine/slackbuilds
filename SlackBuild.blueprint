@@ -22,8 +22,7 @@ PREFIX=${PREFIX:-"/usr"}
 
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
-git submodule update --init
+git pull --quiet --all > /dev/null 2>&1
 
 mkdir -p "$TMP"
 
@@ -39,12 +38,14 @@ case $VERSION in
         ;;
     latest)
         VERSION="$(git tag --sort=-version:refname | head -n1)"
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
     *)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
 esac
+
+git submodule update --quiet --init > /dev/null 2>&1
 
 PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what

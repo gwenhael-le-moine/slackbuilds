@@ -24,7 +24,7 @@ mkdir -p $PKG
 
 [ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
 cd $REPOSITORY
-git pull --all
+git pull --quiet --all
 VERSION="git_r$( cd $REPOSITORY && git rev-list --count HEAD )"
 
 cd $TMP

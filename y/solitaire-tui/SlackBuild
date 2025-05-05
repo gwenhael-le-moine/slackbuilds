@@ -33,7 +33,7 @@ mkdir -p "$PKG"
 cd "$TMP" || exit 1
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
+git pull --quiet --all
 
 cp -R "$REPOSITORY" $TMP/
 cd "$TMP/$PRGNAM" || exit 1

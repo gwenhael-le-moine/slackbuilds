@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# set -e
-
 cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
@@ -35,7 +33,6 @@ for pkg in \
         ap/zauth \
         d/crystal-lang \
         d/factor-lang \
-        d/gforth-lang \
         d/luarocks \
         d/rpn-lang \
         d/uxn \
@@ -76,8 +73,22 @@ for pkg in \
         y/solitaire-tui \
     ;
 do
-    PKGNAM="$(PRINT_PACKAGE_NAME=yes "$CWD"/make-pkg.bash "$pkg" | tail -n1)"
-    if [ ! -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ]; then
-       "$CWD"/make-pkg.bash "$pkg" || echo ">>> FAILED: $PKGNAM"
+    echo -n "$pkg > "
+    PKGNAM="$(PRINT_PACKAGE_NAME=yes "$CWD"/make-pkg.bash "$pkg" | tail -n1 2>&1)"
+
+    if [ -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ]; then
+        echo "✅"
+        continue
+    fi
+
+    echo -n "building /tmp/$PKGNAM > "
+
+    "$CWD"/make-pkg.bash "$pkg" > "$CWD/building_$PKGNAM.log" 2>&1
+
+    if [ -e /tmp/"$PKGNAM" ]; then
+        rm "$CWD/building_$PKGNAM.log"
+        echo "✅"
+    else
+        echo "❌"
     fi
 done

@@ -22,7 +22,7 @@ PREFIX=${PREFIX:-"/usr"}
 
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
+git pull --quiet --all
 
 mkdir -p "$TMP"
 
@@ -38,10 +38,10 @@ case $VERSION in
         ;;
     latest)
         VERSION="$(git tag --sort=-version:refname | head -n1)"
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
     *)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
 esac
 

@@ -29,7 +29,7 @@ cd "$TMP" || exit 1
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git reset --hard HEAD
-git pull --all
+git pull --quiet --all
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 cd "$TMP/$PRGNAM" || exit 1
@@ -39,10 +39,10 @@ case $VERSION in
         ;;
     latest)
         VERSION="$(git tag --sort=-version:refname | head -n1)"
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
     *)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
 esac
 

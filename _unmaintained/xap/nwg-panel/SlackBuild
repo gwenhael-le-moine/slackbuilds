@@ -27,7 +27,7 @@ mkdir -p $PKG
 # mise en place
 [ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
-git pull --all
+git pull --quiet --all
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
@@ -38,10 +38,10 @@ case $VERSION in
         ;;
     latest)
         VERSION=$(git tag --sort=-version:refname | head -n1)
-        git checkout $VERSION
+        git checkout --quiet $VERSION
         ;;
     *)
-        git checkout $VERSION
+        git checkout --quiet $VERSION
         ;;
 esac
 

@@ -27,7 +27,7 @@ mkdir -p $PKG
 # mise en place
 [ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
-git pull --all
+git pull --quiet --all
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PKGNAM/
@@ -38,11 +38,11 @@ case $VERSION in
         ;;
     latest)
         PKGVERSION=$(git tag --sort=-version:refname | head -n1)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
     *)
         PKGVERSION="$VERSION"
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
 esac
 
@@ -139,7 +139,7 @@ if [ "$EMBED_EXTRAS" = "yes" ]; then
     [ ! -e "$EXTRAS_REPOSITORY" ] && git clone ${EXTRAS_UPSTREAM_REPO}.git "$EXTRAS_REPOSITORY"
     cd "$EXTRAS_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
 
     cp -R $EXTRAS_REPOSITORY $TMP/
@@ -150,10 +150,10 @@ if [ "$EMBED_EXTRAS" = "yes" ]; then
             ;;
         latest)
             EXTRAS_VERSION=$(git tag --sort=-version:refname | head -n1)
-            git checkout "$EXTRAS_VERSION"
+            git checkout --quiet "$EXTRAS_VERSION"
             ;;
         *)
-            git checkout "$EXTRAS_VERSION"
+            git checkout --quiet "$EXTRAS_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+extras"
@@ -177,7 +177,7 @@ if [ "$EMBED_PYWAYLAND" = "yes" ]; then
     [ ! -e "$PYWAYLAND_REPOSITORY" ] && git clone ${PYWAYLAND_UPSTREAM_REPO}.git "$PYWAYLAND_REPOSITORY"
     cd "$PYWAYLAND_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
 
     cp -R $PYWAYLAND_REPOSITORY $TMP/
@@ -188,10 +188,10 @@ if [ "$EMBED_PYWAYLAND" = "yes" ]; then
             ;;
         latest)
             PYWAYLAND_VERSION=$(git tag --sort=-version:refname | head -n1)
-            git checkout "$PYWAYLAND_VERSION"
+            git checkout --quiet "$PYWAYLAND_VERSION"
             ;;
         *)
-            git checkout "$PYWAYLAND_VERSION"
+            git checkout --quiet "$PYWAYLAND_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+pywayland"
@@ -214,7 +214,7 @@ if [ "$EMBED_PYWLROOTS" = "yes" ]; then
     [ ! -e "$PYWLROOTS_REPOSITORY" ] && git clone ${PYWLROOTS_UPSTREAM_REPO}.git "$PYWLROOTS_REPOSITORY"
     cd "$PYWLROOTS_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
 
     cp -R $PYWLROOTS_REPOSITORY $TMP/
@@ -225,10 +225,10 @@ if [ "$EMBED_PYWLROOTS" = "yes" ]; then
             ;;
         latest)
             PYWLROOTS_VERSION=$(git tag --sort=-version:refname | head -n1)
-            git checkout "$PYWLROOTS_VERSION"
+            git checkout --quiet "$PYWLROOTS_VERSION"
             ;;
         *)
-            git checkout "$PYWLROOTS_VERSION"
+            git checkout --quiet "$PYWLROOTS_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+pywlroots"

@@ -25,14 +25,14 @@ mkdir -p $PKG
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://git.sr.ht/~adnano/wmenu $REPOSITORY
 cd $REPOSITORY
-git pull
+git pull --quiet
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 
 [ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout --quiet $VERSION
 
 meson setup --prefix /usr --mandir /usr/man/ build/
 ninja -C build/

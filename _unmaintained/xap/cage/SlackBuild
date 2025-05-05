@@ -26,14 +26,14 @@ mkdir -p $PKG
 # mise en place
 [ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
-git pull --all
+git pull --quiet --all
 
 cp -R $REPOSITORY $TMP/
 cd $TMP/$PRGNAM/
 
 [ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout $VERSION
+[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout --quiet $VERSION
 
 # wget -c https://github.com/Hjdskes/cage/pull/217.patch
 # git am 217.patch

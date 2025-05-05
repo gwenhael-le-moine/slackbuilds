@@ -29,7 +29,7 @@ rm -fr "$TMP"/"$PRGNAM" "$PKG"
 # Fetching sources
 [ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
+git pull --quiet --all
 
 cp -R "$REPOSITORY" "$TMP"/"$PRGNAM"
 cd "$TMP"/"$PRGNAM" || exit 1

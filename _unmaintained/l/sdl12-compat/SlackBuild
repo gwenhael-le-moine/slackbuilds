@@ -35,7 +35,7 @@ cd "$TMP/$PRGNAM" || exit
 if [ "$VERSION" == "trunk" ]; then
     VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
 else
-    git checkout "$VERSION"
+    git checkout --quiet "$VERSION"
 fi
 
 # configuration

@@ -11,7 +11,7 @@ if [ "$(id -g minecraft 2> /dev/null)" != "987" -o "$(id -u minecraft 2> /dev/nu
 fi
 
 PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl https://www.minecraft.net/en-us/download/server | grep "minecraft_server.*\.jar" -o | grep -o "[0-9][0-9.]*[0-9]" | head -n1)}
+VERSION=${VERSION:-$(curl -s https://www.minecraft.net/en-us/download/server | grep "minecraft_server.*\.jar" -o | grep -o "[0-9][0-9.]*[0-9]" | head -n1)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}

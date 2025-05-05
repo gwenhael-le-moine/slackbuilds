@@ -93,7 +93,7 @@ mkdir -p "$TMP" "$PKG"
 
 cd "$REPOSITORY" || exit 1
 git reset --hard HEAD
-git pull --all
+git pull --quiet --all
 
 git clean -dfX                  # https://github.com/commercial-emacs/commercial-emacs
 
@@ -101,8 +101,8 @@ git clean -dfX                  # https://github.com/commercial-emacs/commercial
 cp -R "$REPOSITORY" "$TMP/${PKGNAM}"
 cd "$TMP/${PKGNAM}" || exit 1
 
-git checkout "$BRANCH"
-git pull
+git checkout --quiet "$BRANCH"
+git pull --quiet
 
 case $VERSION in
     trunk)
@@ -110,11 +110,11 @@ case $VERSION in
         ;;
     latest)
         VERSION=$(git tag --sort=-version:refname | head -n1)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         VERSION=${VERSION#emacs-}
         ;;
     *)
-        git checkout "emacs-$VERSION"
+        git checkout --quiet "emacs-$VERSION"
         ;;
 esac
 

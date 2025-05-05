@@ -71,22 +71,22 @@ mkdir -p $TMP $PKG $OUTPUT
 
 [ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
-git pull --all
+git pull --quiet --all
 
 cp -R $REPOSITORY $TMP/
 
 cd $TMP/$PRGNAM/
 case $VERSION in
     trunk)
-        git checkout wlroots-next
+        git checkout --quiet wlroots-next
         VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
         VERSION=$(git tag --sort=-version:refname | head -n1)
-        git checkout $VERSION
+        git checkout --quiet $VERSION
         ;;
     *)
-        git checkout $VERSION
+        git checkout --quiet $VERSION
         ;;
 esac
 

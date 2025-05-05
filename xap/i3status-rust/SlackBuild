@@ -22,8 +22,8 @@ PREFIX=${PREFIX:-"/usr"}
 
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
-git submodule update --init
+git pull --quiet --all
+git submodule update --quiet --init
 
 mkdir -p "$TMP"
 
@@ -39,10 +39,10 @@ case $VERSION in
         ;;
     latest)
         VERSION="$(git tag --sort=-version:refname | head -n1)"
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
     *)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
 esac
 
@@ -66,11 +66,11 @@ cp -R files/* "$PKG$PREFIX/share/$PRGNAM"
 
 # move doc/ to the appropriate location
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
-cp -R doc/ examples/ LICENSE *.md "$PKG$PREFIX/doc/$PRGNAM"
+cp -R doc/ examples/ LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM"
 
-mkdir -p "$PKG$PREFIX"/man/man1
-cp man/i3status-rs.1 "$PKG$PREFIX"/man/man1
-[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -exec gzip -9 {} \;
+# mkdir -p "$PKG$PREFIX"/man/man1
+# cp man/i3status-rs.1 "$PKG$PREFIX"/man/man1
+# [ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -exec gzip -9 {} \;
 
 # correction
 cd "$PKG" || exit 1

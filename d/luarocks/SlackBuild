@@ -22,8 +22,8 @@ PREFIX=${PREFIX:-"/usr"}
 
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
-git submodule update --init
+git pull --quiet --all
+git submodule update --quiet --init
 
 mkdir -p "$TMP"
 
@@ -39,10 +39,10 @@ case $VERSION in
         ;;
     latest)
         VERSION="$(git tag --sort=-version:refname | head -n1)"
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
     *)
-        git checkout "$VERSION"
+        git checkout --quiet "$VERSION"
         ;;
 esac
 
@@ -68,13 +68,13 @@ make -j"$(nproc)" PREFIX="$PREFIX"
 # installation
 make install DESTDIR="$PKG" ROCKS_TREE="$PREFIX"/lib64/luarocks
 
-mkdir -p "$PKG/etc/profile.d/"
-cat <<EOF > "$PKG/etc/profile.d/luarocks.sh"
+mkdir -p "$PKG"/etc/profile.d/
+cat <<EOF > "$PKG"/etc/profile.d/luarocks.sh
 #!/bin/bash
 
 eval \$(luarocks path)
 EOF
-chmod +x "$PKG/etc/profile.d/*"
+chmod +x "$PKG"/etc/profile.d/*
 
 # correction
 cd "$PKG" || exit 1
@@ -85,13 +85,6 @@ cd "$TMP/$PRGNAM" || exit 1
 cp -R ./*.md COPYING "$PKG/usr/doc/$PRGNAM"
 
 [ -d "$PKG/usr/man" ] && find "$PKG/usr/man" -type f -name "*.?" -exec gzip -9f {} \;
-
-# Strip binaries
-( cd "$PKG" || exit 1
-  find . -print0 | xargs -0 file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . -print0 | xargs -0 file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-
 
 # embaumement
 mkdir -p "$PKG/install"

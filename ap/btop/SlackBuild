@@ -22,7 +22,7 @@ PREFIX=${PREFIX:-"/usr"}
 
 [ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
+git pull --quiet --all
 
 mkdir -p "$TMP"
 
@@ -38,11 +38,11 @@ case $VERSION in
         ;;
     latest)
         PKGVERSION="$(git tag --sort=-version:refname | head -n1)"
-        git checkout "$PKGVERSION"
+        git checkout --quiet "$PKGVERSION"
         ;;
     *)
         PKGVERSION="$VERSION"
-        git checkout "$PKGVERSION"
+        git checkout --quiet "$PKGVERSION"
         ;;
 esac
 
@@ -59,7 +59,7 @@ if [ "$EMBED_ROCM_SMI_LIB" = "yes" ]; then
     [ ! -e "$ROCM_SMI_LIB_REPOSITORY" ] && git clone https://github.com/rocm/rocm_smi_lib.git "$ROCM_SMI_LIB_REPOSITORY"
     cd "$ROCM_SMI_LIB_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
     mkdir -p "$TMP/$PRGNAM"/lib/
     cp -a "$ROCM_SMI_LIB_REPOSITORY" "$TMP/$PRGNAM"/lib/rocm_smi_lib
@@ -71,10 +71,10 @@ if [ "$EMBED_ROCM_SMI_LIB" = "yes" ]; then
             ;;
         latest)
             ROCM_SMI_LIB_VERSION=$(git tag --sort=-version:refname | head -n1)
-            git checkout "$ROCM_SMI_LIB_VERSION"
+            git checkout --quiet "$ROCM_SMI_LIB_VERSION"
             ;;
         *)
-            git checkout "$ROCM_SMI_LIB_VERSION"
+            git checkout --quiet "$ROCM_SMI_LIB_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+rocm_smi_lib"

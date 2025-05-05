@@ -14,14 +14,6 @@ OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
 
-# Check if the jellyfin user and group exist. If not, then bail.
-# if [ "$(id -g jellyfin 2> /dev/null)" != "857" -o "$(id -u jellyfin 2> /dev/null)" != "857" ]; then
-#     echo "  You must have an 'jellyfin' user and group to run this script."
-#     echo "    # groupadd -g 857 jellyfin"
-#     echo "    # useradd -d /var/lib/jellyfin -g jellyfin -s /bin/bash -u 857 jellyfin --system "
-#     exit 1
-# fi
-
 PACKAGE_NAME="$PKGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
@@ -30,6 +22,14 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     echo "$PACKAGE_NAME"
     exit 0
 fi
+
+# Check if the jellyfin user and group exist. If not, then bail.
+# if [ "$(id -g jellyfin 2> /dev/null)" != "857" -o "$(id -u jellyfin 2> /dev/null)" != "857" ]; then
+#     echo "  You must have an 'jellyfin' user and group to run this script."
+#     echo "    # groupadd -g 857 jellyfin"
+#     echo "    # useradd -d /var/lib/jellyfin -g jellyfin -s /bin/bash -u 857 jellyfin --system "
+#     exit 1
+# fi
 
 mkdir -p "$REPOSITORY"
 

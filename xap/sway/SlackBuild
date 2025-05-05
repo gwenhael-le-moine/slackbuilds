@@ -31,7 +31,7 @@ mkdir -p "$PKG"
 [ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git reset --hard HEAD
-git pull --all
+git pull --quiet --all
 
 cp -R "$REPOSITORY" $TMP/
 
@@ -43,12 +43,12 @@ case $VERSION in
         ;;
     latest)
         PKGVERSION=$(git tag --sort=-taggerdate | head -n1)
-        git checkout "$PKGVERSION"
+        git checkout --quiet "$PKGVERSION"
         ;;
     *)
         PKGVERSION=$VERSION
         MESONFLAGS="-Dc_args=\"-Wno-error=switch\""
-        git checkout "$PKGVERSION"
+        git checkout --quiet "$PKGVERSION"
         ;;
 esac
 PKGNAM=${PRGNAM}
@@ -77,7 +77,7 @@ if [ "$EMBED_WLROOTS" = "yes" ]; then
     [ ! -e "$WLROOTS_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git "$WLROOTS_REPOSITORY"
     cd "$WLROOTS_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
     mkdir -p "$TMP/$PRGNAM"/subprojects/
     cp -a "$WLROOTS_REPOSITORY" "$TMP/$PRGNAM"/subprojects/wlroots
@@ -89,10 +89,10 @@ if [ "$EMBED_WLROOTS" = "yes" ]; then
             ;;
         latest)
             WLROOTS_VERSION=$(git tag --sort=-taggerdate | head -n1)
-            git checkout "$WLROOTS_VERSION"
+            git checkout --quiet "$WLROOTS_VERSION"
             ;;
         *)
-            git checkout "$WLROOTS_VERSION"
+            git checkout --quiet "$WLROOTS_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+wlroots"
@@ -107,7 +107,7 @@ if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
     [ ! -e "$LIBLIFTOFF_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libliftoff.git "$LIBLIFTOFF_REPOSITORY"
     cd "$LIBLIFTOFF_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
     mkdir -p "$TMP/$PRGNAM"/subprojects/
     cp -a "$LIBLIFTOFF_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libliftoff
@@ -119,10 +119,10 @@ if [ "$EMBED_LIBLIFTOFF" = "yes" ]; then
             ;;
         latest)
             LIBLIFTOFF_VERSION=$(git tag --sort=-taggerdate | head -n1)
-            git checkout "$LIBLIFTOFF_VERSION"
+            git checkout --quiet "$LIBLIFTOFF_VERSION"
             ;;
         *)
-            git checkout "$LIBLIFTOFF_VERSION"
+            git checkout --quiet "$LIBLIFTOFF_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+libliftoff"
@@ -137,7 +137,7 @@ if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
     [ ! -e "$LIBDISPLAYINFO_REPOSITORY" ] && git clone https://gitlab.freedesktop.org/emersion/libdisplay-info.git "$LIBDISPLAYINFO_REPOSITORY"
     cd "$LIBDISPLAYINFO_REPOSITORY" || exit 1
     git reset --hard HEAD
-    git pull --all
+    git pull --quiet --all
 
     mkdir -p "$TMP/$PRGNAM"/subprojects/
     cp -a "$LIBDISPLAYINFO_REPOSITORY" "$TMP/$PRGNAM"/subprojects/libdisplay-info
@@ -149,10 +149,10 @@ if [ "$EMBED_LIBDISPLAYINFO" = "yes" ]; then
             ;;
         latest)
             LIBDISPLAYINFO_VERSION=$(git tag --sort=-taggerdate | head -n1)
-            git checkout "$LIBDISPLAYINFO_VERSION"
+            git checkout --quiet "$LIBDISPLAYINFO_VERSION"
             ;;
         *)
-            git checkout "$LIBDISPLAYINFO_VERSION"
+            git checkout --quiet "$LIBDISPLAYINFO_VERSION"
             ;;
     esac
     PKGNAM="${PKGNAM}+libdisplay_info"

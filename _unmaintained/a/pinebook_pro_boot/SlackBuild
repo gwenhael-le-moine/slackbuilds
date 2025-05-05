@@ -25,12 +25,12 @@ done
 
 # mise en place
 [ ! -e $REPOSITORY ] && git clone https://github.com/mrfixit2001/updates_repo.git $REPOSITORY
-( cd $REPOSITORY; git pull )
+( cd $REPOSITORY; git pull --quiet )
 VERSION="git_r$( cd $REPOSITORY/pinebook/ && cat version )"
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM/
-git checkout v$VERSION
+git checkout --quiet v$VERSION
 
 mkdir -p $PKG/boot/
 cp $TMP/$PRGNAM/pinebook/filesystem/{idbloader,uboot,trust}.img $PKG/boot/

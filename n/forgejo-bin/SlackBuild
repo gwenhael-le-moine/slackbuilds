@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-VERSION=${VERSION:-$(curl -q https://codeberg.org/forgejo/forgejo/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
+VERSION=${VERSION:-$(curl -s https://codeberg.org/forgejo/forgejo/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-6}
 TAG=${TAG:-gwh}
@@ -20,14 +20,6 @@ mkdir -p "$REPOSITORY"
 
 FORGEJO_WORK_DIR=/var/lib/forgejo
 
-# Check if the forgejo user and group exist. If not, then bail.
-if [ "$(id -g forgejo 2> /dev/null)" != "817" -o "$(id -u forgejo 2> /dev/null)" != "817" ]; then
-    echo "  You must have an 'forgejo' user and group to run this script."
-    echo "    # groupadd -g 817 forgejo"
-    echo "    # useradd -d /var/lib/forgejo -g forgejo -s /bin/bash -u 817 forgejo --system "
-    exit 1
-fi
-
 echo "$ARCH" | grep -q arm && SRC_ARCH=arm-7
 echo "$ARCH" | grep -q 86 && SRC_ARCH=386
 echo "$ARCH" | grep -q 64 && SRC_ARCH=amd64
@@ -39,6 +31,14 @@ PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
 if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     echo "$PACKAGE_NAME"
     exit 0
+fi
+
+# Check if the forgejo user and group exist. If not, then bail.
+if [ "$(id -g forgejo 2> /dev/null)" != "817" -o "$(id -u forgejo 2> /dev/null)" != "817" ]; then
+    echo "  You must have an 'forgejo' user and group to run this script."
+    echo "    # groupadd -g 817 forgejo"
+    echo "    # useradd -d /var/lib/forgejo -g forgejo -s /bin/bash -u 817 forgejo --system "
+    exit 1
 fi
 
 mkdir -p "$REPOSITORY"

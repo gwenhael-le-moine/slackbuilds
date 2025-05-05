@@ -33,7 +33,7 @@ rm -rf "$PRGNAM"
 
 [ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
-git pull --all
+git pull --quiet --all
 
 cp -R "$REPOSITORY" "$TMP/$PRGNAM"
 
