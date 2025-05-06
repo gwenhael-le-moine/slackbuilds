@@ -25,7 +25,7 @@ rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 mkdir -p "$PKG"
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git --recursive "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet ${UPSTREAM_REPO}.git --recursive "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --quiet --all
 git submodule update --quiet

@@ -24,7 +24,7 @@ REPOSITORY=${REPOSITORY:=/var/cache/SlackBuilds.gwh/$PRGNAM}
 rm -fr $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO}.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet ${UPSTREAM_REPO}.git $REPOSITORY
 ( cd $REPOSITORY; git pull --quiet )
 [ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
 [ "$VERSION" == "" ] && VERSION=trunk

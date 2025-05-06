@@ -24,7 +24,7 @@ for d in $PKG $TMP/$PRGNAM; do
 done
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/mrfixit2001/updates_repo.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://github.com/mrfixit2001/updates_repo.git $REPOSITORY
 ( cd $REPOSITORY; git pull --quiet )
 VERSION="git_r$( cd $REPOSITORY/pinebook/ && cat version )"
 

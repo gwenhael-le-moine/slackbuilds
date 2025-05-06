@@ -25,7 +25,7 @@ mkdir -p "$PKG"
 
 # mise en place
 cd "$TMP" || exit 1
-[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet ${UPSTREAM_REPO}.git "$REPOSITORY"
 
 cd "$REPOSITORY" || exit1
 git pull --quiet --all

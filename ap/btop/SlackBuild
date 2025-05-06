@@ -20,7 +20,7 @@ ARCH=${ARCH:-$(uname -m)}
 REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
 PREFIX=${PREFIX:-"/usr"}
 
-[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --quiet --all
 
@@ -56,7 +56,7 @@ EMBED_ROCM_SMI_LIB=${EMBED_ROCM_SMI_LIB:-"yes"}
 if [ "$EMBED_ROCM_SMI_LIB" = "yes" ]; then
     ROCM_SMI_LIB_VERSION=${ROCM_SMI_LIB_VERSION:-$VERSION}
     ROCM_SMI_LIB_REPOSITORY=/var/cache/SlackBuilds.gwh/rocm_smi_lib
-    [ ! -e "$ROCM_SMI_LIB_REPOSITORY" ] && git clone https://github.com/rocm/rocm_smi_lib.git "$ROCM_SMI_LIB_REPOSITORY"
+    [ ! -e "$ROCM_SMI_LIB_REPOSITORY" ] && git clone --quiet https://github.com/rocm/rocm_smi_lib.git "$ROCM_SMI_LIB_REPOSITORY"
     cd "$ROCM_SMI_LIB_REPOSITORY" || exit 1
     git reset --hard HEAD
     git pull --quiet --all

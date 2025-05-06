@@ -61,7 +61,7 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM
 
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

@@ -23,7 +23,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://git.sr.ht/~leon_plickat/lswt $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://git.sr.ht/~leon_plickat/lswt $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

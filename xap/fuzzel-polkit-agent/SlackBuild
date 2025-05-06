@@ -20,7 +20,7 @@ ARCH=${ARCH:-$(uname -m)}
 REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
 PREFIX=${PREFIX:-"/usr"}
 
-[ ! -e "$REPOSITORY" ] && git clone "${UPSTREAM_REPO}.git" "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --quiet --all
 git submodule update --quiet --init

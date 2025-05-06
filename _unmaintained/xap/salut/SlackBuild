@@ -24,7 +24,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://gitlab.com/snakedye/salut.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://gitlab.com/snakedye/salut.git $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

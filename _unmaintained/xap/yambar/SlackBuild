@@ -22,7 +22,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://codeberg.org/dnkl/yambar.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://codeberg.org/dnkl/yambar.git $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

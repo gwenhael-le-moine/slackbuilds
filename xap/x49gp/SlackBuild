@@ -27,7 +27,7 @@ mkdir -p $TMP
 rm -fr "$TMP"/"$PRGNAM" "$PKG"
 
 # Fetching sources
-[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet ${UPSTREAM_REPO}.git "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --quiet --all
 

@@ -21,7 +21,7 @@ rm -fr "$PKG" "${TMP:?}/$PRGNAM/"
 mkdir -p $TMP/
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit
 git pull --quiet --all
 
@@ -49,7 +49,7 @@ SHARDS_PKG=$TMP/pkg-$SHARDS_PRGNAM
 rm -fr "$SHARDS_PKG" "${TMP:?}/$SHARDS_PRGNAM/"
 
 # mise en place
-[ ! -e "$SHARDS_REPOSITORY" ] && git clone ${SHARDS_UPSTREAM_REPO} "$SHARDS_REPOSITORY"
+[ ! -e "$SHARDS_REPOSITORY" ] && git clone --quiet ${SHARDS_UPSTREAM_REPO} "$SHARDS_REPOSITORY"
 cd "$SHARDS_REPOSITORY" || exit
 git pull --quiet --all
 

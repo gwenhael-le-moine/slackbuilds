@@ -28,7 +28,7 @@ mkdir -p $PKG
 
 # mise en place
 GIT_URL="https://github.com/Kozea/cairocffi.git"
-[ ! -e $REPOSITORY ] && git clone "$GIT_URL" $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet "$GIT_URL" $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

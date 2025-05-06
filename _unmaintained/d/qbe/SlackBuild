@@ -27,7 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone git://c9x.me/qbe.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet git://c9x.me/qbe.git $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

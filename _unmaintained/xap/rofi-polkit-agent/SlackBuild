@@ -22,7 +22,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://github.com/czaplicki/rofi-polkit-agent.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://github.com/czaplicki/rofi-polkit-agent.git $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

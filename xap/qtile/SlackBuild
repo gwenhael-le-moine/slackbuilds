@@ -25,7 +25,7 @@ rm -fr $PKG $TMP/$PKGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet ${UPSTREAM_REPO} $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 
@@ -136,7 +136,7 @@ if [ "$EMBED_EXTRAS" = "yes" ]; then
     EXTRAS_UPSTREAM_REPO=https://github.com/elParaguayo/qtile-extras
     EXTRAS_VERSION=${EXTRAS_VERSION:-$VERSION}
     EXTRAS_REPOSITORY=/var/cache/SlackBuilds.gwh/$EXTRAS_PKGNAM
-    [ ! -e "$EXTRAS_REPOSITORY" ] && git clone ${EXTRAS_UPSTREAM_REPO}.git "$EXTRAS_REPOSITORY"
+    [ ! -e "$EXTRAS_REPOSITORY" ] && git clone --quiet ${EXTRAS_UPSTREAM_REPO}.git "$EXTRAS_REPOSITORY"
     cd "$EXTRAS_REPOSITORY" || exit 1
     git reset --hard HEAD
     git pull --quiet --all
@@ -174,7 +174,7 @@ if [ "$EMBED_PYWAYLAND" = "yes" ]; then
     PYWAYLAND_UPSTREAM_REPO=https://github.com/flacjacket/pywayland
     PYWAYLAND_VERSION=${PYWAYLAND_VERSION:-$VERSION}
     PYWAYLAND_REPOSITORY=/var/cache/SlackBuilds.gwh/$PYWAYLAND_PKGNAM
-    [ ! -e "$PYWAYLAND_REPOSITORY" ] && git clone ${PYWAYLAND_UPSTREAM_REPO}.git "$PYWAYLAND_REPOSITORY"
+    [ ! -e "$PYWAYLAND_REPOSITORY" ] && git clone --quiet ${PYWAYLAND_UPSTREAM_REPO}.git "$PYWAYLAND_REPOSITORY"
     cd "$PYWAYLAND_REPOSITORY" || exit 1
     git reset --hard HEAD
     git pull --quiet --all
@@ -211,7 +211,7 @@ if [ "$EMBED_PYWLROOTS" = "yes" ]; then
     PYWLROOTS_UPSTREAM_REPO=https://github.com/flacjacket/pywlroots
     PYWLROOTS_VERSION=${PYWLROOTS_VERSION:-$VERSION}
     PYWLROOTS_REPOSITORY=/var/cache/SlackBuilds.gwh/$PYWLROOTS_PKGNAM
-    [ ! -e "$PYWLROOTS_REPOSITORY" ] && git clone ${PYWLROOTS_UPSTREAM_REPO}.git "$PYWLROOTS_REPOSITORY"
+    [ ! -e "$PYWLROOTS_REPOSITORY" ] && git clone --quiet ${PYWLROOTS_UPSTREAM_REPO}.git "$PYWLROOTS_REPOSITORY"
     cd "$PYWLROOTS_REPOSITORY" || exit 1
     git reset --hard HEAD
     git pull --quiet --all

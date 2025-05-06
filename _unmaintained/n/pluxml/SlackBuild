@@ -27,7 +27,7 @@ rm -rf $PKG
 mkdir -p $TMP $OUTPUT $PKG/$VHOSTROOT
 
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-[ ! -e $REPOSITORY ] && git clone ${UPSTREAM_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet ${UPSTREAM_REPO} $REPOSITORY
 ( cd $REPOSITORY
   git pull --quiet )
 

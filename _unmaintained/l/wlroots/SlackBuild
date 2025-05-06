@@ -25,7 +25,7 @@ rm -fr $PKG $TMP/$PRGNAM
 mkdir -p $PKG
 
 # mise en place
-[ ! -e $REPOSITORY ] && git clone https://gitlab.freedesktop.org/wlroots/wlroots.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://gitlab.freedesktop.org/wlroots/wlroots.git $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

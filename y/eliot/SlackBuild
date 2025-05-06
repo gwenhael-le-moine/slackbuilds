@@ -40,7 +40,7 @@ mkdir -p "$TMP" "$PKG" "$OUTPUT"
 cd "$TMP" || exit 1
 rm -rf "$PRGNAM"
 
-[ ! -e "$REPOSITORY" ] && git clone git://git.savannah.nongnu.org/eliot.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet git://git.savannah.nongnu.org/eliot.git "$REPOSITORY"
 cd "$REPOSITORY"
 git pull --quiet --all
 

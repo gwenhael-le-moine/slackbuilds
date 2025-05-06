@@ -27,7 +27,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone --recursive ${UPSTREAM_REPO} $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet --recursive ${UPSTREAM_REPO} $REPOSITORY
 
 cp -R $REPOSITORY $TMP/$PRGNAM
 cd $TMP/$PRGNAM

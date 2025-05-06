@@ -89,7 +89,7 @@ REPOSITORY=/var/cache/SlackBuilds.gwh/$PKGNAM
 rm -rf "$PKG"
 mkdir -p "$TMP" "$PKG"
 
-[ ! -e $REPOSITORY ] && git clone git://git.savannah.gnu.org/emacs.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet git://git.savannah.gnu.org/emacs.git $REPOSITORY
 
 cd "$REPOSITORY" || exit 1
 git reset --hard HEAD

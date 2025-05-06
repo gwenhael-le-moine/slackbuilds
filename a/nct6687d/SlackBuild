@@ -19,7 +19,7 @@ ARCH=$(uname -m)
 BUILD=7
 
 # mise en place
-[ ! -e "$REPOSITORY" ] && git clone ${UPSTREAM_REPO} "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet ${UPSTREAM_REPO} "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --quiet --all
 

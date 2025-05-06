@@ -24,7 +24,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone git://git.kernel.org/pub/scm/utils/dtc/dtc.git $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet git://git.kernel.org/pub/scm/utils/dtc/dtc.git $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 

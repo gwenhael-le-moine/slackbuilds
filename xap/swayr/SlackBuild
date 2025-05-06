@@ -24,7 +24,7 @@ mkdir -p $PKG
 
 # mise en place
 cd $TMP
-[ ! -e $REPOSITORY ] && git clone https://git.sr.ht/~tsdh/swayr $REPOSITORY
+[ ! -e $REPOSITORY ] && git clone --quiet https://git.sr.ht/~tsdh/swayr $REPOSITORY
 cd $REPOSITORY
 git pull --quiet --all
 
