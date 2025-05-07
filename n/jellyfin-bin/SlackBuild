@@ -174,15 +174,15 @@ cat <<EOF > "$PKG/install/slack-desc"
             |-----handy-ruler------------------------------------------------------|
 jellyfin-bin: jellyfin-bin (The Free Software Media System)
 jellyfin-bin:
-jellyfin-bin:
 jellyfin-bin: Jellyfin is a volunteer-built media solution that puts you in control
 jellyfin-bin: of your media. Stream to any device from your own server, with no
 jellyfin-bin: strings attached. Your media, your server, your way.
 jellyfin-bin:
+jellyfin-bin:
+jellyfin-bin:
+jellyfin-bin: (RECOMMENDED: intel-media-driver)
+jellyfin-bin:
 jellyfin-bin: https://jellyfin.org/
-jellyfin-bin:
-jellyfin-bin:
-jellyfin-bin:
 EOF
 
 cd "$PKG" || exit 1
