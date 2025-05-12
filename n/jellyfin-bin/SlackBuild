@@ -1,12 +1,13 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PKGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | grep tag_name | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 TAG=${TAG:-gwh}
-BUILD=${BUILD:-9}
+BUILD=${BUILD:-12}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
@@ -14,7 +15,11 @@ OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
 
-PACKAGE_NAME="$PKGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+FFMPEG_VERSION=${FFMPEG_VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin-ffmpeg/releases/latest | jq .tag_name )}
+FFMPEG_VERSION=${FFMPEG_VERSION//\"/}
+FFMPEG_VERSION=${FFMPEG_VERSION#v}
+
+PACKAGE_NAME="$PKGNAM-${VERSION//-/}_${FFMPEG_VERSION//-/_}-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
 # the name of the created package would be, and then exit. This information
 # could be useful to other scripts.
@@ -33,14 +38,15 @@ fi
 
 mkdir -p "$REPOSITORY"
 
-# echo $ARCH | grep -q arm && SRC_ARCH=arm-7
-# echo $ARCH | grep -q 86 && SRC_ARCH=386
 echo "$ARCH" | grep -q 64 && SRC_ARCH=amd64
 
 mkdir -p "$REPOSITORY"
 [ ! -e "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" ] && \
-    wget -c "https://repo.jellyfin.org/files/server/linux/latest-stable/amd64/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" \
+    wget --quiet -c "https://repo.jellyfin.org/files/server/linux/latest-stable/amd64/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz" \
          -O "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
+[ ! -e "$REPOSITORY/jellyfin-ffmpeg_${FFMPEG_VERSION}.tar.xz" ] && \
+    wget --quiet -c "https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v${FFMPEG_VERSION}/jellyfin-ffmpeg_${FFMPEG_VERSION}_portable_linux64-gpl.tar.xz" \
+         -O "$REPOSITORY/jellyfin-ffmpeg_${FFMPEG_VERSION}.tar.xz"
 
 rm -fr "$PKG"
 
@@ -58,9 +64,11 @@ mkdir -p "$PKG/var/lib/jellyfin/data" \
 mkdir -p "$PKG/opt"
 cd "$PKG/opt/" || exit 1
 
-tar xvf "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
+tar xf "$REPOSITORY/jellyfin_${VERSION}-${SRC_ARCH}.tar.gz"
 
 cd jellyfin || exit 1
+tar xf "$REPOSITORY/jellyfin-ffmpeg_${FFMPEG_VERSION}.tar.xz"
+
 chown -R root:root .
 find -L . \
  \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
@@ -106,6 +114,7 @@ if [ -x /opt/jellyfin/jellyfin ]; then
     --name=jellyfin \\
     --pidfile=/run/jellyfin/pid -- \\
        /opt/jellyfin/jellyfin \\
+       --ffmpeg /opt/jellyfin/ffmpeg \\
        -d \$DATADIR \\
        -C \$CACHEDIR \\
        -c \$CONFIGDIR \\
@@ -124,7 +133,9 @@ restart() {
 echo "Restarting Jellyfin Media Server"
 if /usr/bin/daemon --name=jellyfin --pidfile=/run/jellyfin/pid --running ; then
         /usr/bin/daemon --name=jellyfin --pidfile=/run/jellyfin/pid --restart
- fi
+else
+	start
+fi
 }
 
 status() {
@@ -163,15 +174,15 @@ cat <<EOF > "$PKG/install/slack-desc"
             |-----handy-ruler------------------------------------------------------|
 jellyfin-bin: jellyfin-bin (The Free Software Media System)
 jellyfin-bin:
-jellyfin-bin:
 jellyfin-bin: Jellyfin is a volunteer-built media solution that puts you in control
 jellyfin-bin: of your media. Stream to any device from your own server, with no
 jellyfin-bin: strings attached. Your media, your server, your way.
 jellyfin-bin:
+jellyfin-bin:
+jellyfin-bin:
+jellyfin-bin: (RECOMMENDED: intel-media-driver)
+jellyfin-bin:
 jellyfin-bin: https://jellyfin.org/
-jellyfin-bin:
-jellyfin-bin:
-jellyfin-bin:
 EOF
 
 cd "$PKG" || exit 1
