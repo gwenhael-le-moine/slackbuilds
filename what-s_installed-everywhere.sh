@@ -37,7 +37,7 @@ PKG_KO="|          "
 counter=0
 echo "| tibou    | titplume | tibonom  | titrash  | gwenhael | NB |"
 echo "|----------+----------+----------+----------+----------+----+-----"
-for cat in a ap d fonts l n xap y; do
+for cat in a ap d e fonts l n xap y; do
     for p in $(find "$cat" -type d -maxdepth 1 -not -name "$cat" | cut -d/ -f2); do
         if echo -n $PKGs_tibou | grep -q -e " $p " -e " $p+" -e " $p$"; then
             echo -n "$PKG_OK";
