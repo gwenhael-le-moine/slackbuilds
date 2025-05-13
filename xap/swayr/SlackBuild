@@ -65,8 +65,8 @@ mkdir -p $PKG$PREFIX/doc/$PRGNAM
 cp -a LICENSE *.md $PKG$PREFIX/doc/$PRGNAM
 
 # correction
-cd $PKG
-chown -R root:root *
+cd $PKG || exit 1
+chown -R root:root ./*
 
 [ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
 

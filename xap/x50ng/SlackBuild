@@ -56,13 +56,6 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
 fi
 
 # Preparation
-chown -R root:root .
-find . \
-     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-     -exec chmod 755 {} \; -o \
-     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-     -exec chmod 644 {} \;
-
 make PREFIX=/usr MANDIR=/usr/man/man1
 make pull-firmware
 
@@ -70,12 +63,12 @@ make pull-firmware
 mkdir -p "$PKG"
 make install DESTDIR="$PKG" PREFIX=/usr MANDIR=/usr/man/man1
 
+[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -name "*.?" -exec gzip -9 {} \;
+
 # Cleaning
 cd "$PKG" || exit 1
 
-[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -name "*.?" -exec gzip -9 {} \;
-
-chown -R root:root .
+chown -R root:root ./*
 find . \
      \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
      -exec chmod 755 {} \; -o \
