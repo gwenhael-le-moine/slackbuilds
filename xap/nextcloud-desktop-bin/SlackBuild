@@ -1,0 +1,64 @@
+#!/bin/bash -e
+
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
+VERSION=${VERSION:-$(curl -s "https://api.github.com/repos/nextcloud/desktop/releases/latest" | jq -r .tag_name)}
+
+PRGNAM=$(basename "$CWD")
+
+ARCH=${ARCH:-$(uname -m)}
+BUILD=1
+
+TAG=gwh
+TMP=/tmp/$TAG
+PKG=$TMP/pkg-$PRGNAM
+OUTPUT=/tmp
+
+PREFIX=/usr
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+# nettoyage préalable
+rm -fr $PKG
+
+mkdir -p $PKG/opt/$PRGNAM
+
+# mise en place
+cd $PKG/opt/$PRGNAM
+
+wget -c https://github.com/nextcloud-releases/desktop/releases/download/${VERSION}/Nextcloud-${VERSION//v/}-${ARCH}.AppImage -O ${PRGNAM}-${VERSION}.AppImage
+chmod +x ${PRGNAM}-${VERSION}.AppImage
+
+mkdir -p $PKG$PREFIX/bin/
+cd $PKG$PREFIX/bin/
+ln -s ../../opt/$PRGNAM/${PRGNAM}-${VERSION}.AppImage nextcloud
+
+# correction
+cd $PKG
+chown -R root:root ./*
+
+# embaumement
+mkdir -p $PKG/install
+cat <<EOF > $PKG/install/slack-desc
+$PRGNAM: $PRGNAM (NextCloud Desktop Syncing Client)
+$PRGNAM:
+$PRGNAM: nextcloud themed desktop client
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://github.com/nextcloud/client_theming
+$PRGNAM:
+EOF
+
+# empaquetage
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
