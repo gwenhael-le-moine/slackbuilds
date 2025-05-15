@@ -57,7 +57,8 @@ fi
 #configuration
 
 #build
-cargo build --release
+RUSTONIG_SYSTEM_LIBONIG=1 \
+    cargo build --release
 
 #install
 mkdir -p "$PKG$PREFIX/bin"
