@@ -4,6 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 [ -x "$CWD"/what-s_installed.sh ] || exit 1
+[ -x "$CWD"/make-pkg.bash ] || exit 1
 
 FORCE_REBUILD=${FORCE_REBUILD:-"false"}
 DRYRUN=${DRYRUN:-"false"}
