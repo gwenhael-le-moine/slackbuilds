@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/htrefil/rkvm"}
 VERSION=${VERSION:-"trunk"}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-4}
 
 TAG="gwh"
 TMP="/tmp/$TAG"
@@ -75,7 +75,7 @@ EOF
 chmod +x "$PKG$PREFIX/doc/$PRGNAM/setup-keys.sh"
 
 mkdir -p "$PKG/etc/rc.d"
-cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-server"
+cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-server.new"
 #!/bin/bash
 
 start() {
@@ -109,7 +109,7 @@ case \$1 in
 esac
 EOF
 
-cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-client"
+cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-client.new"
 #!/bin/bash
 
 start() {
@@ -165,6 +165,22 @@ chown -R root:root ./*
 
 # packaging
 mkdir -p "$PKG/install"
+
+cat <<EOF > "$PKG/install/doinst.sh"
+if [ -e /etc/rc.d/rc.rkvm-client ]; then
+   if [ -x /etc/rc.d/rc.rkvm-client ]; then
+      chmod +x /etc/rc.d/rc.rkvm-client.new
+   fi
+fi
+mv /etc/rc.d/rc.rkvm-client.new /etc/rc.d/rc.rkvm-client
+
+if [ -e /etc/rc.d/rc.rkvm-server ]; then
+   if [ -x /etc/rc.d/rc.rkvm-server ]; then
+      chmod +x /etc/rc.d/rc.rkvm-server.new
+   fi
+fi
+mv /etc/rc.d/rc.rkvm-server.new /etc/rc.d/rc.rkvm-server
+EOF
 
 cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
