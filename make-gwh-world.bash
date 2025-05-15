@@ -51,7 +51,7 @@ for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
 
     if [ -e /tmp/"$PKGNAM" ]; then
         rm "$CWD/building_$PKGNAM.log"
-        [ "$INSTALL" = "true" ] && upgradepkg /tmp/"$PKGNAM"
+        [ "$INSTALL" = "true" ] && upgradepkg --terse /tmp/"$PKGNAM"
         echo "✅"
     else
         echo "❌"
