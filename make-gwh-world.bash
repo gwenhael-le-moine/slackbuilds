@@ -3,8 +3,11 @@
 cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
-DRYRUN="false"
-INSTALL="true"
+[ -x "$CWD"/what-s_installed.sh ] || exit 1
+
+FORCE_REBUILD=${FORCE_REBUILD:-"false"}
+DRYRUN=${DRYRUN:-"false"}
+INSTALL=${INSTALL:-"true"}
 
 until [ -z "$1" ]
 do
@@ -15,6 +18,10 @@ do
             ;;
         "--no-install")
             INSTALL="false"
+            shift
+            ;;
+        "--force-rebuild")
+            FORCE_REBUILD="true"
             shift
             ;;
 
@@ -35,7 +42,7 @@ for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
         fi
         PKGNAM="$(PRINT_PACKAGE_NAME=yes "$CWD"/make-pkg.bash "$pkg" | tail -n1 2>&1)"
 
-    if [ -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ]; then
+    if [ "$FORCE_REBUILD" = false] && [ -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ]; then
         echo "✅"
         continue
     fi
