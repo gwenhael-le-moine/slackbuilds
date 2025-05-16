@@ -43,7 +43,7 @@ for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
         fi
         PKGNAM="$(PRINT_PACKAGE_NAME=yes "$CWD"/make-pkg.bash "$pkg" | tail -n1 2>&1)"
 
-    if [ "$FORCE_REBUILD" = false] && [ -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ]; then
+    if [ -e /home/installs/PKGs/x86_64/gwh/"$PKGNAM" ] && [ "$FORCE_REBUILD" = "false" ]; then
         echo "✅"
         continue
     fi
@@ -58,9 +58,10 @@ for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
     "$CWD"/make-pkg.bash "$pkg" > "$CWD/building_$PKGNAM.log" 2>&1
 
     if [ -e /tmp/"$PKGNAM" ]; then
-        rm "$CWD/building_$PKGNAM.log"
-        [ "$INSTALL" = "true" ] && upgradepkg --terse /tmp/"$PKGNAM"
         echo "✅"
+        rm "$CWD/building_$PKGNAM.log"
+        echo -n " >> "
+        [ "$INSTALL" = "true" ] && upgradepkg --terse /tmp/"$PKGNAM"
     else
         echo "❌"
     fi
