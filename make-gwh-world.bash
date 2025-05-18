@@ -60,8 +60,10 @@ for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
     if [ -e /tmp/"$PKGNAM" ]; then
         echo "✅"
         rm "$CWD/building_$PKGNAM.log"
-        echo -n " >> "
-        [ "$INSTALL" = "true" ] && upgradepkg --terse /tmp/"$PKGNAM"
+        if [ "$INSTALL" = "true" ]; then
+            echo -n " >> "
+            upgradepkg --terse /tmp/"$PKGNAM"
+        fi
     else
         echo "❌"
     fi
