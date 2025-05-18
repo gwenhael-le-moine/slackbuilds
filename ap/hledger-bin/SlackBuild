@@ -29,21 +29,27 @@ mkdir -p "$REPOSITORY"
 
 echo "$ARCH" | grep -q 64 && SRC_ARCH=x64
 DOCS="CHANGES.md CONTRIBUTING.md CREDITS.md LICENSE README.md"
-[ ! -e "$REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip" ] && \
-    wget -c "https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-${SRC_ARCH}.zip" \
-         -O "$REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip"
-for d in $DOCS; do
-    [ ! -e "$REPOSITORY/${d}.${VERSION}" ] && \
-        wget -c "https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d}" \
-             -O "$REPOSITORY/${d}.${VERSION}"
-done
+[ ! -e "$REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.tar.gz" ] && \
+    wget -c "https://github.com/simonmichael/hledger/releases/download/${VERSION}/hledger-linux-${SRC_ARCH}.tar.gz" \
+         -O "$REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.tar.gz"
+# for d in $DOCS; do
+#     [ ! -e "$REPOSITORY/${d}.${VERSION}" ] && \
+#         wget -c "https://raw.githubusercontent.com/simonmichael/hledger/${VERSION}/${d}" \
+#              -O "$REPOSITORY/${d}.${VERSION}"
+# done
 rm -fr "$PKG"
 
 mkdir -p "$PKG$PREFIX/bin"
 cd "$PKG$PREFIX/bin" || exit 1
-unzip "$REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.zip"
-tar xvf "hledger-linux-${SRC_ARCH}.tar"
-rm "hledger-linux-${SRC_ARCH}.tar"
+tar xf "$REPOSITORY/hledger-linux-${SRC_ARCH}-${VERSION}.tar.gz"
+
+mkdir -p "$PKG$PREFIX/man/man1"
+mv ./*.1 "$PKG$PREFIX/man/man1"
+find  "$PKG$PREFIX/man/man1" -exec gzip -9 {} \;
+
+mkdir -p "$PKG$PREFIX/info"
+mv ./*.info "$PKG$PREFIX/info"
+find  "$PKG$PREFIX/info" -exec gzip -9 {} \;
 
 mkdir -p "$PKG/usr/share/bash-completion/completions"
 mv hledger-completion.bash "$PKG/usr/share/bash-completion/completions/hledger"
@@ -51,11 +57,11 @@ chmod 0644 "$PKG/usr/share/bash-completion/completions/hledger"
 
 chmod +x "$PKG$PREFIX/bin"/*
 
-mkdir -p "$PKG$PREFIX/doc/hledger/"
-for d in $DOCS; do
-    [ -e "$REPOSITORY/${d}.${VERSION}" ] && \
-        cp "$REPOSITORY/${d}.${VERSION}" "$PKG$PREFIX/doc/hledger/${d}"
-done
+# mkdir -p "$PKG$PREFIX/doc/hledger/"
+# for d in $DOCS; do
+#     [ -e "$REPOSITORY/${d}.${VERSION}" ] && \
+#         cp "$REPOSITORY/${d}.${VERSION}" "$PKG$PREFIX/doc/hledger/${d}"
+# done
 
 mkdir -p "$PKG/etc/rc.d/"
 cat <<EOF > "$PKG/etc/rc.d/rc.hledger-web.new"
