@@ -1,0 +1,117 @@
+#!/bin/bash
+
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/jj-vcs/jj"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
+
+ARCH=${ARCH:-$(uname -m)}
+
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
+
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --quiet --all
+
+mkdir -p "$TMP"
+
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout --quiet "$VERSION"
+        ;;
+    *)
+        git checkout --quiet "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+#configuration
+
+#build
+LIBGIT2_NO_VENDOR=1 \
+    LIBSSH2_SYS_USE_PKG_CONFIG=1 \
+    CFLAGS+=' -ffat-lto-objects' \
+    cargo build --frozen --release --target-dir target
+
+#install
+mkdir -p "$PKG$PREFIX/bin"
+#find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX/bin"/ \;
+cp ./target/release/jj "$PKG$PREFIX/bin"/
+chmod 755 "$PKG$PREFIX/bin"/*
+
+# mkdir -p "$PKG$PREFIX/man/man1/"
+# cargo run -- --man > "$PKG$PREFIX/man/man1"/just.1
+
+mkdir -p "$PKG"/usr/share/bash-completion/completions/
+./target/release/jj util completion bash > "$PKG"/usr/share/bash-completion/completions/jj.bash
+
+mkdir -p "$PKG"/usr/share/zsh/site-functions/
+./target/release/jj util completion zsh > "$PKG"/usr/share/zsh/site-functions/_jj
+
+# move doc/ to the appropriate location
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp -R ./demos/ ./docs/ ./AUTHORS ./LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM"
+
+# correction
+cd "$PKG" || exit 1
+chown -R root:root ./*
+
+[ -d "$PKG$PREFIX/man" ] && find "$PKG$PREFIX/man" -type f -not -name \*.gz -exec gzip -9 {} \;
+
+# packaging
+mkdir -p "$PKG/install"
+
+cat <<EOF > "$PKG/install/slack-desc"
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM ( A Git-compatible VCS that is both simple and powerful )
+$PRGNAM:
+$PRGNAM: Jujutsu is a powerful version control system for software projects.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://jj-vcs.github.io/jj/
+$PRGNAM: ${UPSTREAM_REPO}
+EOF
+
+# empaquetage
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
