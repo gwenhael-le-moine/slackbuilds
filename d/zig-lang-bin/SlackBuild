@@ -31,12 +31,12 @@ mkdir -p "$REPOSITORY"
 rm -fr "$PKG"
 
 # unpacking
-[ ! -e "$REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz" ] && wget -c "https://ziglang.org/download/${VERSION}/zig-linux-${ARCH}-${VERSION}.tar.xz" -O "$REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz"
+[ ! -e "$REPOSITORY/zig-${ARCH}-linux-${VERSION}.tar.gz" ] && wget -c "https://ziglang.org/download/${VERSION}/zig-${ARCH}-linux-${VERSION}.tar.xz" -O "$REPOSITORY/zig-${ARCH}-linux-${VERSION}.tar.gz"
 
 mkdir -p "$TMP"
 cd "$TMP" || exit 1
-tar xvf "$REPOSITORY/zig-linux-${ARCH}-${VERSION}.tar.gz"
-cd "zig-linux-${ARCH}-${VERSION}" || exit 1
+tar xvf "$REPOSITORY/zig-${ARCH}-linux-${VERSION}.tar.gz"
+cd "zig-${ARCH}-linux-${VERSION}" || exit 1
 
 # installation
 mkdir -p "$PKG$PREFIX"/bin/
