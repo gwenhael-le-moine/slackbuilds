@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/htrefil/rkvm"}
 VERSION=${VERSION:-"trunk"}
-BUILD=${BUILD:-4}
+BUILD=${BUILD:-5}
 
 TAG="gwh"
 TMP="/tmp/$TAG"
@@ -81,7 +81,7 @@ cat <<EOF > "$PKG/etc/rc.d/rc.rkvm-server.new"
 start() {
         echo "Starting rkvm server..."
 
-        /usr/bin/rkvm-server /etc/rkvm/server.toml &
+        sleep 1 && /usr/bin/rkvm-server /etc/rkvm/server.toml &
 
         [ \$? -ne 0 ] && echo "Could not start rkvm-server."
 }
