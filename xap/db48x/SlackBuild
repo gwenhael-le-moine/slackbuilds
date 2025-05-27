@@ -1,49 +1,59 @@
 #!/bin/bash
-set -x
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/c3d/db48x"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
 PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
-BUILD=1
-UPSTREAM_REPO=https://github.com/c3d/db48x
-VERSION=${VERSION:-latest}
+ARCH=${ARCH:-$(uname -m)}
 
-ARCH=$(uname -m)
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-TAG=gwh
-OUTPUT=/tmp
-TMP=/tmp/$TAG
-PKG=$TMP/pkg-$PRGNAM
-
-REPOSITORY=/var/cache/SlackBuilds.gwh/$PRGNAM
-
-PREFIX=/usr
-
-mkdir -p $TMP
-
-# Cleaning
-rm -fr "${TMP:?}"/"$PRGNAM" "$PKG"
-
-# Fetching sources
-[ ! -e "$REPOSITORY" ] && git clone --quiet --recursive ${UPSTREAM_REPO}.git "$REPOSITORY"
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
 cd "$REPOSITORY" || exit 1
 git pull --quiet --all
-
-cp -R "$REPOSITORY" $TMP/"$PRGNAM"
-
-# Preparation
-cd $TMP/"$PRGNAM" || exit 1
-
-[ "$VERSION" == "latest" ] && VERSION=$(git describe --tags --abbrev=0)
-[ "$VERSION" == "" ] && VERSION=trunk
-if [ "$VERSION" == "trunk" ]; then
-    VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
-else
-    git checkout --quiet "$VERSION"
-fi
-
 git submodule update --quiet --init
+
+mkdir -p "$TMP"
+
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout --quiet "$VERSION"
+        ;;
+    *)
+        git checkout --quiet "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 chown -R root:root .
 find . \
@@ -69,13 +79,6 @@ cd "$PKG" || exit 1
 
 [ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -name "*.?" -exec gzip -9 {} \;
 
-chown -R root:root .
-find . \
-     \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
-     -exec chmod 755 {} \; -o \
-     \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
-     -exec chmod 644 {} \;
-
 # Packaging
 mkdir install
 cat <<EOF > install/slack-desc
@@ -93,4 +96,4 @@ $PRGNAM: ${UPSTREAM_REPO}
 EOF
 
 rm -f "$PKG"/{,usr/}"lib$(uname -m | grep -o 64)"/*.la
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr -d '-')-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
