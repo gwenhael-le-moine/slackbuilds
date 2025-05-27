@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://codeberg.org/readeck/readeck/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -61,7 +61,8 @@ data_directory = "${WORK_DIR}"
 [server]
 host = "0.0.0.0"
 port = 8000
-allowed_hosts
+# allowed_hosts = []
+# trusted_proxies = [ "127.0.0.1" ]
 
 [database]
 source = "sqlite3:${WORK_DIR}/db.sqlite3"
@@ -137,6 +138,11 @@ EOF
 chmod +x "$PKG/etc/rc.d/rc.$PRGNAM"
 
 mkdir -p "$PKG"/install
+cat <<EOF > "$PKG"/install/doinst.sh
+#!/bin/bash
+
+[ -e /etc/readeck/config.toml ] && su readeck -c "/usr/bin/readeck migrate -config /etc/readeck/config.toml"
+EOF
 cat <<EOF > "$PKG"/install/slack-desc
            # HOW TO EDIT THIS FILE:
            # The "handy ruler" below makes it easier to edit a package description.  Line
