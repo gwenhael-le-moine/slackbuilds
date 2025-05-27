@@ -60,7 +60,7 @@ fi
 LIBGIT2_NO_VENDOR=1 \
     LIBSSH2_SYS_USE_PKG_CONFIG=1 \
     CFLAGS+=' -ffat-lto-objects' \
-    cargo build --frozen --release --target-dir target
+    cargo build --release --target-dir target
 
 #install
 mkdir -p "$PKG$PREFIX/bin"
