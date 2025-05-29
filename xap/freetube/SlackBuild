@@ -57,7 +57,7 @@ fi
 
 yarn install
 
-sed -i "s|deb', 'zip', '7z', 'apk', 'rpm', 'AppImage', 'pacman|zip|" _scripts/build.js
+sed -i "s|deb', 'zip', '7z', 'apk', 'rpm', 'AppImage', 'pacman|zip|" _scripts/build.mjs
 
 npm run build
 

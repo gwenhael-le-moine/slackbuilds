@@ -1,39 +1,59 @@
 #!/bin/bash
 
-# variables
-UPSTREAM_REPO=https://github.com/jwilm/alacritty
-VERSION=${VERSION:-latest}
-BUILD=${BUILD:-1}
-
-TAG=gwh
-TMP=/tmp/$TAG
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
+# variables
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/alacritty/alacritty"}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
 PRGNAM=$(basename "$CWD")
-PKG=$TMP/pkg-$PRGNAM
-OUTPUT=${OUTPUT:-/tmp}
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
 
 ARCH=${ARCH:-$(uname -m)}
 
-REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
-PREFIX=${PREFIX:-/usr}
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
 
-# nettoyage préalable
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
+git pull --quiet --all
+git submodule update --quiet --init
+
+mkdir -p "$TMP"
+
 rm -fr "$PKG" "${TMP:?}/$PRGNAM"
 
 mkdir -p "$PKG"
 
-# mise en place
-cd "$TMP" || exit 1
-[ ! -e "$REPOSITORY" ] && git clone --quiet ${UPSTREAM_REPO}.git "$REPOSITORY"
-cd "$REPOSITORY" || exit 1
-git pull --quiet --all
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout --quiet "$VERSION"
+        ;;
+    *)
+        git checkout --quiet "$VERSION"
+        ;;
+esac
 
-cp -R "$REPOSITORY" $TMP/
-cd $TMP/"$PRGNAM" || exit 1
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout --quiet $VERSION
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 cargo build --release
 
@@ -57,7 +77,7 @@ cp extra/linux/Alacritty.desktop "$PKG$PREFIX"/share/applications/
 cp extra/logo/alacritty-term.svg "$PKG$PREFIX"/share/pixmaps/Alacritty.svg
 
 mkdir -p "$PKG$PREFIX"/share/appdata
-cp extra/linux/io.alacritty.Alacritty.appdata.xml "$PKG$PREFIX"/share/appdata/
+cp extra/linux/org.alacritty.Alacritty.appdata.xml "$PKG$PREFIX"/share/appdata/
 
 mkdir -p "$PKG$PREFIX"/share/bash-completion/completions
 cp extra/completions/alacritty.bash "$PKG$PREFIX"/share/bash-completion/completions/alacritty
@@ -101,5 +121,4 @@ $PRGNAM:
 EOF
 
 # empaquetage
-rm -f "$PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la"
-/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PRGNAM-$(echo "$VERSION" | tr - _)-$ARCH-$BUILD$TAG.txz"
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
