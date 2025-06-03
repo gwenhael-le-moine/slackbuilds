@@ -4,8 +4,8 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 # variables
-UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/wagoodman/dive"}
-VERSION=${VERSION:-"latest"}
+UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/brandonyoungdev/tldx"}
+VERSION=${VERSION:-"trunk"}
 BUILD=${BUILD:-1}
 
 TAG="gwh"
@@ -57,18 +57,17 @@ fi
 #configuration
 
 #build
-go build \
+go build  \
    -trimpath \
    -buildmode=pie \
    -mod=readonly \
    -modcacherw \
-   -ldflags "-X main.version=$VERSION -linkmode external -extldflags \"${LDFLAGS}\"" \
-   -o ./bin/dive \
+   -o ./bin/tldx \
    .
 
 #install
 mkdir -p $PKG$PREFIX/bin
-cp ./bin/dive $PKG$PREFIX/bin/
+cp ./bin/tldx $PKG$PREFIX/bin/
 chmod 755 $PKG$PREFIX/bin/*
 
 # move doc/ to the appropriate location
@@ -93,7 +92,7 @@ cat <<EOF > "$PKG/install/slack-desc"
 # customary to leave one space after the ':'.
 
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (A tool for exploring each layer in a docker image)
+$PRGNAM: $PRGNAM ( Domain Availability Research Tool )
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

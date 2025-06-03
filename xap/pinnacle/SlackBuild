@@ -2,7 +2,7 @@
 
 # variables
 UPSTREAM_REPO=https://github.com/pinnacle-comp/pinnacle
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-trunk}
 BUILD=${BUILD:-1}
 
 TAG=gwh
@@ -35,20 +35,37 @@ cd "$TMP"/"$PRGNAM" || exit 1
 [ "$VERSION" == "" ] && VERSION=trunk
 [ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" # || git checkout --quiet $VERSION
 
-export RUSTUP_TOOLCHAIN=stable
-cargo fetch --locked
+RUSTUP_TOOLCHAIN=stable \
+    cargo fetch
 
-export RUSTUP_TOOLCHAIN=stable
-export CARGO_TARGET_DIR=target
-cargo build --frozen --release
+    # VERGEN_GIT_BRANCH=main \
+    # VERGEN_GIT_COMMIT_MESSAGE="release: Fix rockspec" \
+    # VERGEN_GIT_SHA="a8974da" \
+    # VERGEN_GIT_DIRTY="false" \
+RUSTUP_TOOLCHAIN=stable \
+    CARGO_TARGET_DIR=target \
+    cargo build --release
 
-mkdir -p "$PKG$PREFIX"/bin
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX"/bin/ \;
-chmod 755 "$PKG$PREFIX"/bin/*
+./target/release/pinnacle gen-completions --shell bash > "$PKG"/usr/share/bash-completion/completions/pinnacle
+./target/release/pinnacle gen-completions --shell fish > "$PKG"/usr/share/fish/vendor_completions.d/pinnacle.fish
+./target/release/pinnacle gen-completions --shell zsh > "$PKG"/usr/share/zsh/site-functions/_pinnacle
+./target/release/pinnacle gen-completions --shell elvish > "$PKG"/usr/share/elvish/lib/pinnacle.elv
 
-install -vDm 644 resources/"$PRGNAM"{.service,-shutdown.target} -t "$PKG/usr/lib/systemd/user/"
-install -vDm 644 resources/"$PRGNAM".desktop -t "$PKG/usr/share/wayland-sessions/"
-install -vDm 644 resources/"$PRGNAM"-portals.conf -t "$PKG/usr/share/xdg-desktop-portal/"
+install -Dm755 target/release/pinnacle -t "$PKG/usr/bin/"
+install -Dm755 resources/pinnacle-session -t "$PKG/usr/bin/"
+install -Dm644 resources/pinnacle.desktop -t "$PKG/usr/share/wayland-sessions/"
+install -Dm644 resources/pinnacle-portals.conf -t "$PKG/usr/share/xdg-desktop-portal/"
+#install -Dm644 resources/pinnacle{.service,-shutdown.target} -t "$PKG/usr/lib/systemd/user/"
+
+cd "api/protobuf" || exit 1
+for proto in $(find . -type f -name "*.proto"); do
+    install -Dm644 "$proto" "$PKG/usr/share/pinnacle/protobuf/${proto#\./}"
+done
+
+cd "../../snowcap/api/protobuf" || exit 1
+for proto in $(find . -type f -name "*.proto"); do
+    install -Dm644 "$proto" "$PKG/usr/share/pinnacle/snowcap/protobuf/${proto#\./}"
+done
 
 # lua
 install -vd "$PKG/usr/share/$PRGNAM"
@@ -64,6 +81,7 @@ cp -R assets/ wiki/ LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM/"
   luarocks make --pack-binary-rock
   # find . -type f -depath 1 -name \*.rockspec -exec luarocks pack {} \;
   cp ./*.rock "$PKG$PREFIX/doc/$PRGNAM/"
+  luarocks --lua-version 5.4 --tree "$PKG/usr/" install --deps-mode none --no-manifest ./*.rock
 )
 
 # correction
@@ -75,10 +93,10 @@ chown -R root:root ./*
 # embaumement
 mkdir -p "$PKG"/install
 
-cat <<EOF > "$PKG"/install/doinst.sh
-#!/bin/bash
-find "$PREFIX/doc/$PRGNAM/" -type f -name \\*.rock -exec luarocks install --force {} \;
-EOF
+# cat <<EOF > "$PKG"/install/doinst.sh
+# #!/bin/bash
+# find "$PREFIX/doc/$PRGNAM/" -type f -name \\*.rock -exec luarocks install --force {} \;
+# EOF
 
 cat <<EOF > "$PKG"/install/slack-desc
 # HOW TO EDIT THIS FILE:
