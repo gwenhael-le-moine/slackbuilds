@@ -4,7 +4,7 @@
 UPSTREAM_REPO=https://github.com/FreeTubeApp/FreeTube
 VERSION=${VERSION:-trunk}
 
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-4}
 
 TAG=gwh
 OUTPUT=/tmp
@@ -67,7 +67,7 @@ unzip "$TMP/$PKGNAM/build/freetube*.zip"
 
 mkdir -p "$PKG$PREFIX/bin"
 cd "$PKG$PREFIX/bin" || exit 1
-ln -s "../../opt/$PKGNAM/freetube" freetube
+ln -s "../../opt/$PKGNAM/FreeTube" freetube
 
 cd "$TMP/$PKGNAM/" || exit 1
 
@@ -78,7 +78,7 @@ mkdir -p "$PKG$PREFIX/share/applications/"
 cat <<EOF > "$PKG$PREFIX/share/applications/freetube.desktop"
 [Desktop Entry]
 Name=FreeTube
-Exec=/opt/$PKGNAM/freetube %U
+Exec=/opt/$PKGNAM/FreeTube %U
 Terminal=false
 Type=Application
 Icon=freetube
