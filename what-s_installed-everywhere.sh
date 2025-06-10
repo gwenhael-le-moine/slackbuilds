@@ -26,17 +26,12 @@ if [ "$SHORT_HOSTNAME" = "gwenhael" ]; then
 else
     PKGs_gwenhael=$(ssh gwenhael "find /var/lib/pkgtools/packages/ -name \*gwh | sed 's|/var/lib/pkgtools/packages/\(.*\)-.*-.*-.*$|\1|' | sort")
 fi
-if [ "$SHORT_HOSTNAME" = "titrash" ]; then
-    PKGs_titrash=$PKGs_local
-else
-    PKGs_titrash=$(ssh titrash "find /var/lib/pkgtools/packages/ -name \*gwh | sed 's|/var/lib/pkgtools/packages/\(.*\)-.*-.*-.*$|\1|' | sort")
-fi
 
 PKG_OK="|    x     "
 PKG_KO="|          "
 counter=0
-echo "| tibou    | titplume | tibonom  | titrash  | gwenhael | NB |"
-echo "|----------+----------+----------+----------+----------+----+-----"
+echo "| tibou    | titplume | tibonom  | gwenhael | NB |"
+echo "|----------+----------+----------+----------+----+-----"
 for cat in a ap d e fonts l n xap y; do
     for p in $(find "$cat" -type d -maxdepth 1 -not -name "$cat" | cut -d/ -f2); do
         if echo -n $PKGs_tibou | grep -q -e " $p " -e " $p+" -e " $p$"; then
@@ -52,12 +47,6 @@ for cat in a ap d e fonts l n xap y; do
             echo -n "$PKG_KO";
         fi
         if echo -n $PKGs_tibonom | grep -q -e " $p " -e " $p+" -e " $p$"; then
-            echo -n "$PKG_OK";
-            counter=$((counter + 1));
-        else
-            echo -n "$PKG_KO";
-        fi
-        if echo -n $PKGs_titrash | grep -q -e " $p " -e " $p+" -e " $p$"; then
             echo -n "$PKG_OK";
             counter=$((counter + 1));
         else
