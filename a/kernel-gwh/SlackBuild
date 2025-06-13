@@ -20,7 +20,7 @@ CONFIG=${CONFIG:-""}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-VERSION=${VERSION:-$(curl https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
+VERSION=${VERSION:-$(curl -s https://www.kernel.org/feeds/kdist.xml | grep -o "[0-9.rc-]*: $BRANCH" | head -n1 | cut -d: -f1)}
 
 PACKAGE_NAME="$PRGNAM-${VERSION//-/_}-$ARCH-$BUILD$TAG.txz"
 # If the variable PRINT_PACKAGE_NAME is set, then this script will report what
