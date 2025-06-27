@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# variables
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
 
 TAG=gwh
 TMP=/tmp/$TAG
 OUTPUT=/tmp
-CWD=$(pwd)
+
 PRGNAM=$(basename "$CWD")
 PKG=$TMP/pkg-$PRGNAM
 

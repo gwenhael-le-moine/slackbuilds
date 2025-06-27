@@ -3,10 +3,12 @@
 set -e
 #set -x
 
+cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
+
 PRGNAM=$(basename "$CWD")
-BUILD=${BUILD:-20}
-BRANCH=${BRANCH:-stable}        # stable ; mainline
+BUILD=${BUILD:-21}
+BRANCH=${BRANCH:-mainline}        # stable ; mainline
 ARCH=$(uname -m)
 
 TAG=gwh
@@ -56,7 +58,7 @@ if [ ! -f .config ]; then
     zcat /proc/config.gz > .config
 fi
 
-make oldconfig "$@"
+make oldconfig nconfig "$@"
 
 make -j"$NUMJOBS"
 make modules -j"$NUMJOBS"

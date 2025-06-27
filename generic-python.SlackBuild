@@ -34,6 +34,16 @@ METADATA_FILE=$(find $PKG -name METADATA)
 
 [ ! -e $METADATA_FILE ] && exit 1
 VERSION=$(grep "^Version:" $METADATA_FILE | sed 's|^Version: ||')
+
+PACKAGE_NAME="python3-$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
 SUMMARY=$(grep "^Summary:" $METADATA_FILE | sed 's|^Summary: ||')
 HOMEPAGE=$(grep "^Home-page:" $METADATA_FILE | sed 's|^Home-page: ||')
 
@@ -60,4 +70,4 @@ EOF
 # empaquetage
 cd $PKG
 rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/python3-$PRGNAM-$(echo $VERSION | sed 's/-//g')-$ARCH-$BUILD$TAG.txz
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
