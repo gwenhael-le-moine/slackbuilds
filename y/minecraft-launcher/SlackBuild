@@ -2,8 +2,8 @@
 
 CWD=$(pwd)
 
-PRGNAM=$(basename $CWD)
-VERSION=${VERSION:-$(curl "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=minecraft-launcher" | grep "pkgver=" | grep -o "[0-9.]*")}
+PRGNAM=$(basename "$CWD")
+VERSION=${VERSION:-$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=minecraft-launcher" | grep "pkgver=" | grep -o "[0-9.]*")}
 
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
@@ -23,26 +23,24 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     exit 0
 fi
 
-mkdir -p $REPOSITORY
+mkdir -p "$REPOSITORY"
 
-[ ! -e $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz ] && wget -c -O $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz https://launcher.mojang.com/download/Minecraft.tar.gz
-[ ! -e $REPOSITORY/minecraft-launcher.svg ] && wget -c -O $REPOSITORY/minecraft-launcher.svg https://launcher.mojang.com/download/minecraft-launcher.svg
-rm -fr $PKG
-mkdir -p $PKG/opt/${PRGNAM}
+[ ! -e "$REPOSITORY/minecraft-launcher_${VERSION}.tar.gz" ] && wget -c -O "$REPOSITORY/minecraft-launcher_${VERSION}.tar.gz https://launcher.mojang.com/download/Minecraft.tar.gz"
+[ ! -e "$REPOSITORY/minecraft-launcher.svg" ] && wget -c -O "$REPOSITORY/minecraft-launcher.svg" https://launcher.mojang.com/download/minecraft-launcher.svg
+rm -fr "$PKG"
+mkdir -p "$PKG/opt/${PRGNAM}"
 
-tar xvf $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz -C $PKG/opt/
+tar xvf "$REPOSITORY/minecraft-launcher_${VERSION}.tar.gz" -C "$PKG/opt/"
 
-rm $REPOSITORY/minecraft-launcher_${VERSION}.tar.gz
+mkdir -p "$PKG/usr/bin"
+cd "$PKG/usr/bin" || exit 1
+ln -s ../../opt/minecraft-launcher/minecraft-launcher minecraft-launcher
 
-mkdir -p $PKG/usr/bin
-cd $PKG/usr/bin
-ln -s ../../opt/minecraft-launcher/minecraft-launcher
+mkdir -p "$PKG/usr/share/icons/hicolor/symbolic/apps/"
+cp "$REPOSITORY/minecraft-launcher.svg" "$PKG/usr/share/icons/hicolor/symbolic/apps/"
 
-mkdir -p $PKG/usr/share/icons/hicolor/symbolic/apps/
-cp $REPOSITORY/minecraft-launcher.svg $PKG/usr/share/icons/hicolor/symbolic/apps/
-
-mkdir -p $PKG/usr/share/applications/
-cat <<EOF > $PKG/usr/share/applications/minecraft-launcher.desktop
+mkdir -p "$PKG/usr/share/applications/"
+cat <<EOF > "$PKG/usr/share/applications/minecraft-launcher.desktop"
 [Desktop Entry]
 Type=Application
 Version=${VERSION}
@@ -54,9 +52,10 @@ Icon=minecraft-launcher
 Terminal=false
 Categories=Game;Application;
 EOF
-mkdir -p $PKG/install
 
-cat <<EOF > $PKG/install/slack-desc
+mkdir -p "$PKG/install"
+
+cat <<EOF > "$PKG/install/slack-desc"
 # HOW TO EDIT THIS FILE:
 # The "handy ruler" below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -78,6 +77,5 @@ ${PRGNAM}:
 ${PRGNAM}: ${PRGNAM} home: http://minecraft.net/
 EOF
 
-cd $PKG
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend ${OUTPUT}/$PACKAGE_NAME
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "${OUTPUT}/$PACKAGE_NAME"
