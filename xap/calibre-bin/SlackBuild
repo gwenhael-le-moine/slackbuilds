@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-VERSION=${VERSION:-$(wget -O - -o /dev/null http://status.calibre-ebook.com/latest)}
+VERSION=${VERSION:-$(curl -s http://status.calibre-ebook.com/latest)}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
