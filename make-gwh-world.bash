@@ -9,6 +9,7 @@ CWD=$(pwd)
 FORCE_REBUILD=${FORCE_REBUILD:-"false"}
 DRYRUN=${DRYRUN:-"false"}
 INSTALL=${INSTALL:-"true"}
+CATS=${CATS:-""}
 
 until [ -z "$1" ]
 do
@@ -26,15 +27,20 @@ do
             shift
             ;;
 
-        "-h"|"--help"|*)
+        "-h"|"--help")
             echo "$0 \\"
             echo "  --dry-run : only check but don't build packages"
             echo "  --no-install : don't install the packages after building"
             exit
+            ;;
+        *)
+            CATS="$CATS $1"
+            shift
+            ;;
     esac
 done
 
-for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
+for pkg in $("$CWD"/what-s_installed.sh \"$CATS\" | grep "^| x | " | sed 's/| x | //') ;
     do
         echo -n "$pkg > "
         if [ ! -e "$pkg"/SlackBuild ] || ! grep -q "PRINT_PACKAGE_NAME" "$pkg"/SlackBuild; then
@@ -52,6 +58,7 @@ for pkg in $("$CWD"/what-s_installed.sh | grep "^| x | " | sed 's/| x | //') ;
 
     if [ "$DRYRUN" = "true" ]; then
         echo "-"
+        ls -l / | grep tmp | grep -q "^drwxrwxrwt" || echo "BROKE /tmp"
         continue
     fi
 
