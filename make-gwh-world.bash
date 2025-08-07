@@ -9,7 +9,7 @@ CWD=$(pwd)
 FORCE_REBUILD=${FORCE_REBUILD:-"false"}
 DRYRUN=${DRYRUN:-"false"}
 INSTALL=${INSTALL:-"true"}
-CATS=${CATS:-""}
+CATEGORY=${CATEGORY:-""}
 
 until [ -z "$1" ]
 do
@@ -34,13 +34,13 @@ do
             exit
             ;;
         *)
-            CATS="$CATS $1"
+            CATEGORY="$CATEGORY $1"
             shift
             ;;
     esac
 done
 
-for pkg in $("$CWD"/what-s_installed.sh \"$CATS\" | grep "^| x | " | sed 's/| x | //') ;
+for pkg in $("$CWD"/what-s_installed.sh $CATEGORY | grep "^| x | " | sed 's/| x | //') ;
     do
         echo -n "$pkg > "
         if [ ! -e "$pkg"/SlackBuild ] || ! grep -q "PRINT_PACKAGE_NAME" "$pkg"/SlackBuild; then
