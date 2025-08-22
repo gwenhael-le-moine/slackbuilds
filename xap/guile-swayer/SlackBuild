@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/ebeem/guile-swayer"}
 VERSION=${VERSION:-"trunk"}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 TAG="gwh"
 TMP="/tmp/$TAG"
@@ -64,6 +64,7 @@ make install DESTDIR="$PKG"
 
 mkdir -p "$PKG/usr/doc/$PRGNAM"
 cp LICENSE README* "$PKG/usr/doc/$PRGNAM/"
+cp -r examples/ "$PKG/usr/doc/$PRGNAM/"
 
 # correction
 cd "$PKG" || exit 1

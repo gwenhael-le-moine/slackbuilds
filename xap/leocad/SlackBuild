@@ -73,11 +73,9 @@ for i in $( find "$PKG"/usr/man -type l ) ; do ln -s "$( readlink "$i" ).gz" "$i
 # Data from zip-file + set permissions
 mkdir -p "$PKG"/usr/share/leocad
 unzip "$REPOSITORY/$LIBRARY_FILE" -d "$PKG"/usr/share/leocad/
-chown -R root:root "$PKG"
 
 # correction
-cd "$PKG" || exit 1
-chown -R root:root ./*
+chown -R root:root "$PKG"/*
 
 # embaumement
 mkdir -p "$PKG"/install
