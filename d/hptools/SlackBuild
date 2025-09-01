@@ -1,0 +1,90 @@
+#!/bin/bash
+
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
+VERSION=${VERSION:-3.0.8}
+
+PRGNAM=$(basename "$CWD")
+ARCH=$(uname -m)
+BUILD=${BUILD:-1}
+
+TAG="gwh"
+TMP="/tmp/$TAG"
+
+PRGNAM=$(basename "$CWD")
+PKG="$TMP/pkg-$PRGNAM"
+OUTPUT=${OUTPUT:-"/tmp"}
+
+ARCH=${ARCH:-$(uname -m)}
+
+REPOSITORY=${REPOSITORY:-"/var/cache/SlackBuilds.gwh/$PRGNAM/"}
+PREFIX=${PREFIX:-"/usr"}
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
+mkdir -p "$REPOSITORY"
+
+mkdir -p "$TMP"
+
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+# download
+[ ! -e "$REPOSITORY/hptools-src-${VERSION}.tar.gz" ] && wget -c "https://www.hpcalc.org/hp48/pc/programming/hptools-src-${VERSION}.tar.gz" -O "$REPOSITORY/hptools-src-${VERSION}.tar.gz"
+
+# installation
+cd "$TMP" || exit 1
+tar xvf "$REPOSITORY/hptools-src-${VERSION}.tar.gz"
+cd Hptools || exit 1
+
+REV=$(./support/config.guess)
+mkdir -p "$REV"
+cd "$REV" || exit 1
+../support/configure
+
+sed -i 's/-O2/-ansi -std=c99 -O2/' Makefile
+sed -i 's/^static//' ../common/getopt.c
+sed -i 's/^static//' ../sload/symb.c
+
+make
+
+mkdir -p "$PKG$PREFIX/bin"
+for b in makerom rplcomp sasm sload; do
+    cp "$b" "$PKG$PREFIX/bin/hptools-$b"
+    chmod +x "$PKG$PREFIX/bin/hptools-$b"
+done
+
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+for d in ../doc/*; do
+    dos2unix -n "$d" "$PKG$PREFIX/doc/$PRGNAM/$(basename "$d")"
+done
+rm "$PKG$PREFIX/doc/$PRGNAM/rmcrlf"
+chmod 644 "$PKG$PREFIX/doc/$PRGNAM"/*
+
+# packaging
+cd "$PKG" || exit 1
+mkdir install
+cat <<EOF > install/slack-desc
+$PRGNAM: $PRGNAM (System RPL and assembly language development kit)
+$PRGNAM:
+$PRGNAM: free System RPL and assembly language (HP syntax and MASD [Meta Kernel] syntax) development kit.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: https://www.hpcalc.org/details/4263
+$PRGNAM:
+EOF
+
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
