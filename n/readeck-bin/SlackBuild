@@ -4,7 +4,7 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
-VERSION=${VERSION:-$(curl -s https://codeberg.org/readeck/readeck/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
+VERSION=${VERSION:-$(curl -s https://codeberg.org/readeck/readeck/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | grep -o "[0-9.]*")}
 ARCH=${ARCH:-$(uname -m)}
 BUILD=${BUILD:-2}
 TAG=${TAG:-gwh}
