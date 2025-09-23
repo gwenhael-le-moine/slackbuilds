@@ -80,7 +80,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 BRANCH=${BRANCH:-master}
-VERSION=${VERSION:-trunk}
+VERSION=${VERSION:-latest}
 
 PREFIX=${PREFIX:-/usr}
 
@@ -109,7 +109,7 @@ case $VERSION in
         VERSION="${BRANCH//-/_}_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
         ;;
     latest)
-        VERSION=$(git tag --sort=-version:refname | head -n1)
+        VERSION=$(git tag --sort=-taggerdate | head -n1)
         git checkout --quiet "$VERSION"
         VERSION=${VERSION#emacs-}
         ;;
@@ -163,6 +163,9 @@ find . \
 # The defaults are a little too worried about adding a few more K of pure
 # memory given the amount available on modern systems:
 [ -e src/puresize.h ] && sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
+
+# Replace deprecated tree-sitter function name:
+sed -i "s/ts_language_version/ts_language_abi_version/g" src/treesit.c
 
 [ -e Makefile ] && make distclean
 ./autogen.sh
