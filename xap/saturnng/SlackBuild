@@ -65,6 +65,8 @@ find . \
 # Building
 make all PREFIX=/usr
 
+make -C dist/ROMs/
+
 # Installation
 make install DESTDIR="$PKG" PREFIX=/usr
 
