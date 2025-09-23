@@ -21,6 +21,7 @@
 
 # 2018: Modification by Gwenhael Le Moine
 
+cd $(dirname "$0") || exit 1
 CWD=$(pwd)
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/package-$PRGNAM
