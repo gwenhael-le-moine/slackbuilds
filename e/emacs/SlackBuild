@@ -78,7 +78,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 BRANCH=${BRANCH:-master}
-VERSION=${VERSION:-trunk}
+VERSION=${VERSION:-latest}
 
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PKGNAM
 REPO_URL="https://git.sr.ht/~emacs/emacs" # "git://git.savannah.gnu.org/emacs.git"
