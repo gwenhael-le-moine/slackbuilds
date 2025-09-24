@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2018, 2019, 2020, 2021, 2023  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2018, 2019, 2020, 2021, 2023, 2024, 2025  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -25,7 +25,7 @@
 # Modified by Patrick Volkerding <volkerdi@slackware.com>
 # Modified by Gwenhael Le Moine <gwenhael@le-moine.org>
 
-cd "$(dirname "$0")" || exit 1
+cd $(dirname $0) ; CWD=$(pwd)
 
 PKGNAM=emacs
 BUILD=${BUILD:-11}
@@ -41,9 +41,7 @@ PKG=$TMP/package-$PKGNAM
 # installed package is larger. Pass NATIVECOMP=NO to do a normal build.
 NATIVECOMP=${NATIVECOMP:-YES}
 
-# When building with native compilation, link to the X11 libraries. This option
-# is only for native compilation builds -- regular builds will include both
-# an X11 and non-X11 version of Emacs.
+# Do we want X support? (causes Emacs to be linked with many X11 libraries):
 WITHX=${WITHX:-YES}
 
 # Pass this variable set to "--with-pgtk" to use GTK+3 without linking to X11
@@ -65,13 +63,13 @@ fi
 if [ "$NATIVECOMP" = "YES" ]; then
   PDUMPER=${PDUMPER:-"--with-dumping=pdumper --with-native-compilation"}
 else
-  PDUMPER=${PDUMPER:-"--with-pdumper=no --with-dumping=unexec --without-native-compilation"}
+  PDUMPER=${PDUMPER:-"--with-pdumper=auto --with-native-compilation=no"}
 fi
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
   case "$(uname -m)" in
-    i?86) ARCH=i586 ;;
+    i?86) ARCH=i686 ;;
     arm*) readelf /usr/bin/file -A | grep -E -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7hl ;;
     # Unless $ARCH is already set, use uname -m for all other archs:
     *) ARCH=$(uname -m) ;;
@@ -81,8 +79,6 @@ fi
 
 BRANCH=${BRANCH:-master}
 VERSION=${VERSION:-latest}
-
-PREFIX=${PREFIX:-/usr}
 
 REPOSITORY=/var/cache/SlackBuilds.gwh/$PKGNAM
 
@@ -139,11 +135,11 @@ fi
 if [ "$ARCH" = "i586" ]; then
   SLKCFLAGS="-O2 -march=i586 -mtune=i686"
 elif [ "$ARCH" = "i686" ]; then
-  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+  SLKCFLAGS="-O2 -march=pentium4 -mtune=generic"
 elif [ "$ARCH" = "s390" ]; then
   SLKCFLAGS="-O2"
 elif [ "$ARCH" = "x86_64" ]; then
-  SLKCFLAGS="-O2 -fPIC"
+  SLKCFLAGS="-O2 -march=x86-64 -mtune=generic -fPIC"
 elif [ "$ARCH" = "armv7hl" ]; then
   SLKCFLAGS="-O2 -march=armv7-a -mfpu=vfpv3-d16"
 else
@@ -162,7 +158,7 @@ find . \
 
 # The defaults are a little too worried about adding a few more K of pure
 # memory given the amount available on modern systems:
-[ -e src/puresize.h ] && sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
+sed -i "s/#define SYSTEM_PURESIZE_EXTRA 0/#define SYSTEM_PURESIZE_EXTRA 100000/g" src/puresize.h
 
 # Replace deprecated tree-sitter function name:
 sed -i "s/ts_language_version/ts_language_abi_version/g" src/treesit.c
@@ -177,13 +173,13 @@ sed -i "s/ts_language_version/ts_language_abi_version/g" src/treesit.c
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
 ./configure \
-  --prefix=${PREFIX} \
+  --prefix=/usr \
   --sysconfdir=/etc \
   --localstatedir=/var \
   --program-prefix="" \
   --program-suffix="" \
-  --mandir=${PREFIX}/man \
-  --infodir=${PREFIX}/info \
+  --mandir=/usr/man \
+  --infodir=/usr/info \
   --without-gconf \
   --without-gsettings \
   --with-modules \
@@ -200,40 +196,43 @@ fi
 make install DESTDIR=$PKG || exit 1
 
 # Seems like this nonsense is finally obsolete:
-if [ -d "$PKG/var/games/emacs" ]; then
+if [ -d $PKG/var/games/emacs ]; then
   # I don't care for broken permissions.
-  chmod 755 "$PKG/var/games/emacs"
-  chown -R root:games "$PKG/var/games/emacs"
-  chmod 664 "$PKG/var/games/emacs/*"
+  chmod 755 $PKG/var/games/emacs
+  chown -R root:games $PKG/var/games/emacs
+  chmod 664 $PKG/var/games/emacs/*
 fi
 
 # This avoids a collision with Exuberant Ctags...
-[ -e "$PKG${PREFIX}/bin/ctags" ] && mv "$PKG${PREFIX}/bin/ctags" "$PKG${PREFIX}/bin/ctags-emacs"
-if [ -r "$PKG${PREFIX}/man/man1/ctags.1" ]; then
-  mv "$PKG${PREFIX}/man/man1/ctags.1" "$PKG${PREFIX}/man/man1/ctags-emacs.1"
-elif [ -r "$PKG${PREFIX}/man/man1/ctags.1.gz" ]; then
-  mv "$PKG${PREFIX}/man/man1/ctags.1.gz" "$PKG${PREFIX}/man/man1/ctags-emacs.1.gz"
+mv $PKG/usr/bin/ctags $PKG/usr/bin/ctags-emacs
+if [ -r $PKG/usr/man/man1/ctags.1 ]; then
+  mv $PKG/usr/man/man1/ctags.1 $PKG/usr/man/man1/ctags-emacs.1
+elif [ -r $PKG/usr/man/man1/ctags.1.gz ]; then
+  mv $PKG/usr/man/man1/ctags.1.gz $PKG/usr/man/man1/ctags-emacs.1.gz
 fi
 
-( cd "$PKG${PREFIX}/man" || exit 1
+find $PKG | xargs file | grep -e "executable" -e "shared object" \
+  | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+( cd $PKG/usr/man
   find . -type f -exec gzip -9 {} \+
   for i in $(find . -type l) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 )
 
-( cd "$PKG${PREFIX}/info" || exit 1
+( cd $PKG/usr/info
   rm -f dir
-  gzip -9 ./*
+  gzip -9 *
 )
 
-mkdir -p "$PKG${PREFIX}/doc/$PKGNAM"
+mkdir -p "$PKG/usr/doc/$PKGNAM"
 cp -a \
   BUGS* CONTRIBUTE* COPYING* INSTALL* README* ChangeLog* \
-  "$PKG${PREFIX}/doc/$PKGNAM"
+  "$PKG/usr/doc/$PKGNAM"
 
 # Link the latest NEWS file:
-( cd "$PKG${PREFIX}/doc/$PKGNAM" || exit 1
-  if [ -r "$PKG${PREFIX}/share/emacs/$VERSION/etc/NEWS" ]; then
-    ln -sf "${PREFIX}/share/emacs/$VERSION/etc/NEWS" .
+( cd "$PKG/usr/doc/$PKGNAM" || exit 1
+  if [ -r "$PKG/usr/share/emacs/$VERSION/etc/NEWS" ]; then
+    ln -sf "/usr/share/emacs/$VERSION/etc/NEWS" .
   fi
 )
 
