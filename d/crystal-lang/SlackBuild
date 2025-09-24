@@ -9,8 +9,8 @@ UPSTREAM_REPO=https://github.com/crystal-lang/crystal
 VERSION=${VERSION:-latest}
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 
-BUILD=1
-TAG=gwh
+BUILD=${BUILD:-2}
+TAG=${TAG:-gwh}
 OUTPUT=/tmp
 TMP=/tmp/$TAG
 PKG=$TMP/pkg-$PRGNAM
@@ -75,17 +75,27 @@ fi
 
 cd "$TMP/$PRGNAM/" || exit
 
-make -j"$(nproc)" interpreter=1 release=1
+LLVM_CONFIG=/usr/bin/llvm-config \
+    LLVM_VERSION=$(/usr/bin/llvm-config --version) \
+    make -j"$(nproc)" interpreter=1 release=1
 
 # installation
-make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR="$PKG"
+LLVM_CONFIG=/usr/bin/llvm-config \
+    LLVM_VERSION=$(/usr/bin/llvm-config --version) \
+    make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR="$PKG"
 
 [ -d "$PKG/usr/man" ] && find "$PKG/usr/man" -type f -name "*.?" -exec gzip -9f {} \;
 
-make -j"$(nproc)" release=1
+cd $TMP/$SHARDS_PRGNAM/ || exit 1
+
+LLVM_CONFIG=/usr/bin/llvm-config \
+    LLVM_VERSION=$(/usr/bin/llvm-config --version) \
+    make -j"$(nproc)" interpreter=1 release=1
 
 # installation
-make install PREFIX=$PREFIX MANDIR=$SHARDS_PKG$PREFIX/man LIBDIR="$SHARDS_PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR=$SHARDS_PKG
+LLVM_CONFIG=/usr/bin/llvm-config \
+    LLVM_VERSION=$(/usr/bin/llvm-config --version) \
+    make install PREFIX=$PREFIX MANDIR="$PKG$PREFIX/man" LIBDIR="$PKG$PREFIX/lib$(uname -m | grep -o 64)" DESTDIR="$SHARDS_PKG"
 
 [ -d $SHARDS_PKG/usr/man ] && find $SHARDS_PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
 
