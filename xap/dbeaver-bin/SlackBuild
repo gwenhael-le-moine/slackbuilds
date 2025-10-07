@@ -32,6 +32,15 @@ VERSION=${VERSION:-$(curl -s https://api.github.com/repos/dbeaver/dbeaver/releas
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
 
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
+
 ARCH=${ARCH:-$(uname -m)}
 case "$ARCH" in
     i?86) ARCH=i586; SRCARCH=x86 ;;
@@ -110,4 +119,4 @@ dbeaver: Homepage: https://dbeaver.jkiss.org
 EOF
 
 cd $PKG
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-tgz}
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
