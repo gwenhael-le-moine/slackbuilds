@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO=${UPSTREAM_REPO:-"https://github.com/dunst-project/dunst"}
 VERSION=${VERSION:-"trunk"}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 TAG="gwh"
 TMP="/tmp/$TAG"
@@ -55,16 +55,11 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     exit 0
 fi
 
-#configuration
-meson setup \
-      --prefix /usr \
-      --mandir /usr/man/ \
-       build/
+make PREFIX=/usr MANDIR=/usr/man MANPREFIX=/usr/man
 
-ninja -C build/
-cd build/
-meson install --destdir="$PKG"
-cd ../
+make install DESTDIR=$PKG PREFIX=/usr MANDIR=/usr/man MANPREFIX=/usr/man
+
+#[ -d "$PKG"/usr/share/man ] && mv "$PKG"/usr/share/man "$PKG"/usr/
 
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
 cp ./*.md LICENSE "$PKG$PREFIX/doc/$PRGNAM/"
