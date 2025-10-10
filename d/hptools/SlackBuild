@@ -51,7 +51,7 @@ mkdir -p "$REV"
 cd "$REV" || exit 1
 ../support/configure
 
-sed -i 's/-O2/-ansi -std=c99 -O2/' Makefile
+sed -i 's/-O2/-std=c99 -O2/' Makefile
 sed -i 's/^static//' ../common/getopt.c
 sed -i 's/^static//' ../sload/symb.c
 
