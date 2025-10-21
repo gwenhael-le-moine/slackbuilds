@@ -1,14 +1,15 @@
 #!/bin/bash
 
+cd "$(dirname "$0")" || exit 1
+CWD=$(pwd)
+
 # variables
 UPSTREAM_REPO=https://github.com/MaxVerevkin/wl-gammarelay-rs
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/MaxVerevkin/wl-gammarelay-rs/releases/latest | jq -r .tag_name)} # or VERSION=trunk
-
-BUILD=${BUILD:-1}
+VERSION=${VERSION:-"trunk"}
+BUILD=${BUILD:-2}
 
 TAG=gwh
 TMP=/tmp/$TAG
-CWD=$(pwd)
 
 PRGNAM=$(basename $CWD)
 PKG=$TMP/pkg-$PRGNAM
@@ -19,38 +20,56 @@ ARCH=${ARCH:-$(uname -m)}
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PRGNAM}
 PREFIX=${PREFIX:-/usr}
 
-# nettoyage préalable
-rm -fr $PKG $TMP/$PRGNAM
-
-mkdir -p $PKG
-
-# mise en place
-cd $TMP
-[ ! -e $REPOSITORY ] && git clone --quiet ${UPSTREAM_REPO}.git $REPOSITORY
-cd $REPOSITORY
+[ ! -e "$REPOSITORY" ] && git clone --quiet "${UPSTREAM_REPO}.git" "$REPOSITORY"
+cd "$REPOSITORY" || exit 1
 git pull --quiet --all
+git submodule update --quiet --init
 
-cp -R $REPOSITORY $TMP/
-cd $TMP/$PRGNAM
-[ "$VERSION" == "latest" ] && VERSION=$(git tag --sort=-version:refname | head -n1)
-[ "$VERSION" == "" ] && VERSION=trunk
-[ "$VERSION" == "trunk" ] && VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)" || git checkout --quiet $VERSION
+mkdir -p "$TMP"
+
+rm -fr "$PKG" "${TMP:?}/$PRGNAM"
+
+mkdir -p "$PKG"
+
+cp -R "$REPOSITORY" "$TMP/$PRGNAM"
+cd "$TMP/$PRGNAM" || exit 1
+case $VERSION in
+    trunk)
+        VERSION="git_r$(git rev-list --count HEAD)_$(git log -1 --format=%h)"
+        ;;
+    latest)
+        VERSION="$(git tag --sort=-version:refname | head -n1)"
+        git checkout --quiet "$VERSION"
+        ;;
+    *)
+        git checkout --quiet "$VERSION"
+        ;;
+esac
+
+PACKAGE_NAME="$PRGNAM-${VERSION//-/}-$ARCH-$BUILD$TAG.txz"
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+    echo "$PACKAGE_NAME"
+    exit 0
+fi
 
 cargo build --release
 
-mkdir -p $PKG$PREFIX/bin
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} $PKG$PREFIX/bin/ \;
-chmod 755 $PKG$PREFIX/bin/*
+mkdir -p "$PKG$PREFIX"/bin
+find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX"/bin/ \;
+chmod 755 "$PKG$PREFIX"/bin/*
 
 # move doc/ to the appropriate location
-mkdir -p $PKG$PREFIX/doc/$PRGNAM
-cp *.md LICEN?E* $PKG$PREFIX/doc/$PRGNAM
+mkdir -p "$PKG$PREFIX"/doc/$PRGNAM
+cp -r scripts/ *.md LICEN?E* "$PKG$PREFIX"/doc/$PRGNAM
 
 # correction
 cd $PKG
 chown -R root:root *
 
-[ -d $PKG$PREFIX/man ] && find $PKG$PREFIX/man -type f -not -name \*.gz -exec gzip -9 {} \;
+[ -d "$PKG$PREFIX"/man ] && find "$PKG$PREFIX"/man -type f -not -name \*.gz -exec gzip -9 {} \;
 
 # embaumement
 mkdir -p $PKG/install
@@ -78,5 +97,5 @@ $PRGNAM: https://github.com/MaxVerevkin/wl-gammarelay-rs
 EOF
 
 # empaquetage
-rm -f $PKG/{,usr/}lib$(uname -m | grep -o 64)/*.la
-/sbin/makepkg --linkadd y --chown n --prepend $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+cd "$PKG" || exit 1
+/sbin/makepkg --linkadd y --chown n --prepend "$OUTPUT/$PACKAGE_NAME"
