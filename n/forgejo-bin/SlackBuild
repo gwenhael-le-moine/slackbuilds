@@ -6,7 +6,7 @@ CWD=$(pwd)
 PRGNAM=$(basename "$CWD")
 VERSION=${VERSION:-$(curl -s https://codeberg.org/forgejo/forgejo/releases.rss | grep title | head -n2 | tail -n1 | sed 's|<title>||g' | sed 's|</title>||g' | xargs)}
 ARCH=${ARCH:-$(uname -m)}
-BUILD=${BUILD:-6}
+BUILD=${BUILD:-7}
 TAG=${TAG:-gwh}
 
 TMP=${TMP:-/tmp/$TAG}
@@ -44,8 +44,9 @@ fi
 mkdir -p "$REPOSITORY"
 
 if [ ! -e "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz" ]; then
-    wget -c "https://codeberg.org/forgejo/forgejo/releases/download/${VERSION}/forgejo-${VERSION#v}-linux-${SRC_ARCH}.xz" -O "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz"
+    wget -4 -c "https://codeberg.org/forgejo/forgejo/releases/download/${VERSION}/forgejo-${VERSION#v}-linux-${SRC_ARCH}.xz" -O "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz"
 fi
+[ -e "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}" ] && rm "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}"
 xz -d "$REPOSITORY/forgejo-${VERSION}-linux-${SRC_ARCH}.xz"
 
 rm -fr "$PKG"
@@ -66,10 +67,10 @@ chmod 750 "$PKG${FORGEJO_WORK_DIR}"/{data,indexers,log}
 mkdir -p "$PKG"/var/log/forgejo
 chown -R forgejo:forgejo "$PKG"/var/log/forgejo
 
-( cd "$PKG" || exit 1
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
+# ( cd "$PKG" || exit 1
+#   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+#   find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+# )
 
 mkdir -p "$PKG/etc/rc.d/"
 cat <<EOF > "$PKG/etc/rc.d/rc.$PRGNAM"
