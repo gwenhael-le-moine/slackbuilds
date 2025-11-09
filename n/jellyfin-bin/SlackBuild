@@ -4,10 +4,11 @@ cd "$(dirname "$0")" || exit 1
 CWD=$(pwd)
 
 PKGNAM=$(basename "$CWD")
-VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | grep tag_name | grep -o "[0-9.]*")}
+VERSION=${VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin/releases/latest | jq -r .tag_name )}
+VERSION=${VERSION#v}
 ARCH=${ARCH:-$(uname -m)}
 TAG=${TAG:-gwh}
-BUILD=${BUILD:-12}
+BUILD=${BUILD:-14}
 
 TMP=${TMP:-/tmp/$TAG}
 PKG=$TMP/pkg-$PKGNAM
@@ -15,8 +16,7 @@ OUTPUT=${OUTPUT:-/tmp}
 
 REPOSITORY=${REPOSITORY:-/var/cache/SlackBuilds.gwh/$PKGNAM}
 
-FFMPEG_VERSION=${FFMPEG_VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin-ffmpeg/releases/latest | jq .tag_name )}
-FFMPEG_VERSION=${FFMPEG_VERSION//\"/}
+FFMPEG_VERSION=${FFMPEG_VERSION:-$(curl -s https://api.github.com/repos/jellyfin/jellyfin-ffmpeg/releases/latest | jq -r .tag_name )}
 FFMPEG_VERSION=${FFMPEG_VERSION#v}
 
 PACKAGE_NAME="$PKGNAM-${VERSION//-/}_${FFMPEG_VERSION//-/_}-$ARCH-$BUILD$TAG.txz"
