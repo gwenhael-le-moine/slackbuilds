@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO="https://github.com/FreeTubeApp/FreeTube"
 VERSION=${VERSION:-"trunk"}
-BUILD=${BUILD:-8}
+BUILD=${BUILD:-9}
 
 TAG="gwh"
 TMP="/tmp/$TAG"
@@ -80,7 +80,7 @@ mkdir -p "$PKG$PREFIX/share/applications/"
 cat <<EOF > "$PKG$PREFIX/share/applications/freetube.desktop"
 [Desktop Entry]
 Name=FreeTube
-Exec=/opt/$PRGNAM/FreeTube %U
+Exec=/opt/$PRGNAM/freetube %U
 Terminal=false
 Type=Application
 Icon=freetube
