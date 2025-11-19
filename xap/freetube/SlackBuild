@@ -4,7 +4,7 @@
 UPSTREAM_REPO=https://github.com/FreeTubeApp/FreeTube
 VERSION=${VERSION:-trunk}
 
-BUILD=${BUILD:-6}
+BUILD=${BUILD:-7}
 
 TAG=gwh
 OUTPUT=/tmp
@@ -65,13 +65,11 @@ mkdir -p "$PKG/opt/$PKGNAM"
 cd "$PKG/opt/$PKGNAM" || exit 1
 unzip "$TMP/$PKGNAM/build/freetube*.zip"
 
+[ -x FreeTube ] && mv FreeTube freetube
+
 mkdir -p "$PKG$PREFIX/bin"
 cd "$PKG$PREFIX/bin" || exit 1
-if [ -e "$PKG/opt/$PKGNAM/FreeTube" ]; then
-    ln -s "/opt/$PKGNAM/FreeTube" freetube
-else
-    ln -s "/opt/$PKGNAM/freetube" freetube
-fi
+ln -s "/opt/$PKGNAM/freetube" freetube
 
 cd "$TMP/$PKGNAM/" || exit 1
 
