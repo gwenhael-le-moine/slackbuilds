@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO="https://github.com/FreeTubeApp/FreeTube"
 VERSION=${VERSION:-"trunk"}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-8}
 
 TAG="gwh"
 TMP="/tmp/$TAG"
@@ -61,17 +61,17 @@ sed -i "s|deb', 'zip', '7z', 'apk', 'rpm', 'AppImage', 'pacman|zip|" _scripts/bu
 
 npm run build
 
-mkdir -p "$PKG/opt/$PKGNAM"
-cd "$PKG/opt/$PKGNAM" || exit 1
-unzip "$TMP/$PKGNAM/build/freetube*.zip"
+mkdir -p "$PKG/opt/$PRGNAM"
+cd "$PKG/opt/$PRGNAM" || exit 1
+unzip "$TMP/$PRGNAM/build/freetube*.zip"
 
 [ -x ./FreeTube ] && mv ./FreeTube ./freetube
 
 mkdir -p "$PKG$PREFIX/bin"
 cd "$PKG$PREFIX/bin" || exit 1
-ln -s "/opt/$PKGNAM/freetube" freetube
+ln -s "/opt/$PRGNAM/freetube" freetube
 
-cd "$TMP/$PKGNAM/" || exit 1
+cd "$TMP/$PRGNAM/" || exit 1
 
 mkdir -p "$PKG$PREFIX/share/icons/hicolor/scalable/apps/"
 cp _icons/icon.svg "$PKG$PREFIX/share/icons/hicolor/scalable/apps/freetube.svg"
@@ -80,7 +80,7 @@ mkdir -p "$PKG$PREFIX/share/applications/"
 cat <<EOF > "$PKG$PREFIX/share/applications/freetube.desktop"
 [Desktop Entry]
 Name=FreeTube
-Exec=/opt/$PKGNAM/FreeTube %U
+Exec=/opt/$PRGNAM/FreeTube %U
 Terminal=false
 Type=Application
 Icon=freetube
@@ -90,8 +90,8 @@ MimeType=x-scheme-handler/freetube;
 Categories=Network;
 EOF
 
-mkdir -p "$PKG$PREFIX/doc/$PKGNAM"
-cp ./LICENSE ./*.md "$PKG$PREFIX/doc/$PKGNAM/"
+mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
+cp ./LICENSE ./*.md "$PKG$PREFIX/doc/$PRGNAM/"
 
 # correction
 cd "$PKG" || exit 1
