@@ -5,7 +5,7 @@ CWD=$(pwd)
 
 PRGNAM=$(basename "$CWD")
 #VERSION=${VERSION:-$(curl -s http://status.calibre-ebook.com/latest)}
-VERSION=${VERSION:-$(curl https://calibre-ebook.com/changelog.rss | grep "title>calibre" | grep -o "[0-9.]*" | head -n1)}
+VERSION=${VERSION:-$(curl -s https://calibre-ebook.com/changelog.rss | grep "title>calibre" | grep -o "[0-9.]*" | head -n1)}
 ARCH=$(uname -m)
 BUILD=${BUILD:-1}
 TAG=${TAG:-gwh}
