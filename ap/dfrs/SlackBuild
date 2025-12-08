@@ -6,7 +6,7 @@ CWD=$(pwd)
 # variables
 UPSTREAM_REPO=https://github.com/anthraxx/dfrs
 VERSION=${VERSION:-trunk}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 TAG=gwh
 TMP=/tmp/$TAG
@@ -54,11 +54,15 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
     exit 0
 fi
 
-cargo build --release
+# cargo build --release
 
-mkdir -p "$PKG$PREFIX/bin"
-find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX/bin/" \;
-chmod 755 "$PKG$PREFIX/bin"/*
+make PREFIX=/usr MANDIR=/usr/man
+
+# mkdir -p "$PKG$PREFIX/bin"
+# find target/release/ -type f -executable -maxdepth 1 -exec cp {} "$PKG$PREFIX/bin/" \;
+# chmod 755 "$PKG$PREFIX/bin"/*
+
+make install PREFIX=/usr MANDIR=/usr/man DESTDIR=$PKG
 
 # move doc/ to the appropriate location
 mkdir -p "$PKG$PREFIX/doc/$PRGNAM"
